@@ -1,0 +1,59 @@
+#################################################################
+## Groups
+#################################################################
+
+  Wohnzimmer:
+    name: Wohnzimmer
+    view: yes
+    icon: mdi:television-classic
+    entities:
+      - media_player.mi_box
+      - media_player.wohnzimmer_mini
+      - light.yeelight_color1_34ce008bcc9d #Stehlampe
+      - light.hyperion
+      - light.lampe1
+      - light.lampe2
+      - light.lampe3
+      - light.leds_wohnzimmer
+      - light.wohnzimmer_lampe
+      - climate.wohnzimmer
+      - switch.sonoff_100018bc6c
+      - switch.fernseher
+      - switch.ventilator
+      - scene.gwgzlgdduflgtsct # Deckenlampen an
+      - scene.v5ay8rhpdsbl4eqs # Deckenlampen aus
+
+  Schlafzimmer:
+    name: Schlafzimmer
+    view: yes
+    icon: mdi:hotel
+    entities:
+      - media_player.schlafzimmer
+      - light.yeelight_strip1_34ce008b1863 #Bett LEDs
+      - light.bettlicht
+      - light.leds_tisch
+      - climate.schlafzimmer
+      - switch.sonoff_100016e326
+      - switch.fabian_strom
+      - switch.regal
+
+  Gästezimmer:
+    name: Gästezimmer
+    view: yes
+    icon: mdi:laptop
+    entities:
+      - media_player.guest_mini
+      - light.nachtlampe
+      - light.leds_gastezimmer
+      - switch.nessie_pc
+
+  Keller:
+    name: Keller
+    view: yes
+    icon: mdi:washing-machine
+    entities:
+      - media_player.keller_tv
+      - switch.sonoff_1000915e4d
+      - input_boolean.strom_keller
+      - input_boolean.strom2_keller
+      - input_boolean.kuehlschrank_keller

@@ -1,0 +1,2150 @@
+  - alias: 'Turn off everything if nobody is at home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1
+    condition:
+      condition: and
+      conditions:
+        # - condition: state
+        #   entity_id: device_tracker.google_maps_112174659110860535869
+        #   state: 'not_home'
+        # - condition: state
+        #   entity_id: device_tracker.google_maps_112056758146194246561
+        #   state: 'not_home'
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+    action:
+      - service: light.turn_off
+      - service: switch.turn_off
+        data:
+          entity_id: group.wohnzimmer
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100018bc6c
+      - service: switch.turn_off
+        data:
+          entity_id: switch.regal
+      - service: switch.turn_off
+        data:
+          entity_id: switch.ventilator
+      # - service: climate.set_away_mode
+      #   data:
+      #     entity_id: climate.wohnzimmer
+      #     away_mode: 'on'
+      # - service: climate.set_away_mode
+      #   data:
+      #     entity_id: climate.schlafzimmer
+      #     away_mode: 'on'
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.wohnzimmer_mini
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.schlafzimmer
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.guest_mini
+          #entity_id: media_player.mini_gruppe
+
+  - alias: 'Turn off fabian pc if nobody is at home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: device_tracker.fabianpc
+          state: home
+    action:
+      - service: notify.telegram_fabian
+        data:
+          title: 'Fabian-PC ist noch an'
+          message: "Keiner ist mehr zu Hause!"
+          data:
+            inline_keyboard:
+            - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
+
+  - alias: 'If nobody is at home and nessie pc is on'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: device_tracker.nessiepc
+          state: home
+    action:
+      - service: notify.telegram_fabian
+        data:
+          title: 'Nessie-PC ist noch an'
+          message: "Keiner ist mehr zu Hause. Der Computer ist allerdings noch an und wurde nicht ausgeschaltet!"
+      - service: notify.telegram_nessie
+        data:
+          title: 'Nessie-PC ist noch an'
+          message: "Keiner ist mehr zu Hause. Der Computer ist allerdings noch an und wurde nicht ausgeschaltet!"
+
+  - alias: 'If nobody is at home and nessie pc strom is on'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.nessiepc
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'home'
+        to: 'not_home'
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'home'
+        to: 'not_home'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: device_tracker.nessiepc
+          state: 'not_home'
+          for:
+            minutes: 2
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.nessie_pc
+
+  - alias: 'If nobody is at home and fabian pc strom is on'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.fabianpc
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'home'
+        to: 'not_home'
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'home'
+        to: 'not_home'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: device_tracker.fabianpc
+          state: 'not_home'
+          for:
+            minutes: 2
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.fabian_strom
+
+  - alias: 'Turn on ventilator if coming home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.openweather_temperature
+          above: 22.0
+        - condition: time
+          after: '12:00:00'
+          before: '21:00:00'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.ventilator
+
+  - alias: 'Turn on lights if coming home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+      - condition: time
+        before: '21:45:00'
+      - condition: sun
+        after: sunset
+      - condition: state
+        entity_id: sensor.fscharging
+        state: 'notcharging'
+      - condition: state
+        entity_id: sensor.vkcharging
+        state: 'notcharging'
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: group.wohnzimmer
+
+  # - alias: 'Turn on thermostats if coming home'
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: state
+  #       entity_id:
+  #         - device_tracker.google_maps_112174659110860535869
+  #       from: 'not_home'
+  #       to: 'home'
+  #     - platform: state
+  #       entity_id:
+  #         - device_tracker.google_maps_112056758146194246561
+  #       from: 'not_home'
+  #       to: 'home'
+  #   condition:
+  #     condition: and
+  #     conditions:
+  #     - condition: state
+  #       entity_id: sensor.fscharging
+  #       state: 'notcharging'
+  #     - condition: state
+  #       entity_id: sensor.vkcharging
+  #       state: 'notcharging'
+  #   action:
+  #     - service: climate.set_away_mode
+  #       data:
+  #         entity_id: climate.wohnzimmer1
+  #         away_mode: 'off'
+  #     - service: climate.set_away_mode
+  #       data:
+  #         entity_id: climate.wohnzimmer2
+  #         away_mode: 'off'
+  #     - service: climate.set_temperature
+  #       data:
+  #         entity_id: climate.wohnzimmer1
+  #         temperature: 20
+  #         operation_mode: Heat
+  #     - service: climate.set_temperature
+  #       data:
+  #         entity_id: climate.wohnzimmer2
+  #         temperature: 20
+  #         operation_mode: Heat
+
+  - alias: 'Turn on tleds if fpc starts'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+      - condition: time
+        before: '23:59:00'
+      - condition: sun
+        after: sunset
+      - condition: state
+        entity_id: device_tracker.tv
+        state: 'not_home'
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.leds_tisch
+      - service: switch.turn_on
+        data:
+          entity_id: switch.regal
+
+  - alias: 'Turn off tleds if fpc starts'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.fabianpc
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+      - condition: sun
+        after: sunrise
+      - condition: sun
+        before: sunset
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: light.leds_tisch
+      - service: switch.turn_off
+        data:
+          entity_id: switch.regal
+
+  - alias: 'Turn on light if npc starts'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.nessiepc
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+      - condition: time
+        before: '23:59:00'
+      - condition: sun
+        after: sunset
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: group.gastezimmer
+
+  - alias: 'Turn off lights if npc stops'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.nessiepc
+        from: 'home'
+        to: 'not_home'
+        for:
+            minutes: 3
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: group.gastezimmer
+
+  - alias: 'Turn off strom if npc stops'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.nessiepc
+        from: 'home'
+        to: 'not_home'
+        for:
+            minutes: 90
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.nessie_pc
+
+  - alias: 'Turn off tleds if fpc stops'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.fabianpc
+        from: 'home'
+        to: 'not_home'
+        for:
+            minutes: 1
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: light.leds_tisch
+
+  - alias: 'Turn off strom if fpc stops'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.fabianpc
+        from: 'home'
+        to: 'not_home'
+        for:
+            minutes: 90
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.fabian_strom
+
+  - alias: 'Turn on light if tv starts'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.tv
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+      - condition: time
+        before: '23:59:00'
+      - condition: sun
+        after: sunset
+    action:
+      #- service: shell_command.tv_leds_turnon
+      - service: light.turn_on
+        data:
+          entity_id: light.leds_wohnzimmer
+      - service: light.turn_on
+        data:
+          entity_id: light.yeelight_color1_34ce008bcc9d
+
+  - alias: 'Turn off bett after 2,5 hours'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - switch.sonoff_100016e326
+        from: 'off'
+        to: 'on'
+        for:
+            minutes: 150
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326
+
+  - alias: 'Turn on lights in morning'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+      - condition: time
+        after: '05:00:00'
+      - condition: sun
+        before: sunrise
+      - condition: state
+        entity_id: device_tracker.google_maps_112174659110860535869
+        state: home
+      - condition: state
+        entity_id: device_tracker.google_maps_112056758146194246561
+        state: home
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.yeelight_strip1_34ce008b1863
+
+  # - alias: 'Turn on climate if fernseher started'
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     platform: state
+  #     entity_id:
+  #       - device_tracker.tv
+  #     from: 'not_home'
+  #     to: 'home'
+  #   action:
+  #     - service: climate.set_temperature
+  #       data:
+  #         entity_id: climate.wohnzimmer
+  #         temperature: 21
+  #         hvac_mode: heat
+
+  # - alias: 'Turn off climate if fernseher stopped'
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     platform: state
+  #     entity_id:
+  #       - device_tracker.tv
+  #     from: 'home'
+  #     to: 'not_home'
+  #   action:
+  #     - service: climate.turn_off
+  #       data:
+  #         entity_id: climate.wohnzimmer
+
+  - alias: 'Turn on light in sleeping room if fernseher turned off'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id:
+        - device_tracker.tv
+      from: 'home'
+      to: 'not_home'
+    condition:
+      condition: time
+      after: '21:15:00'
+      before: '23:50:00'
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: group.schlafzimmer
+      - delay: '00:04:00'
+      - service: light.turn_off
+        data:
+          entity_id: group.wohnzimmer
+
+  - alias: 'Turn on lights in livingroom when sun set'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: sun
+      event: sunset
+      offset: "-00:25:00"
+    condition:
+      condition: state
+      entity_id: device_tracker.tv
+      state: home
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.leds_wohnzimmer
+      - service: light.turn_on
+        data:
+          entity_id: light.yeelight_color1_34ce008bcc9d
+
+  - alias: 'Turn on lights in sleeping room when sun set'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: sun
+      event: sunset
+      offset: "-00:05:00"
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.fabianpc
+        state: home
+      - condition: state
+        entity_id: device_tracker.tv
+        state: 'not_home'
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.leds_tisch
+      - service: switch.turn_on
+        data:
+          entity_id: switch.regal
+
+  - alias: 'Turn on lights in guest room room when sun set'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: sun
+      event: sunset
+      offset: "-00:15:00"
+    condition:
+      condition: state
+      entity_id: device_tracker.nessiepc
+      state: home
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: group.gastezimmer
+
+  - alias: 'Turn on fridge for Gruppentreffen'
+    hide_entity: True
+    initial_state: True
+    trigger:
+      - platform: time
+        at: '13:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.calendar.fabianseitz98_gmail_com.attributes.message == 'Gruppentreffen' }}"
+        - condition: state
+          entity_id: 'input_boolean.kuehlschrank_keller'
+          state: 'off'
+    action:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_5friends
+          message: 'Kühlschrank für Gruppentreffen heute angeschaltet zum kühlen.'
+          disable_notification: true
+          inline_keyboard:
+            - 'Ausschalten:/fridgeoff'
+
+  - alias: 'Turn on Strom Keller'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/kelleran'
+    action:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom_keller
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.strom_keller
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Strom im Keller wurde angeschaltet.'
+
+  - alias: 'Set dark theme for the night'
+    hide_entity: True
+    initial_state: True
+    trigger:
+      - platform: time
+        at: '18:00'
+    action:
+      - service: frontend.set_theme
+        data:
+          name: darkcyan
+
+  - alias: 'Set light theme for the day'
+    hide_entity: True
+    initial_state: True
+    trigger:
+      - platform: time
+        at: '10:00'
+    action:
+      - service: frontend.set_theme
+        data:
+          name: default
+
+  - alias: Turn on Steckerleiste1 Keller
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.kuehlschrank_keller
+        to: 'on'
+    action:
+      - service: ifttt.trigger
+        data: {"event":"turn_on_steckerleiste1"}
+
+  - alias: Turn off Steckerleiste1 Keller
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.kuehlschrank_keller
+        to: 'off'
+    action:
+      - service: ifttt.trigger
+        data: {"event":"turn_off_steckerleiste"}
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom_keller
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom2_keller
+
+  - alias: Turn on Steckerleiste2 Keller
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.strom_keller
+        to: 'on'
+    action:
+      - service: ifttt.trigger
+        data: {"event":"turn_on_steckerleiste2"}
+
+  - alias: Turn off Steckerleiste2 Keller
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.strom_keller
+        to: 'off'
+    action:
+      - service: ifttt.trigger
+        data: {"event":"turn_off_steckerleiste"}
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom2_keller
+
+  - alias: Turn on Steckerleiste3 Keller
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.strom2_keller
+        to: 'on'
+    action:
+      - service: ifttt.trigger
+        data: {"event":"turn_on_steckerleiste3"}
+
+  - alias: Turn off Steckerleiste3 Keller
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.strom2_keller
+        to: 'off'
+    action:
+      - service: ifttt.trigger
+        data: {"event":"turn_off_steckerleiste"}
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom_keller
+
+  # - alias: Turn on Strom (PC)
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger: 
+  #     - platform: state
+  #       entity_id: input_boolean.f_pc_switch
+  #       to: 'on'
+  #   action:
+  #     - service: ifttt.trigger
+  #       data: {"event":"turn_on_strom"}
+
+  # - alias: Turn off PC
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger: 
+  #     - platform: state
+  #       entity_id: input_boolean.f_pc_switch
+  #       to: 'off'
+  #   action:
+  #     - service: ifttt.trigger
+  #       data: {"event":"turn_pc_off"}
+
+  - alias: 'Update Available Notifications'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.updater
+        from: 'off'
+        to: 'on'
+    action:
+        - service: telegram_bot.send_message
+          data_template:
+            message: "Home Assistant  {{ state_attr('binary_sensor.updater', 'newest_version') }}  ist nun verfügbar."
+            target: !secret telegram_chat_fabian
+            inline_keyboard:
+            - 'Update starten:/updateha'
+
+  - alias: 'Incoming Call Fabian'
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: state
+        entity_id: automation.incoming_call_fabian
+        to: 'on'
+    action:
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
+        data:
+          message: 'Fabian wird soeben angerufen!'
+      - service: tts.google_translate_say
+        entity_id: media_player.schlafzimmer
+        data:
+          message: 'Fabian wird soeben angerufen!'
+      - service: automation.turn_off
+        data:
+          entity_id: automation.incoming_call_fabian
+
+  - alias: 'Incoming Call Nessie'
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: state
+        entity_id: automation.incoming_call_nessie
+        to: 'on'
+    action:
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
+        data:
+          message: 'Nessie wird soeben angerufen!'
+      - service: tts.google_translate_say
+        entity_id: media_player.schlafzimmer
+        data:
+          message: 'Nessie wird soeben angerufen!'
+      - service: automation.turn_off
+        data:
+          entity_id: automation.incoming_call_nessie
+
+  # - alias: "Check for SBahn Delay"
+  #   hide_entity: true
+  #   initial_state: off
+  #   trigger:
+  #     - platform: template
+  #       value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 1 }}"
+  #   action:
+  #     - service: notify.sbahn_txt
+  #       data_template: 
+  #         message: "Sbahn nach MUC: {{ states.sensor.zorneding_to_truedering.attributes.departure }} Uhr +{{ states.sensor.zorneding_to_truedering.attributes.delay }} min }}"
+
+  # - alias: 'Bitcoin below XX'
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     platform: numeric_state
+  #     entity_id: sensor.exchange_rate_1_btc
+  #     below: 12541
+  #   action:
+  #       - service: telegram_bot.send_message
+  #         data_template:
+  #           title: 'BTC Wert sinkt!'
+  #           target: !secret telegram_chat_fabian
+  #           message: "Aktueller Wert: {{ states('sensor.exchange_rate_1_btc') }} . Jetzt verkaufen?"
+  #           inline_keyboard:
+  #           - 'Ja:/sellbtc, Nein:/no'
+  #       - service: telegram_bot.send_message
+  #         data_template:
+  #           title: 'BTC Wert sinkt!'
+  #           target: !secret telegram_chat_adrian
+  #           message: "Aktueller Wert: {{ states('sensor.exchange_rate_1_btc') }} . Jetzt verkaufen?"
+  #           inline_keyboard:
+  #           - 'Ja:/sellbtc, Nein:/no'
+
+  # - alias: 'Telegram Sell BTC'
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     platform: event
+  #     event_type: telegram_callback
+  #     event_data:
+  #       data: '/sellbtc'
+  #   action:
+  #     - service: telegram_bot.answer_callback_query
+  #       data_template:
+  #         callback_query_id: '{{ trigger.event.data.id }}'
+  #         message: 'ACHTUNG, aktuell noch nicht funktional!'
+  #     - service: telegram_bot.edit_replymarkup
+  #       data_template:
+  #         message_id: '{{ trigger.event.data.message.message_id }}'
+  #         chat_id: '{{ trigger.event.data.user_id }}'
+  #         inline_keyboard: []
+  #     - service: shell_command.sellbtc
+
+  - alias: Turn Schloss off after turning on
+    hide_entity: true
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: switch.schloss
+        to: 'on'
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.schloss
+
+  - alias: "Fabian Phone Charged"
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template
+        value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | int > 5 }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_charging == 'true' }}"
+        - condition: time
+          after: '09:30:00'
+          before: '21:10:00'
+    action:
+      service: tts.google_translate_say
+      entity_id: media_player.wohnzimmer_mini
+      data:
+        message: 'Fabians Handy ist aufgeladen.'
+
+  - alias: Nessie Phone Battery below 5 %
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.vkphone_battery
+      below: 5
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          title: 'Nessie Akku unter 5%'
+          target: !secret telegram_chat_fabian
+          message: ''
+
+  - alias: Fabi Phone Battery below 5 %
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.fsphone_battery
+      below: 5
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          title: 'Fabi Akku unter 5%'
+          target: !secret telegram_chat_nessie
+          message: ''
+
+  - alias: Fabi Phone Charging
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: sensor.fsphone_charging
+      to: 'false'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.battery_charging == 'false' }}"
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ states.device_tracker.google_maps_112056758146194246561.battery_charging == 'false' }}"
+            - condition: template
+              value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326
+
+  - alias: Nessie Phone Charging
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: sensor.vkphone_charging
+      to: 'false'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.battery_charging == 'false' }}"
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ states.device_tracker.google_maps_112174659110860535869.battery_charging == 'false' }}"
+            - condition: template
+              value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326
+
+  - alias: Public IP Change
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: template 
+      value_template: "{{ states('sensor.fritz_netmonitor.attributes.external_ip') }}"
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
+
+  - alias: Internet Speed Test Poor Fabian
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template
+        value_template: "{{ states('sensor.speedtest_download')|float < 40 }}"
+    condition:
+      - condition: template
+        value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ state.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
+
+  - alias: Internet Speed Test Poor Nessie
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template
+        value_template: "{{ states('sensor.speedtest_download')|float < 30 }}"
+    condition:
+      - condition: template
+        value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
+      - condition: state
+        entity_id: device_tracker.nessiepc
+        state: home
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
+
+  - alias: washing machine finished
+    hide_entity: true
+    initial_state: off
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.sonoff_1000915e4d_power
+      below: 4
+      for: '00:05:00'
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Waschmaschine ist fertig.'
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Waschmaschine ist fertig.'
+      - service: tts.google_translate_say
+        entity_id: media_player.schlafzimmer
+        data:
+          message: 'Die Waschmaschine ist fertig!'
+      - service: automation.turn_off
+        data:
+          entity_id: automation.washing_machine_finished
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
+        data:
+          message: 'Die Waschmaschine ist fertig!'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_1000915e4d
+      - service: automation.turn_on
+        data:
+          entity_id: automation.washing_machine_started
+
+  - alias: washing machine started
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.sonoff_1000915e4d_power
+      above: 4
+      for: '00:01:00'
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Waschmaschine wurde gestartet.'
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Waschmaschine wurde gestartet.'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.washing_machine_finished
+      - service: automation.turn_off
+        data:
+          entity_id: automation.washing_machine_started
+
+  - alias: 'Turn off Washing machine'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/turnoffwasher'
+    action:
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_1000915e4d
+
+  - alias: 'Remind for going off'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: time
+      at: '22:05:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - sun
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.nessiepc
+            state: home
+          - condition: state
+            entity_id: device_tracker.fabianpc
+            state: home
+    action:
+      - service: notify.browser
+        data_template:
+          message: "Es ist 22 Uhr - Zeit off zu gehen."
+          target: 
+            - Fabian-Mi9T
+            - Nessie-F1
+            - Fabian-PC
+            - Fabian-Hackbook
+            - Nessie-PC
+        data:
+          data:
+            tag: 'notification-about-sensor'
+
+  - alias: 'Turn on Airplane Mode Fabi'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: time
+      at: '23:30:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - sun
+        - condition: state
+          entity_id: device_tracker.google_maps_112174659110860535869
+          state: home
+        - condition: state
+          entity_id: group.all_lights
+          state: "off"
+    action:
+      - service: notify.browser
+        data_template:
+          message: "Flugmodus wird automatisch aktiviert."
+          target: Fabian-Mi9T
+        data:
+          data:
+            tag: 'notification-about-sensor'
+
+  - alias: 'Remind Nessie for pill'
+    initial_state: on
+    hide_entity: True
+    trigger:
+      platform: time
+      at: '19:50:00'
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Pille nehmen nicht vergessen!"
+          data:
+            inline_keyboard:
+            - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
+
+  - alias: 'Remind Nessie for overtime'
+    initial_state: on
+    hide_entity: True
+    trigger:
+      platform: time
+      at: '16:15:00'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Hast du heute Überstunden gemacht oder eingelöst?"
+          data:
+            inline_keyboard:
+            - 'Nein:/telegramno, 0-5h:/overtime05, 1-0h:/overtime10, 1-5h:/overtime15, 2-0h:/overtime20, -0-5h:/overtime-05'
+
+  - alias: 'Telegram overtime-05'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/overtime-05'
+    action:
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: shell_command.overtime_input_minus_05
+      - service: notify.telegram_nessie
+        data:
+          title: 'Eine Halbe Überstunde wurde für heute eingelöst.'
+          message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
+
+  - alias: 'Telegram overtime05'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/overtime05'
+    action:
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: shell_command.overtime_input05
+      - service: notify.telegram_nessie
+        data:
+          title: 'Eine Halbe Überstunde wurde für heute eingetragen.'
+          message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
+
+  - alias: 'Telegram overtime10'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/overtime10'
+    action:
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: shell_command.overtime_input10
+      - service: notify.telegram_nessie
+        data:
+          title: 'Eine Überstunde wurde für heute eingetragen.'
+          message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
+
+  - alias: 'Telegram overtime15'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/overtime15'
+    action:
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: shell_command.overtime_input15
+      - service: notify.telegram_nessie
+        data:
+          title: '1,5 Überstunden wurden für heute eingetragen.'
+          message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
+
+  - alias: 'Telegram overtime20'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/overtime20'
+    action:
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: shell_command.overtime_input20
+      - service: notify.telegram_nessie
+        data:
+          title: 'Zwei Überstunden wurden für heute eingetragen.'
+          message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
+
+  - alias: 'Telegram urgent message'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/urgent'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Alle Google Homes werden Fabi/Nessie über eine wichtige Nachricht bescheid geben.'
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
+        data:
+          message: 'Wichtige Nachricht! Schau auf dein Handy.'
+      - service: tts.google_translate_say
+        entity_id: media_player.schlafzimmer
+        data:
+          message: 'Wichtige Nachricht! Schau auf dein Handy.'
+
+  - alias: 'Telegram open door'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/open'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
+      - service: switch.turn_off
+        data:
+          entity_id: switch.schloss
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Gartentor wurde geöffnet'
+
+  - alias: 'Telegram open door - secretly'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/alohomora'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
+      - service: switch.turn_off
+        data:
+          entity_id: switch.schloss
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Du hast ein Easter Egg gefunden. Gartentor wurde geöffnet'
+
+  - alias: 'Telegram virtual bell'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/klingel'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Klingel in Wohnung aktiviert.'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: media_player.wohnzimmer_mini
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
+        data:
+          message: Ding Dong, es klingelt! 
+          #{% if trigger.event.data.user_id=649657901 %} Fabian {% elif trigger.event.data.user_id=654536464 %}Nessie {% elif trigger.event.data.user_id=665446537 %}Kai {% elif trigger.event.data.user_id=159366362 %}Adri {% else %}Unbekannte Person{% endif %} ist da.
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_mini
+
+  - alias: 'Telegram pill marked done'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/pilldone'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+
+  - alias: 'Nessie forgot pill'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: time
+        at: '23:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.automation.telegram_pill_marked_done.attributes.last_triggered != 'null' }}"
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 10800 }}"
+    action:
+      - service: tts.google_translate_say
+        entity_id: media_player.schlafzimmer
+        data:
+          message: 'Nessie, du hast die Pille vergessen'
+      - service: notify.telegram_nessie
+        data:
+          message: "Du hast die Pille vergessen!"
+          data:
+            inline_keyboard:
+            - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
+
+  - alias: 'Telegram pill 1h'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/pill1h'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay, eine Stunde'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - delay: '00:60:00'
+      - service: notify.telegram_nessie
+        data:
+          message: "Pille nehmen nicht vergessen!"
+          data:
+            inline_keyboard:
+            - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
+
+  - alias: 'Telegram shutdown fpc'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/shutdownfpc'
+    action:
+      - service: notify.pushbullet_fabian
+        data:
+          title: 'Push2Run Fabian-PC'
+          message: "herunterfahren"
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'PC wird heruntergefahren, Strom wird nach 4 Minuten ausgeschaltet.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - delay: '00:04:00'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.fabian_strom
+
+  - alias: 'Telegram hibernate fpc'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/hibernatefpc'
+    action:
+      - service: notify.pushbullet_fabian
+        data:
+          title: 'Push2Run Fabian-PC'
+          message: "Ruhezustand"
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'OK'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+
+  - alias: Telegram Reboot HA
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/rebootha'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "Restarting Homeassistant..."
+      - service: homeassistant.restart
+
+  - alias: Telegram Reboot
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/reboot'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "Rebooting Server..."
+      - delay: 00:00:05
+      - service: shell_command.quick_restart
+
+  - alias: Telegram Help
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/help'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "Hier sind ein paar Befehle:
+          
+          /admin - Übersicht der Admin Befehle
+          /food - zufälliger Essensvorschlag"
+
+  - alias: Telegram Admin
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/admin'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "Hier sind ein paar Befehle:
+          
+          /rebootha - Neustart des HA Servers
+          /reboot - Neustart des Servers
+          /status - Homeassistant Status
+          /updateha - Homeassistant Update starten"
+
+  - alias: Telegram Status
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/status'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "System is online!
+          Last system reboot was on {{ states('sensor.last_boot') }}."
+
+  - alias: 'Tägliche Essensvorschläge'
+    hide_entity: True
+    initial_state: on
+    trigger:
+      platform: time
+      at: '16:00:00'
+    action:
+      - service: shell_command.randomfood
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Gericht heute zubereiten?'
+          disable_notification: true
+          inline_keyboard:
+            - 'Ja:/foodyes, Nein:/telegramno'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          message: 'Gericht heute zubereiten?'
+          disable_notification: true
+          inline_keyboard:
+            - 'Ja:/foodyes, Nein:/telegramno'
+
+  - alias: Telegram Essen
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/food'
+    action:
+      - service: shell_command.randomfood
+        data_template:
+          telegram_sender: '{{ trigger.event.data.user_id }}'
+      - service: telegram_bot.send_message
+        data_template:
+          title: 'Gericht heute zubereiten?'
+          target: "{{ trigger.event.data.user_id }}"
+          message: ''
+          disable_notification: true
+          inline_keyboard:
+            - 'Ja:/foodyes, Nein:/telegramno'
+
+  - alias: Telegram Essen Vegetarisch
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/foodv'
+    action:
+      - service: shell_command.randomfood
+        data_template:
+          telegram_sender: '{{ trigger.event.data.user_id }}'
+          vegetarisch: 'j'
+      - service: telegram_bot.send_message
+        data_template:
+          title: 'Gericht heute zubereiten?'
+          target: "{{ trigger.event.data.user_id }}"
+          message: ''
+          disable_notification: true
+          inline_keyboard:
+            - 'Ja:/foodyes, Nein:/telegramno'
+
+  - alias: Telegram Essen Fleisch
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/foodn'
+    action:
+      - service: shell_command.randomfood
+        data_template:
+          telegram_sender: '{{ trigger.event.data.user_id }}'
+          vegetarisch: 'n'
+      - service: telegram_bot.send_message
+        data_template:
+          title: 'Gericht heute zubereiten?'
+          target: "{{ trigger.event.data.user_id }}"
+          message: ''
+          disable_notification: true
+          inline_keyboard:
+            - 'Ja:/foodyes, Nein:/telegramno'
+
+  - alias: 'Telegram food yes'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/foodyes'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay.'
+      # - service: telegram_bot.send_message
+      #   data_template:
+      #     title: 'Das essen für heute wurde entschieden'
+      #     target: !secret telegram_chat_fabian
+      #     message: ''
+      #     disable_notification: true
+      # - service: telegram_bot.send_message
+      #   data_template:
+      #     title: 'Das essen für heute wurde entschieden'
+      #     target: !secret telegram_chat_nessie
+      #     message: ''
+      #     disable_notification: true
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: !secret telegram_chat_nessie
+          inline_keyboard: []
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: !secret telegram_chat_fabian 
+          inline_keyboard: []
+      - service: shell_command.foodyes
+
+  - alias: 'Telegram answer no'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/telegramno'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+
+  - alias: Turn off fridge
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/fridgeoff'
+    action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.kuehlschrank_keller
+    # - service: telegram_bot.answer_callback_query
+    #   data_template:
+    #     callback_query_id: '{{ trigger.event.data.id }}'
+    #     message: 'Okay, wird ausgeschaltet.'
+    - service: telegram_bot.send_message
+      data_template:
+        target: !secret telegram_chat_5friends
+        message: 'Kühlschrank wurde wieder ausgeschaltet.'
+        disable_notification: true
+    - service: telegram_bot.edit_replymarkup
+      data_template:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.user_id }}'
+        inline_keyboard: []
+
+  - alias: Telegram HA Update
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/updateha'
+    action:
+      - service: shell_command.updateha
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "Update gestartet."
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+
+  - alias: "Notify Nessie on Train delay Home -> Work"
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template
+        value_template: "{{ states.sensor.zorneding_to_silberhornstraße.attributes.delay | int > 5 }}"
+    condition:
+      - condition: time
+        after: '06:30:00'
+        before: '07:10:00'
+        weekday:
+          - mon
+          - tue
+          - fri
+    action:
+      - service: notify.telegram_nessie
+        data:
+          title: "Sbahn um {{ states.sensor.zorneding_to_silberhornstraße.attributes.departure }} hat +{{ states.sensor.zorneding_to_silberhornstraße.attributes.delay }} min Verspätung."
+          message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_silberhornstraße.attributes.next }} Uhr"
+
+  - alias: "Notify Fabi on Train delay Home -> Work"
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template
+        value_template: "{{ states.sensor.zorneding_to_starnberg_nord.attributes.delay | int > 5 }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.last_seen)) < 3600 }}"
+        - condition: time
+          after: '06:30:00'
+          before: '07:10:00'
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+    action:
+      - service: notify.telegram_fabian
+        data:
+          title: "Zug um {{ states.sensor.zorneding_to_starnberg_nord.attributes.departure }} hat +{{ states.sensor.zorneding_to_starnberg_nord.attributes.delay }} min Verspätung."
+          message: "Nächster Zug: {{ states.sensor.zorneding_to_starnberg_nord.attributes.next }} Uhr"
+
+  - alias: "Notify on Sbahn delay. Work -> Home"
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template
+        value_template: "{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay | int > 5 }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '16:57:00'
+          before: '17:30:00'
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+        - condition: template
+          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+    action:
+      - service: notify.telegram_fabian
+        data:
+          title: "Sbahn um {{ states.sensor.starnberg_nord_to_zorneding.attributes.departure }} Uhr nach Hause +{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min."
+          message: "Nächste Sbahn: {{ states.sensor.starnberg_nord_to_zorneding.attributes.next }} Uhr"
+
+  - alias: 'Notify Nessie Fabian on way home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'Arbeit Fabi'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '14:00:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+
+  - alias: 'Notify Nessie Fabian on way home from GIL'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'Arbeit Fabi GIL'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '14:00:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause von Gilching und kommt voraussichtlich um {{ states.sensor.gewerbegebiet_sued_gilching_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.gewerbegebiet_sued_gilching_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+
+  - alias: 'Notify Nessie Fabian on way home from MUC'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'Arbeit Fabi MUC'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '14:00:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause von Gräfelfing und kommt voraussichtlich um {{ states.sensor.seeholzenerstrasse_graefelfing_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.seeholzenerstrasse_graefelfing_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+
+  - alias: 'Notify Nessie Fabian on way home from WHM'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'Arbeit Fabi WHM'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '14:00:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich."
+
+  - alias: 'Notify Fabian Nessie on way home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'Arbeit Nessie'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '13:15:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+
+  - alias: 'Telegram send weather forecast'
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/weather'
+    action:
+      - service: telegram_bot.send_photo
+        data_template:
+          target: '{{ trigger.event.data.user_id }}'
+          disable_notification: true
+          file: '/home/homeassistant/.homeassistant/www/climacons/{{ states.sensor.dark_sky_icon.state }}.png'
+          caption: '{{ states.sensor.dark_sky_summary.state }}'
+      - service: telegram_bot.send_message
+        data_template:
+          target: '{{ trigger.event.data.user_id }}'
+          disable_notification: true
+          message: >
+            {{ states.sensor.dark_sky_hourly_summary.state }}
+
+
+            *Momentan {{ states.sensor.dark_sky_temperature.state_with_unit }}*
+
+
+            {{ states.sensor.dark_sky_overnight_low_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_temperature_0d.state_with_unit }}
+
+            {{ states.sensor.dark_sky_overnight_low_apparent_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_apparent_temperature_0d.state_with_unit }} (gefühlt)
+
+
+            Regen: {{ states.sensor.dark_sky_precip_probability.state_with_unit }}, {{ states.sensor.dark_sky_precip_intensity.state_with_unit }}
+            {% if not is_state('sensor.dark_sky_precip', 'unknown') %}
+
+            Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
+            {% endif %}
+
+  - alias: 'Telegram send weekly weather forecast'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '06:20:00'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: false
+          message: "Wettervorhersage für diese Woche: 
+          {{ states.sensor.dark_sky_daily_summary.state }}"
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: false
+          message: "Wettervorhersage für diese Woche: 
+          {{ states.sensor.dark_sky_daily_summary.state }}"
+
+  - alias: 'Telegram send daily weather forecast'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '06:30:00'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            Wettervorhersage für heute
+            {{ states.sensor.dark_sky_hourly_summary.state }}
+
+
+            *Momentan {{ states.sensor.dark_sky_temperature.state_with_unit }}*
+
+
+            {{ states.sensor.dark_sky_overnight_low_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_temperature_0d.state_with_unit }}
+
+            {{ states.sensor.dark_sky_overnight_low_apparent_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_apparent_temperature_0d.state_with_unit }} (gefühlt)
+
+
+            Regen: {{ states.sensor.dark_sky_precip_probability.state_with_unit }}, {{ states.sensor.dark_sky_precip_intensity.state_with_unit }}
+            {% if not is_state('sensor.dark_sky_precip', 'unknown') %}
+
+            Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
+            {% endif %}
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: true
+          message: >
+            Wettervorhersage für heute
+            {{ states.sensor.dark_sky_hourly_summary.state }}
+
+
+            *Momentan {{ states.sensor.dark_sky_temperature.state_with_unit }}*
+
+
+            {{ states.sensor.dark_sky_overnight_low_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_temperature_0d.state_with_unit }}
+
+            {{ states.sensor.dark_sky_overnight_low_apparent_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_apparent_temperature_0d.state_with_unit }} (gefühlt)
+
+
+            Regen: {{ states.sensor.dark_sky_precip_probability.state_with_unit }}, {{ states.sensor.dark_sky_precip_intensity.state_with_unit }}
+            {% if not is_state('sensor.dark_sky_precip', 'unknown') %}
+
+            Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
+            {% endif %}

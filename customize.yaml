@@ -1,0 +1,10 @@
+light.yeelight_color1_34ce008bcc9d:
+  friendly_name: Stehlampe
+light.yeelight_strip1_34ce008b1863:
+  friendly_name: LEDs Bett
+sun.sun:
+  hidden: true
+sensor.fritz_netmonitor:
+  hidden: true
+sensor.yr_temperature:
+  hidden: true

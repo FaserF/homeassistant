@@ -1,0 +1,16 @@
+#  f_pc_switch:
+#    name: Fabian Computer
+#    initial: off  
+#    icon: mdi:desktop-tower
+  kuehlschrank_keller:
+    name: Kühlschrank Keller
+    initial: off  
+    icon: mdi:fridge
+  strom_keller:
+    name: Strom Keller
+    initial: off  
+    icon: mdi:power-plug
+  strom2_keller:
+    name: Strom2 Keller
+    initial: off  
+    icon: mdi:power-plug

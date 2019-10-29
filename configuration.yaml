@@ -1,0 +1,507 @@
+homeassistant:
+  auth_providers:
+  - type: homeassistant
+  - type: trusted_networks
+    trusted_networks:
+      - 127.0.0.1
+      - ::1
+      - 192.168.178.0/24
+      - fd00::/8
+    allow_bypass_login: true
+  - type: legacy_api_password
+    api_password: !secret http_password
+  # Name of the location where Home Assistant is running
+  name: Fabian's Smart Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: !secret elevation
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Berlin
+  # Customization file
+  customize: !include customize.yaml
+  whitelist_external_dirs:
+  - '/mnt/usb-drive/smarthome/'
+  - '/home/cadmin/scripts/'
+  customize_glob:
+    "sensor.fsphone_charging":
+      hidden: true
+    "sensor.vkphone_charging":
+      hidden: true
+    "switch.0220008568c63a970c00":
+      hidden: true
+    "sensor.openweather*":
+      hidden: true
+    "sensor.dark_sky*":
+      hidden: true
+    "scene*":
+      hidden: true
+    "calendar*":
+      hidden: true
+    "automation*":
+      hidden: true
+    "media_player.lautsprecher_2":
+      hidden: true
+    "media_player.miraculixx":
+      hidden: true
+    "media_player.lg_wk7_0662":
+      hidden: true
+    "device_tracker.fabianop6t*":
+      hidden: true
+    "sensor.starnberg_nord_to_munchen_pasing*":
+      hidden: true
+    "binary_sensor.updater":
+      hidden: true
+    "sensor.sonoff_1000915e4d_voltage":
+      hidden: true
+    "sensor.sonoff_1000915e4d_current":
+      hidden: true
+    "sensor.silberhornstrasse_to_zorneding":
+      hidden: true
+    "sensor.starnberg_nord_to_zorneding":
+      hidden: true
+    
+zone:
+  # This will override the default home zone
+  - name: Home
+    latitude: !secret latitude
+    longitude: !secret longitude
+    radius: 100
+    icon: mdi:account-multiple
+
+  - name: Arbeit Fabi
+    latitude: !secret latitude_work
+    longitude: !secret longitude_work
+    radius: 250
+    icon: mdi:school
+  
+  - name: Arbeit Fabi WHM
+    latitude: !secret latitude_work_whm
+    longitude: !secret longitude_work_whm
+    radius: 250
+    icon: mdi:school
+  
+  - name: Arbeit Fabi MUC
+    latitude: !secret latitude_work_muc
+    longitude: !secret longitude_work_muc
+    radius: 250
+    icon: mdi:school
+
+  - name: Arbeit Fabi GIL
+    latitude: !secret latitude_work_gil
+    longitude: !secret longitude_work_gil
+    radius: 250
+    icon: mdi:school
+
+  - name: Arbeit Nessie
+    latitude: !secret latitude_work_nessie
+    longitude: !secret longitude_work_nessie
+    radius: 250
+    icon: mdi:school
+
+# Enables configuration UI
+config:
+system_health:
+api:
+
+http:
+  # Secrets are defined in the file secrets.yaml
+  ssl_certificate: !secret ssl_certificate
+  ssl_key: !secret ssl_key
+  base_url: !secret baseurl
+  ip_ban_enabled: false
+  login_attempts_threshold: 5
+
+recorder:
+  purge_keep_days: 7
+  exclude:
+    domains:
+      - automation
+      - weblink
+      - updater
+      - scene
+      - calendar
+    entities:
+      - sun.sun # Don't record sun data
+      - sensor.last_boot # Comes from 'systemmonitor' sensor platform
+      - sensor.date
+      - sensor.fscharging
+      - sensor.vkcharging
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  include_used_components: true
+
+# Discover some devices automatically
+discovery:
+  ignore:
+    - igd
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+#conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+#dashboard
+#hadashboard:
+#  dash_url: http://192.168.178.2:8124
+#  dash_password: !secret http_password
+#  dash_dir: /home/homeassistant/.homeassistant/dashboard
+
+device_tracker:
+  # - platform: cisco_ios
+  #   host: 192.168.178.3
+  #   username: !secret ciscouser
+  #   password: !secret ciscopw
+  #   interval_seconds: 5
+  #   consider_home: 30
+  #   new_device_defaults:
+  #       track_new_devices: False
+  # - platform: cisco_ios
+  #   host: 192.168.178.254
+  #   username: !secret ciscouser
+  #   password: !secret ciscopw
+  #   interval_seconds: 5
+  #   consider_home: 30
+  #   new_device_defaults:
+  #       track_new_devices: False
+  - platform: fritz
+    host: 192.168.178.1
+    password: !secret fritzbox
+    interval_seconds: 8
+    consider_home: 30
+    new_device_defaults:
+        track_new_devices: False
+  # - platform: nmap_tracker
+  #   hosts: 192.168.178.0/24
+  # #  scan_options: " --privileged -sP "
+  #   interval_seconds: 30
+  #   consider_home: 30
+  #   new_device_defaults:
+  #       track_new_devices: False
+  - platform: google_maps
+    username: !secret gmaps_mail
+    max_gps_accuracy: 1000
+    new_device_defaults:
+        track_new_devices: False
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_bot_api
+    allowed_chat_ids:
+      - !secret telegram_chat_fabian
+      - !secret telegram_chat_nessie
+      - !secret telegram_chat_adrian
+      - !secret telegram_chat_kai
+      - !secret telegram_chat_flo
+      - !secret telegram_chat_maxi
+      - !secret telegram_chat_fabio
+      - !secret telegram_chat_5friends
+
+notify:
+  - name: pushbullet_fabian
+    platform: pushbullet
+    api_key: !secret pushbullet_fabian_api
+  - name: telegram_fabian
+    platform: telegram
+    chat_id: !secret telegram_chat_fabian
+  - name: telegram_nessie
+    platform: telegram
+    chat_id: !secret telegram_chat_nessie
+  - name: telegram_adrian
+    platform: telegram
+    chat_id: !secret telegram_chat_adrian
+  - platform: html5
+    name: browser
+    vapid_pub_key: !secret vapid_pub_key
+    vapid_prv_key: !secret vapid_prv_key
+    vapid_email: !secret vapid_email
+  - platform: file
+    name: sbahn_txt
+    filename: /mnt/usb-drive/smarthome/sbahndelay.txt
+    timestamp: false
+
+media_player:
+  #- platform: androidtv
+    #name: MiBox S
+    #device_class: androidtv
+    #host: 192.168.1.22
+    #adb_server_ip: 127.0.0.1
+    #apps:
+    #  "amazon": "Amazon Premium Video"
+    #adbkey: "/home/homeassistant/.homeassistant/www/android/adbkey"
+  # - platform: spotify
+  #   client_id: !secret spotifyid
+  #   client_secret: !secret spotifysecret
+  #- platform: emby
+    #host: !secret emby_jek_mail
+    #api_key: !secret emby_jek
+    #port: 29004
+
+#speedtestdotnet:
+#  server_id: 21514
+
+climate:
+  - platform: eq3btsmart
+    devices:
+      wohnzimmer:
+        mac: !secret eq3btsmart1
+      schlafzimmer:
+        mac: !secret eq3btsmart2
+
+# Weather prediction
+weather:
+  #- platform: openweathermap
+  #  api_key: !secret openweather
+  #  name: Wetter openweather
+  - platform: darksky
+    api_key: !secret darksky
+    name: Wetter darksky
+
+# sensor weather:
+#   - platform: openweathermap
+#     api_key: !secret openweather
+#     name: openweather
+#     language: de
+#     forecast: 6
+#     monitored_conditions:
+#       - weather
+#       - temperature
+#       - rain
+#       - snow
+
+#link shortcuts
+#weblink:
+#  entities:
+#    - name: FritzBox
+#      url: http://fritz.box
+#      icon: mdi:router-wireless
+
+shell_command:
+  randomfood: '/bin/bash /home/cadmin/scripts/randomfood.sh {{ telegram_sender }} {{ vegetarisch }}'
+  foodyes: 'bash /home/cadmin/scripts/foodyes.sh'
+  updateha: 'bash /home/cadmin/scripts/update-homeassistant.sh'
+  quick_restart: 'sudo init 6'
+  overtime_input_minus_05: 'bash /home/cadmin/scripts/overtime_input.sh -0.5'
+  overtime_input05: 'bash /home/cadmin/scripts/overtime_input.sh 0.5'
+  overtime_input10: 'bash /home/cadmin/scripts/overtime_input.sh 1.0'
+  overtime_input15: 'bash /home/cadmin/scripts/overtime_input.sh 1.5'
+  overtime_input20: 'bash /home/cadmin/scripts/overtime_input.sh 2.0'
+  #tv_leds_turnon: 'ssh root@192.168.178.9 "bash /home/dietpi/rpi_ws281x/startleds.sh"'
+  #tv_leds_turnoff: 'ssh root@192.168.178.9 "bash /home/dietpi/rpi_ws281x/stopleds.sh"'
+
+sensor:
+  - platform: fritzbox_netmonitor
+  - platform: deutsche_bahn
+    from: !secret fabian_work
+    to: !secret sbahn_home
+    only_direct: true
+  - platform: deutsche_bahn
+    from: !secret nessie_work
+    to: !secret sbahn_home
+    only_direct: false
+  - platform: deutsche_bahn
+    from: !secret sbahn_home
+    to: Trudering
+    only_direct: true
+  - platform: bitcoin
+    display_options:
+      - exchangerate
+  - platform: template
+    sensors:
+      fsphone_battery:
+        friendly_name: 'Mi9T'
+        value_template: '{{states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | round}}'
+        unit_of_measurement: '%'
+  - platform: template
+    sensors:
+      vkphone_battery:
+        friendly_name: 'PocoF1'
+        value_template: '{{states.device_tracker.google_maps_112056758146194246561.attributes.battery_level | round}}'
+        unit_of_measurement: '%'
+  - platform: template
+    sensors:
+      fsphone_charging:
+        friendly_name: 'Mi9T Charging'
+        value_template: '{{states.device_tracker.google_maps_112174659110860535869.attributes.battery_charging}}'
+  - platform: template
+    sensors:
+      vkphone_charging:
+        friendly_name: 'PocoF1 Charging'
+        value_template: '{{states.device_tracker.google_maps_112056758146194246561.attributes.battery_charging}}'
+  - platform: darksky
+    api_key: !secret darksky
+    scan_interval:
+      minutes: 5
+    language: 'de'
+    forecast:
+      - 0
+      - 1
+      - 2
+      - 3
+    monitored_conditions:
+      - summary
+      - hourly_summary
+      - daily_summary
+      - icon
+      - temperature
+      - temperature_high
+      - temperature_low
+      - apparent_temperature_high
+      - apparent_temperature_low
+      - precip_probability
+      - precip_intensity
+      - precip_type
+      - uv_index
+  # - platform: sql
+  #   db_url: !secret db_url
+  #   scan_interval: 600
+  #   queries:
+  #     - name: randomfood
+  #       query: 'SELECT ID FROM food WHERE active='y' ORDER BY RAND() ASC LIMIT 0,1;'
+  #       column: 'value'
+        #unit_of_measurement: 
+  # - platform: pi_hole
+  #   monitored_conditions:
+  #     - ads_blocked_today
+  #Package tracking
+ # - platform: aftership
+ #   api_key: !secret aftership_api
+
+light:
+  #Xiaomi Yeelight
+  #- platform: yeelight
+  #  devices:
+  #    192.168.178.202:
+  #      name: Stehlampe
+  #      transition: 1000
+  #    192.168.178.201:
+  #      name: LEDs Schlafzimmer
+  #MagicHue LEDs
+  - platform: flux_led
+    devices:
+      192.168.178.205:
+        name: LEDs Gästezimmer
+      192.168.178.200:
+        name: LEDs Tisch
+#     #SmartLife
+#   - platform: tuya
+#     name: LEDs Wohnzimmer
+#     host: 192.168.178.237
+#     local_key: 652ee3811c786c7e
+#     device_id: 01200592ecfabc83f19d
+  - platform: hyperion
+    host: 192.168.178.9
+
+tuya:
+  username: !secret tuyauser
+  password: !secret default
+  country_code: 49
+  platform: smart_life
+
+sonoff:
+  username: !secret defaultmail
+  password: !secret default
+  api_region: 'eu'
+
+ifttt:
+  key: !secret ifttt
+
+homekit:
+  filter:
+    exclude_domains:
+      - automation
+      - script
+      - devices
+
+mqtt:
+  broker: localhost
+  discovery: true
+    
+switch:
+  - platform: mqtt
+    name: "Schloss"
+    state_topic: "ha/schloss"
+    command_topic: "ha/schloss"
+    qos: 0
+    payload_on: "ON"
+    payload_off: "OFF"
+    optimistic: false 
+    retain: true
+
+
+
+google_assistant:
+  project_id: !secret google_assistant_id
+  api_key: !secret google_assistant_api
+  #exposed_domains:
+  #  - climate
+  #  - switch
+  #  - light
+  expose_by_default: false
+  entity_config:
+    climate.wohnzimmer:
+      name: Wohnzimmer
+      expose: true
+    climate.schlafzimmer:
+      name: Schlafzimmer
+      expose: true
+    light.leds_tisch:
+      name: LEDs Tisch
+      expose: true
+    light.leds_gastezimmer:
+      name: LEDs Gastezimmer
+      expose: true
+    light.yeelight_strip1_34ce008b1863:
+      name: LEDs Schlafzimmer
+      expose: true
+    light.yeelight_color1_34ce008bcc9d:
+      name: Stehlampe
+      expose: true
+    # switch.sonoff_100018bc6c:
+    #   name: Diffusor
+    #   expose: true
+    # switch.sonoff_100016e326:
+    #   name: Bett
+    #   expose: true
+
+google:
+  client_id: !secret google_calendar_client_id
+  client_secret: !secret google_calendar_client_secret
+  track_new_calendar: false
+
+# Text to speech
+tts:
+  - platform: google_translate
+    language: 'de'
+
+panel_iframe:
+  mdiindex:
+    title: MDI Icon Index
+    icon: mdi:vector-square
+    url: https://cdn.rawgit.com/james-fry/home-assistant-mdi/efd95d7a/home-assistant-mdi.html
+
+input_boolean: !include input_boolean.yaml
+# Enables the frontend (Themes)
+frontend: !include frontend.yaml
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
