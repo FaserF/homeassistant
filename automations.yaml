@@ -690,27 +690,25 @@
           target: "{{ trigger.event.data.user_id }}"
           message: 'Strom im Keller wurde angeschaltet.'
 
-  - alias: 'Set dark theme for the night'
+  - alias: 'on HA restart'
     hide_entity: True
-    initial_state: True
+    initial_state: 'true'
     trigger:
-      - platform: time
-        at: '18:00'
+      platform: homeassistant
+      event: start
     action:
       - service: frontend.set_theme
         data:
-          name: darkcyan
-
-  - alias: 'Set light theme for the day'
-    hide_entity: True
-    initial_state: True
-    trigger:
-      - platform: time
-        at: '10:00'
-    action:
-      - service: frontend.set_theme
+          name: slate
+      - service: mqtt.publish
         data:
-          name: default
+          topic: "cmnd/sonoffs/SetOption19"
+          payload: "1"
+      - delay: '00:01:00'
+      - service: mqtt.publish
+        data:
+          topic: "sonoffs/cmnd/state"
+          payload: ""
 
   - alias: Turn on Steckerleiste1 Keller
     hide_entity: true
@@ -1137,25 +1135,37 @@
         data:
           entity_id: automation.washing_machine_started
 
-  - alias: 'Turn off Washing machine'
+  - alias: 'Remind for going off Nessie'
     hide_entity: true
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_callback
-      event_data:
-        data: '/turnoffwasher'
+      platform: time
+      at: '22:05:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - sun
+        - condition: state
+          entity_id: device_tracker.nessiepc
+          state: home
     action:
-      - service: telegram_bot.edit_replymarkup
+      - service: notify.browser
         data_template:
-          message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
-          inline_keyboard: []
-      - service: switch.turn_off
+          message: "Es ist 22 Uhr - Zeit off zu gehen."
+          target: 
+            - Nessie-F1
+            - Nessie-PC
         data:
-          entity_id: switch.sonoff_1000915e4d
+          data:
+            tag: 'notification-about-sensor'
 
-  - alias: 'Remind for going off'
+  - alias: 'Remind for going off Fabi'
     hide_entity: true
     initial_state: on
     trigger:
@@ -1174,7 +1184,7 @@
         - condition: or
           conditions:
           - condition: state
-            entity_id: device_tracker.nessiepc
+            entity_id: device_tracker.fabianhackbook
             state: home
           - condition: state
             entity_id: device_tracker.fabianpc
@@ -1185,44 +1195,42 @@
           message: "Es ist 22 Uhr - Zeit off zu gehen."
           target: 
             - Fabian-Mi9T
-            - Nessie-F1
             - Fabian-PC
             - Fabian-Hackbook
-            - Nessie-PC
         data:
           data:
             tag: 'notification-about-sensor'
 
-  - alias: 'Turn on Airplane Mode Fabi'
-    hide_entity: true
-    initial_state: on
-    trigger:
-      platform: time
-      at: '23:30:00'
-    condition:
-      condition: and
-      conditions:
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - sun
-        - condition: state
-          entity_id: device_tracker.google_maps_112174659110860535869
-          state: home
-        - condition: state
-          entity_id: group.all_lights
-          state: "off"
-    action:
-      - service: notify.browser
-        data_template:
-          message: "Flugmodus wird automatisch aktiviert."
-          target: Fabian-Mi9T
-        data:
-          data:
-            tag: 'notification-about-sensor'
+  # - alias: 'Turn on Airplane Mode Fabi'
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     platform: time
+  #     at: '23:30:00'
+  #   condition:
+  #     condition: and
+  #     conditions:
+  #       - condition: time
+  #         weekday:
+  #           - mon
+  #           - tue
+  #           - wed
+  #           - thu
+  #           - sun
+  #       - condition: state
+  #         entity_id: device_tracker.google_maps_112174659110860535869
+  #         state: home
+  #       - condition: state
+  #         entity_id: group.all_lights
+  #         state: "off"
+  #   action:
+  #     - service: notify.browser
+  #       data_template:
+  #         message: "Flugmodus wird automatisch aktiviert."
+  #         target: Fabian-Mi9T
+  #       data:
+  #         data:
+  #           tag: 'notification-about-sensor'
 
   - alias: 'Remind Nessie for pill'
     initial_state: on
