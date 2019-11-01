@@ -709,6 +709,10 @@
         data:
           topic: "sonoffs/cmnd/state"
           payload: ""
+      - service: mqtt.publish
+        data:
+          topic: sonoffs/cmnd/status
+          payload: '2'
 
   - alias: Turn on Steckerleiste1 Keller
     hide_entity: true
