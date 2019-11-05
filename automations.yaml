@@ -652,6 +652,8 @@
       conditions:
         - condition: template
           value_template: "{{ states.calendar.fabianseitz98_gmail_com.attributes.message == 'Gruppentreffen' }}"
+        - condition: template
+          value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
         - condition: state
           entity_id: 'input_boolean.kuehlschrank_keller'
           state: 'off'
@@ -820,7 +822,7 @@
   #     - service: ifttt.trigger
   #       data: {"event":"turn_pc_off"}
 
-  - alias: 'Update Available Notifications'
+  - alias: 'HA Update Available'
     hide_entity: true
     initial_state: on
     trigger:
@@ -829,12 +831,26 @@
         from: 'off'
         to: 'on'
     action:
-        - service: telegram_bot.send_message
-          data_template:
-            message: "Home Assistant  {{ state_attr('binary_sensor.updater', 'newest_version') }}  ist nun verfügbar."
-            target: !secret telegram_chat_fabian
-            inline_keyboard:
-            - 'Update starten:/updateha'
+      - service: telegram_bot.send_message
+        data_template:
+          message: "Home Assistant  {{ state_attr('binary_sensor.updater', 'newest_version') }}  ist nun verfügbar."
+          target: !secret telegram_chat_fabian
+          inline_keyboard:
+          - 'Update starten:/updateha'
+
+  - alias: 'Tasmota Update Available'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.tasmota_firmware_available
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          message: "Tasmota {{ states('sensor.tasmota_firmware_available') }} ist nun verfügbar. Es können alle Tasmota Geräte automatisch aktualisiert werden."
+          target: !secret telegram_chat_fabian
+          inline_keyboard:
+          - 'Update starten:/updatetasmota'
 
   - alias: 'Incoming Call Fabian'
     hide_entity: true

@@ -63,6 +63,12 @@ homeassistant:
       hidden: true
     "sensor.starnberg_nord_to_zorneding":
       hidden: true
+    "sensor.ventilator*":
+      hidden: true
+    "binary_sensor.ventilator*":
+      hidden: true
+    "binary_sensor.bulb*":
+      hidden: true
     
 zone:
   # This will override the default home zone
@@ -347,6 +353,19 @@ sensor:
       vkphone_charging:
         friendly_name: 'PocoF1 Charging'
         value_template: '{{states.device_tracker.google_maps_112056758146194246561.attributes.battery_charging}}'
+  # Getting Firmware from JSON for Tasmota
+  - platform: rest
+    resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
+    name: Tasmota Firmware available
+    username: !secret githubuser
+    password: !secret githubpass
+    authentication: basic
+    value_template: '{{ value_json.tag_name }}'
+    headers:
+      Accept: application/vnd.github.v3+json
+      Content-Type: application/json
+      User-Agent: Home Assistant REST sensor
+  #Darksky Weather
   - platform: darksky
     api_key: !secret darksky
     scan_interval:
@@ -475,6 +494,12 @@ google_assistant:
       expose: true
     light.yeelight_color1_34ce008bcc9d:
       name: Stehlampe
+      expose: true
+    switch.ventilator:
+      name: Ventilator
+      expose: true
+    light.bulb_lr:
+      name: Deckenlampe
       expose: true
     # switch.sonoff_100018bc6c:
     #   name: Diffusor

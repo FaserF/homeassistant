@@ -14,6 +14,7 @@
       - light.lampe1
       - light.lampe2
       - light.lampe3
+      - light.bulb_lr
       - light.leds_wohnzimmer
       - light.wohnzimmer_lampe
       - climate.wohnzimmer
