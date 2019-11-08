@@ -504,12 +504,12 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.google_maps_112174659110860535869
+          - device_tracker.fabianphone
         from: 'not_home'
         to: 'home'
       - platform: state
         entity_id:
-          - device_tracker.google_maps_112056758146194246561
+          - device_tracker.nessiephone
         from: 'not_home'
         to: 'home'
     condition:
@@ -520,15 +520,36 @@
       - condition: sun
         before: sunrise
       - condition: state
-        entity_id: device_tracker.google_maps_112174659110860535869
+        entity_id: device_tracker.fabianphone
         state: home
       - condition: state
-        entity_id: device_tracker.google_maps_112056758146194246561
+        entity_id: device_tracker.nessiephone
         state: home
     action:
       - service: light.turn_on
         data:
           entity_id: light.yeelight_strip1_34ce008b1863
+
+  - alias: 'Remind for leaving'
+    hide_entity: True
+    initial_state: True
+    trigger:
+      - platform: time
+        at: '06:55'
+    condition:
+      condition: or
+      conditions:
+      - condition: state
+        entity_id: device_tracker.fabianphone
+        state: home
+      - condition: state
+        entity_id: device_tracker.nessiephone
+        state: home
+    action:
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
+        data: 
+          message: "Es ist {{ now().hour }} : {{ now().minute }} Uhr. Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung."
 
   # - alias: 'Turn on climate if fernseher started'
   #   hide_entity: true
@@ -1221,36 +1242,36 @@
           data:
             tag: 'notification-about-sensor'
 
-  # - alias: 'Turn on Airplane Mode Fabi'
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger:
-  #     platform: time
-  #     at: '23:30:00'
-  #   condition:
-  #     condition: and
-  #     conditions:
-  #       - condition: time
-  #         weekday:
-  #           - mon
-  #           - tue
-  #           - wed
-  #           - thu
-  #           - sun
-  #       - condition: state
-  #         entity_id: device_tracker.google_maps_112174659110860535869
-  #         state: home
-  #       - condition: state
-  #         entity_id: group.all_lights
-  #         state: "off"
-  #   action:
-  #     - service: notify.browser
-  #       data_template:
-  #         message: "Flugmodus wird automatisch aktiviert."
-  #         target: Fabian-Mi9T
-  #       data:
-  #         data:
-  #           tag: 'notification-about-sensor'
+  - alias: 'Turn on Airplane Mode Fabi'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: time
+      at: '23:30:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - sun
+        - condition: state
+          entity_id: device_tracker.fabianphone
+          state: home
+        - condition: state
+          entity_id: group.all_lights
+          state: "off"
+    action:
+      - service: notify.browser
+        data_template:
+          target: Fabian-Mi9T
+          message: "Flugmodus wurde vergessen!"
+        data:
+          data:
+            tag: 'notification-about-sensor'
 
   - alias: 'Remind Nessie for pill'
     initial_state: on
@@ -2118,19 +2139,22 @@
           message: "Wettervorhersage für diese Woche: 
           {{ states.sensor.dark_sky_daily_summary.state }}"
 
-  - alias: 'Telegram send daily weather forecast'
+  - alias: 'Telegram send daily weather forecast fabian'
     initial_state: true
     trigger:
-      platform: time
-      at: '06:30:00'
-    condition:
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - platform: state
+        entity_id:
+          - device_tracker.fabianphone
+        from: 'not_home'
+        to: 'home'
+    # condition:
+    #   - condition: time
+    #     weekday:
+    #       - mon
+    #       - tue
+    #       - wed
+    #       - thu
+    #       - fri
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -2154,6 +2178,24 @@
 
             Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
             {% endif %}
+
+  - alias: 'Telegram send daily weather forecast nessie'
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.nessiephone
+        from: 'not_home'
+        to: 'home'
+    # condition:
+    #   - condition: time
+    #     weekday:
+    #       - mon
+    #       - tue
+    #       - wed
+    #       - thu
+    #       - fri
+    action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie

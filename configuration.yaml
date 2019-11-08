@@ -31,8 +31,6 @@ homeassistant:
       hidden: true
     "sensor.vkphone_charging":
       hidden: true
-    "switch.0220008568c63a970c00":
-      hidden: true
     "sensor.openweather*":
       hidden: true
     "sensor.dark_sky*":
@@ -42,14 +40,6 @@ homeassistant:
     "calendar*":
       hidden: true
     "automation*":
-      hidden: true
-    "media_player.lautsprecher_2":
-      hidden: true
-    "media_player.miraculixx":
-      hidden: true
-    "media_player.lg_wk7_0662":
-      hidden: true
-    "device_tracker.fabianop6t*":
       hidden: true
     "sensor.starnberg_nord_to_munchen_pasing*":
       hidden: true
@@ -68,6 +58,10 @@ homeassistant:
     "binary_sensor.ventilator*":
       hidden: true
     "binary_sensor.bulb*":
+      hidden: true
+    "device_tracker.fabianphone":
+      hidden: true
+    "device_tracker.nessiephone":
       hidden: true
     
 zone:
