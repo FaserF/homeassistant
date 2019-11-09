@@ -2147,7 +2147,9 @@
           - device_tracker.fabianphone
         from: 'not_home'
         to: 'home'
-    # condition:
+    condition:
+      - condition: time
+        before: '09:30:00'
     #   - condition: time
     #     weekday:
     #       - mon
@@ -2187,8 +2189,10 @@
           - device_tracker.nessiephone
         from: 'not_home'
         to: 'home'
-    # condition:
-    #   - condition: time
+    condition:
+      - condition: time
+        before: '09:30:00'
+    # - condition: time
     #     weekday:
     #       - mon
     #       - tue

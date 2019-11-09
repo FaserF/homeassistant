@@ -465,42 +465,32 @@ switch:
 google_assistant:
   project_id: !secret google_assistant_id
   api_key: !secret google_assistant_api
-  #exposed_domains:
-  #  - climate
-  #  - switch
-  #  - light
-  expose_by_default: false
+  exposed_domains:
+    - climate
+    - switch
+    - light
+  expose_by_default: true
   entity_config:
-    climate.wohnzimmer:
-      name: Wohnzimmer
-      expose: true
-    climate.schlafzimmer:
-      name: Schlafzimmer
-      expose: true
-    light.leds_tisch:
-      name: LEDs Tisch
-      expose: true
-    light.leds_gastezimmer:
-      name: LEDs Gastezimmer
-      expose: true
-    light.yeelight_strip1_34ce008b1863:
-      name: LEDs Schlafzimmer
-      expose: true
-    light.yeelight_color1_34ce008bcc9d:
-      name: Stehlampe
-      expose: true
-    switch.ventilator:
-      name: Ventilator
-      expose: true
-    light.bulb_lr:
-      name: Deckenlampe
-      expose: true
-    # switch.sonoff_100018bc6c:
-    #   name: Diffusor
-    #   expose: true
-    # switch.sonoff_100016e326:
-    #   name: Bett
-    #   expose: true
+    light.hyperion:
+      name: Hyperion
+      expose: false
+    group.all_automations:
+      expose: false
+    switch.sonoff_100016e326:
+      name: Bett
+      expose: false
+    switch.sonoff_100018bc6c:
+      name: Diffusor
+      expose: false
+    switch.sonoff_1000915e4d:
+      name: Waschmaschine
+      expose: false
+    switch.fernseher:
+      name: Fernseher
+      expose: false
+    switch.schloss:
+      name: Schloss
+      expose: false
 
 google:
   client_id: !secret google_calendar_client_id
