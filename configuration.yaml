@@ -53,15 +53,15 @@ homeassistant:
       hidden: true
     "sensor.starnberg_nord_to_zorneding":
       hidden: true
-    "sensor.ventilator*":
+    "sensor.*status*":
       hidden: true
-    "binary_sensor.ventilator*":
-      hidden: true
-    "binary_sensor.bulb*":
+    "binary_sensor.*button*":
       hidden: true
     "device_tracker.fabianphone":
       hidden: true
     "device_tracker.nessiephone":
+      hidden: true
+    "switch.sonoff_100016e326":
       hidden: true
     
 zone:
@@ -415,20 +415,14 @@ light:
         name: LEDs Gästezimmer
       192.168.178.200:
         name: LEDs Tisch
-#     #SmartLife
-#   - platform: tuya
-#     name: LEDs Wohnzimmer
-#     host: 192.168.178.237
-#     local_key: 652ee3811c786c7e
-#     device_id: 01200592ecfabc83f19d
   - platform: hyperion
     host: 192.168.178.9
 
-tuya:
-  username: !secret tuyauser
-  password: !secret default
-  country_code: 49
-  platform: smart_life
+# tuya:
+#   username: !secret tuyauser
+#   password: !secret default
+#   country_code: 49
+#   platform: smart_life
 
 sonoff:
   username: !secret defaultmail
@@ -459,8 +453,34 @@ switch:
     payload_off: "OFF"
     optimistic: false 
     retain: true
-
-
+  - platform: command_line
+    switches:
+      fabian_pc:
+        command_off: 'curl http://192.168.178.62:5001/shutdown'
+  - platform: sonoff_lan_mode_r3
+    name: Bett
+    device_id: 100016e326
+    api_key: 1bed0f5f-3848-4ab3-9b89-fb43faade84b
+    icon: mdi:power-plug
+  # - platform: sonoff_lan_mode_r3
+  #   name: Waschmaschine
+  #   device_id: 1000915e4d
+  #   api_key: 11604ccd-1f58-47f2-acd1-816861348b1a
+  #   icon: mdi:washing-machine
+  # - platform: sonoff_lan_mode_r3
+  #   name: Diffusor
+  #   device_id: 100018bc6c
+  #   api_key: 289c955f-8015-4413-b3d8-8c815805928c
+  #   icon: mdi:weather-windy
+  # - platform: sonoff_lan_mode
+  #   name: Diffusor
+  #   host: 192.168.178.222
+  #   icon: mdi:weather-windy
+  # - platform: sonoff_lan_mode_r3
+  #   name: Sonoff Steckdose
+  #   device_id: 1000134649
+  #   api_key: b7bbed8a-33b2-4260-ae2e-89a00fbd85c2
+  #   icon: mdi:power-plug
 
 google_assistant:
   project_id: !secret google_assistant_id
@@ -479,14 +499,14 @@ google_assistant:
     switch.sonoff_100016e326:
       name: Bett
       expose: false
+    switch.bett:
+      name: Bett
+      expose: false
     switch.sonoff_100018bc6c:
       name: Diffusor
       expose: false
     switch.sonoff_1000915e4d:
       name: Waschmaschine
-      expose: false
-    switch.fernseher:
-      name: Fernseher
       expose: false
     switch.schloss:
       name: Schloss

@@ -34,7 +34,7 @@
       - light.bettlicht
       - light.leds_tisch
       - climate.schlafzimmer
-      - switch.sonoff_100016e326
+      - switch.bett
       - switch.fabian_strom
       - switch.regal
 

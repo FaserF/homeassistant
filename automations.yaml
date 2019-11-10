@@ -36,7 +36,7 @@
           entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100016e326
+          entity_id: switch.bett
       - service: switch.turn_off
         data:
           entity_id: switch.sonoff_100018bc6c
@@ -488,7 +488,7 @@
     trigger:
       - platform: state
         entity_id:
-          - switch.sonoff_100016e326
+          - switch.bett
         from: 'off'
         to: 'on'
         for:
@@ -496,7 +496,7 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100016e326
+          entity_id: switch.bett
 
   - alias: 'Turn on lights in morning'
     hide_entity: true
@@ -700,7 +700,7 @@
       platform: event
       event_type: telegram_command
       event_data:
-        command: '/kelleran'
+        command: '/keller'
     action:
       - service: input_boolean.turn_off
         data:
@@ -711,7 +711,7 @@
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
-          message: 'Strom im Keller wurde angeschaltet.'
+          message: 'Strom im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
   - alias: 'on HA restart'
     hide_entity: True
@@ -881,14 +881,20 @@
         entity_id: automation.incoming_call_fabian
         to: 'on'
     action:
-      - service: tts.google_translate_say
-        entity_id: media_player.wohnzimmer_mini
+      - service: media_player.volume_set
         data:
-          message: 'Fabian wird soeben angerufen!'
+          volume_level: 0.7
+          entity_id: media_player.wohnzimmer_mini
       - service: tts.google_translate_say
-        entity_id: media_player.schlafzimmer
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
         data:
-          message: 'Fabian wird soeben angerufen!'
+          message: 'Fabian wird soeben von angerufen!'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_mini
       - service: automation.turn_off
         data:
           entity_id: automation.incoming_call_fabian
@@ -902,11 +908,9 @@
         to: 'on'
     action:
       - service: tts.google_translate_say
-        entity_id: media_player.wohnzimmer_mini
-        data:
-          message: 'Nessie wird soeben angerufen!'
-      - service: tts.google_translate_say
-        entity_id: media_player.schlafzimmer
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
         data:
           message: 'Nessie wird soeben angerufen!'
       - service: automation.turn_off
@@ -1052,7 +1056,7 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100016e326
+          entity_id: switch.bett
 
   - alias: Nessie Phone Charging
     hide_entity: true
@@ -1077,7 +1081,7 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100016e326
+          entity_id: switch.bett
 
   - alias: Public IP Change
     hide_entity: true
@@ -1128,7 +1132,7 @@
       platform: numeric_state
       entity_id: sensor.sonoff_1000915e4d_power
       below: 4
-      for: '00:05:00'
+      for: '00:04:00'
     action:
       - service: notify.telegram_nessie
         data:
@@ -1422,14 +1426,38 @@
         data_template:
           target: "{{ trigger.event.data.user_id }}"
           message: 'Alle Google Homes werden Fabi/Nessie über eine wichtige Nachricht bescheid geben.'
-      - service: tts.google_translate_say
-        entity_id: media_player.wohnzimmer_mini
+      - service: media_player.volume_set
         data:
-          message: 'Wichtige Nachricht! Schau auf dein Handy.'
+          volume_level: 0.7
+          entity_id: media_player.wohnzimmer_mini
       - service: tts.google_translate_say
-        entity_id: media_player.schlafzimmer
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
+        - media_player.guest_mini
+        data_template:
+          message: >
+            Wichtige Nachricht von
+            {% if ("trigger.event.data.user_id", "649657901")%} 
+            Fabian 
+            {% elif ("trigger.event.data.user_id", "654536464")%} 
+            Nessie
+            {% elif ("trigger.event.data.user_id", "665446537")%} 
+            Kai
+            {% elif ("trigger.event.data.user_id", "159366362")%} 
+            Adri
+            {% elif ("trigger.event.data.user_id", "668937527")%} 
+            Flo
+            {% elif ("trigger.event.data.user_id", "610791756")%} 
+            Maxi
+            {% else %}
+            jemandem
+            {% endif %}
+            . Schau auf dein Handy!
+      - service: media_player.volume_set
         data:
-          message: 'Wichtige Nachricht! Schau auf dein Handy.'
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_mini
 
   - alias: 'Telegram open door'
     hide_entity: true
@@ -1490,9 +1518,21 @@
           entity_id: media_player.wohnzimmer_mini
       - service: tts.google_translate_say
         entity_id: media_player.wohnzimmer_mini
-        data:
-          message: Ding Dong, es klingelt! 
-          #{% if trigger.event.data.user_id=649657901 %} Fabian {% elif trigger.event.data.user_id=654536464 %}Nessie {% elif trigger.event.data.user_id=665446537 %}Kai {% elif trigger.event.data.user_id=159366362 %}Adri {% else %}Unbekannte Person{% endif %} ist da.
+        data_template:
+          message: >
+            Ding Dong, es klingelt.
+            {% if ("trigger.event.data.user_id", "649657901")%} 
+            Fabian 
+            {% elif ("trigger.event.data.user_id", "654536464")%} 
+            Nessie
+            {% elif ("trigger.event.data.user_id", "665446537")%} 
+            Kai
+            {% elif ("trigger.event.data.user_id", "159366362")%} 
+            Adri
+            {% else %}
+            Jemand
+            {% endif %}
+            ist da.
       - service: media_player.volume_set
         data:
           volume_level: 0.3
