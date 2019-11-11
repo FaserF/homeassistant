@@ -99,8 +99,7 @@
     action:
       - service: notify.telegram_fabian
         data:
-          title: 'Fabian-PC ist noch an'
-          message: "Keiner ist mehr zu Hause!"
+          message: "Keiner ist mehr zu Hause! Fabian-PC ist allerdings noch an!"
           data:
             inline_keyboard:
             - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
@@ -136,12 +135,16 @@
     action:
       - service: notify.telegram_fabian
         data:
-          title: 'Nessie-PC ist noch an'
-          message: "Keiner ist mehr zu Hause. Der Computer ist allerdings noch an und wurde nicht ausgeschaltet!"
+          message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+          data:
+            inline_keyboard:
+            - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
       - service: notify.telegram_nessie
         data:
-          title: 'Nessie-PC ist noch an'
-          message: "Keiner ist mehr zu Hause. Der Computer ist allerdings noch an und wurde nicht ausgeschaltet!"
+          message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+          data:
+            inline_keyboard:
+            - 'Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc'
 
   - alias: 'If nobody is at home and nessie pc strom is on'
     hide_entity: true
@@ -1476,7 +1479,7 @@
           entity_id: switch.schloss
       - service: telegram_bot.send_message
         data_template:
-          target: "{{ trigger.event.data.user_id }}"
+          callback_query_id: '{{ trigger.event.data.id }}'
           message: 'Gartentor wurde geöffnet'
 
   - alias: 'Telegram open door - secretly'
@@ -1619,10 +1622,9 @@
       event_data:
         data: '/shutdownfpc'
     action:
-      - service: notify.pushbullet_fabian
+      - service: switch.turn_off
         data:
-          title: 'Push2Run Fabian-PC'
-          message: "herunterfahren"
+          entity_id: switch.fabian_pc
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
@@ -1646,14 +1648,55 @@
       event_data:
         data: '/hibernatefpc'
     action:
-      - service: notify.pushbullet_fabian
-        data:
-          title: 'Push2Run Fabian-PC'
-          message: "Ruhezustand"
+      - service: shell_command.hibernatefpc
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
-          message: 'OK'
+          message: 'OK, PC wird in Ruhezustand gestellt.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+
+  - alias: 'Telegram shutdown npc'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/shutdownnpc'
+    action:
+      - service: shell_command.shutdownnpc
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'PC wird heruntergefahren, Strom wird nach 4 Minuten ausgeschaltet.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - delay: '00:04:00'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.nessie_pc
+
+  - alias: 'Telegram hibernate npc'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/hibernatenpc'
+    action:
+      - service: shell_command.hibernatenpc
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'OK, PC wird in Ruhezustand gestellt.'
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
@@ -2188,8 +2231,13 @@
         from: 'not_home'
         to: 'home'
     condition:
+      - condition: state
+        entity_id: 'device_tracker.fabianphone'
+        state: 'not_home'
+        for:
+          hours: 5
       - condition: time
-        before: '09:30:00'
+        before: '12:00:00'
     #   - condition: time
     #     weekday:
     #       - mon
@@ -2230,8 +2278,13 @@
         from: 'not_home'
         to: 'home'
     condition:
+      - condition: state
+        entity_id: 'device_tracker.nessiephone'
+        state: 'not_home'
+        for:
+          hours: 5
       - condition: time
-        before: '09:30:00'
+        before: '12:00:00'
     # - condition: time
     #     weekday:
     #       - mon
