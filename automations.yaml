@@ -531,7 +531,7 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: light.yeelight_strip1_34ce008b1863
+          entity_id: group.schlafzimmer
 
   - alias: 'Remind for leaving'
     hide_entity: True
@@ -552,7 +552,36 @@
       - service: tts.google_translate_say
         entity_id: media_player.wohnzimmer_mini
         data: 
-          message: "Es ist {{ now().hour }} : {{ now().minute }} Uhr. Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung."
+          message: >
+            Es ist 
+            {{ now().hour }}: {{ now().minute }} Uhr.
+            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
+
+  - alias: 'Remind for leaving schlafzimmer'
+    hide_entity: True
+    initial_state: True
+    trigger:
+      - platform: time
+        at: '06:54'
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.fabianphone
+        state: home
+      - condition: state
+        entity_id: device_tracker.nessiephone
+        state: home
+    action:
+      - service: tts.google_translate_say
+        entity_id: media_player.schlafzimmer
+        data: 
+          message: >
+            Es ist 
+            {{ now().hour }} {{ now().minute }} Uhr.
+            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   # - alias: 'Turn on climate if fernseher started'
   #   hide_entity: true
