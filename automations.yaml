@@ -485,17 +485,30 @@
         data:
           entity_id: light.yeelight_color1_34ce008bcc9d
 
-  - alias: 'Turn off bett after 2,5 hours'
+  - alias: 'Turn off bett if no device is charging'
     hide_entity: true
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - switch.bett
-        from: 'off'
-        to: 'on'
-        for:
-            minutes: 150
+        entity_id: sensor.fsphone_charging
+        from: 'charging'
+        to: 'not_charging'
+      - platform: state
+        entity_id: sensor.vkphone_charging
+        from: 'charging'
+        to: 'not_charging'
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: 'switch.bett'
+        state: 'on'
+      - condition: state
+        entity_id: 'sensor.fsphone_charging'
+        state: 'not_charging'
+      - condition: state
+        entity_id: 'sensor.vkphone_charging'
+        state: 'not_charging'
     action:
       - service: switch.turn_off
         data:

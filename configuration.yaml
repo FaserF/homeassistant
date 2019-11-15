@@ -344,12 +344,12 @@ sensor:
     sensors:
       fsphone_charging:
         friendly_name: 'Mi9T Charging'
-        value_template: '{{states.device_tracker.google_maps_112174659110860535869.attributes.battery_charging}}'
+        value_template: 'not_charging'
   - platform: template
     sensors:
       vkphone_charging:
         friendly_name: 'PocoF1 Charging'
-        value_template: '{{states.device_tracker.google_maps_112056758146194246561.attributes.battery_charging}}'
+        value_template: 'not_charging'
   # Getting Firmware from JSON for Tasmota
   - platform: rest
     resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
