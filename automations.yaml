@@ -564,7 +564,7 @@
     action:
       - service: tts.google_translate_say
         entity_id: media_player.wohnzimmer_mini
-        data: 
+        data_template: 
           message: >
             Es ist 
             {{ now().hour }}: {{ now().minute }} Uhr.
@@ -589,7 +589,7 @@
     action:
       - service: tts.google_translate_say
         entity_id: media_player.schlafzimmer
-        data: 
+        data_template: 
           message: >
             Es ist 
             {{ now().hour }} {{ now().minute }} Uhr.
@@ -768,19 +768,6 @@
       - service: frontend.set_theme
         data:
           name: slate
-      - service: mqtt.publish
-        data:
-          topic: "cmnd/sonoffs/SetOption19"
-          payload: "1"
-      - delay: '00:01:00'
-      - service: mqtt.publish
-        data:
-          topic: "sonoffs/cmnd/state"
-          payload: ""
-      - service: mqtt.publish
-        data:
-          topic: sonoffs/cmnd/status
-          payload: '2'
 
   - alias: Turn on Steckerleiste1 Keller
     hide_entity: true
@@ -866,28 +853,6 @@
         data:
           entity_id: input_boolean.strom_keller
 
-  # - alias: Turn on Strom (PC)
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger: 
-  #     - platform: state
-  #       entity_id: input_boolean.f_pc_switch
-  #       to: 'on'
-  #   action:
-  #     - service: ifttt.trigger
-  #       data: {"event":"turn_on_strom"}
-
-  # - alias: Turn off PC
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger: 
-  #     - platform: state
-  #       entity_id: input_boolean.f_pc_switch
-  #       to: 'off'
-  #   action:
-  #     - service: ifttt.trigger
-  #       data: {"event":"turn_pc_off"}
-
   - alias: 'HA Update Available'
     hide_entity: true
     initial_state: on
@@ -910,6 +875,9 @@
     trigger:
       - platform: state
         entity_id: sensor.tasmota_firmware_available
+    condition:
+      - condition: template
+        value_template: "{{ states.sensor.tasmota_firmware_available.state != 'unavailable' }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1028,27 +996,27 @@
         data:
           entity_id: switch.schloss
 
-  - alias: "Fabian Phone Charged"
-    hide_entity: true
-    initial_state: on
-    trigger:
-      - platform: template
-        value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | int > 5 }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_charging == 'true' }}"
-        - condition: time
-          after: '09:30:00'
-          before: '21:10:00'
-    action:
-      service: tts.google_translate_say
-      entity_id: media_player.wohnzimmer_mini
-      data:
-        message: 'Fabians Handy ist aufgeladen.'
+  # - alias: "Fabian Phone Charged"
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: template
+  #       value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | int > 5 }}"
+  #   condition:
+  #     condition: and
+  #     conditions:
+  #       - condition: template
+  #         value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+  #       - condition: template
+  #         value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_charging == 'true' }}"
+  #       - condition: time
+  #         after: '09:30:00'
+  #         before: '21:10:00'
+  #   action:
+  #     service: tts.google_translate_say
+  #     entity_id: media_player.wohnzimmer_mini
+  #     data:
+  #       message: 'Fabians Handy ist aufgeladen.'
 
   - alias: Nessie Phone Battery below 5 %
     hide_entity: true
@@ -1077,56 +1045,6 @@
           title: 'Fabi Akku unter 5%'
           target: !secret telegram_chat_nessie
           message: ''
-
-  - alias: Fabi Phone Charging
-    hide_entity: true
-    initial_state: on
-    trigger:
-      platform: state
-      entity_id: sensor.fsphone_charging
-      to: 'false'
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.battery_charging == 'false' }}"
-        - condition: or
-          conditions:
-            - condition: template
-              value_template: "{{ states.device_tracker.google_maps_112056758146194246561.battery_charging == 'false' }}"
-            - condition: template
-              value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.bett
-
-  - alias: Nessie Phone Charging
-    hide_entity: true
-    initial_state: on
-    trigger:
-      platform: state
-      entity_id: sensor.vkphone_charging
-      to: 'false'
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.battery_charging == 'false' }}"
-        - condition: or
-          conditions:
-            - condition: template
-              value_template: "{{ states.device_tracker.google_maps_112174659110860535869.battery_charging == 'false' }}"
-            - condition: template
-              value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.bett
 
   - alias: Public IP Change
     hide_entity: true
