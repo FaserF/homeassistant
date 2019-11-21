@@ -273,10 +273,10 @@
         after: sunset
       - condition: state
         entity_id: sensor.fscharging
-        state: 'notcharging'
+        state: 'not_charging'
       - condition: state
         entity_id: sensor.vkcharging
-        state: 'notcharging'
+        state: 'not_charging'
     action:
       - service: light.turn_on
         data:
@@ -301,10 +301,10 @@
   #     conditions:
   #     - condition: state
   #       entity_id: sensor.fscharging
-  #       state: 'notcharging'
+  #       state: 'not_charging'
   #     - condition: state
   #       entity_id: sensor.vkcharging
-  #       state: 'notcharging'
+  #       state: 'not_charging'
   #   action:
   #     - service: climate.set_away_mode
   #       data:
