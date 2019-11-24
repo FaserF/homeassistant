@@ -240,14 +240,27 @@ notify:
     timestamp: false
 
 media_player:
-  #- platform: androidtv
-    #name: MiBox S
-    #device_class: androidtv
-    #host: 192.168.1.22
-    #adb_server_ip: 127.0.0.1
-    #apps:
-    #  "amazon": "Amazon Premium Video"
-    #adbkey: "/home/homeassistant/.homeassistant/www/android/adbkey"
+  - platform: androidtv
+    name: MiBox S
+    device_class: androidtv
+    host: 192.168.178.37
+    adb_server_ip: 127.0.0.1
+    apps:
+      com.liskovsoft.videomanager: "Smart YoutTube TV"
+      exp.animo.fireanime: "FireAnime"
+      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
+      com.valvesoftware.steamlink: "Steam Link"
+      com.zdf.android.mediathek: "ZDF Mediathek"
+      tv.emby.embyatv: "Emby"
+    state_detection_rules:
+      'com.google.android.tvlauncher':
+        - 'standby'
+      'com.netflix.ninja':
+        - 'media_session_state'
+      'com.spotify.tv.android':
+        - 'audio_state'
+      'com.liskovsoft.videomanager':
+        - 'media_session_state'
   # - platform: spotify
   #   client_id: !secret spotifyid
   #   client_secret: !secret spotifysecret
@@ -460,6 +473,10 @@ switch:
     switches:
       fabian_pc:
         command_off: 'curl http://192.168.178.62:5001/shutdown'
+  - platform: command_line
+    switches:
+      nessie_pc:
+        command_off: 'curl http://192.168.178.58:5001/shutdown'
   - platform: sonoff_lan_mode_r3
     name: Bett
     device_id: 100016e326

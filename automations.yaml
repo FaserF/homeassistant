@@ -878,6 +878,8 @@
     condition:
       - condition: template
         value_template: "{{ states.sensor.tasmota_firmware_available.state != 'unavailable' }}"
+      # - condition: template
+      #   value_template: "{{ states.sensor.tasmota_firmware_available.state != 'v6.7.1' }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -996,28 +998,6 @@
         data:
           entity_id: switch.schloss
 
-  # - alias: "Fabian Phone Charged"
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger:
-  #     - platform: template
-  #       value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | int > 5 }}"
-  #   condition:
-  #     condition: and
-  #     conditions:
-  #       - condition: template
-  #         value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
-  #       - condition: template
-  #         value_template: "{{ states.device_tracker.google_maps_112174659110860535869.attributes.battery_charging == 'true' }}"
-  #       - condition: time
-  #         after: '09:30:00'
-  #         before: '21:10:00'
-  #   action:
-  #     service: tts.google_translate_say
-  #     entity_id: media_player.wohnzimmer_mini
-  #     data:
-  #       message: 'Fabians Handy ist aufgeladen.'
-
   - alias: Nessie Phone Battery below 5 %
     hide_entity: true
     initial_state: on
@@ -1046,7 +1026,56 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  - alias: Public IP Change
+  - alias: Turn off Hyperion Grabber
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.netflix.ninja' }}"
+      - platform: template 
+        value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.amazon.amazonvideo.livingroom' }}"
+    condition:
+      - condition: state
+        entity_id: 'light.hyperion'
+        state: 'off'
+      # - condition: state
+      #   entity_id: sun.sun
+      #   state: 'above_horizon'
+      #   offset: "-00:25:00"
+    action:
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.mibox_s
+          command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
+      - service: light.turn_on
+        data:
+          entity_id: light.hyperion
+          brightness: 130
+          rgb_color: [255,0,0]
+
+  - alias: Turn on Hyperion Grabber
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.netflix.ninja' }}"
+      - platform: template 
+        value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.amazon.amazonvideo.livingroom' }}"
+    condition:
+      - condition: state
+        entity_id: 'light.hyperion'
+        state: 'on'
+      # - condition: state
+      #   entity_id: sun.sun
+      #   state: 'above_horizon'
+      #   offset: "-00:25:00"
+    action:
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.mibox_s
+          command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
+
+  - alias: Fritzbox Public IP Change
     hide_entity: true
     initial_state: on
     trigger:
@@ -1057,36 +1086,83 @@
         data:
           message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
 
-  - alias: Internet Speed Test Poor Fabian
+  - alias: Fritzbox Internet no access
     hide_entity: true
     initial_state: on
     trigger:
-      - platform: template
-        value_template: "{{ states('sensor.speedtest_download')|float < 40 }}"
+      platform: template 
+      value_template: "{% if is_state('sensor.fritz_netmonitor.attributes.is_connected', 'false') %}true{% endif %}"
+      for: "00:01:00"
     condition:
-      - condition: template
-        value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+      condition: and
+      conditions:
+        - condition: time
+          after: '06:30:00'
+          before: '07:10:00'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.nessiephone
+            state: home
+          - condition: state
+            entity_id: device_tracker.fabianphone
+            state: home
     action:
-      - service: notify.telegram_fabian
+      - service: tts.google_translate_say
+        entity_id: 
+        - media_player.schlafzimmer
+        - media_player.wohnzimmer_mini
         data:
-          message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ state.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
+          message: 'Die Fritzbox hat keine Internet Verbindung!'
 
-  - alias: Internet Speed Test Poor Nessie
-    hide_entity: true
-    initial_state: on
-    trigger:
-      - platform: template
-        value_template: "{{ states('sensor.speedtest_download')|float < 30 }}"
-    condition:
-      - condition: template
-        value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
-      - condition: state
-        entity_id: device_tracker.nessiepc
-        state: home
-    action:
-      - service: notify.telegram_nessie
-        data:
-          message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
+  # - alias: Fritzbox Internet access returned
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     platform: template 
+  #     value_template: "{{ states.sensor.fritz_netmonitor.attributes.is_connected == 'false') }}"
+  #   condition:
+  #     - condition: time
+  #       after: '06:30:00'
+  #       before: '07:10:00'
+  #   action:
+  #     - service: tts.google_translate_say
+  #       entity_id: 
+  #       - media_player.schlafzimmer
+  #       - media_player.wohnzimmer_mini
+  #       data:
+  #         message: 'Die Fritzbox hat keine Internet Verbindung!'
+
+  # - alias: Internet Speed Test Poor Fabian
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: template
+  #       value_template: "{{ states('sensor.speedtest_download')|float < 40 }}"
+  #   condition:
+  #     - condition: template
+  #       value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+  #   action:
+  #     - service: notify.telegram_fabian
+  #       data:
+  #         message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ state.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
+
+  # - alias: Internet Speed Test Poor Nessie
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: template
+  #       value_template: "{{ states('sensor.speedtest_download')|float < 30 }}"
+  #   condition:
+  #     - condition: template
+  #       value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
+  #     - condition: state
+  #       entity_id: device_tracker.nessiepc
+  #       state: home
+  #   action:
+  #     - service: notify.telegram_nessie
+  #       data:
+  #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
   - alias: washing machine finished
     hide_entity: true
@@ -1104,19 +1180,17 @@
         data:
           message: 'Die Waschmaschine ist fertig.'
       - service: tts.google_translate_say
-        entity_id: media_player.schlafzimmer
-        data:
-          message: 'Die Waschmaschine ist fertig!'
-      - service: automation.turn_off
-        data:
-          entity_id: automation.washing_machine_finished
-      - service: tts.google_translate_say
-        entity_id: media_player.wohnzimmer_mini
+        entity_id: 
+        - media_player.schlafzimmer
+        - media_player.wohnzimmer_mini
         data:
           message: 'Die Waschmaschine ist fertig!'
       - service: switch.turn_off
         data:
           entity_id: switch.sonoff_1000915e4d
+      - service: automation.turn_off
+        data:
+          entity_id: automation.washing_machine_finished
       - service: automation.turn_on
         data:
           entity_id: automation.washing_machine_started
@@ -1437,10 +1511,10 @@
       - service: switch.turn_off
         data:
           entity_id: switch.schloss
-      - service: telegram_bot.send_message
+      - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
-          message: 'Gartentor wurde geöffnet'
+          message: 'Gartentor wurde geöffnet.'
 
   - alias: 'Telegram open door - secretly'
     hide_entity: true
