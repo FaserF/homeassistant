@@ -252,12 +252,15 @@ media_player:
       com.valvesoftware.steamlink: "Steam Link"
       com.zdf.android.mediathek: "ZDF Mediathek"
       tv.emby.embyatv: "Emby"
+      com.google.android.apps.mediashell: "Chromecast"
     state_detection_rules:
       'com.google.android.tvlauncher':
         - 'standby'
       'com.netflix.ninja':
         - 'media_session_state'
       'com.spotify.tv.android':
+        - 'audio_state'
+      'com.google.android.apps.mediashell':
         - 'audio_state'
       'com.liskovsoft.videomanager':
         - 'media_session_state'

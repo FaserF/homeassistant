@@ -1075,6 +1075,222 @@
           entity_id: media_player.mibox_s
           command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
 
+  - alias: Mute Spotify ads wohnzimmer mini
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title == 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.wohnzimmer_mini
+          is_volume_muted: true
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
+      - service: automation.turn_off
+        data:
+          entity_id: automation.mute_spotify_ads_wohnzimmer_mini
+
+  - alias: Unmute after Spotify ads wohnzimmer mini
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.wohnzimmer_mini
+          is_volume_muted: false
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_wohnzimmer_mini
+      - service: automation.turn_off
+        data:
+          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
+
+  - alias: Mute Spotify ads schlafzimmer
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title == 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.schlafzimmer
+          is_volume_muted: true
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_schlafzimmer
+      - service: automation.turn_off
+        data:
+          entity_id: automation.mute_spotify_ads_schlafzimmer
+
+  - alias: Unmute after Spotify ads schlafzimmer
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.schlafzimmer
+          is_volume_muted: false
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_schlafzimmer
+      - service: automation.turn_off
+        data:
+          entity_id: automation.unmute_after_spotify_ads_schlafzimmer
+
+  - alias: Mute Spotify ads mi box
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.mi_box.attributes.media_title == 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.mi_box
+          is_volume_muted: true
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_mi_box
+      - service: automation.turn_off
+        data:
+          entity_id: automation.mute_spotify_ads_mi_box
+
+  - alias: Unmute after Spotify ads mi box
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.mi_box.attributes.media_title != 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.mi_box
+          is_volume_muted: false
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_mi_box
+      - service: automation.turn_off
+        data:
+          entity_id: automation.unmute_after_spotify_ads_mi_box
+
+  - alias: Mute Spotify ads mini Gruppe
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title == 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.mini_gruppe
+          is_volume_muted: true
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_mini_gruppe
+      - service: automation.turn_off
+        data:
+          entity_id: automation.mute_spotify_ads_mini_gruppe
+
+  - alias: Unmute after Spotify ads mini Gruppe
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.mini_gruppe
+          is_volume_muted: false
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_mini_gruppe
+      - service: automation.turn_off
+        data:
+          entity_id: automation.unmute_after_spotify_ads_mini_gruppe
+
+  - alias: Mute Spotify ads guest mini
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.guest_mini.attributes.media_title == 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.guest_mini
+          is_volume_muted: true
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_guest_mini
+      - service: automation.turn_off
+        data:
+          entity_id: automation.mute_spotify_ads_guest_mini
+
+  - alias: Unmute after Spotify ads guest mini
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.guest_mini.attributes.media_title != 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.guest_mini
+          is_volume_muted: false
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_guest_mini
+      - service: automation.turn_off
+        data:
+          entity_id: automation.unmute_after_spotify_ads_guest_mini
+
+  - alias: Mute Spotify ads keller tv
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.keller_tv.attributes.media_title == 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.keller_tv
+          is_volume_muted: true
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_keller_tv
+      - service: automation.turn_off
+        data:
+          entity_id: automation.mute_spotify_ads_keller_tv
+
+  - alias: Unmute after Spotify ads keller tv
+    hide_entity: true
+    initial_state: off
+    trigger:
+      - platform: template 
+        value_template: "{{ states.media_player.keller_tv.attributes.media_title != 'Advertisement' }}"
+    action:
+      - service: media_player.volume_mute
+        data:
+          entity_id: media_player.keller_tv
+          is_volume_muted: false
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_keller_tv
+      - service: automation.turn_off
+        data:
+          entity_id: automation.unmute_after_spotify_ads_keller_tv
+
   - alias: Fritzbox Public IP Change
     hide_entity: true
     initial_state: on
