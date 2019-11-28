@@ -1026,54 +1026,54 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  - alias: Turn off Hyperion Grabber
-    hide_entity: true
-    initial_state: on
-    trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.netflix.ninja' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.amazon.amazonvideo.livingroom' }}"
-    condition:
-      - condition: state
-        entity_id: 'light.hyperion'
-        state: 'off'
-      # - condition: state
-      #   entity_id: sun.sun
-      #   state: 'above_horizon'
-      #   offset: "-00:25:00"
-    action:
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.mibox_s
-          command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
-      - service: light.turn_on
-        data:
-          entity_id: light.hyperion
-          brightness: 130
-          rgb_color: [0,0,255]
+  # - alias: Turn off Hyperion Grabber
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: template 
+  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.netflix.ninja' }}"
+  #     - platform: template 
+  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.amazon.amazonvideo.livingroom' }}"
+  #   condition:
+  #     - condition: state
+  #       entity_id: 'light.hyperion'
+  #       state: 'off'
+  #     # - condition: state
+  #     #   entity_id: sun.sun
+  #     #   state: 'above_horizon'
+  #     #   offset: "-00:25:00"
+  #   action:
+  #     - service: androidtv.adb_command
+  #       data:
+  #         entity_id: media_player.mibox_s
+  #         command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
+  #     - service: light.turn_on
+  #       data:
+  #         entity_id: light.hyperion
+  #         brightness: 130
+  #         rgb_color: [0,0,255]
 
-  - alias: Turn on Hyperion Grabber
-    hide_entity: true
-    initial_state: on
-    trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.netflix.ninja' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.amazon.amazonvideo.livingroom' }}"
-    condition:
-      - condition: state
-        entity_id: 'light.hyperion'
-        state: 'on'
-      # - condition: state
-      #   entity_id: sun.sun
-      #   state: 'above_horizon'
-      #   offset: "-00:25:00"
-    action:
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.mibox_s
-          command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
+  # - alias: Turn on Hyperion Grabber
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: template 
+  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.netflix.ninja' }}"
+  #     - platform: template 
+  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.amazon.amazonvideo.livingroom' }}"
+  #   condition:
+  #     - condition: state
+  #       entity_id: 'light.hyperion'
+  #       state: 'on'
+  #     # - condition: state
+  #     #   entity_id: sun.sun
+  #     #   state: 'above_horizon'
+  #     #   offset: "-00:25:00"
+  #   action:
+  #     - service: androidtv.adb_command
+  #       data:
+  #         entity_id: media_player.mibox_s
+  #         command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
 
   - alias: Mute Spotify ads wohnzimmer mini
     hide_entity: true
@@ -2557,6 +2557,8 @@
         before: '10:00:00'
       - condition: time
         after: '05:00:00'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 10800 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -2591,6 +2593,8 @@
         before: '10:00:00'
       - condition: time
         after: '05:00:00'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_nessie.attributes.last_triggered) | int > 10800 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
