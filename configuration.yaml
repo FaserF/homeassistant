@@ -315,6 +315,7 @@ shell_command:
   randomfood: '/bin/bash /home/cadmin/scripts/randomfood.sh {{ telegram_sender }} {{ vegetarisch }}'
   foodyes: 'bash /home/cadmin/scripts/foodyes.sh'
   updateha: 'bash /home/cadmin/scripts/update-homeassistant.sh'
+  adbconnecttv: 'adb connect 192.168.178.37'
   quick_restart: 'sudo init 6'
   hibernatefpc: 'curl http://192.168.178.62:5001/hibernate'
   hibernatenpc: 'curl http://192.168.178.58:5001/hibernate'

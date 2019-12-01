@@ -1026,54 +1026,22 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  # - alias: Turn off Hyperion Grabber
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger:
-  #     - platform: template 
-  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.netflix.ninja' }}"
-  #     - platform: template 
-  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id == 'com.amazon.amazonvideo.livingroom' }}"
-  #   condition:
-  #     - condition: state
-  #       entity_id: 'light.hyperion'
-  #       state: 'off'
-  #     # - condition: state
-  #     #   entity_id: sun.sun
-  #     #   state: 'above_horizon'
-  #     #   offset: "-00:25:00"
-  #   action:
-  #     - service: androidtv.adb_command
-  #       data:
-  #         entity_id: media_player.mibox_s
-  #         command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
-  #     - service: light.turn_on
-  #       data:
-  #         entity_id: light.hyperion
-  #         brightness: 130
-  #         rgb_color: [0,0,255]
-
-  # - alias: Turn on Hyperion Grabber
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger:
-  #     - platform: template 
-  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.netflix.ninja' }}"
-  #     - platform: template 
-  #       value_template: "{{ states.media_player.mibox_s.attributes.app_id != 'com.amazon.amazonvideo.livingroom' }}"
-  #   condition:
-  #     - condition: state
-  #       entity_id: 'light.hyperion'
-  #       state: 'on'
-  #     # - condition: state
-  #     #   entity_id: sun.sun
-  #     #   state: 'above_horizon'
-  #     #   offset: "-00:25:00"
-  #   action:
-  #     - service: androidtv.adb_command
-  #       data:
-  #         entity_id: media_player.mibox_s
-  #         command: "am start com.abrenoch.hyperiongrabber/com.abrenoch.hyperiongrabber.common.ToggleActivity"
+  - alias: connect to adb on tv startup and change volume
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.tv
+        from: 'not_home'
+        to: 'home'
+    action:
+      - service: shell_command.adbconnecttv
+      - delay: '00:00:03'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.5
+          entity_id: media_player.wohnzimmer_mini
 
   - alias: Mute Spotify ads wohnzimmer mini
     hide_entity: true
@@ -1408,80 +1376,44 @@
         data:
           message: 'Die Waschmaschine ist fertig.'
       - service: tts.google_translate_say
-        entity_id: 
-        - media_player.schlafzimmer
-        - media_player.wohnzimmer_mini
+        entity_id: media_player.schlafzimmer
+        data:
+          message: 'Die Waschmaschine ist fertig!'
+      - service: automation.turn_off
+        data:
+          entity_id: automation.washing_machine_finished
+      - service: tts.google_translate_say
+        entity_id: media_player.wohnzimmer_mini
         data:
           message: 'Die Waschmaschine ist fertig!'
       - service: switch.turn_off
         data:
           entity_id: switch.sonoff_1000915e4d
-      - service: automation.turn_off
+      - service: automation.turn_on
         data:
-          entity_id: automation.kohleanzuender_ausgeschaltet
-      - service: automation.turn_off
-        data:
-          entity_id: automation.washing_machine_finished
+          entity_id: automation.washing_machine_started
 
-  - alias: Kohleanzuender ausgeschaltet
+  - alias: washing machine started
     hide_entity: true
-    initial_state: off
+    initial_state: on
     trigger:
       platform: numeric_state
       entity_id: sensor.sonoff_1000915e4d_power
       above: 4
-    condition:
-      - condition: state
-        entity_id: 'automation.washing_machine_started'
-        state: 'on'
+      for: '00:00:15'
     action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: 'Die Kohle für die Shisha könnte fertig sein. Der Kohleanzünder war nun 15 Minuten an.'
-      - service: automation.turn_off
+      - service: notify.telegram_nessie
         data:
-          entity_id: automation.kohleanzuender_ausgeschaltet
-      - service: automation.turn_off
+          message: 'Die Waschmaschine wurde gestartet.'
+      - service: notify.telegram_fabian
         data:
-          entity_id: automation.washing_machine_started
-
-  - alias: Washing Machine started
-    hide_entity: true
-    initial_state: off
-    trigger:
-      platform: numeric_state
-      entity_id: sensor.sonoff_1000915e4d_power
-      above: 800
-    action:
+          message: 'Die Waschmaschine wurde gestartet.'
       - service: automation.turn_on
         data:
           entity_id: automation.washing_machine_finished
       - service: automation.turn_off
         data:
-          entity_id: automation.kohleanzuender_ausgeschaltet
-      - service: automation.turn_off
-        data:
           entity_id: automation.washing_machine_started
-
-  - alias: Kohleanzuender angeschaltet
-    hide_entity: true
-    initial_state: off
-    trigger:
-      platform: numeric_state
-      entity_id: sensor.sonoff_1000915e4d_power
-      above: 400
-    action:
-      - service: automation.turn_on
-        data:
-          entity_id: automation.washing_machine_started
-      - service: automation.turn_off
-        data:
-          entity_id: automation.kohleanzuender_angeschaltet
-      - delay: '00:15:00'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.kohleanzuender_ausgeschaltet
 
   - alias: strom keller an
     hide_entity: true
