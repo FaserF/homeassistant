@@ -878,8 +878,9 @@
     condition:
       - condition: template
         value_template: "{{ states.sensor.tasmota_firmware_available.state != 'unavailable' }}"
-      # - condition: template
-      #   value_template: "{{ states.sensor.tasmota_firmware_available.state != 'v6.7.1' }}"
+      - condition: numeric_state
+        entity_id: sensor.tasmota_firmware_available
+        above: 7
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -922,12 +923,20 @@
         entity_id: automation.incoming_call_nessie
         to: 'on'
     action:
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: media_player.wohnzimmer_mini
       - service: tts.google_translate_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
         data:
-          message: 'Nessie wird soeben angerufen!'
+          message: 'Nessie wird soeben von angerufen!'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_mini
       - service: automation.turn_off
         data:
           entity_id: automation.incoming_call_nessie
@@ -943,28 +952,19 @@
   #       data_template: 
   #         message: "Sbahn nach MUC: {{ states.sensor.zorneding_to_truedering.attributes.departure }} Uhr +{{ states.sensor.zorneding_to_truedering.attributes.delay }} min }}"
 
-  # - alias: 'Bitcoin below XX'
+  # - alias: 'Coinbase balance above 200'
   #   hide_entity: true
   #   initial_state: on
   #   trigger:
-  #     platform: numeric_state
-  #     entity_id: sensor.exchange_rate_1_btc
-  #     below: 12541
+  #     - platform: template
+  #       value_template: "{{ states.sensor.coinbase_btc_wallet.attributes.Balance in native currency | int > 164 }}"
   #   action:
   #       - service: telegram_bot.send_message
   #         data_template:
-  #           title: 'BTC Wert sinkt!'
   #           target: !secret telegram_chat_fabian
-  #           message: "Aktueller Wert: {{ states('sensor.exchange_rate_1_btc') }} . Jetzt verkaufen?"
+  #           message: "Aktueller BTC Wert: {{ states.sensor.coinbase_btc_wallet.attributes.Balance in native currency }} . Jetzt verkaufen?"
   #           inline_keyboard:
-  #           - 'Ja:/sellbtc, Nein:/no'
-  #       - service: telegram_bot.send_message
-  #         data_template:
-  #           title: 'BTC Wert sinkt!'
-  #           target: !secret telegram_chat_adrian
-  #           message: "Aktueller Wert: {{ states('sensor.exchange_rate_1_btc') }} . Jetzt verkaufen?"
-  #           inline_keyboard:
-  #           - 'Ja:/sellbtc, Nein:/no'
+  #           - 'Ja:/sellbtc, Nein:/telegramno'
 
   # - alias: 'Telegram Sell BTC'
   #   hide_entity: true

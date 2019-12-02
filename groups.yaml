@@ -8,6 +8,7 @@
     icon: mdi:television-classic
     entities:
       - media_player.mi_box
+      - media_player.mibox_s
       - media_player.wohnzimmer_mini
       - light.yeelight_color1_34ce008bcc9d #Stehlampe
       - light.hyperion

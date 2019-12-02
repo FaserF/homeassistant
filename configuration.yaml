@@ -283,7 +283,6 @@ climate:
       schlafzimmer:
         mac: !secret eq3btsmart2
 
-# Weather prediction
 weather:
   #- platform: openweathermap
   #  api_key: !secret openweather
@@ -291,18 +290,6 @@ weather:
   - platform: darksky
     api_key: !secret darksky
     name: Wetter darksky
-
-# sensor weather:
-#   - platform: openweathermap
-#     api_key: !secret openweather
-#     name: openweather
-#     language: de
-#     forecast: 6
-#     monitored_conditions:
-#       - weather
-#       - temperature
-#       - rain
-#       - snow
 
 #link shortcuts
 #weblink:
@@ -315,7 +302,7 @@ shell_command:
   randomfood: '/bin/bash /home/cadmin/scripts/randomfood.sh {{ telegram_sender }} {{ vegetarisch }}'
   foodyes: 'bash /home/cadmin/scripts/foodyes.sh'
   updateha: 'bash /home/cadmin/scripts/update-homeassistant.sh'
-  adbconnecttv: 'adb connect 192.168.178.37'
+  adbconnecttv: 'bash /home/cadmin/scripts/adbconnect.sh'
   quick_restart: 'sudo init 6'
   hibernatefpc: 'curl http://192.168.178.62:5001/hibernate'
   hibernatenpc: 'curl http://192.168.178.58:5001/hibernate'
@@ -325,8 +312,14 @@ shell_command:
   overtime_input10: 'bash /home/cadmin/scripts/overtime_input.sh 1.0'
   overtime_input15: 'bash /home/cadmin/scripts/overtime_input.sh 1.5'
   overtime_input20: 'bash /home/cadmin/scripts/overtime_input.sh 2.0'
-  #tv_leds_turnon: 'ssh root@192.168.178.9 "bash /home/dietpi/rpi_ws281x/startleds.sh"'
-  #tv_leds_turnoff: 'ssh root@192.168.178.9 "bash /home/dietpi/rpi_ws281x/stopleds.sh"'
+
+coinbase:
+  api_key: !secret coinbase_key
+  api_secret: !secret coinbase_secret
+  account_balance_currencies:
+    - BTC
+  exchange_rate_currencies:
+    - BTC
 
 sensor:
   - platform: fritzbox_netmonitor
@@ -342,9 +335,9 @@ sensor:
     from: !secret sbahn_home
     to: Trudering
     only_direct: true
-  - platform: bitcoin
-    display_options:
-      - exchangerate
+  # - platform: bitcoin
+  #   display_options:
+  #     - exchangerate
   - platform: template
     sensors:
       fsphone_battery:
