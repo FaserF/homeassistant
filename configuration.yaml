@@ -106,6 +106,7 @@ zone:
 config:
 system_health:
 api:
+mobile_app:
 
 http:
   # Secrets are defined in the file secrets.yaml
