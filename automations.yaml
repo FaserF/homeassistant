@@ -568,7 +568,7 @@
           message: >
             Es ist 
             {{ now().hour }}: {{ now().minute }} Uhr.
-            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich 
+            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Remind for leaving schlafzimmer'
@@ -593,7 +593,7 @@
           message: >
             Es ist 
             {{ now().hour }} {{ now().minute }} Uhr.
-            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich 
+            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   # - alias: 'Turn on climate if fernseher started'
@@ -1367,7 +1367,7 @@
       platform: numeric_state
       entity_id: sensor.sonoff_1000915e4d_power
       below: 4
-      for: '00:04:00'
+      for: '00:12:00'
     action:
       - service: notify.telegram_nessie
         data:
