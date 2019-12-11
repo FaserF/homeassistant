@@ -125,12 +125,13 @@ recorder:
       - updater
       - scene
       - calendar
+      - device_tracker
     entities:
       - sun.sun # Don't record sun data
       - sensor.last_boot # Comes from 'systemmonitor' sensor platform
       - sensor.date
-      - sensor.fscharging
-      - sensor.vkcharging
+      - sensor.fsphone_charging
+      - sensor.vkphone_charging
 
 # Checks for available updates
 # Note: This component will send some information about your system to
@@ -193,7 +194,7 @@ device_tracker:
         track_new_devices: False
   # - platform: nmap_tracker
   #   hosts: 192.168.178.0/24
-  # #  scan_options: " --privileged -sP "
+  #   scan_options: " --privileged -sP "
   #   interval_seconds: 30
   #   consider_home: 30
   #   new_device_defaults:

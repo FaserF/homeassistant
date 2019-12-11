@@ -546,28 +546,30 @@
         data:
           entity_id: group.schlafzimmer
 
-  - alias: 'Remind for leaving'
+  - alias: 'Remind for leaving wohnzimmer'
     hide_entity: True
     initial_state: True
     trigger:
       - platform: time
-        at: '06:55'
+        at: '06:54'
     condition:
-      condition: or
+      condition: and
       conditions:
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: state
-        entity_id: device_tracker.fabianphone
-        state: home
-      - condition: state
-        entity_id: device_tracker.nessiephone
-        state: home
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.nessiephone
+            state: home
+          - condition: state
+            entity_id: device_tracker.fabianphone
+            state: home
     action:
       - service: tts.google_translate_say
         entity_id: media_player.wohnzimmer_mini
@@ -587,6 +589,13 @@
     condition:
       condition: and
       conditions:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
       - condition: state
         entity_id: device_tracker.fabianphone
         state: home
