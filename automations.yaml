@@ -551,7 +551,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '06:54'
+        at: '06:55'
     condition:
       condition: and
       conditions:
@@ -585,7 +585,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '06:54'
+        at: '06:55'
     condition:
       condition: and
       conditions:
@@ -904,6 +904,28 @@
           target: !secret telegram_chat_fabian
           inline_keyboard:
           - 'Update starten:/updatetasmota'
+
+  - alias: 'Notify for SMS PIN Fabian'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.fs_smspin
+    condition:
+      - condition: template
+        value_template: "{{ states.sensor.fs_smspin.state != 'not_set' }}"
+    action:
+      - service: notify.browser
+        data_template:
+          message: "Der Security Code lautet: {{ states('sensor.fs_smspin') }}"
+          target: 
+            - Fabian-Mi9T
+            - Fabian-PC
+            - Fabian-Hackbook
+            - Chrome-Arbeit
+        data:
+          data:
+            tag: 'notification-about-sensor'
 
   - alias: 'Incoming Call Fabian'
     hide_entity: true
@@ -1622,10 +1644,41 @@
           entity_id: group.all_lights
           state: "off"
     action:
-      - service: notify.browser
+      - service: notify.mobile_app_redmi_k20
         data_template:
-          target: Fabian-Mi9T
-          message: "Flugmodus wurde vergessen!"
+          title: "Flugmodus"
+          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
+        data:
+          data:
+            tag: 'notification-about-sensor'
+
+  - alias: 'Turn on Airplane Mode Nessie'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: time
+      at: '23:30:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - sun
+        - condition: state
+          entity_id: device_tracker.nessiephone
+          state: home
+        - condition: state
+          entity_id: group.all_lights
+          state: "off"
+    action:
+      - service: notify.mobile_app_poco_f1
+        data_template:
+          title: "Flugmodus"
+          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
         data:
           data:
             tag: 'notification-about-sensor'
@@ -2326,32 +2379,36 @@
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
 
-  - alias: "Notify Nessie on Train delay Home -> Work"
-    hide_entity: true
-    initial_state: on
-    trigger:
-      - platform: template
-        value_template: "{{ states.sensor.zorneding_to_silberhornstraße.attributes.delay | int > 5 }}"
-    condition:
-      - condition: time
-        after: '06:30:00'
-        before: '07:10:00'
-        weekday:
-          - mon
-          - tue
-          - fri
-    action:
-      - service: notify.telegram_nessie
-        data:
-          title: "Sbahn um {{ states.sensor.zorneding_to_silberhornstraße.attributes.departure }} hat +{{ states.sensor.zorneding_to_silberhornstraße.attributes.delay }} min Verspätung."
-          message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_silberhornstraße.attributes.next }} Uhr"
+  # - alias: "Notify Nessie on Train delay Home -> Work"
+  #   hide_entity: true
+  #   initial_state: on
+  #   trigger:
+  #     - platform: template
+  #       value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 3 }}"
+  #   condition:
+  #     condition: and
+  #     conditions:
+  #       - condition: template
+  #         value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+  #       - condition: time
+  #         after: '06:30:00'
+  #         before: '07:10:00'
+  #         weekday:
+  #           - mon
+  #           - tue
+  #           - fri
+  #   action:
+  #     - service: notify.telegram_nessie
+  #       data:
+  #         title: "Ubahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} hat +{{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
+  #         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
 
-  - alias: "Notify Fabi on Train delay Home -> Work"
+  - alias: "Notify Fabi on sbahn delay Home -> Work"
     hide_entity: true
     initial_state: on
     trigger:
       - platform: template
-        value_template: "{{ states.sensor.zorneding_to_starnberg_nord.attributes.delay | int > 5 }}"
+        value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 5 }}"
     condition:
       condition: and
       conditions:
@@ -2369,27 +2426,26 @@
     action:
       - service: notify.telegram_fabian
         data:
-          title: "Zug um {{ states.sensor.zorneding_to_starnberg_nord.attributes.departure }} hat +{{ states.sensor.zorneding_to_starnberg_nord.attributes.delay }} min Verspätung."
-          message: "Nächster Zug: {{ states.sensor.zorneding_to_starnberg_nord.attributes.next }} Uhr"
+          title: "Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} hat +{{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
+          message: "Nächste Sbahn: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
 
-  - alias: "Notify on Sbahn delay. Work -> Home"
+  - alias: "Notify on Sbahn delay Work -> Home"
     hide_entity: true
     initial_state: on
     trigger:
       - platform: template
-        value_template: "{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay | int > 5 }}"
+        value_template: "{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay | int > 3 }}"
     condition:
       condition: and
       conditions:
         - condition: time
-          after: '16:57:00'
+          after: '16:45:00'
           before: '17:30:00'
           weekday:
             - mon
             - tue
             - wed
             - thu
-            - fri
         - condition: template
           value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
     action:
@@ -2397,6 +2453,23 @@
         data:
           title: "Sbahn um {{ states.sensor.starnberg_nord_to_zorneding.attributes.departure }} Uhr nach Hause +{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min."
           message: "Nächste Sbahn: {{ states.sensor.starnberg_nord_to_zorneding.attributes.next }} Uhr"
+
+  - alias: 'Notify on Sbahn delay Work Nessie -> Home'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'Arbeit Nessie'
+        to: 'not_home'
+    condition:
+      - condition: template
+        value_template: "{{ states.sensor.trudering_to_zorneding.attributes.delay | int > 3 }}"
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Sbahn in Trudering um {{ states.sensor.trudering_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.trudering_to_zorneding.attributes.delay }} min Verspätung."
 
   - alias: 'Notify Nessie Fabian on way home'
     hide_entity: true
@@ -2588,6 +2661,9 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 10800 }}"
     action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian

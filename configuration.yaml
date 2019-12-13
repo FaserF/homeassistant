@@ -41,8 +41,6 @@ homeassistant:
       hidden: true
     "automation*":
       hidden: true
-    "sensor.starnberg_nord_to_munchen_pasing*":
-      hidden: true
     "binary_sensor.updater":
       hidden: true
     "sensor.sonoff_1000915e4d_voltage":
@@ -50,6 +48,10 @@ homeassistant:
     "sensor.sonoff_1000915e4d_current":
       hidden: true
     "sensor.silberhornstrasse_to_zorneding":
+      hidden: true
+    "sensor.trudering_to_zorneding":
+      hidden: true
+    "sensor.gewerbegebiet_sued_gilching_to_zorneding":
       hidden: true
     "sensor.starnberg_nord_to_zorneding":
       hidden: true
@@ -132,6 +134,7 @@ recorder:
       - sensor.date
       - sensor.fsphone_charging
       - sensor.vkphone_charging
+      - sensor.fs_smspin
 
 # Checks for available updates
 # Note: This component will send some information about your system to
@@ -330,6 +333,10 @@ sensor:
     to: !secret sbahn_home
     only_direct: true
   - platform: deutsche_bahn
+    from: gewerbegebiet_sued_gilching
+    to: !secret sbahn_home
+    only_direct: true
+  - platform: deutsche_bahn
     from: !secret nessie_work
     to: !secret sbahn_home
     only_direct: false
@@ -337,9 +344,10 @@ sensor:
     from: !secret sbahn_home
     to: Trudering
     only_direct: true
-  # - platform: bitcoin
-  #   display_options:
-  #     - exchangerate
+  - platform: deutsche_bahn
+    from: Trudering
+    to: !secret sbahn_home
+    only_direct: true
   - platform: template
     sensors:
       fsphone_battery:
@@ -362,6 +370,11 @@ sensor:
       vkphone_charging:
         friendly_name: 'PocoF1 Charging'
         value_template: 'not_charging'
+  - platform: template
+    sensors:
+      fs_smspin:
+        friendly_name: 'Mi9T SMS PIN'
+        value_template: 'not_set'
   # Getting Firmware from JSON for Tasmota
   - platform: rest
     resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
