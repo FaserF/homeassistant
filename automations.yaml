@@ -1675,7 +1675,7 @@
           entity_id: group.all_lights
           state: "off"
     action:
-      - service: notify.mobile_app_poco_f1
+      - service: notify.mobile_app_pocophone_f1
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
