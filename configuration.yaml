@@ -51,8 +51,6 @@ homeassistant:
       hidden: true
     "sensor.trudering_to_zorneding":
       hidden: true
-    "sensor.gewerbegebiet_sued_gilching_to_zorneding":
-      hidden: true
     "sensor.starnberg_nord_to_zorneding":
       hidden: true
     "sensor.*status*":
@@ -330,10 +328,6 @@ sensor:
   - platform: fritzbox_netmonitor
   - platform: deutsche_bahn
     from: !secret fabian_work
-    to: !secret sbahn_home
-    only_direct: true
-  - platform: deutsche_bahn
-    from: gewerbegebiet_sued_gilching
     to: !secret sbahn_home
     only_direct: true
   - platform: deutsche_bahn

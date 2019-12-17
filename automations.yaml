@@ -19,24 +19,23 @@
     condition:
       condition: and
       conditions:
-        # - condition: state
-        #   entity_id: device_tracker.google_maps_112174659110860535869
-        #   state: 'not_home'
-        # - condition: state
-        #   entity_id: device_tracker.google_maps_112056758146194246561
-        #   state: 'not_home'
         - condition: template
           value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
         - condition: template
           value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
     action:
       - service: light.turn_off
+        data:
+          entity_id: group.all_lights
       - service: switch.turn_off
         data:
           entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
-          entity_id: switch.bett
+          entity_id: switch.bett #Bett via local message
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326 #Bett via ewelink
       - service: switch.turn_off
         data:
           entity_id: switch.sonoff_100018bc6c
@@ -501,9 +500,6 @@
       condition: and
       conditions:
       - condition: state
-        entity_id: 'switch.bett'
-        state: 'on'
-      - condition: state
         entity_id: 'sensor.fsphone_charging'
         state: 'not_charging'
       - condition: state
@@ -513,6 +509,9 @@
       - service: switch.turn_off
         data:
           entity_id: switch.bett
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326 #Bett via ewelink
 
   - alias: 'Turn on lights in morning'
     hide_entity: true
@@ -663,6 +662,9 @@
       - service: light.turn_off
         data:
           entity_id: group.wohnzimmer
+      - service: switch.turn_off
+        data:
+          entity_id: sonoff_100018bc6c
 
   - alias: 'Turn on lights in livingroom when sun set'
     hide_entity: true
@@ -1399,8 +1401,8 @@
       condition: and
       conditions:
         - condition: time
-          after: '06:30:00'
-          before: '07:10:00'
+          after: '10:30:00'
+          before: '22:30:00'
         - condition: or
           conditions:
           - condition: state
@@ -2515,7 +2517,7 @@
     action:
       - service: notify.telegram_nessie
         data:
-          message: "Fabian ist auf dem Weg nach Hause von Gilching und kommt voraussichtlich um {{ states.sensor.gewerbegebiet_sued_gilching_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.gewerbegebiet_sued_gilching_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+          message: "Fabian ist auf dem Weg nach Hause von Gilching und kommt voraussichtlich in 1,25 Stunden nach Hause."
 
   - alias: 'Notify Nessie Fabian on way home from MUC'
     hide_entity: true
