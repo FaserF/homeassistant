@@ -63,6 +63,10 @@ homeassistant:
       hidden: true
     "switch.sonoff_100016e326":
       hidden: true
+    "sensor.wohnzimmer_temperature":
+      hidden: true
+    "sensor.gastezimmer_temperature":
+      hidden: true
     
 zone:
   # This will override the default home zone
@@ -281,10 +285,14 @@ media_player:
 climate:
   - platform: eq3btsmart
     devices:
-      wohnzimmer:
+      Bad:
         mac: !secret eq3btsmart1
-      schlafzimmer:
+      Schlafzimmer:
         mac: !secret eq3btsmart2
+
+tado:
+  username: !secret defaultmail
+  password: !secret githubpass
 
 weather:
   #- platform: openweathermap
@@ -518,7 +526,10 @@ google_assistant:
   expose_by_default: true
   entity_config:
     light.hyperion:
-      name: Hyperion
+      expose: false
+    climate.gastezimmer:
+      expose: false
+    climate.wohnzimmer:
       expose: false
     group.all_automations:
       expose: false
@@ -535,7 +546,6 @@ google_assistant:
       name: Waschmaschine
       expose: false
     switch.schloss:
-      name: Schloss
       expose: false
 
 google:

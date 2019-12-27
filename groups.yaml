@@ -46,6 +46,7 @@
     entities:
       - media_player.guest_mini
       - light.nachtlampe
+      - climate.gastezimmer
       - light.leds_gastezimmer
       - switch.nessie_pc
 

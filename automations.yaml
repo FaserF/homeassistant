@@ -611,35 +611,35 @@
             Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
-  # - alias: 'Turn on climate if fernseher started'
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger:
-  #     platform: state
-  #     entity_id:
-  #       - device_tracker.tv
-  #     from: 'not_home'
-  #     to: 'home'
-  #   action:
-  #     - service: climate.set_temperature
-  #       data:
-  #         entity_id: climate.wohnzimmer
-  #         temperature: 21
-  #         hvac_mode: heat
+  - alias: 'Turn on climate if Nessie PC started'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id:
+        - device_tracker.nessiepc
+      from: 'not_home'
+      to: 'home'
+    action:
+      - service: climate.set_temperature
+        data:
+          entity_id: climate.gastezimmer
+          temperature: 21
+          hvac_mode: heat
 
-  # - alias: 'Turn off climate if fernseher stopped'
-  #   hide_entity: true
-  #   initial_state: on
-  #   trigger:
-  #     platform: state
-  #     entity_id:
-  #       - device_tracker.tv
-  #     from: 'home'
-  #     to: 'not_home'
-  #   action:
-  #     - service: climate.turn_off
-  #       data:
-  #         entity_id: climate.wohnzimmer
+  - alias: 'Turn off climate if Nessie PC stopped'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id:
+        - device_tracker.nessiepc
+      from: 'home'
+      to: 'not_home'
+    action:
+      - service: climate.turn_off
+        data:
+          entity_id: climate.gastezimmer
 
   - alias: 'Turn on light in sleeping room if fernseher turned off'
     hide_entity: true
