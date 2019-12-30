@@ -490,7 +490,7 @@ switch:
   - platform: command_line
     switches:
       nessie_pc:
-        command_off: 'curl http://192.168.178.58:5001/shutdown'
+        command_off: 'curl http://192.168.178.92:5001/shutdown'
   - platform: sonoff_lan_mode_r3
     name: Bett
     device_id: 100016e326

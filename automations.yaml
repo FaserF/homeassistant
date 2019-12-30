@@ -1081,7 +1081,7 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.5
-          entity_id: media_player.wohnzimmer_mini
+          entity_id: media_player.mibox_s
 
   - alias: Mute Spotify ads wohnzimmer mini
     hide_entity: true
