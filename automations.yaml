@@ -238,9 +238,8 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: sensor.openweather_temperature
-          above: 22.0
+        - condition: template
+          value_template: "{{ states.sensor.openweather_temperature.temperature >= '22' }}"
         - condition: time
           after: '12:00:00'
           before: '21:00:00'
@@ -512,6 +511,32 @@
       - service: switch.turn_off
         data:
           entity_id: switch.sonoff_100016e326 #Bett via ewelink
+
+  - alias: 'Turn off bett after 2,5 hours'
+    hide_entity: true
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - switch.sonoff_100016e326
+        from: 'off'
+        to: 'on'
+        for:
+            minutes: 150
+      - platform: state
+        entity_id:
+          - switch.bett
+        from: 'off'
+        to: 'on'
+        for:
+            minutes: 150
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.sonoff_100016e326
+      - service: switch.turn_off
+        data:
+          entity_id: switch.bett
 
   - alias: 'Turn on lights in morning'
     hide_entity: true
@@ -1646,7 +1671,7 @@
           entity_id: group.all_lights
           state: "off"
     action:
-      - service: notify.mobile_app_redmi_k20
+      - service: notify.mobile_app_mi_9t
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -1677,7 +1702,7 @@
           entity_id: group.all_lights
           state: "off"
     action:
-      - service: notify.mobile_app_pocophone_f1
+      - service: notify.mobile_app_oneplus_3t
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
