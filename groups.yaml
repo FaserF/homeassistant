@@ -22,8 +22,7 @@
       - switch.sonoff_100018bc6c
       - switch.fernseher
       - switch.ventilator
-      - scene.gwgzlgdduflgtsct # Deckenlampen an
-      - scene.v5ay8rhpdsbl4eqs # Deckenlampen aus
+      - switch.deckenlampe
 
   Schlafzimmer:
     name: Schlafzimmer
@@ -36,6 +35,7 @@
       - light.leds_tisch
       - climate.schlafzimmer
       - switch.bett
+      - switch.switch_bett
       - switch.fabian_strom
       - switch.regal
 

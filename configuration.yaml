@@ -448,11 +448,11 @@ light:
   - platform: hyperion
     host: 192.168.178.9
 
-# tuya:
-#   username: !secret tuyauser
-#   password: !secret default
-#   country_code: 49
-#   platform: smart_life
+tuya:
+  username: !secret tuyauser
+  password: !secret default
+  country_code: 49
+  platform: smart_life
 
 sonoff:
   username: !secret defaultmail
