@@ -32,10 +32,10 @@
           entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
-          entity_id: switch.bett #Bett via local message
+          entity_id: switch.switch_bett
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100016e326 #Bett via ewelink
+          entity_id: switch.lichtschalter
       - service: switch.turn_off
         data:
           entity_id: switch.sonoff_100018bc6c
@@ -475,7 +475,6 @@
       - condition: sun
         after: sunset
     action:
-      #- service: shell_command.tv_leds_turnon
       - service: light.turn_on
         data:
           entity_id: light.leds_wohnzimmer
@@ -507,10 +506,7 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.bett
-      - service: switch.turn_off
-        data:
-          entity_id: switch.sonoff_100016e326 #Bett via ewelink
+          entity_id: switch.switch_bett
 
   - alias: 'Turn off bett after 2,5 hours'
     hide_entity: true
@@ -536,7 +532,7 @@
           entity_id: switch.sonoff_100016e326
       - service: switch.turn_off
         data:
-          entity_id: switch.bett
+          entity_id: switch.switch_bett
 
   - alias: 'Turn on lights in morning'
     hide_entity: true
@@ -569,6 +565,9 @@
       - service: light.turn_on
         data:
           entity_id: group.schlafzimmer
+      - service: switch.turn_on
+        data:
+          entity_id: switch.lichtschalter
 
   - alias: 'Remind for leaving wohnzimmer'
     hide_entity: True
@@ -689,7 +688,10 @@
           entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
-          entity_id: sonoff_100018bc6c
+          entity_id: switch.sonoff_100018bc6c
+      - service: switch.turn_off
+        data:
+          entity_id: switch.deckenlampe
 
   - alias: 'Turn on lights in livingroom when sun set'
     hide_entity: true
