@@ -12,10 +12,6 @@
       - media_player.wohnzimmer_mini
       - light.yeelight_color1_34ce008bcc9d #Stehlampe
       - light.hyperion
-      - light.lampe1
-      - light.lampe2
-      - light.lampe3
-      - light.bulb_lr
       - light.leds_wohnzimmer
       - light.wohnzimmer_lampe
       - climate.wohnzimmer
@@ -38,6 +34,8 @@
       - switch.switch_bett
       - switch.fabian_strom
       - switch.regal
+      - switch.0220019768c63aa72808
+      - switch.lichtschalter
 
   Gästezimmer:
     name: Gästezimmer

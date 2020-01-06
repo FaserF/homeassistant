@@ -67,6 +67,10 @@ homeassistant:
       hidden: true
     "sensor.gastezimmer_temperature":
       hidden: true
+    "switch.reserve*":
+      hidden: true
+    "light.reserve*":
+      hidden: true
     
 zone:
   # This will override the default home zone
@@ -545,7 +549,15 @@ google_assistant:
     switch.sonoff_1000915e4d:
       name: Waschmaschine
       expose: false
+    switch.reserve_coosa:
+      expose: false
+    switch.reserve_klein:
+      expose: false
+    light.reserve_bulb_blue:
+      expose: false
     switch.schloss:
+      expose: false
+    switch.0220019768c63aa72808:
       expose: false
 
 google:
