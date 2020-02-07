@@ -1,5 +1,4 @@
   - alias: 'Turn off everything if nobody is at home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -23,10 +22,16 @@
           value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
         - condition: template
           value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: device_tracker.fabianphone
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.nessiephone
+          state: not_home
     action:
       - service: light.turn_off
         data:
-          entity_id: group.all_lights
+          entity_id: all
       - service: switch.turn_off
         data:
           entity_id: group.wohnzimmer
@@ -38,10 +43,13 @@
           entity_id: switch.lichtschalter
       - service: switch.turn_off
         data:
+          entity_id: switch.deckenlampe
+      - service: switch.turn_off
+        data:
           entity_id: switch.sonoff_100018bc6c
       - service: switch.turn_off
         data:
-          entity_id: switch.regal
+          entity_id: switch.regal_leds
       - service: switch.turn_off
         data:
           entity_id: switch.ventilator
@@ -64,11 +72,9 @@
           entity_id: media_player.schlafzimmer
       - service: media_player.turn_off
         data:
-          entity_id: media_player.guest_mini
-          #entity_id: media_player.mini_gruppe
+          entity_id: media_player.gastezimmer_mini
 
   - alias: 'Turn off fabian pc if nobody is at home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -104,7 +110,6 @@
             - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
 
   - alias: 'If nobody is at home and nessie pc is on'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -146,7 +151,6 @@
             - 'Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc'
 
   - alias: 'If nobody is at home and nessie pc strom is on'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -184,7 +188,6 @@
           entity_id: switch.nessie_pc
 
   - alias: 'If nobody is at home and fabian pc strom is on'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -222,7 +225,6 @@
           entity_id: switch.fabian_strom
 
   - alias: 'Turn on ventilator if coming home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -249,7 +251,6 @@
           entity_id: switch.ventilator
 
   - alias: 'Turn on lights if coming home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -281,7 +282,7 @@
           entity_id: group.wohnzimmer
 
   # - alias: 'Turn on thermostats if coming home'
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     - platform: state
@@ -324,7 +325,6 @@
   #         operation_mode: Heat
 
   - alias: 'Turn on tleds if fpc starts'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -347,10 +347,14 @@
           entity_id: light.leds_tisch
       - service: switch.turn_on
         data:
-          entity_id: switch.regal
+          entity_id: switch.regal_leds
+      - service: climate.set_temperature
+        data:
+          entity_id: climate.schlafzimmer
+          temperature: 21
+          hvac_mode: heat
 
   - alias: 'Turn off tleds if fpc starts'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -371,10 +375,13 @@
           entity_id: light.leds_tisch
       - service: switch.turn_off
         data:
-          entity_id: switch.regal
+          entity_id: switch.regal_leds
+      - service: climate.set_hvac_mode
+        data:
+          entity_id: climate.schlafzimmer
+          hvac_mode: 'auto'
 
   - alias: 'Turn on light if npc starts'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -395,7 +402,6 @@
           entity_id: group.gastezimmer
 
   - alias: 'Turn off lights if npc stops'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -411,7 +417,6 @@
           entity_id: group.gastezimmer
 
   - alias: 'Turn off strom if npc stops'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -427,7 +432,6 @@
           entity_id: switch.nessie_pc
 
   - alias: 'Turn off tleds if fpc stops'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -443,7 +447,6 @@
           entity_id: light.leds_tisch
 
   - alias: 'Turn off strom if fpc stops'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -459,7 +462,6 @@
           entity_id: switch.fabian_strom
 
   - alias: 'Turn on light if tv starts'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -483,7 +485,6 @@
           entity_id: light.yeelight_color1_34ce008bcc9d
 
   - alias: 'Turn off bett if no device is charging'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -494,6 +495,12 @@
         entity_id: sensor.vkphone_charging
         from: 'charging'
         to: 'not_charging'
+      #- condition: state
+      #  entity_id: 'sensor.battery_state_ipad'
+      #  state: 'Not Charging'
+      #- condition: state
+      #  entity_id: 'sensor.battery_level_ipad'
+      #  state: '100'
     condition:
       condition: and
       conditions:
@@ -503,13 +510,20 @@
       - condition: state
         entity_id: 'sensor.vkphone_charging'
         state: 'not_charging'
+      #- condition: or
+      #  conditions:
+      #  - condition: state
+      #    entity_id: 'sensor.battery_state_ipad'
+      #    state: 'Not Charging'
+      #  - condition: state
+      #    entity_id: 'sensor.battery_level_ipad'
+      #    state: '100'
     action:
       - service: switch.turn_off
         data:
           entity_id: switch.switch_bett
 
   - alias: 'Turn off bett after 2,5 hours'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -521,7 +535,7 @@
             minutes: 150
       - platform: state
         entity_id:
-          - switch.bett
+          - switch.switch_bett
         from: 'off'
         to: 'on'
         for:
@@ -535,7 +549,6 @@
           entity_id: switch.switch_bett
 
   - alias: 'Turn on lights in morning'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -570,7 +583,6 @@
           entity_id: switch.lichtschalter
 
   - alias: 'Remind for leaving wohnzimmer'
-    hide_entity: True
     initial_state: True
     trigger:
       - platform: time
@@ -604,7 +616,6 @@
             {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Remind for leaving schlafzimmer'
-    hide_entity: True
     initial_state: True
     trigger:
       - platform: time
@@ -636,7 +647,6 @@
             {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Turn on climate if Nessie PC started'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: state
@@ -652,7 +662,6 @@
           hvac_mode: heat
 
   - alias: 'Turn off climate if Nessie PC stopped'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: state
@@ -661,12 +670,12 @@
       from: 'home'
       to: 'not_home'
     action:
-      - service: climate.turn_off
+      - service: climate.set_hvac_mode
         data:
           entity_id: climate.gastezimmer
+          hvac_mode: 'auto'
 
   - alias: 'Turn on light in sleeping room if fernseher turned off'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: state
@@ -694,7 +703,6 @@
           entity_id: switch.deckenlampe
 
   - alias: 'Turn on lights in livingroom when sun set'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: sun
@@ -713,7 +721,6 @@
           entity_id: light.yeelight_color1_34ce008bcc9d
 
   - alias: 'Turn on lights in sleeping room when sun set'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: sun
@@ -734,10 +741,9 @@
           entity_id: light.leds_tisch
       - service: switch.turn_on
         data:
-          entity_id: switch.regal
+          entity_id: switch.regal_leds
 
   - alias: 'Turn on lights in guest room room when sun set'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: sun
@@ -753,7 +759,6 @@
           entity_id: group.gastezimmer
 
   - alias: 'Turn on fridge for Gruppentreffen'
-    hide_entity: True
     initial_state: True
     trigger:
       - platform: time
@@ -784,7 +789,6 @@
             - 'Ausschalten:/fridgeoff'
 
   - alias: 'Turn on Strom Keller'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -804,7 +808,6 @@
           message: 'Strom im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
   - alias: 'on HA restart'
-    hide_entity: True
     initial_state: 'true'
     trigger:
       platform: homeassistant
@@ -813,9 +816,21 @@
       - service: frontend.set_theme
         data:
           name: slate
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Homeassistant wurde soeben gestartet.'
+          
+  - alias: "Let's Encrypt Renewal"
+    trigger:
+    - platform: time
+      at: '00:02:00'
+    action:
+    - service: hassio.addon_restart
+      data:
+        addon: core_letsencrypt
 
   - alias: Turn on Steckerleiste1 Keller
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -826,7 +841,6 @@
         data: {"event":"turn_on_steckerleiste1"}
 
   - alias: Turn off Steckerleiste1 Keller
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -843,7 +857,6 @@
           entity_id: input_boolean.strom2_keller
 
   - alias: Turn on Steckerleiste2 Keller
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -854,7 +867,6 @@
         data: {"event":"turn_on_steckerleiste2"}
 
   - alias: Turn off Steckerleiste2 Keller
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -871,7 +883,6 @@
           entity_id: input_boolean.strom2_keller
 
   - alias: Turn on Steckerleiste3 Keller
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -882,7 +893,6 @@
         data: {"event":"turn_on_steckerleiste3"}
 
   - alias: Turn off Steckerleiste3 Keller
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -899,7 +909,6 @@
           entity_id: input_boolean.strom_keller
 
   - alias: 'HA Update Available'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -915,7 +924,6 @@
           - 'Update starten:/updateha'
 
   - alias: 'Tasmota Update Available'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -935,7 +943,6 @@
           - 'Update starten:/updatetasmota'
 
   - alias: 'Notify for SMS PIN Fabian'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -948,7 +955,6 @@
         data_template:
           message: "Der Security Code lautet: {{ states('sensor.fs_smspin') }}"
           target: 
-            - Fabian-Mi9T
             - Fabian-PC
             - Fabian-Hackbook
             - Chrome-Arbeit
@@ -957,7 +963,6 @@
             tag: 'notification-about-sensor'
 
   - alias: 'Incoming Call Fabian'
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: state
@@ -983,7 +988,6 @@
           entity_id: automation.incoming_call_fabian
 
   - alias: 'Incoming Call Nessie'
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: state
@@ -1009,7 +1013,7 @@
           entity_id: automation.incoming_call_nessie
 
   # - alias: "Check for SBahn Delay"
-  #   hide_entity: true
+  # 
   #   initial_state: off
   #   trigger:
   #     - platform: template
@@ -1020,7 +1024,7 @@
   #         message: "Sbahn nach MUC: {{ states.sensor.zorneding_to_truedering.attributes.departure }} Uhr +{{ states.sensor.zorneding_to_truedering.attributes.delay }} min }}"
 
   # - alias: 'Coinbase balance above 200'
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     - platform: template
@@ -1034,7 +1038,7 @@
   #           - 'Ja:/sellbtc, Nein:/telegramno'
 
   # - alias: 'Telegram Sell BTC'
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     platform: event
@@ -1054,7 +1058,6 @@
   #     - service: shell_command.sellbtc
 
   - alias: Turn Schloss off after turning on
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
@@ -1066,7 +1069,6 @@
           entity_id: switch.schloss
 
   - alias: Nessie Phone Battery below 5 %
-    hide_entity: true
     initial_state: on
     trigger:
       platform: numeric_state
@@ -1080,7 +1082,6 @@
           message: ''
 
   - alias: Fabi Phone Battery below 5 %
-    hide_entity: true
     initial_state: on
     trigger:
       platform: numeric_state
@@ -1093,25 +1094,27 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  - alias: connect to adb on tv startup and change volume
-    hide_entity: true
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.tv
-        from: 'not_home'
-        to: 'home'
-    action:
-      - service: shell_command.adbconnecttv
-      - delay: '00:00:03'
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.5
-          entity_id: media_player.mibox_s
+  #- alias: connect to adb on tv startup and change volume
+
+    #initial_state: on
+    #trigger:
+      #- platform: state
+        #entity_id:
+          #- device_tracker.tv
+        #from: 'not_home'
+        #to: 'home'
+    #action:
+      #service: androidtv.adb_command
+      #data:
+        #entity_id: media_player.mibox_s
+        #command: "HOME"
+      #- delay: '00:00:03'
+      #- service: media_player.volume_set
+        #data:
+          #volume_level: 0.5
+          #entity_id: media_player.mibox_s
 
   - alias: Mute Spotify ads wohnzimmer mini
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template 
@@ -1123,15 +1126,15 @@
         data:
           entity_id: media_player.wohnzimmer_mini
           is_volume_muted: true
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
       - service: automation.turn_off
         data:
           entity_id: automation.mute_spotify_ads_wohnzimmer_mini
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
 
   - alias: Unmute after Spotify ads wohnzimmer mini
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: template 
@@ -1150,15 +1153,15 @@
         data:
           entity_id: media_player.wohnzimmer_mini
           is_volume_muted: false
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_wohnzimmer_mini
       - service: automation.turn_off
         data:
           entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_wohnzimmer_mini
 
   - alias: Mute Spotify ads schlafzimmer
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template 
@@ -1170,15 +1173,15 @@
         data:
           entity_id: media_player.schlafzimmer
           is_volume_muted: true
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_schlafzimmer
       - service: automation.turn_off
         data:
           entity_id: automation.mute_spotify_ads_schlafzimmer
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_schlafzimmer
 
   - alias: Unmute after Spotify ads schlafzimmer
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: template 
@@ -1197,15 +1200,15 @@
         data:
           entity_id: media_player.schlafzimmer
           is_volume_muted: false
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_schlafzimmer
       - service: automation.turn_off
         data:
           entity_id: automation.unmute_after_spotify_ads_schlafzimmer
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_schlafzimmer
 
   - alias: Mute Spotify ads mi box
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template 
@@ -1217,15 +1220,15 @@
         data:
           entity_id: media_player.mi_box
           is_volume_muted: true
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_mi_box
       - service: automation.turn_off
         data:
           entity_id: automation.mute_spotify_ads_mi_box
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_mi_box
 
   - alias: Unmute after Spotify ads mi box
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: template 
@@ -1244,15 +1247,15 @@
         data:
           entity_id: media_player.mi_box
           is_volume_muted: false
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_mi_box
       - service: automation.turn_off
         data:
           entity_id: automation.unmute_after_spotify_ads_mi_box
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_mi_box
 
   - alias: Mute Spotify ads mini Gruppe
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template 
@@ -1264,15 +1267,15 @@
         data:
           entity_id: media_player.mini_gruppe
           is_volume_muted: true
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_mini_gruppe
       - service: automation.turn_off
         data:
           entity_id: automation.mute_spotify_ads_mini_gruppe
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_mini_gruppe
 
   - alias: Unmute after Spotify ads mini Gruppe
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: template 
@@ -1291,21 +1294,21 @@
         data:
           entity_id: media_player.mini_gruppe
           is_volume_muted: false
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_mini_gruppe
       - service: automation.turn_off
         data:
           entity_id: automation.unmute_after_spotify_ads_mini_gruppe
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_mini_gruppe
 
   - alias: Mute Spotify ads guest mini
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template 
-        value_template: "{{ states.media_player.guest_mini.attributes.media_title == 'Advertisement' }}"
+        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Advertisement' }}"
       - platform: template 
-        value_template: "{{ states.media_player.guest_mini.attributes.media_title == 'Spotify' }}"
+        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Spotify' }}"
     condition:
       condition: and
       conditions:
@@ -1316,23 +1319,23 @@
     action:
       - service: media_player.volume_mute
         data:
-          entity_id: media_player.guest_mini
+          entity_id: media_player.gastezimmer_mini
           is_volume_muted: true
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_guest_mini
       - service: automation.turn_off
         data:
-          entity_id: automation.mute_spotify_ads_guest_mini
+          entity_id: automation.mute_spotify_ads_gastezimmer_mini
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_gastezimmer_mini
 
   - alias: Unmute after Spotify ads guest mini
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: template 
-        value_template: "{{ states.media_player.guest_mini.attributes.media_title != 'Advertisement' }}"
+        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
       - platform: template 
-        value_template: "{{ states.media_player.guest_mini.attributes.media_title != 'Spotify' }}"
+        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Spotify' }}"
     condition:
       condition: and
       conditions:
@@ -1343,17 +1346,17 @@
     action:
       - service: media_player.volume_mute
         data:
-          entity_id: media_player.guest_mini
+          entity_id: media_player.gastezimmer_mini
           is_volume_muted: false
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_guest_mini
       - service: automation.turn_off
         data:
-          entity_id: automation.unmute_after_spotify_ads_guest_mini
+          entity_id: automation.unmute_after_spotify_ads_gastezimmer_mini
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_gastezimmer_mini
 
   - alias: Mute Spotify ads keller tv
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template 
@@ -1372,15 +1375,15 @@
         data:
           entity_id: media_player.keller_tv
           is_volume_muted: true
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_keller_tv
       - service: automation.turn_off
         data:
           entity_id: automation.mute_spotify_ads_keller_tv
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.unmute_after_spotify_ads_keller_tv
 
   - alias: Unmute after Spotify ads keller tv
-    hide_entity: true
     initial_state: off
     trigger:
       - platform: template 
@@ -1399,15 +1402,15 @@
         data:
           entity_id: media_player.keller_tv
           is_volume_muted: false
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_keller_tv
       - service: automation.turn_off
         data:
           entity_id: automation.unmute_after_spotify_ads_keller_tv
+      - delay: '00:00:07'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.mute_spotify_ads_keller_tv
 
   - alias: Fritzbox Public IP Change
-    hide_entity: true
     initial_state: on
     trigger:
       platform: template 
@@ -1418,7 +1421,6 @@
           message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
 
   - alias: Fritzbox Internet no access
-    hide_entity: true
     initial_state: on
     trigger:
       platform: template 
@@ -1447,7 +1449,7 @@
           message: 'Die Fritzbox hat keine Internet Verbindung!'
 
   # - alias: Fritzbox Internet access returned
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     platform: template 
@@ -1465,7 +1467,7 @@
   #         message: 'Die Fritzbox hat keine Internet Verbindung!'
 
   # - alias: Internet Speed Test Poor Fabian
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     - platform: template
@@ -1479,7 +1481,7 @@
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ state.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
 
   # - alias: Internet Speed Test Poor Nessie
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     - platform: template
@@ -1495,27 +1497,283 @@
   #       data:
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
+  - alias: Deckenlampe Button Hold
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.deckenlampe
+        platform: state
+        to: 'HOLD'
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: group.wohnzimmer
+      - service: switch.turn_off
+        data:
+          entity_id: group.wohnzimmer
+
+  - alias: Notify for high humidity
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.gastezimmer_humidity
+        above: 57
+      - platform: numeric_state
+        entity_id: sensor.wohnzimmer_humidity
+        above: 57
+    condition:
+      - condition: state
+        entity_id: device_tracker.fabianphone
+        state: home
+      - condition: state
+        entity_id: device_tracker.nessiephone
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
+    action:
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+          - media_player.gastezimmer_mini
+      - service: media_player.media_pause
+        data:
+          entity_id: media_player.mibox_s
+      - service: tts.google_translate_say
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
+        - media_player.gastezimmer_mini
+        data:
+          message: 'Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+          - media_player.gastezimmer_mini
+          
+  - alias: Notify for extreme high humidity
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.gastezimmer_humidity
+        above: 65
+      - platform: numeric_state
+        entity_id: sensor.wohnzimmer_humidity
+        above: 65
+    condition:
+      - condition: state
+        entity_id: device_tracker.fabianphone
+        state: not_home
+      - condition: state
+        entity_id: device_tracker.nessiephone
+        state: not_home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Achtung, sehr hohe Luftfeuchtigkeit. Luftfeuchtigkeit Wohnzimmer: {{ states.climate.wohnzimmer.attributes.current_humidity }} %. Luftfeuchtigkeit Gästezimmer: {{ states.climate.gastezimmer.attributes.current_humidity }} %.'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          message: 'Achtung, sehr hohe Luftfeuchtigkeit. Luftfeuchtigkeit Wohnzimmer: {{ states.climate.wohnzimmer.attributes.current_humidity }} %. Luftfeuchtigkeit Gästezimmer: {{ states.climate.gastezimmer.attributes.current_humidity }} %.'
+          
+  - alias: Notify for high humidity when coming home
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: device_tracker.nessiephone
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.fabianphone
+        from: 'not_home'
+        to: 'home'
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.gastezimmer_humidity
+        above: 57
+      - condition: numeric_state
+        entity_id: sensor.wohnzimmer_humidity
+        above: 57
+      - condition: time
+        before: '22:00:00'
+      - condition: time
+        after: '05:00:00'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
+    action:
+      - delay: 00:05:00
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+          - media_player.gastezimmer_mini
+      - service: tts.google_translate_say
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
+        - media_player.gastezimmer_mini
+        data:
+          message: 'Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+          - media_player.gastezimmer_mini
+
   - alias: Turn on Strom Keller automation after strom turning off
-    hide_entity: true
     initial_state: on
     trigger: 
       - platform: state
-        entity_id: switch.sonoff_1000915e4d
+        entity_id: switch.waschmaschine
         to: 'off'
     action:
       - service: automation.turn_on
         data:
           entity_id: automation.strom_keller_an
 
-  - alias: washing machine finished
-    hide_entity: true
-    initial_state: off
+  # - alias: washing machine finished
+  # 
+  #   initial_state: off
+  #   trigger:
+  #     platform: numeric_state
+  #     entity_id: sensor.waschmaschine_energy_power
+  #     below: 4
+  #     for: '00:12:00'
+  #   action:
+  #     - service: notify.telegram_nessie
+  #       data:
+  #         message: 'Die Waschmaschine ist fertig.'
+  #     - service: notify.telegram_fabian
+  #       data:
+  #         message: 'Die Waschmaschine ist fertig.'
+  #     - service: tts.google_translate_say
+  #       entity_id: media_player.schlafzimmer
+  #       data:
+  #         message: 'Die Waschmaschine ist fertig!'
+  #     - service: automation.turn_off
+  #       data:
+  #         entity_id: automation.washing_machine_finished
+  #     - service: tts.google_translate_say
+  #       entity_id: media_player.wohnzimmer_mini
+  #       data:
+  #         message: 'Die Waschmaschine ist fertig!'
+  #     - service: switch.turn_off
+  #       data:
+  #         entity_id: switch.waschmaschine
+  #     - service: automation.turn_on
+  #       data:
+  #         entity_id: automation.washing_machine_started
+
+  # - alias: washing machine started
+  # 
+  #   initial_state: on
+  #   trigger:
+  #     platform: numeric_state
+  #     entity_id: sensor.waschmaschine_energy_power
+  #     above: 4
+  #     for: '00:00:15'
+  #   action:
+  #     - service: notify.telegram_nessie
+  #       data:
+  #         message: 'Die Waschmaschine wurde gestartet.'
+  #     - service: notify.telegram_fabian
+  #       data:
+  #         message: 'Die Waschmaschine wurde gestartet.'
+  #     - service: automation.turn_on
+  #       data:
+  #         entity_id: automation.washing_machine_finished
+  #     - service: automation.turn_off
+  #       data:
+  #         entity_id: automation.washing_machine_started
+
+# When power is detected, and the washing machine is not in 
+# the Running state, change the status of the washing machine
+# to Running. 
+# The status check will ensure we don't try to put the state 
+# to Running each time the power level changes, and we're already
+# in the Running state.
+ 
+  - alias: Set washing machine active when power detected
     trigger:
-      platform: numeric_state
-      entity_id: sensor.sonoff_1000915e4d_power
-      below: 4
-      for: '00:12:00'
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 6
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.washing_machine_state
+          state: Idle
+        - condition: state
+          entity_id: sensor.washing_machine_state
+          state: Clean
+        - condition: state
+          entity_id: sensor.washing_machine_state
+          state: Finishing
     action:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.washing_machine_status
+          option: Running
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Waschmaschine wurde gestartet.'
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Waschmaschine wurde gestartet.'
+  
+  # When the power drops, move the state of the washing machine to 
+  # Finishing.
+  
+  - alias: Set washing machine finished when power drops
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        below: 6
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_select.washing_machine_status
+          state: Running
+    action:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.washing_machine_status
+          option: Finishing
+  
+  # Wait 8 minutes for us to be in the Finishing state before we
+  # decide the washing machine has finished. This way, if the 
+  # washing machine is in between cycles and the power drops, we 
+  # won't mark the washing machine cycle as finished too early.
+  
+  - alias: Set washing machine clean after timeout
+    trigger:
+      - platform: state
+        entity_id: input_select.washing_machine_status
+        to: Finishing
+        for:
+          minutes: 10
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_select.washing_machine_status
+          state: Finishing
+    action:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.washing_machine_status
+          option: Clean
       - service: notify.telegram_nessie
         data:
           message: 'Die Waschmaschine ist fertig.'
@@ -1526,48 +1784,19 @@
         entity_id: media_player.schlafzimmer
         data:
           message: 'Die Waschmaschine ist fertig!'
-      - service: automation.turn_off
-        data:
-          entity_id: automation.washing_machine_finished
       - service: tts.google_translate_say
         entity_id: media_player.wohnzimmer_mini
         data:
           message: 'Die Waschmaschine ist fertig!'
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_1000915e4d
-      - service: automation.turn_on
-        data:
-          entity_id: automation.washing_machine_started
-
-  - alias: washing machine started
-    hide_entity: true
-    initial_state: on
-    trigger:
-      platform: numeric_state
-      entity_id: sensor.sonoff_1000915e4d_power
-      above: 4
-      for: '00:00:15'
-    action:
-      - service: notify.telegram_nessie
-        data:
-          message: 'Die Waschmaschine wurde gestartet.'
-      - service: notify.telegram_fabian
-        data:
-          message: 'Die Waschmaschine wurde gestartet.'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.washing_machine_finished
-      - service: automation.turn_off
-        data:
-          entity_id: automation.washing_machine_started
+          entity_id: switch.waschmaschine
 
   - alias: strom keller an
-    hide_entity: true
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.sonoff_1000915e4d_power
+      entity_id: sensor.waschmaschine_energy_power
       above: 4
       for: '00:00:20'
     action:
@@ -1585,7 +1814,6 @@
           entity_id: automation.strom_keller_an
 
   - alias: 'Remind for going off Nessie'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: time
@@ -1608,14 +1836,19 @@
         data_template:
           message: "Es ist 22 Uhr - Zeit off zu gehen."
           target: 
-            - Nessie-F1
             - Nessie-PC
+        data:
+          data:
+            tag: 'notification-about-sensor'
+      - service: notify.mobile_app_mi_9t_2
+        data_template:
+          title: "Zeit off zu gehen"
+          message: "Es ist 22 Uhr."
         data:
           data:
             tag: 'notification-about-sensor'
 
   - alias: 'Remind for going off Fabi'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: time
@@ -1643,15 +1876,20 @@
         data_template:
           message: "Es ist 22 Uhr - Zeit off zu gehen."
           target: 
-            - Fabian-Mi9T
             - Fabian-PC
             - Fabian-Hackbook
         data:
           data:
             tag: 'notification-about-sensor'
+      - service: notify.mobile_app_mi_9t
+        data_template:
+          title: "Zeit off zu gehen"
+          message: "Es ist 22 Uhr."
+        data:
+          data:
+            tag: 'notification-about-sensor'
 
   - alias: 'Turn on Airplane Mode Fabi'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: time
@@ -1669,9 +1907,11 @@
         - condition: state
           entity_id: device_tracker.fabianphone
           state: home
-        - condition: state
-          entity_id: group.all_lights
-          state: "off"
+        - condition: template
+          value_template: >
+            {% set domain = 'light' %}
+            {% set state = 'off' %}
+            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
     action:
       - service: notify.mobile_app_mi_9t
         data_template:
@@ -1682,7 +1922,6 @@
             tag: 'notification-about-sensor'
 
   - alias: 'Turn on Airplane Mode Nessie'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: time
@@ -1700,11 +1939,13 @@
         - condition: state
           entity_id: device_tracker.nessiephone
           state: home
-        - condition: state
-          entity_id: group.all_lights
-          state: "off"
+        - condition: template
+          value_template: >
+            {% set domain = 'light' %}
+            {% set state = 'off' %}
+            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
     action:
-      - service: notify.mobile_app_oneplus_3t
+      - service: notify.mobile_app_mi_9t_2
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -1714,7 +1955,6 @@
 
   - alias: 'Remind Nessie for pill'
     initial_state: on
-    hide_entity: True
     trigger:
       platform: time
       at: '19:50:00'
@@ -1728,7 +1968,6 @@
 
   - alias: 'Remind Nessie for overtime'
     initial_state: on
-    hide_entity: True
     trigger:
       platform: time
       at: '16:15:00'
@@ -1749,7 +1988,6 @@
             - 'Nein:/telegramno, 0-5h:/overtime05, 1-0h:/overtime10, 1-5h:/overtime15, 2-0h:/overtime20, -0-5h:/overtime-05'
 
   - alias: 'Telegram overtime-05'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1762,14 +2000,15 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - service: shell_command.overtime_input_minus_05
+      - service: shell_command.overtime_input
+        data_template:
+            hours_overtime: '-0,5'
       - service: notify.telegram_nessie
         data:
           title: 'Eine Halbe Überstunde wurde für heute eingelöst.'
           message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
 
   - alias: 'Telegram overtime05'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1782,14 +2021,15 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - service: shell_command.overtime_input05
+      - service: shell_command.overtime_input
+        data_template:
+            hours_overtime: '-0,5'
       - service: notify.telegram_nessie
         data:
           title: 'Eine Halbe Überstunde wurde für heute eingetragen.'
           message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
 
   - alias: 'Telegram overtime10'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1802,14 +2042,15 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - service: shell_command.overtime_input10
+      - service: shell_command.overtime_input
+        data_template:
+            hours_overtime: '-0,5'
       - service: notify.telegram_nessie
         data:
           title: 'Eine Überstunde wurde für heute eingetragen.'
           message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
 
   - alias: 'Telegram overtime15'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1822,14 +2063,15 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - service: shell_command.overtime_input15
+      - service: shell_command.overtime_input
+        data_template:
+            hours_overtime: '-0,5'
       - service: notify.telegram_nessie
         data:
           title: '1,5 Überstunden wurden für heute eingetragen.'
           message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
 
   - alias: 'Telegram overtime20'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1842,14 +2084,15 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - service: shell_command.overtime_input20
+      - service: shell_command.overtime_input
+        data_template:
+            hours_overtime: '-0,5'
       - service: notify.telegram_nessie
         data:
           title: 'Zwei Überstunden wurden für heute eingetragen.'
           message: "Überstunden Übersicht: https://smartlife.ddns.net/overtime"
 
   - alias: 'Telegram urgent message'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1869,7 +2112,7 @@
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
-        - media_player.guest_mini
+        - media_player.gastezimmer_mini
         data_template:
           message: >
             Wichtige Nachricht von
@@ -1895,7 +2138,6 @@
           entity_id: media_player.wohnzimmer_mini
 
   - alias: 'Telegram open door'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1915,7 +2157,6 @@
           message: 'Gartentor wurde geöffnet.'
 
   - alias: 'Telegram open door - secretly'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1935,7 +2176,6 @@
           message: 'Du hast ein Easter Egg gefunden. Gartentor wurde geöffnet'
 
   - alias: 'Telegram virtual bell'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1974,7 +2214,6 @@
           entity_id: media_player.wohnzimmer_mini
 
   - alias: 'Telegram pill marked done'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -1993,7 +2232,6 @@
           inline_keyboard: []
 
   - alias: 'Nessie forgot pill'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: time
@@ -2020,7 +2258,6 @@
             - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
 
   - alias: 'Telegram pill 1h'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2046,7 +2283,6 @@
             - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
 
   - alias: 'Telegram shutdown fpc'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2072,7 +2308,6 @@
           entity_id: switch.fabian_strom
 
   - alias: 'Telegram hibernate fpc'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2092,7 +2327,6 @@
           inline_keyboard: []
 
   - alias: 'Telegram shutdown npc'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2116,7 +2350,6 @@
           entity_id: switch.nessie_pc
 
   - alias: 'Telegram hibernate npc'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2136,7 +2369,6 @@
           inline_keyboard: []
 
   - alias: Telegram Reboot HA
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2151,7 +2383,6 @@
       - service: homeassistant.restart
 
   - alias: Telegram Reboot
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2167,7 +2398,6 @@
       - service: shell_command.quick_restart
 
   - alias: Telegram Help
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2184,7 +2414,6 @@
           /food - zufälliger Essensvorschlag"
 
   - alias: Telegram Admin
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2203,7 +2432,6 @@
           /updateha - Homeassistant Update starten"
 
   - alias: Telegram Status
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2218,7 +2446,6 @@
           Last system reboot was on {{ states('sensor.last_boot') }}."
 
   - alias: 'Tägliche Essensvorschläge'
-    hide_entity: True
     initial_state: on
     trigger:
       platform: time
@@ -2238,10 +2465,9 @@
           message: 'Gericht heute zubereiten?'
           disable_notification: true
           inline_keyboard:
-            - 'Ja:/foodyes, Nein:/telegramno'
+            - 'Ja:/foodyes, Nein:/foodno'
 
   - alias: Telegram Essen
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2259,10 +2485,9 @@
           message: ''
           disable_notification: true
           inline_keyboard:
-            - 'Ja:/foodyes, Nein:/telegramno'
+            - 'Ja:/foodyes, Nein:/foodno'
 
   - alias: Telegram Essen Vegetarisch
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2281,10 +2506,9 @@
           message: ''
           disable_notification: true
           inline_keyboard:
-            - 'Ja:/foodyes, Nein:/telegramno'
+            - 'Ja:/foodyes, Nein:/foodno'
 
   - alias: Telegram Essen Fleisch
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2303,10 +2527,9 @@
           message: ''
           disable_notification: true
           inline_keyboard:
-            - 'Ja:/foodyes, Nein:/telegramno'
+            - 'Ja:/foodyes, Nein:/foodno'
 
   - alias: 'Telegram food yes'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2318,18 +2541,6 @@
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
           message: 'Okay.'
-      # - service: telegram_bot.send_message
-      #   data_template:
-      #     title: 'Das essen für heute wurde entschieden'
-      #     target: !secret telegram_chat_fabian
-      #     message: ''
-      #     disable_notification: true
-      # - service: telegram_bot.send_message
-      #   data_template:
-      #     title: 'Das essen für heute wurde entschieden'
-      #     target: !secret telegram_chat_nessie
-      #     message: ''
-      #     disable_notification: true
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
@@ -2341,9 +2552,37 @@
           chat_id: !secret telegram_chat_fabian 
           inline_keyboard: []
       - service: shell_command.foodyes
+      
+  - alias: 'Telegram food no'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/foodno'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay, neues Essen.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: shell_command.randomfood
+        data_template:
+          telegram_sender: '{{ trigger.event.data.user_id }}'
+      - service: telegram_bot.send_message
+        data_template:
+          title: 'Gericht heute zubereiten?'
+          target: "{{ trigger.event.data.user_id }}"
+          message: ''
+          disable_notification: true
+          inline_keyboard:
+            - 'Ja:/foodyes, Nein:/foodno'
 
   - alias: 'Telegram answer no'
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2362,7 +2601,6 @@
           inline_keyboard: []
 
   - alias: Turn off fridge
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2389,7 +2627,6 @@
         inline_keyboard: []
 
   - alias: Telegram HA Update
-    hide_entity: true
     initial_state: on
     trigger:
       platform: event
@@ -2409,7 +2646,7 @@
           inline_keyboard: []
 
   # - alias: "Notify Nessie on Train delay Home -> Work"
-  #   hide_entity: true
+  # 
   #   initial_state: on
   #   trigger:
   #     - platform: template
@@ -2433,7 +2670,6 @@
   #         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
 
   - alias: "Notify Fabi on sbahn delay Home -> Work"
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template
@@ -2459,7 +2695,6 @@
           message: "Nächste Sbahn: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
 
   - alias: "Notify on Sbahn delay Work -> Home"
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: template
@@ -2484,7 +2719,6 @@
           message: "Nächste Sbahn: {{ states.sensor.starnberg_nord_to_zorneding.attributes.next }} Uhr"
 
   - alias: 'Notify on Sbahn delay Work Nessie -> Home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -2501,7 +2735,6 @@
           message: "Sbahn in Trudering um {{ states.sensor.trudering_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.trudering_to_zorneding.attributes.delay }} min Verspätung."
 
   - alias: 'Notify Nessie Fabian on way home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -2524,7 +2757,6 @@
           message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
 
   - alias: 'Notify Nessie Fabian on way home from GIL'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -2547,7 +2779,6 @@
           message: "Fabian ist auf dem Weg nach Hause von Gilching und kommt voraussichtlich in 1,25 Stunden nach Hause."
 
   - alias: 'Notify Nessie Fabian on way home from MUC'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -2567,10 +2798,9 @@
     action:
       - service: notify.telegram_nessie
         data:
-          message: "Fabian ist auf dem Weg nach Hause von Gräfelfing und kommt voraussichtlich um {{ states.sensor.seeholzenerstrasse_graefelfing_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.seeholzenerstrasse_graefelfing_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+          message: "Fabian ist auf dem Weg nach Hause von Gräfelfing und kommt voraussichtlich in einer Stunde in Zorneding an."
 
   - alias: 'Notify Nessie Fabian on way home from WHM'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -2590,10 +2820,9 @@
     action:
       - service: notify.telegram_nessie
         data:
-          message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich."
+          message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich. Voraussichtlich daheim in ca. 1,5 Stunden."
 
   - alias: 'Notify Fabian Nessie on way home'
-    hide_entity: true
     initial_state: on
     trigger:
       - platform: state
@@ -2690,9 +2919,6 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 10800 }}"
     action:
-      - service: notify.telegram_fabian
-        data:
-          message: "Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.arrival }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -2748,3 +2974,20 @@
 
             Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
             {% endif %}
+
+  - alias: 'remind for jek'
+    initial_state: True
+    trigger:
+      #- platform: template
+      #  value_template: "{{ ((as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - as_timestamp(now())) < 86400) }}"
+      #- platform: template
+      #  value_template: "{{ ((as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - as_timestamp(now())) > 86400) }}"
+      - platform: template
+        value_template: "{{ is_state_attr('calendar.jugendtreffjek_gmail_com', 'offset_reached', 'true') }}"
+    action:
+      - service: shell_command.jek_telegram
+      #- service: telegram_bot.send_message
+      #  data_template:
+      #    target: !secret telegram_chat_jek_group
+      #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
+          

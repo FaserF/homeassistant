@@ -11,6 +11,7 @@
       - media_player.mibox_s
       - media_player.wohnzimmer_mini
       - light.yeelight_color1_34ce008bcc9d #Stehlampe
+      - liht.stehlampe
       - light.hyperion
       - light.leds_wohnzimmer
       - light.wohnzimmer_lampe
@@ -27,14 +28,15 @@
     entities:
       - media_player.schlafzimmer
       - light.yeelight_strip1_34ce008b1863 #Bett LEDs
-      - light.bettlicht
+      - light.leds_bett
+      - light.bett_gluhbirne
       - light.leds_tisch
       - climate.schlafzimmer
       - switch.bett
       - switch.switch_bett
       - switch.fabian_strom
-      - switch.regal
-      - switch.0220019768c63aa72808
+      - switch.fabian_pc_shutdown
+      - switch.regal_leds
       - switch.lichtschalter
 
   Gästezimmer:
@@ -43,10 +45,11 @@
     icon: mdi:laptop
     entities:
       - media_player.guest_mini
-      - light.nachtlampe
+      - light.lampe_gastezimmer
       - climate.gastezimmer
       - light.leds_gastezimmer
       - switch.nessie_pc
+      - switch.nessie_pc_shutdown
 
   Keller:
     name: Keller
@@ -54,7 +57,7 @@
     icon: mdi:washing-machine
     entities:
       - media_player.keller_tv
-      - switch.sonoff_1000915e4d
+      - switch.waschmaschine
       - input_boolean.strom_keller
       - input_boolean.strom2_keller
       - input_boolean.kuehlschrank_keller

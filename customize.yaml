@@ -8,3 +8,7 @@ sensor.fritz_netmonitor:
   hidden: true
 sensor.yr_temperature:
   hidden: true
+person.fabian:
+  entity_picture: '/local/fabian.jpg'
+person.nessie:
+  entity_picture: '/local/nessie.jpg'

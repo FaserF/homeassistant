@@ -17,15 +17,15 @@ homeassistant:
   longitude: !secret longitude
   # Impacts weather/sunrise data (altitude above sea level in meters)
   elevation: !secret elevation
-  # metric for Metric, imperial for Imperial
-  unit_system: metric
+  # metric for Metric, imperial for Imperialf
+  #unit_system: metricbinary_sensor.snapshots_stale
   # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   time_zone: Europe/Berlin
   # Customization file
   customize: !include customize.yaml
-  whitelist_external_dirs:
-  - '/mnt/usb-drive/smarthome/'
-  - '/home/cadmin/scripts/'
+  #whitelist_external_dirs:
+  #- '/mnt/usb-drive/smarthome/'
+  #- '/home/cadmin/scripts/'
   customize_glob:
     "sensor.fsphone_charging":
       hidden: true
@@ -70,6 +70,16 @@ homeassistant:
     "switch.reserve*":
       hidden: true
     "light.reserve*":
+      hidden: true
+    "binary_sensor.snapshots_stale":
+      hidden: true
+    "sensor.snapshot_backup":
+      hidden: true
+    "*snapshots_*":
+      hidden: true
+    "input_select.washing_machine_status":
+      hidden: true
+    "sensor.battery_state_ipad":
       hidden: true
     
 zone:
@@ -117,7 +127,6 @@ api:
 mobile_app:
 
 http:
-  # Secrets are defined in the file secrets.yaml
   ssl_certificate: !secret ssl_certificate
   ssl_key: !secret ssl_key
   base_url: !secret baseurl
@@ -155,6 +164,7 @@ updater:
 discovery:
   ignore:
     - igd
+    #- yeelight
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 #conversation:
@@ -226,6 +236,11 @@ telegram_bot:
       - !secret telegram_chat_maxi
       - !secret telegram_chat_fabio
       - !secret telegram_chat_5friends
+      - !secret telegram_chat_jek_group
+      
+twilio:
+  account_sid: !secret twilio_sid
+  auth_token: !secret twilio_token
 
 notify:
   - name: pushbullet_fabian
@@ -249,12 +264,15 @@ notify:
     name: sbahn_txt
     filename: /mnt/usb-drive/smarthome/sbahndelay.txt
     timestamp: false
+  - name: twilio_whatsapp
+    platform: twilio_whatsapp
+    from_number: whatsapp:+14155238886
 
 media_player:
   - platform: androidtv
     name: MiBox S
     device_class: androidtv
-    host: 192.168.178.37
+    host: 192.168.178.41
     adb_server_ip: 127.0.0.1
     apps:
       com.liskovsoft.videomanager: "Smart YoutTube TV"
@@ -268,13 +286,20 @@ media_player:
       'com.google.android.tvlauncher':
         - 'standby'
       'com.netflix.ninja':
-        - 'media_session_state'
+        - 'playing':
+            'media_session_state': 3
+        - 'paused':
+            'media_session_state': 2
       'com.spotify.tv.android':
-        - 'audio_state'
+        - 'playing':
+            'media_session_state': 3
+        - 'paused':
+            'media_session_state': 2
       'com.google.android.apps.mediashell':
         - 'audio_state'
       'com.liskovsoft.videomanager':
-        - 'media_session_state'
+        - 'playing':
+            'media_session_state': 3
   # - platform: spotify
   #   client_id: !secret spotifyid
   #   client_secret: !secret spotifysecret
@@ -306,27 +331,19 @@ weather:
     api_key: !secret darksky
     name: Wetter darksky
 
-#link shortcuts
-#weblink:
-#  entities:
-#    - name: FritzBox
-#      url: http://fritz.box
-#      icon: mdi:router-wireless
-
 shell_command:
-  randomfood: '/bin/bash /home/cadmin/scripts/randomfood.sh {{ telegram_sender }} {{ vegetarisch }}'
-  foodyes: 'bash /home/cadmin/scripts/foodyes.sh'
-  updateha: 'bash /home/cadmin/scripts/update-homeassistant.sh'
-  adbconnecttv: 'bash /home/cadmin/scripts/adbconnect.sh'
-  quick_restart: 'sudo init 6'
-  hibernatefpc: 'curl http://192.168.178.62:5001/hibernate'
-  hibernatenpc: 'curl http://192.168.178.58:5001/hibernate'
-  shutdownnpc: 'curl http://192.168.178.58:5001/shutdown'
-  overtime_input_minus_05: 'bash /home/cadmin/scripts/overtime_input.sh -0.5'
-  overtime_input05: 'bash /home/cadmin/scripts/overtime_input.sh 0.5'
-  overtime_input10: 'bash /home/cadmin/scripts/overtime_input.sh 1.0'
-  overtime_input15: 'bash /home/cadmin/scripts/overtime_input.sh 1.5'
-  overtime_input20: 'bash /home/cadmin/scripts/overtime_input.sh 2.0'
+  #create_keys: ssh-keygen -t rsa -N "" -f my.key
+  randomfood: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}'
+  foodyes: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes'
+  jek_telegram: !secret telegram_jek_open_command
+  #randomfood: 'ssh cadmin@7208ad356903 "/bin/bash /home/cadmin/scripts/randomfood.sh {{ telegram_sender }} {{ vegetarisch }}"'
+  #foodyes: 'ssh cadmin@7208ad356903 "/bin/bash /home/cadmin/scripts/foodyes.sh "'
+  quick_restart: 'shutdown -r now'
+  hibernatefpc: 'curl http://192.168.178.65:5001/hibernate'
+  hibernatenpc: 'curl http://192.168.178.92:5001/hibernate'
+  shutdownnpc: 'curl http://192.168.178.92:5001/shutdown'
+  overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
+  #overtime_input_minus_05: 'ssh cadmin@7208ad356903 "/bin/bash /home/cadmin/scripts/overtime_input.sh {{ hours_overtime }}"'
 
 coinbase:
   api_key: !secret coinbase_key
@@ -337,6 +354,11 @@ coinbase:
     - BTC
 
 sensor:
+  - platform: template
+    sensors:
+      washing_machine_state:
+        value_template: '{{ states.input_select.washing_machine_status.state}}'
+        friendly_name: 'Waschmaschine Status'
   - platform: fritzbox_netmonitor
   - platform: deutsche_bahn
     from: !secret fabian_work
@@ -354,27 +376,33 @@ sensor:
     from: Trudering
     to: !secret sbahn_home
     only_direct: true
+  #- platform: mqtt
+    #name: "Deckenlampe"
+    #state_topic: "stat/deckenlampe/BUTTON1"
+    #value_template: "{{ value_json.POWER }}"
+    #qos: 1
+    #expire_after: "1"  # Forget what just happen
   - platform: template
     sensors:
       fsphone_battery:
-        friendly_name: 'Mi9T'
+        friendly_name: 'Fabi-Phone'
         value_template: '{{states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | round}}'
         unit_of_measurement: '%'
   - platform: template
     sensors:
       vkphone_battery:
-        friendly_name: 'PocoF1'
+        friendly_name: 'Nessie-Phone'
         value_template: '{{states.device_tracker.google_maps_112056758146194246561.attributes.battery_level | round}}'
         unit_of_measurement: '%'
   - platform: template
     sensors:
       fsphone_charging:
-        friendly_name: 'Mi9T Charging'
+        friendly_name: 'Fabi Charging'
         value_template: 'not_charging'
   - platform: template
     sensors:
       vkphone_charging:
-        friendly_name: 'PocoF1 Charging'
+        friendly_name: 'Nessie Charging'
         value_template: 'not_charging'
   - platform: template
     sensors:
@@ -418,45 +446,31 @@ sensor:
       - precip_intensity
       - precip_type
       - uv_index
-  # - platform: sql
-  #   db_url: !secret db_url
-  #   scan_interval: 600
-  #   queries:
-  #     - name: randomfood
-  #       query: 'SELECT ID FROM food WHERE active='y' ORDER BY RAND() ASC LIMIT 0,1;'
-  #       column: 'value'
-        #unit_of_measurement: 
-  # - platform: pi_hole
-  #   monitored_conditions:
-  #     - ads_blocked_today
-  #Package tracking
- # - platform: aftership
- #   api_key: !secret aftership_api
 
 light:
   #Xiaomi Yeelight
   #- platform: yeelight
   #  devices:
-  #    192.168.178.202:
+  #    192.168.178.247:
   #      name: Stehlampe
   #      transition: 1000
-  #    192.168.178.201:
-  #      name: LEDs Schlafzimmer
+  #    192.168.178.246:
+  #      name: LEDs Bett
   #MagicHue LEDs
   - platform: flux_led
     devices:
-      192.168.178.205:
+      192.168.178.249:
         name: LEDs Gästezimmer
-      192.168.178.200:
+      192.168.178.248:
         name: LEDs Tisch
   - platform: hyperion
     host: 192.168.178.9
 
-tuya:
-  username: !secret tuyauser
-  password: !secret default
-  country_code: 49
-  platform: smart_life
+#tuya:
+#  username: !secret tuyauser
+#  password: !secret default
+#  country_code: 49
+#  platform: smart_life
 
 sonoff:
   username: !secret defaultmail
@@ -474,32 +488,25 @@ homekit:
       - devices
 
 mqtt:
-  broker: localhost
+  broker: core-mosquitto
+  username: !secret mqttuser
+  password: !secret mqttpass
   discovery: true
     
 switch:
-  - platform: mqtt
-    name: "Schloss"
-    state_topic: "ha/schloss"
-    command_topic: "ha/schloss"
-    qos: 0
-    payload_on: "ON"
-    payload_off: "OFF"
-    optimistic: false 
-    retain: true
   - platform: command_line
     switches:
-      fabian_pc:
-        command_off: 'curl http://192.168.178.62:5001/shutdown'
+      fabian_pc_shutdown:
+        command_off: 'curl http://192.168.178.65:5001/shutdown'
   - platform: command_line
     switches:
-      nessie_pc:
+      nessie_pc_shutdown:
         command_off: 'curl http://192.168.178.92:5001/shutdown'
-  - platform: sonoff_lan_mode_r3
-    name: Bett
-    device_id: 100016e326
-    api_key: 1bed0f5f-3848-4ab3-9b89-fb43faade84b
-    icon: mdi:power-plug
+  #- platform: sonoff_lan_mode_r3
+    #name: Bett
+    #device_id: 100016e326
+    #api_key: 1bed0f5f-3848-4ab3-9b89-fb43faade84b
+    #icon: mdi:power-plug
   # - platform: sonoff_lan_mode_r3
   #   name: Waschmaschine
   #   device_id: 1000915e4d
@@ -522,7 +529,9 @@ switch:
 
 google_assistant:
   project_id: !secret google_assistant_id
-  api_key: !secret google_assistant_api
+  service_account: !include Homeassistant SmartLife-f9d43c517637.json
+  report_state: true
+  #api_key: !secret google_assistant_api
   exposed_domains:
     - climate
     - switch
@@ -531,6 +540,16 @@ google_assistant:
   entity_config:
     light.hyperion:
       expose: false
+    switch.fabian_strom:
+      name: Strom Schlafzimmer
+      expose: true
+      room: Schlafzimmer
+    light.lampe_gastezimmer:
+      name: Nachtlampe
+      expose: true
+    switch.deckenlampe:
+      name: Deckenlampe Licht
+      expose: true
     climate.gastezimmer:
       expose: false
     climate.wohnzimmer:
@@ -545,19 +564,19 @@ google_assistant:
       expose: false
     switch.sonoff_100018bc6c:
       name: Diffusor
-      expose: false
+      expose: true
     switch.sonoff_1000915e4d:
       name: Waschmaschine
       expose: false
     switch.reserve_coosa:
       expose: false
-    switch.reserve_klein:
-      expose: false
     light.reserve_bulb_blue:
       expose: false
     switch.schloss:
       expose: false
-    switch.0220019768c63aa72808:
+    switch.nessie_pc_shutdown:
+      expose: false
+    switch.fabian_pc_shutdown:
       expose: false
 
 google:
@@ -571,10 +590,32 @@ tts:
     language: 'de'
 
 panel_iframe:
-  mdiindex:
-    title: MDI Icon Index
-    icon: mdi:vector-square
-    url: https://cdn.rawgit.com/james-fry/home-assistant-mdi/efd95d7a/home-assistant-mdi.html
+  tasmoadmin:
+    title: TasmoAdmin
+    icon: mdi:lightbulb-on
+    url: https://smartlife.ddns.net:8124
+  fritzbox:
+    title: FritzBox
+    icon: mdi:router-wireless
+    url: https://smartlife.ddns.net:32270
+  bookstack:
+    title: Bookstack
+    icon: mdi:format-vertical-align-bottom
+    url: https://smartlife.ddns.net:2665
+  #mdiindex:
+  #  title: MDI Icon Index
+  #  icon: mdi:vector-square
+  #  url: https://cdn.rawgit.com/james-fry/home-assistant-mdi/efd95d7a/home-assistant-mdi.html
+
+input_select:
+  washing_machine_status:
+    name: Washing Machine Status
+    options:
+      - Idle
+      - Running
+      - Finishing
+      - Clean
+    initial: Idle
 
 input_boolean: !include input_boolean.yaml
 # Enables the frontend (Themes)
