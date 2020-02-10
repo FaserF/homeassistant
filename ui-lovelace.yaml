@@ -3,6 +3,8 @@ resources:
     type: module
   - url: /community_plugin/simple-thermostat/simple-thermostat.js 
     type: module
+  - url: /local/slider-entity-row.js 
+    type: module
 
 title: Fabian's Smart Home
 path: default_view
@@ -12,11 +14,11 @@ views:
     badges:
       - entity: person.fabian
       - entity: person.nessie
-      - entity: sensor.vkphone_battery
-      - entity: sensor.washing_machine_state
-      - entity: sensor.fs_smspin
       - entity: sensor.fsphone_battery
+      - entity: sensor.vkphone_battery
       - entity: sensor.battery_level_ipad
+      - entity: sensor.fs_smspin
+      - entity: sensor.washing_machine_state
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.gastezimmer_humidity
       - entity: sensor.tasmota_firmware_available
@@ -27,16 +29,30 @@ views:
       - entity: sensor.waschmaschine_energy_power
     cards:
       - entities:
-          - light.bett_gluhbirne
-          - switch.regal_leds
           - switch.lichtschalter
-          - light.lampe_gastezimmer
-          - light.leds_wohnzimmer
           - switch.deckenlampe
-          - light.leds_tisch
-          - light.leds_gastezimmer
-          - light.yeelight_strip1_34ce008b1863
-          - light.yeelight_color1_34ce008bcc9d
+          - switch.regal_leds
+          - entity: light.bett_gluhbirne
+            type: custom:slider-entity-row 
+            group: true
+          - entity: light.lampe_gastezimmer
+            type: custom:slider-entity-row 
+            group: true
+          - entity: light.leds_wohnzimmer
+            type: custom:slider-entity-row 
+            group: true
+          - entity: light.leds_tisch
+            type: custom:slider-entity-row 
+            group: true
+          - entity: light.leds_gastezimmer
+            type: custom:slider-entity-row 
+            group: true
+          - entity: light.yeelight_strip1_34ce008b1863
+            type: custom:slider-entity-row 
+            group: true
+          - entity: light.yeelight_color1_34ce008bcc9d
+            type: custom:slider-entity-row 
+            group: true
         show_header_toggle: true
         title: Licht
         type: entities
@@ -61,31 +77,31 @@ views:
         show_header_toggle: true
         title: PC & mehr
         type: entities
-      - entity: climate.bad
+      - entity: climate.wohnzimmer
         type: custom:simple-thermostat
+        sensors:
+          - sensor.wohnzimmer_humidity
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - sensor.gastezimmer_humidity
-      - entity: climate.wohnzimmer
+      - entity: climate.bad
         type: custom:simple-thermostat
-        sensors:
-          - sensor.wohnzimmer_humidity
+      - entity: media_player.mi_box
+        type: custom:mini-media-player
+      - entity: media_player.mibox_s
+        type: custom:mini-media-player
+      - entity: media_player.wohnzimmer_mini
+        type: custom:mini-media-player
+      - entity: media_player.schlafzimmer
+        type: custom:mini-media-player
       - entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
       - entity: media_player.keller_tv
         type: custom:mini-media-player
-      - entity: media_player.schlafzimmer
-        type: custom:mini-media-player
-      - entity: media_player.mi_box
-        type: custom:mini-media-player
-      - entity: media_player.wohnzimmer_mini
-        type: custom:mini-media-player
       - entity: media_player.mini_gruppe
-        type: custom:mini-media-player
-      - entity: media_player.mibox_s
         type: custom:mini-media-player
       - entity: weather.wetter_darksky
         type: weather-forecast
