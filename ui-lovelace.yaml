@@ -1,6 +1,8 @@
 resources:
   - url: /community_plugin/mini-media-player/mini-media-player-bundle.js 
     type: module
+  - url: /community_plugin/simple-custom:simple-thermostat/simple-custom:simple-thermostat.js 
+    type: module
 
 title: Fabian's Smart Home
 path: default_view
@@ -60,13 +62,13 @@ views:
         title: PC & mehr
         type: entities
       - entity: climate.bad
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: climate.schlafzimmer
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: climate.gastezimmer
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: climate.wohnzimmer
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
       - entity: media_player.keller_tv
@@ -106,7 +108,7 @@ views:
         title: Strom
         type: entities
       - entity: climate.wohnzimmer
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: media_player.mibox_s
         type: custom:mini-media-player
       - entity: media_player.mi_box
@@ -138,7 +140,7 @@ views:
         title: Fabian PC
         type: entities
       - entity: climate.schlafzimmer
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: media_player.schlafzimmer
         type: custom:mini-media-player
 
@@ -162,7 +164,7 @@ views:
         title: Nessie PC
         type: entities
       - entity: climate.gastezimmer
-        type: thermostat
+        type: custom:simple-thermostat
       - entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
 
