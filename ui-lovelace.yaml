@@ -5,8 +5,6 @@ resources:
     type: module
   - url: /local/slider-entity-row.js 
     type: module
-  - url: /community_plugin/lovelace-card-mod/card-mod.js 
-    type: module
 
 title: Fabian's Smart Home
 path: default_view
@@ -30,27 +28,25 @@ views:
     #   - entity: sensor.fabian_strom_energy_power
     #   - entity: sensor.waschmaschine_energy_power
     cards:
-      - type: custom:card-mod
-        card:
-          type: glance
-          title: Sensoren      
-          column_width: calc(100% / 5)
-          entities:
-            - person.fabian
-            - person.nessie
-            - sensor.fsphone_battery
-            - sensor.vkphone_battery
-            - sensor.battery_level_ipad
-            - sensor.fs_smspin
-            - sensor.washing_machine_state
-            - sensor.wohnzimmer_humidity
-            - sensor.gastezimmer_humidity
-            - sensor.tasmota_firmware_available
-            - sensor.fernseher_energy_today
-            - sensor.fernseher_energy_power
-            - sensor.fabian_strom_energy_today
-            - sensor.fabian_strom_energy_power
-            - sensor.waschmaschine_energy_power
+      - type: glance
+        title: Sensoren      
+        column_width: calc(100% / 5)
+        entities:
+          - person.fabian
+          - person.nessie
+          - sensor.fsphone_battery
+          - sensor.vkphone_battery
+          - sensor.battery_level_ipad
+          - sensor.fs_smspin
+          - sensor.washing_machine_state
+          - sensor.wohnzimmer_humidity
+          - sensor.gastezimmer_humidity
+          - sensor.tasmota_firmware_available
+          - sensor.fernseher_energy_today
+          - sensor.fernseher_energy_power
+          - sensor.fabian_strom_energy_today
+          - sensor.fabian_strom_energy_power
+          - sensor.waschmaschine_energy_power
       - entities:
           - switch.lichtschalter
           - switch.deckenlampe
