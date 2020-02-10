@@ -41,30 +41,34 @@ views:
         show_header_toggle: true
         title: Strom
         type: entities
-        - entities:
+      - entities:
           - switch.nessie_pc_shutdown
           - switch.fabian_pc_shutdown
           - input_boolean.silent_mode
         show_header_toggle: true
         title: PC & mehr
         type: entities
-        - entity: climate.bad
+      - entity: climate.bad
         type: thermostat
-        - entity: climate.schlafzimmer
+      - entity: climate.schlafzimmer
         type: thermostat
-        - entity: media_player.gastezimmer_mini
-        type: media-control
-        - entity: media_player.keller_tv
-        type: media-control
-        - entity: media_player.schlafzimmer
-        type: media-control
-        - entity: media_player.mi_box
-        type: media-control
-        - entity: media_player.wohnzimmer_mini
-        type: media-control
-        - entity: media_player.mini_gruppe
-        type: media-control
-        - entity: media_player.mibox_s
-        type: media-control
-        - entity: climate.schlafzimmer
+      - entity: climate.gastezimmer
         type: thermostat
+      - entity: climate.wohnzimmer
+        type: thermostat
+      - entity: media_player.gastezimmer_mini
+        type: media-control
+      - entity: media_player.keller_tv
+        type: media-control
+      - entity: media_player.schlafzimmer
+        type: media-control
+      - entity: media_player.mi_box
+        type: media-control
+      - entity: media_player.wohnzimmer_mini
+        type: media-control
+      - entity: media_player.mini_gruppe
+        type: media-control
+      - entity: media_player.mibox_s
+        type: media-control
+      - entity: weather.wetter_darksky
+        type: weather-forecast
