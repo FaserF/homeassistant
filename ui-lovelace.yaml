@@ -5,29 +5,52 @@ resources:
     type: module
   - url: /local/slider-entity-row.js 
     type: module
+  - url: /community_plugin/lovelace-card-mod/card-mod.js 
+    type: module
 
 title: Fabian's Smart Home
 path: default_view
 views:
   - title: Home
     icon: mdi:home-variant
-    badges:
-      - entity: person.fabian
-      - entity: person.nessie
-      - entity: sensor.fsphone_battery
-      - entity: sensor.vkphone_battery
-      - entity: sensor.battery_level_ipad
-      - entity: sensor.fs_smspin
-      - entity: sensor.washing_machine_state
-      - entity: sensor.wohnzimmer_humidity
-      - entity: sensor.gastezimmer_humidity
-      - entity: sensor.tasmota_firmware_available
-      - entity: sensor.fernseher_energy_today
-      - entity: sensor.fernseher_energy_power
-      - entity: sensor.fabian_strom_energy_today
-      - entity: sensor.fabian_strom_energy_power
-      - entity: sensor.waschmaschine_energy_power
+    # badges:
+    #   - entity: person.fabian
+    #   - entity: person.nessie
+    #   - entity: sensor.fsphone_battery
+    #   - entity: sensor.vkphone_battery
+    #   - entity: sensor.battery_level_ipad
+    #   - entity: sensor.fs_smspin
+    #   - entity: sensor.washing_machine_state
+    #   - entity: sensor.wohnzimmer_humidity
+    #   - entity: sensor.gastezimmer_humidity
+    #   - entity: sensor.tasmota_firmware_available
+    #   - entity: sensor.fernseher_energy_today
+    #   - entity: sensor.fernseher_energy_power
+    #   - entity: sensor.fabian_strom_energy_today
+    #   - entity: sensor.fabian_strom_energy_power
+    #   - entity: sensor.waschmaschine_energy_power
     cards:
+      - type: custom:card-mod
+        card:
+          type: glance
+          title: Sensoren      
+          column_width: calc(100% / 5)
+          entities:
+            - person.fabian
+            - person.nessie
+            - sensor.fsphone_battery
+            - sensor.vkphone_battery
+            - sensor.battery_level_ipad
+            - sensor.fs_smspin
+            - sensor.washing_machine_state
+            - sensor.wohnzimmer_humidity
+            - sensor.gastezimmer_humidity
+            - sensor.tasmota_firmware_available
+            - sensor.fernseher_energy_today
+            - sensor.fernseher_energy_power
+            - sensor.fabian_strom_energy_today
+            - sensor.fabian_strom_energy_power
+            - sensor.waschmaschine_energy_power
       - entities:
           - switch.lichtschalter
           - switch.deckenlampe
@@ -35,24 +58,31 @@ views:
           - entity: light.bett_gluhbirne
             type: custom:slider-entity-row 
             group: true
+            toggle: true
           - entity: light.lampe_gastezimmer
             type: custom:slider-entity-row 
             group: true
+            toggle: true
           - entity: light.leds_wohnzimmer
             type: custom:slider-entity-row 
             group: true
+            toggle: true
           - entity: light.leds_tisch
             type: custom:slider-entity-row 
             group: true
+            toggle: true
           - entity: light.leds_gastezimmer
             type: custom:slider-entity-row 
             group: true
+            toggle: true
           - entity: light.yeelight_strip1_34ce008b1863
             type: custom:slider-entity-row 
             group: true
+            toggle: true
           - entity: light.yeelight_color1_34ce008bcc9d
             type: custom:slider-entity-row 
             group: true
+            toggle: true
         show_header_toggle: true
         title: Licht
         type: entities
