@@ -1,7 +1,7 @@
 resources:
   - url: /community_plugin/mini-media-player/mini-media-player-bundle.js 
     type: module
-  - url: /community_plugin/simple-custom:simple-thermostat/simple-custom:simple-thermostat.js 
+  - url: /community_plugin/simple-thermostat/simple-thermostat.js 
     type: module
 
 title: Fabian's Smart Home
@@ -67,8 +67,12 @@ views:
         type: custom:simple-thermostat
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
+        sensors:
+          - sensor.gastezimmer_humidity
       - entity: climate.wohnzimmer
         type: custom:simple-thermostat
+        sensors:
+          - sensor.wohnzimmer_humidity
       - entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
       - entity: media_player.keller_tv
@@ -109,6 +113,8 @@ views:
         type: entities
       - entity: climate.wohnzimmer
         type: custom:simple-thermostat
+        sensors:
+          - sensor.wohnzimmer_humidity
       - entity: media_player.mibox_s
         type: custom:mini-media-player
       - entity: media_player.mi_box
@@ -165,6 +171,8 @@ views:
         type: entities
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
+        sensors:
+          - sensor.gastezimmer_humidity
       - entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
 
