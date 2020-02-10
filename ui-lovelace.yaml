@@ -2,7 +2,8 @@ title: Fabian's Smart Home
 path: default_view
 views:
   - title: Home
-  - badges:
+    icon: mdi:home-variant
+    badges:
       - entity: person.fabian
       - entity: person.nessie
       - entity: sensor.vkphone_battery
@@ -76,7 +77,8 @@ views:
 
   - title: Wohnzimmer
     path: wohnzimmer
-  - badges:
+    icon: mdi:home-variant
+    badges:
       - entity: sensor.wohnzimmer_humidity
     cards:
       - entities:
@@ -103,6 +105,7 @@ views:
 
   - title: Schlafzimmer
     path: schlafzimmer
+    icon: mdi:home-variant
     cards:
       - entities:
           - light.bett_gluhbirne
@@ -131,8 +134,9 @@ views:
         type: media-control
 
   - title: Gästezimmer
+    icon: mdi:home-variant
     path: gastezimmer
-  - badges:
+    badges:
       - entity: sensor.gastezimmer_humidity
     cards:
       - entities:
@@ -155,7 +159,8 @@ views:
 
   - title: Keller
     path: keller
-  - badges:
+    icon: mdi:home-variant
+    badges:
       - entity: sensor.washing_machine_state
     cards:
       - entities:
