@@ -14,6 +14,11 @@ views:
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.gastezimmer_humidity
       - entity: sensor.tasmota_firmware_available
+      - entity: sensor.fernseher_energy_today
+      - entity: sensor.fernseher_energy_power
+      - entity: sensor.fabian_strom_energy_today
+      - entity: sensor.fabian_strom_energy_power
+      - entity: sensor.waschmaschine_energy_power
     cards:
       - entities:
           - light.bett_gluhbirne
@@ -77,9 +82,11 @@ views:
 
   - title: Wohnzimmer
     path: wohnzimmer
-    icon: mdi:home-variant
+    icon: mdi:television
     badges:
       - entity: sensor.wohnzimmer_humidity
+      - entity: sensor.fernseher_energy_today
+      - entity: sensor.fernseher_energy_power
     cards:
       - entities:
           - light.leds_wohnzimmer
@@ -105,7 +112,7 @@ views:
 
   - title: Schlafzimmer
     path: schlafzimmer
-    icon: mdi:home-variant
+    icon: mdi:hotel
     cards:
       - entities:
           - light.bett_gluhbirne
@@ -113,20 +120,18 @@ views:
           - switch.lichtschalter
           - light.leds_tisch
           - light.yeelight_strip1_34ce008b1863
+          - switch.switch_bett
         show_header_toggle: true
-        title: Licht
+        title: Licht & Strom
         type: entities
       - entities:
+          - switch.fabian_strom
           - device_tracker.fabianpc
           - switch.fabian_pc_shutdown
+          - sensor.fabian_strom_energy_today
+          - sensor.fabian_strom_energy_power
         show_header_toggle: true
         title: Fabian PC
-        type: entities
-      - entities:
-          - switch.switch_bett
-          - switch.fabian_strom
-        show_header_toggle: true
-        title: Strom
         type: entities
       - entity: climate.schlafzimmer
         type: thermostat
@@ -134,7 +139,7 @@ views:
         type: media-control
 
   - title: Gästezimmer
-    icon: mdi:home-variant
+    icon: mdi:desktop-tower
     path: gastezimmer
     badges:
       - entity: sensor.gastezimmer_humidity
@@ -159,9 +164,10 @@ views:
 
   - title: Keller
     path: keller
-    icon: mdi:home-variant
+    icon: mdi:washing-machine
     badges:
       - entity: sensor.washing_machine_state
+      - entity: sensor.waschmaschine_energy_power
     cards:
       - entities:
           - switch.waschmaschine
