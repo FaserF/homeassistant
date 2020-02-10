@@ -1,4 +1,5 @@
 title: Fabian's Smart Home
+path: default_view
 views:
   - badges:
       - entity: person.fabian
@@ -8,8 +9,6 @@ views:
       - entity: sensor.fs_smspin
       - entity: sensor.fsphone_battery
       - entity: sensor.battery_level_ipad
-      - entity: sensor.gastezimmer_temperature
-      - entity: sensor.wohnzimmer_temperature
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.gastezimmer_humidity
       - entity: sensor.tasmota_firmware_available
@@ -32,6 +31,7 @@ views:
           - switch.waschmaschine
           - switch.switch_bett
           - switch.fabian_strom
+          - switch.nessie_pc
           - switch.fernseher
           - switch.ventilator
           - input_boolean.kuehlschrank_keller
@@ -72,3 +72,105 @@ views:
         type: media-control
       - entity: weather.wetter_darksky
         type: weather-forecast
+
+title: Wohnzimmer
+path: wohnzimmer
+views:
+  - badges:
+      - entity: sensor.wohnzimmer_temperature
+      - entity: sensor.wohnzimmer_humidity
+    cards:
+      - entities:
+          - light.leds_wohnzimmer
+          - switch.deckenlampe
+          - light.yeelight_color1_34ce008bcc9d
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - switch.fernseher
+          - switch.ventilator
+        show_header_toggle: true
+        title: Strom
+        type: entities
+      - entity: climate.wohnzimmer
+        type: thermostat
+      - entity: media_player.mibox_s
+        type: media-control
+      - entity: media_player.mi_box
+        type: media-control
+      - entity: media_player.wohnzimmer_mini
+        type: media-control
+
+title: Schlafzimmer
+path: schlafzimmer
+views:
+  - badges:
+      - entity: device_tracker.fabianpc
+    cards:
+      - entities:
+          - light.bett_gluhbirne
+          - switch.regal_leds
+          - switch.lichtschalter
+          - light.leds_tisch
+          - light.yeelight_strip1_34ce008b1863
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - device_tracker.fabianpc
+          - switch.fabian_pc_shutdown
+        show_header_toggle: true
+        title: Fabian PC
+        type: entities
+      - entities:
+          - switch.switch_bett
+          - switch.fabian_strom
+        show_header_toggle: true
+        title: Strom
+        type: entities
+      - entity: climate.schlafzimmer
+        type: thermostat
+      - entity: media_player.schlafzimmer
+        type: media-control
+
+title: Gästezimmer
+path: gastezimmer
+views:
+  - badges:
+      - entity: sensor.gastezimmer_humidity
+    cards:
+      - entities:
+          - light.lampe_gastezimmer
+          - light.leds_gastezimmer
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - switch.nessie_pc
+          - switch.nessie_pc_shutdown
+          - device_tracker.nessiepc
+        show_header_toggle: false
+        title: Nessie PC
+        type: entities
+      - entity: climate.gastezimmer
+        type: thermostat
+      - entity: media_player.gastezimmer_mini
+        type: media-control
+
+title: Keller
+path: keller
+views:
+  - badges:
+      - entity: sensor.washing_machine_state
+    cards:
+      - entities:
+          - switch.waschmaschine
+          - input_boolean.kuehlschrank_keller
+          - input_boolean.strom_keller
+          - input_boolean.strom2_keller
+        show_header_toggle: true
+        title: Strom
+        type: entities
+      - entity: media_player.keller_tv
+        type: media-control
