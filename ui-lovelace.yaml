@@ -1,6 +1,7 @@
 title: Fabian's Smart Home
 path: default_view
 views:
+  - title: Home
   - badges:
       - entity: person.fabian
       - entity: person.nessie
@@ -73,11 +74,9 @@ views:
       - entity: weather.wetter_darksky
         type: weather-forecast
 
-title: Wohnzimmer
-path: wohnzimmer
-views:
+  - title: Wohnzimmer
+    path: wohnzimmer
   - badges:
-      - entity: sensor.wohnzimmer_temperature
       - entity: sensor.wohnzimmer_humidity
     cards:
       - entities:
@@ -102,11 +101,8 @@ views:
       - entity: media_player.wohnzimmer_mini
         type: media-control
 
-title: Schlafzimmer
-path: schlafzimmer
-views:
-  - badges:
-      - entity: device_tracker.fabianpc
+  - title: Schlafzimmer
+    path: schlafzimmer
     cards:
       - entities:
           - light.bett_gluhbirne
@@ -134,9 +130,8 @@ views:
       - entity: media_player.schlafzimmer
         type: media-control
 
-title: Gästezimmer
-path: gastezimmer
-views:
+  - title: Gästezimmer
+    path: gastezimmer
   - badges:
       - entity: sensor.gastezimmer_humidity
     cards:
@@ -158,9 +153,8 @@ views:
       - entity: media_player.gastezimmer_mini
         type: media-control
 
-title: Keller
-path: keller
-views:
+  - title: Keller
+    path: keller
   - badges:
       - entity: sensor.washing_machine_state
     cards:
