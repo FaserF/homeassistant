@@ -1,21 +1,38 @@
 resources:
-  - url: /community_plugin/mini-media-player/mini-media-player-bundle.js 
-    type: module
-  - url: /community_plugin/simple-thermostat/simple-thermostat.js 
-    type: module
-  - url: /local/slider-entity-row.js 
-    type: module
-
+  - type: module
+    url: /community_plugin/mini-media-player/mini-media-player-bundle.js
+  - type: module
+    url: /community_plugin/simple-thermostat/simple-thermostat.js
+  - type: module
+    url: /local/slider-entity-row.js
+  - type: module
+    url: /community_plugin/lovelace-slider-entity-row/slider-entity-row.js
+  - type: module
+    url: /community_plugin/weather-card/weather-card.js
+  - type: module
+    url: /community_plugin/lovelace-animated-background/animated-background.js
+animated_background:
+  default_url: >-
+    /community_plugin/lovelace-animated-background/background-animations/night.html
+  entity: weather.wetter_darksky
+  state_url:
+    clear-night: >-
+      /community_plugin/lovelace-animated-background/background-animations/night.html
+    cloudy: >-
+      /community_plugin/lovelace-animated-background/background-animations/cloudy.html
+    fog: >-
+      /community_plugin/lovelace-animated-background/background-animations/fog.html
+    mostlycloudy: >-
+      /community_plugin/lovelace-animated-background/background-animations/mostlycloudy.html
+    partlycloudy: >-
+      /community_plugin/lovelace-animated-background/background-animations/cloudy.html
+    sunny: >-
+      /community_plugin/lovelace-animated-background/background-animations/sunny.html
 title: Fabian's Smart Home
 path: default_view
 views:
-  - title: Home
-    icon: mdi:home-variant
-    cards:
-      - type: glance
-        title: Sensoren      
-        column_width: calc(100% / 5)
-        entities:
+  - cards:
+      - entities:
           - person.fabian
           - person.nessie
           - sensor.fsphone_battery
@@ -31,38 +48,40 @@ views:
           - sensor.fabian_strom_energy_today
           - sensor.fabian_strom_energy_power
           - sensor.waschmaschine_energy_power
+        title: Sensoren
+        type: glance
       - entities:
           - switch.lichtschalter
           - switch.deckenlampe
           - switch.regal_leds
           - entity: light.bett_gluhbirne
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
           - entity: light.lampe_gastezimmer
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
           - entity: light.leds_wohnzimmer
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
           - entity: light.leds_tisch
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
           - entity: light.leds_gastezimmer
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
           - entity: light.yeelight_strip1_34ce008b1863
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
           - entity: light.yeelight_color1_34ce008bcc9d
-            type: custom:slider-entity-row 
             group: true
             toggle: true
+            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
@@ -88,38 +107,43 @@ views:
         title: PC & mehr
         type: entities
       - entity: climate.wohnzimmer
-        type: custom:simple-thermostat
         sensors:
           - sensor.wohnzimmer_humidity
+        type: 'custom:simple-thermostat'
       - entity: climate.schlafzimmer
-        type: custom:simple-thermostat
+        type: 'custom:simple-thermostat'
       - entity: climate.gastezimmer
-        type: custom:simple-thermostat
         sensors:
           - sensor.gastezimmer_humidity
+        type: 'custom:simple-thermostat'
       - entity: climate.bad
-        type: custom:simple-thermostat
-      - entity: media_player.mi_box
-        type: custom:mini-media-player
-      - entity: media_player.mibox_s
-        type: custom:mini-media-player
-      - entity: media_player.wohnzimmer_mini
-        type: custom:mini-media-player
-      - entity: media_player.schlafzimmer
-        type: custom:mini-media-player
-      - entity: media_player.gastezimmer_mini
-        type: custom:mini-media-player
-      - entity: media_player.keller_tv
-        type: custom:mini-media-player
-      - entity: media_player.mini_gruppe
-        type: custom:mini-media-player
+        type: 'custom:simple-thermostat'
+      - artwork: cover
+        entity: media_player.mi_box
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.mibox_s
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.wohnzimmer_mini
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.schlafzimmer
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.gastezimmer_mini
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.keller_tv
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.mini_gruppe
+        type: 'custom:mini-media-player'
       - entity: weather.wetter_darksky
-        type: weather-forecast
-
-  - title: Wohnzimmer
-    path: wohnzimmer
-    icon: mdi:television
-    badges:
+        type: 'custom:weather-card'
+    icon: 'mdi:home-variant'
+    title: Home
+  - badges:
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.fernseher_energy_today
       - entity: sensor.fernseher_energy_power
@@ -138,20 +162,22 @@ views:
         title: Strom
         type: entities
       - entity: climate.wohnzimmer
-        type: custom:simple-thermostat
         sensors:
           - sensor.wohnzimmer_humidity
-      - entity: media_player.mibox_s
-        type: custom:mini-media-player
-      - entity: media_player.mi_box
-        type: custom:mini-media-player
-      - entity: media_player.wohnzimmer_mini
-        type: custom:mini-media-player
-
-  - title: Schlafzimmer
-    path: schlafzimmer
-    icon: mdi:hotel
-    cards:
+        type: 'custom:simple-thermostat'
+      - artwork: cover
+        entity: media_player.mibox_s
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.mi_box
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.wohnzimmer_mini
+        type: 'custom:mini-media-player'
+    icon: 'mdi:television'
+    path: wohnzimmer
+    title: Wohnzimmer
+  - cards:
       - entities:
           - light.bett_gluhbirne
           - switch.regal_leds
@@ -172,14 +198,14 @@ views:
         title: Fabian PC
         type: entities
       - entity: climate.schlafzimmer
-        type: custom:simple-thermostat
-      - entity: media_player.schlafzimmer
-        type: custom:mini-media-player
-
-  - title: Gästezimmer
-    icon: mdi:desktop-tower
-    path: gastezimmer
-    badges:
+        type: 'custom:simple-thermostat'
+      - artwork: cover
+        entity: media_player.schlafzimmer
+        type: 'custom:mini-media-player'
+    icon: 'mdi:hotel'
+    path: schlafzimmer
+    title: Schlafzimmer
+  - badges:
       - entity: sensor.gastezimmer_humidity
     cards:
       - entities:
@@ -196,16 +222,16 @@ views:
         title: Nessie PC
         type: entities
       - entity: climate.gastezimmer
-        type: custom:simple-thermostat
         sensors:
           - sensor.gastezimmer_humidity
-      - entity: media_player.gastezimmer_mini
-        type: custom:mini-media-player
-
-  - title: Keller
-    path: keller
-    icon: mdi:washing-machine
-    badges:
+        type: 'custom:simple-thermostat'
+      - artwork: cover
+        entity: media_player.gastezimmer_mini
+        type: 'custom:mini-media-player'
+    icon: 'mdi:desktop-tower'
+    path: gastezimmer
+    title: Gästezimmer
+  - badges:
       - entity: sensor.washing_machine_state
       - entity: sensor.waschmaschine_energy_power
     cards:
@@ -217,5 +243,9 @@ views:
         show_header_toggle: true
         title: Strom
         type: entities
-      - entity: media_player.keller_tv
-        type: custom:mini-media-player
+      - artwork: cover
+        entity: media_player.keller_tv
+        type: 'custom:mini-media-player'
+    icon: 'mdi:washing-machine'
+    path: keller
+    title: Keller

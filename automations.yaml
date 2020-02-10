@@ -818,7 +818,7 @@
     action:
       - service: frontend.set_theme
         data:
-          name: slate
+          name: 'Google Dark Theme'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
