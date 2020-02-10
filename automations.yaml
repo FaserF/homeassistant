@@ -605,6 +605,9 @@
           - condition: state
             entity_id: device_tracker.fabianphone
             state: home
+          - condition: state
+            entity_id: 'input_boolean.silent_mode'
+            state: 'off'
     action:
       - service: tts.google_translate_say
         entity_id: media_player.wohnzimmer_mini
@@ -1440,6 +1443,9 @@
           - condition: state
             entity_id: device_tracker.fabianphone
             state: home
+          - condition: state
+            entity_id: 'input_boolean.silent_mode'
+            state: 'off'
     action:
       - service: tts.google_translate_say
         entity_id: 
@@ -1526,6 +1532,9 @@
       - condition: state
         entity_id: device_tracker.nessiephone
         state: home
+      - condition: state
+        entity_id: 'input_boolean.silent_mode'
+        state: 'off'
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
     action:
@@ -1595,10 +1604,13 @@
     condition:
       - condition: numeric_state
         entity_id: sensor.gastezimmer_humidity
-        above: 57
+        above: 55
       - condition: numeric_state
         entity_id: sensor.wohnzimmer_humidity
-        above: 57
+        above: 55
+      - condition: state
+        entity_id: 'input_boolean.silent_mode'
+        state: 'off'
       - condition: time
         before: '22:00:00'
       - condition: time
@@ -1613,12 +1625,10 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-          - media_player.gastezimmer_mini
       - service: tts.google_translate_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
-        - media_player.gastezimmer_mini
         data:
           message: 'Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
       - service: media_player.volume_set
@@ -1627,7 +1637,6 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-          - media_player.gastezimmer_mini
 
   - alias: Turn on Strom Keller automation after strom turning off
     initial_state: on
@@ -1701,6 +1710,24 @@
 # The status check will ensure we don't try to put the state 
 # to Running each time the power level changes, and we're already
 # in the Running state.
+
+  - alias: Notify when washing machine starts
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 4
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_when_washing_machine_starts.attributes.last_triggered) | int > 7200 }}"
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Waschmaschine wurde gestartet.'
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Waschmaschine wurde gestartet.'
  
   - alias: Set washing machine active when power detected
     trigger:
@@ -1724,12 +1751,6 @@
         data:
           entity_id: input_select.washing_machine_status
           option: Running
-      - service: notify.telegram_nessie
-        data:
-          message: 'Die Waschmaschine wurde gestartet.'
-      - service: notify.telegram_fabian
-        data:
-          message: 'Die Waschmaschine wurde gestartet.'
   
   # When the power drops, move the state of the washing machine to 
   # Finishing.

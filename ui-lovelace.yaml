@@ -1,0 +1,70 @@
+title: Fabian's Smart Home
+views:
+  - badges:
+      - entity: person.fabian
+      - entity: person.nessie
+      - entity: sensor.vkphone_battery
+      - entity: sensor.washing_machine_state
+      - entity: sensor.fs_smspin
+      - entity: sensor.fsphone_battery
+      - entity: sensor.battery_level_ipad
+      - entity: sensor.gastezimmer_temperature
+      - entity: sensor.wohnzimmer_temperature
+      - entity: sensor.wohnzimmer_humidity
+      - entity: sensor.gastezimmer_humidity
+      - entity: sensor.tasmota_firmware_available
+    cards:
+      - entities:
+          - light.bett_gluhbirne
+          - switch.regal_leds
+          - switch.lichtschalter
+          - light.lampe_gastezimmer
+          - light.leds_wohnzimmer
+          - switch.deckenlampe
+          - light.leds_tisch
+          - light.leds_gastezimmer
+          - light.yeelight_strip1_34ce008b1863
+          - light.yeelight_color1_34ce008bcc9d
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - switch.waschmaschine
+          - switch.switch_bett
+          - switch.fabian_strom
+          - switch.fernseher
+          - switch.ventilator
+          - input_boolean.kuehlschrank_keller
+          - input_boolean.strom_keller
+          - input_boolean.strom2_keller
+          - switch.schloss
+        show_header_toggle: true
+        title: Strom
+        type: entities
+        - entities:
+          - switch.nessie_pc_shutdown
+          - switch.fabian_pc_shutdown
+          - input_boolean.silent_mode
+        show_header_toggle: true
+        title: PC & mehr
+        type: entities
+        - entity: climate.bad
+        type: thermostat
+        - entity: climate.schlafzimmer
+        type: thermostat
+        - entity: media_player.gastezimmer_mini
+        type: media-control
+        - entity: media_player.keller_tv
+        type: media-control
+        - entity: media_player.schlafzimmer
+        type: media-control
+        - entity: media_player.mi_box
+        type: media-control
+        - entity: media_player.wohnzimmer_mini
+        type: media-control
+        - entity: media_player.mini_gruppe
+        type: media-control
+        - entity: media_player.mibox_s
+        type: media-control
+        - entity: climate.schlafzimmer
+        type: thermostat

@@ -46,8 +46,8 @@
     entities:
       - media_player.guest_mini
       - light.lampe_gastezimmer
-      - climate.gastezimmer
       - light.leds_gastezimmer
+      - climate.gastezimmer
       - switch.nessie_pc
       - switch.nessie_pc_shutdown
 

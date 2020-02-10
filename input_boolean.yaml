@@ -1,7 +1,3 @@
-#  f_pc_switch:
-#    name: Fabian Computer
-#    initial: off  
-#    icon: mdi:desktop-tower
   kuehlschrank_keller:
     name: Kühlschrank Keller
     initial: off  
@@ -14,3 +10,7 @@
     name: Strom2 Keller
     initial: off  
     icon: mdi:power-plug
+  silent_mode:
+    name: Leiser Modus
+    initial: off  
+    icon: mdi:volume-low
