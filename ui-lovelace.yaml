@@ -1,3 +1,7 @@
+resources:
+  - url: /community_plugin/mini-media-player/mini-media-player-bundle.js 
+    type: module
+
 title: Fabian's Smart Home
 path: default_view
 views:
@@ -64,19 +68,19 @@ views:
       - entity: climate.wohnzimmer
         type: thermostat
       - entity: media_player.gastezimmer_mini
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.keller_tv
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.schlafzimmer
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.mi_box
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.wohnzimmer_mini
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.mini_gruppe
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.mibox_s
-        type: media-control
+        type: custom:mini-media-player
       - entity: weather.wetter_darksky
         type: weather-forecast
 
@@ -104,11 +108,11 @@ views:
       - entity: climate.wohnzimmer
         type: thermostat
       - entity: media_player.mibox_s
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.mi_box
-        type: media-control
+        type: custom:mini-media-player
       - entity: media_player.wohnzimmer_mini
-        type: media-control
+        type: custom:mini-media-player
 
   - title: Schlafzimmer
     path: schlafzimmer
@@ -136,7 +140,7 @@ views:
       - entity: climate.schlafzimmer
         type: thermostat
       - entity: media_player.schlafzimmer
-        type: media-control
+        type: custom:mini-media-player
 
   - title: Gästezimmer
     icon: mdi:desktop-tower
@@ -160,7 +164,7 @@ views:
       - entity: climate.gastezimmer
         type: thermostat
       - entity: media_player.gastezimmer_mini
-        type: media-control
+        type: custom:mini-media-player
 
   - title: Keller
     path: keller
@@ -178,4 +182,4 @@ views:
         title: Strom
         type: entities
       - entity: media_player.keller_tv
-        type: media-control
+        type: custom:mini-media-player
