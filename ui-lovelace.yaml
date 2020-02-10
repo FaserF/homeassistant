@@ -11,22 +11,6 @@ path: default_view
 views:
   - title: Home
     icon: mdi:home-variant
-    # badges:
-    #   - entity: person.fabian
-    #   - entity: person.nessie
-    #   - entity: sensor.fsphone_battery
-    #   - entity: sensor.vkphone_battery
-    #   - entity: sensor.battery_level_ipad
-    #   - entity: sensor.fs_smspin
-    #   - entity: sensor.washing_machine_state
-    #   - entity: sensor.wohnzimmer_humidity
-    #   - entity: sensor.gastezimmer_humidity
-    #   - entity: sensor.tasmota_firmware_available
-    #   - entity: sensor.fernseher_energy_today
-    #   - entity: sensor.fernseher_energy_power
-    #   - entity: sensor.fabian_strom_energy_today
-    #   - entity: sensor.fabian_strom_energy_power
-    #   - entity: sensor.waschmaschine_energy_power
     cards:
       - type: glance
         title: Sensoren      
