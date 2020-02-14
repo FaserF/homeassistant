@@ -238,9 +238,9 @@ telegram_bot:
       - !secret telegram_chat_5friends
       - !secret telegram_chat_jek_group
       
-twilio:
-  account_sid: !secret twilio_sid
-  auth_token: !secret twilio_token
+#twilio:
+  #account_sid: !secret twilio_sid
+  #auth_token: !secret twilio_token
 
 notify:
   - name: pushbullet_fabian

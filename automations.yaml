@@ -1638,17 +1638,6 @@
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
 
-  - alias: Turn on Strom Keller automation after strom turning off
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: switch.waschmaschine
-        to: 'off'
-    action:
-      - service: automation.turn_on
-        data:
-          entity_id: automation.strom_keller_an
-
   # - alias: washing machine finished
   # 
   #   initial_state: off
@@ -1711,7 +1700,51 @@
 # to Running each time the power level changes, and we're already
 # in the Running state.
 
+  - alias: Detect if Washing machine is currently active
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 4
+        below: 430
+        for:
+          seconds: 40
+    action:
+      - service: automation.turn_on
+        data:
+          entity_id: automation.notify_when_washing_machine_starts
+
+  - alias: Detect if coal lighter is currently active
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 460
+        below: 520
+        for:
+          seconds: 40
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_5friends
+          message: 'Kohleanzünder wurde eingeschaltet. '
+          disable_notification: true
+      - delay: '00:07:00'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_5friends
+          message: 'Bitte Kohle wenden!'
+      - delay: '00:08:00'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_5friends
+          message: 'Die Kohle sollte fertig sein!'
+
   - alias: Notify when washing machine starts
+    initial_state: off
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
@@ -1722,6 +1755,9 @@
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_when_washing_machine_starts.attributes.last_triggered) | int > 7200 }}"
     action:
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
       - service: notify.telegram_nessie
         data:
           message: 'Die Waschmaschine wurde gestartet.'
@@ -1812,27 +1848,12 @@
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
-
-  - alias: strom keller an
-    initial_state: on
-    trigger:
-      platform: numeric_state
-      entity_id: sensor.waschmaschine_energy_power
-      above: 4
-      for: '00:00:20'
-    action:
-      - service: notify.telegram_nessie
-        data:
-          message: 'Strom im Keller (Waschmaschine) wurde eingeschaltet.'
-      - service: notify.telegram_fabian
-        data:
-          message: 'Strom im Keller (Waschmaschine) wurde eingeschaltet.'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.kohleanzuender_angeschaltet
       - service: automation.turn_off
         data:
-          entity_id: automation.strom_keller_an
+          entity_id: automation.notify_when_washing_machine_starts
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
 
   - alias: 'Remind for going off Nessie'
     initial_state: on

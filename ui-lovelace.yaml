@@ -1,3 +1,14 @@
+animated_background:
+  default_url: /community_plugin/lovelace-animated-background/night.html
+  entity: weather.wetter_darksky
+  state_url:
+    clear-night: /community_plugin/lovelace-animated-background/night.html
+    cloudy: /community_plugin/lovelace-animated-background/cloudy.html
+    fog: /community_plugin/lovelace-animated-background/fog.html
+    mostlycloudy: /community_plugin/lovelace-animated-background/mostlycloudy.html
+    partlycloudy: /community_plugin/lovelace-animated-background/cloudy.html
+    sunny: /community_plugin/lovelace-animated-background/sunny.html
+path: default_view
 resources:
   - type: module
     url: /community_plugin/mini-media-player/mini-media-player-bundle.js
@@ -9,20 +20,9 @@ resources:
     url: /community_plugin/lovelace-slider-entity-row/slider-entity-row.js
   - type: module
     url: /community_plugin/weather-card/weather-card.js
-  - url: /community_plugin/lovelace-animated-background/animated-background.js
-    type: module
-animated_background:
-  default_url: /community_plugin/lovelace-animated-background/night.html
-  entity: weather.wetter_darksky
-  state_url:
-    sunny: /community_plugin/lovelace-animated-background/sunny.html
-    partlycloudy: /community_plugin/lovelace-animated-background/cloudy.html
-    cloudy: /community_plugin/lovelace-animated-background/cloudy.html
-    mostlycloudy: /community_plugin/lovelace-animated-background/mostlycloudy.html
-    clear-night: /community_plugin/lovelace-animated-background/night.html
-    fog: /community_plugin/lovelace-animated-background/fog.html
+  - type: module
+    url: /community_plugin/lovelace-animated-background/animated-background.js
 title: Fabian's Smart Home
-path: default_view
 views:
   - badges:
       - entity: person.fabian
@@ -83,6 +83,7 @@ views:
           - switch.nessie_pc
           - switch.fernseher
           - switch.ventilator
+          - switch.sonoff_100018bc6c
           - input_boolean.kuehlschrank_keller
           - input_boolean.strom_keller
           - input_boolean.strom2_keller
@@ -149,6 +150,7 @@ views:
       - entities:
           - switch.fernseher
           - switch.ventilator
+          - switch.sonoff_100018bc6c
         show_header_toggle: true
         title: Strom
         type: entities
