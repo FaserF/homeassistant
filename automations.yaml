@@ -281,6 +281,52 @@
         data:
           entity_id: group.wohnzimmer
 
+  - alias: 'Turn off light at night - notify'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '00:30:00'
+    condition:
+      - condition: template
+        value_template: >
+          {% set domain = 'light' %}
+          {% set state = 'on' %}
+          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Alle Lichter werden in 20 Minuten ausgeschaltet.'
+          inline_keyboard:
+            - 'Abbruch:/cancellight, Okay:/telegramno'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          message: 'Alle Lichter werden in 20 Minuten ausgeschaltet.'
+          inline_keyboard:
+            - 'Abbruch:/cancellight, Okay:/telegramno'
+            
+  - alias: 'Turn off light at night'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '00:50:00'
+    condition:
+      - condition: template
+        value_template: >
+          {% set domain = 'light' %}
+          {% set state = 'on' %}
+          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
+    action:
+      - service: light.turn_off
+        entity_id: all
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
+
   # - alias: 'Turn on thermostats if coming home'
   # 
   #   initial_state: on
@@ -578,9 +624,6 @@
       - service: light.turn_on
         data:
           entity_id: group.schlafzimmer
-      - service: switch.turn_on
-        data:
-          entity_id: switch.lichtschalter
 
   - alias: 'Remind for leaving wohnzimmer'
     initial_state: True
@@ -823,6 +866,19 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
+      - service: shell_command.start_apache
+          
+  - alias: 'Restart Homeassistant every sunday'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '03:00:00'
+    condition:
+      - condition: time
+        weekday:
+          - sun
+    action:
+      - service: shell_command.restartha
           
   - alias: "Let's Encrypt Renewal"
     trigger:
@@ -1503,28 +1559,114 @@
   #       data:
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-  - alias: Deckenlampe Button Hold
+  - alias: Deckenlampe Button Hold Off
     initial_state: on
     trigger: 
       - entity_id: sensor.deckenlampe
         platform: state
         to: 'HOLD'
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: light.leds_wohnzimmer
+          state: 'on'
+        - condition: state
+          entity_id: light.yeelight_color1_34ce008bcc9d
+          state: 'on'
     action:
       - service: light.turn_off
         data:
           entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
+          entity_id: switch.deckenlampe
+          
+  - alias: Deckenlampe Button Hold On
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.deckenlampe
+        platform: state
+        to: 'HOLD'
+    condition:
+      - condition: state
+        entity_id: light.leds_wohnzimmer
+        state: 'off'
+      - condition: state
+        entity_id: light.yeelight_color1_34ce008bcc9d
+        state: 'off'
+    action:
+      - service: light.turn_on
+        data:
           entity_id: group.wohnzimmer
+          
+  - alias: Lichtschalter Button Hold Off
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.lichtschalter
+        platform: state
+        to: 'HOLD'
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: light.yeelight_strip1_34ce008b1863
+          state: 'on'
+        - condition: state
+          entity_id: light.bett_gluhbirne
+          state: 'on'
+        - condition: state
+          entity_id: light.leds_tisch
+          state: 'on'
+        - condition: state
+          entity_id: switch.regal_leds
+          state: 'on'
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: group.schlafzimmer
+      - service: switch.turn_off
+        data:
+          entity_id: switch.regal_leds
+      - service: switch.turn_off
+        data:
+          entity_id: switch.lichtschalter
+          
+  - alias: Lichtschalter Button Hold On
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.lichtschalter
+        platform: state
+        to: 'HOLD'
+    condition:
+      - condition: state
+        entity_id: light.yeelight_strip1_34ce008b1863
+        state: 'off'
+      - condition: state
+        entity_id: light.bett_gluhbirne
+        state: 'off'
+      - condition: state
+        entity_id: light.leds_tisch
+        state: 'off'
+      - condition: state
+        entity_id: switch.regal_leds
+        state: 'off'
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: group.schlafzimmer
+      - service: switch.turn_on
+        data:
+          entity_id: switch.regal_leds
 
   - alias: Notify for high humidity
     trigger:
       - platform: numeric_state
         entity_id: sensor.gastezimmer_humidity
-        above: 57
+        above: 55
       - platform: numeric_state
         entity_id: sensor.wohnzimmer_humidity
-        above: 57
+        above: 55
     condition:
       - condition: state
         entity_id: device_tracker.fabianphone
@@ -1604,10 +1746,10 @@
     condition:
       - condition: numeric_state
         entity_id: sensor.gastezimmer_humidity
-        above: 55
+        above: 54
       - condition: numeric_state
         entity_id: sensor.wohnzimmer_humidity
-        above: 55
+        above: 54
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
@@ -1618,7 +1760,7 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
     action:
-      - delay: 00:05:00
+      - delay: 00:03:00
       - service: media_player.volume_set
         data:
           volume_level: 0.7
@@ -1732,12 +1874,12 @@
           target: !secret telegram_chat_5friends
           message: 'Kohleanzünder wurde eingeschaltet. '
           disable_notification: true
-      - delay: '00:07:00'
+      - delay: '00:10:00'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_5friends
           message: 'Bitte Kohle wenden!'
-      - delay: '00:08:00'
+      - delay: '00:10:00'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_5friends
@@ -1758,6 +1900,9 @@
       - service: automation.turn_off
         data:
           entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
       - service: notify.telegram_nessie
         data:
           message: 'Die Waschmaschine wurde gestartet.'
@@ -1770,6 +1915,8 @@
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
         above: 6
+        for:
+          seconds: 50
     condition:
       condition: or
       conditions:
@@ -1782,6 +1929,8 @@
         - condition: state
           entity_id: sensor.washing_machine_state
           state: Finishing
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
     action:
       - service: input_select.select_option
         data:
@@ -1851,6 +2000,9 @@
       - service: automation.turn_off
         data:
           entity_id: automation.notify_when_washing_machine_starts
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_coal_lighter_is_currently_active
@@ -2421,7 +2573,7 @@
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
-          message: "Restarting Homeassistant..."
+          message: "Restarting Homeassistant Container..."
       - service: homeassistant.restart
 
   - alias: Telegram Reboot
@@ -2437,7 +2589,7 @@
           target: "{{ trigger.event.data.user_id }}"
           message: "Rebooting Server..."
       - delay: 00:00:05
-      - service: shell_command.quick_restart
+      - service: shell_command.restartha
 
   - alias: Telegram Help
     initial_state: on
@@ -2468,8 +2620,8 @@
           target: "{{ trigger.event.data.user_id }}"
           message: "Hier sind ein paar Befehle:
           
-          /rebootha - Neustart des HA Servers
-          /reboot - Neustart des Servers
+          /rebootha - Neustart Homeassistant Container
+          /reboot - Neustart Homeassistant Core
           /status - Homeassistant Status
           /updateha - Homeassistant Update starten"
 
@@ -2636,6 +2788,24 @@
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
           message: 'Okay.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+          
+  - alias: 'Telegram answer cancel light turn off'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/cancellight'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Licht wird in 20 Minuten NICHT ausgeschaltet.'
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'

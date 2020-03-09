@@ -336,14 +336,12 @@ shell_command:
   randomfood: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}'
   foodyes: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes'
   jek_telegram: !secret telegram_jek_open_command
-  #randomfood: 'ssh cadmin@7208ad356903 "/bin/bash /home/cadmin/scripts/randomfood.sh {{ telegram_sender }} {{ vegetarisch }}"'
-  #foodyes: 'ssh cadmin@7208ad356903 "/bin/bash /home/cadmin/scripts/foodyes.sh "'
-  quick_restart: 'shutdown -r now'
+  start_apache: 'ssh cadmin@7208ad356903 "sudo /bin/bash /home/cadmin/scripts/onreboot.sh "'
+  restartha: 'ha host reboot'
   hibernatefpc: 'curl http://192.168.178.65:5001/hibernate'
   hibernatenpc: 'curl http://192.168.178.92:5001/hibernate'
   shutdownnpc: 'curl http://192.168.178.92:5001/shutdown'
   overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
-  #overtime_input_minus_05: 'ssh cadmin@7208ad356903 "/bin/bash /home/cadmin/scripts/overtime_input.sh {{ hours_overtime }}"'
 
 coinbase:
   api_key: !secret coinbase_key
@@ -354,6 +352,12 @@ coinbase:
     - BTC
 
 sensor:
+  - platform: mqtt
+    state_topic: "lichtschalter/HOLD/BUTTON1"
+    name: lichtschalter
+  - platform: mqtt
+    state_topic: "deckenlampe/HOLD/BUTTON1"
+    name: deckenlampe
   - platform: template
     sensors:
       washing_machine_state:
@@ -464,7 +468,7 @@ light:
       192.168.178.248:
         name: LEDs Tisch
   - platform: hyperion
-    host: 192.168.178.9
+    host: 192.168.178.3
 
 #tuya:
 #  username: !secret tuyauser
@@ -602,6 +606,10 @@ panel_iframe:
     title: Bookstack
     icon: mdi:format-vertical-align-bottom
     url: https://smartlife.ddns.net:2665
+  hyperion:
+    title: Hyperion
+    icon: mdi:lightbulb-on
+    url: http://192.168.178.3:8090
   #mdiindex:
   #  title: MDI Icon Index
   #  icon: mdi:vector-square
