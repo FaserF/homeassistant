@@ -377,6 +377,10 @@
         entity_id: device_tracker.fabianpc
         from: 'not_home'
         to: 'home'
+      - platform: state
+        entity_id: device_tracker.fabiantablet
+        from: 'not_home'
+        to: 'home'
     condition:
       condition: and
       conditions:
@@ -404,8 +408,11 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.fabianpc
+        entity_id: device_tracker.fabianpc
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.fabiantablet
         from: 'not_home'
         to: 'home'
     condition:
@@ -481,8 +488,13 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.fabianpc
+        entity_id: device_tracker.fabianpc
+        from: 'home'
+        to: 'not_home'
+        for:
+            minutes: 1
+      - platform: state
+        entity_id: device_tracker.fabiantablet
         from: 'home'
         to: 'not_home'
         for:
@@ -775,12 +787,17 @@
     condition:
       condition: and
       conditions:
-      - condition: state
-        entity_id: device_tracker.fabianpc
-        state: home
-      - condition: state
-        entity_id: device_tracker.tv
-        state: 'not_home'
+        - condition: state
+          entity_id: 'device_tracker.tv'
+          state: 'not_home'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'device_tracker.fabianpc'
+              state: 'home'
+            - condition: state
+              entity_id: 'device_tracker.fabiantablet'
+              state: 'home'
     action:
       - service: light.turn_on
         data:
@@ -1600,6 +1617,36 @@
         data:
           entity_id: group.wohnzimmer
           
+  - alias: Deckenlampe Button double press Off
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.deckenlampe
+        platform: state
+        to: 'DOUBLE'
+    condition:
+      - condition: state
+        entity_id: switch.fernseher
+        state: 'on'
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.fernseher
+          
+  - alias: Deckenlampe Button double press On
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.deckenlampe
+        platform: state
+        to: 'DOUBLE'
+    condition:
+      - condition: state
+        entity_id: switch.fernseher
+        state: 'off'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.fernseher
+
   - alias: Lichtschalter Button Hold Off
     initial_state: on
     trigger: 
@@ -1658,6 +1705,36 @@
       - service: switch.turn_on
         data:
           entity_id: switch.regal_leds
+          
+  - alias: Lichtschalter Button double press Off
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.lichtschalter
+        platform: state
+        to: 'DOUBLE'
+    condition:
+      - condition: state
+        entity_id: switch.fabian_strom
+        state: 'on'
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.fabian_strom
+          
+  - alias: Lichtschalter Button double press On
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.lichtschalter
+        platform: state
+        to: 'DOUBLE'
+    condition:
+      - condition: state
+        entity_id: switch.fabian_strom
+        state: 'off'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.fabian_strom
 
   - alias: Notify for high humidity
     trigger:
@@ -2034,7 +2111,7 @@
         data:
           data:
             tag: 'notification-about-sensor'
-      - service: notify.mobile_app_mi_9t_2
+      - service: notify.mobile_app_mi_9t_nessie
         data_template:
           title: "Zeit off zu gehen"
           message: "Es ist 22 Uhr."
@@ -2064,6 +2141,9 @@
             state: home
           - condition: state
             entity_id: device_tracker.fabianpc
+            state: home
+          - condition: state
+            entity_id: device_tracker.fabiantablet
             state: home
     action:
       - service: notify.browser
@@ -3190,10 +3270,8 @@
   - alias: 'remind for jek'
     initial_state: True
     trigger:
-      #- platform: template
-      #  value_template: "{{ ((as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - as_timestamp(now())) < 86400) }}"
-      #- platform: template
-      #  value_template: "{{ ((as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - as_timestamp(now())) > 86400) }}"
+      - platform: template
+        value_template: "{{ ((as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - as_timestamp(now())) < 86400) }}"
       - platform: template
         value_template: "{{ is_state_attr('calendar.jugendtreffjek_gmail_com', 'offset_reached', 'true') }}"
     action:
