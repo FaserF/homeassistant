@@ -152,10 +152,6 @@ recorder:
       - sensor.fs_smspin
 
 # Checks for available updates
-# Note: This component will send some information about your system to
-# the developers to assist with development of Home Assistant.
-# For more information, please see:
-# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
 updater:
   # Optional, allows Home Assistant developers to focus on popular components.
   include_used_components: true
@@ -164,10 +160,6 @@ updater:
 discovery:
   ignore:
     - igd
-    #- yeelight
-
-# Allows you to issue voice commands from the frontend in enabled browsers
-#conversation:
 
 # Enables support for tracking state changes over time
 history:
@@ -181,29 +173,7 @@ map:
 # Track the sun
 sun:
 
-#dashboard
-#hadashboard:
-#  dash_url: http://192.168.178.2:8124
-#  dash_password: !secret http_password
-#  dash_dir: /home/homeassistant/.homeassistant/dashboard
-
 device_tracker:
-  # - platform: cisco_ios
-  #   host: 192.168.178.3
-  #   username: !secret ciscouser
-  #   password: !secret ciscopw
-  #   interval_seconds: 5
-  #   consider_home: 30
-  #   new_device_defaults:
-  #       track_new_devices: False
-  # - platform: cisco_ios
-  #   host: 192.168.178.254
-  #   username: !secret ciscouser
-  #   password: !secret ciscopw
-  #   interval_seconds: 5
-  #   consider_home: 30
-  #   new_device_defaults:
-  #       track_new_devices: False
   - platform: fritz
     host: 192.168.178.1
     password: !secret fritzbox
@@ -211,13 +181,13 @@ device_tracker:
     consider_home: 30
     new_device_defaults:
         track_new_devices: False
-  # - platform: nmap_tracker
-  #   hosts: 192.168.178.0/24
-  #   scan_options: " --privileged -sP "
-  #   interval_seconds: 30
-  #   consider_home: 30
-  #   new_device_defaults:
-  #       track_new_devices: False
+    #OpenWRT Router
+  - platform: luci
+    host: 192.168.178.8
+    username: root
+    password: !secret fritzbox
+    new_device_defaults:
+        track_new_devices: False
   - platform: google_maps
     username: !secret gmaps_mail
     max_gps_accuracy: 1000
@@ -324,9 +294,6 @@ tado:
   password: !secret githubpass
 
 weather:
-  #- platform: openweathermap
-  #  api_key: !secret openweather
-  #  name: Wetter openweather
   - platform: darksky
     api_key: !secret darksky
     name: Wetter darksky
@@ -355,6 +322,8 @@ sensor:
   - platform: mqtt
     state_topic: "lichtschalter/HOLD/BUTTON1"
     name: lichtschalter
+    #qos: 1
+    #expire_after: "1"  # Forget what just happen
   - platform: mqtt
     state_topic: "deckenlampe/HOLD/BUTTON1"
     name: deckenlampe
@@ -380,12 +349,6 @@ sensor:
     from: Trudering
     to: !secret sbahn_home
     only_direct: true
-  #- platform: mqtt
-    #name: "Deckenlampe"
-    #state_topic: "stat/deckenlampe/BUTTON1"
-    #value_template: "{{ value_json.POWER }}"
-    #qos: 1
-    #expire_after: "1"  # Forget what just happen
   - platform: template
     sensors:
       fsphone_battery:
@@ -425,7 +388,6 @@ sensor:
       Accept: application/vnd.github.v3+json
       Content-Type: application/json
       User-Agent: Home Assistant REST sensor
-  #Darksky Weather
   - platform: darksky
     api_key: !secret darksky
     scan_interval:
@@ -469,12 +431,6 @@ light:
         name: LEDs Tisch
   - platform: hyperion
     host: 192.168.178.3
-
-#tuya:
-#  username: !secret tuyauser
-#  password: !secret default
-#  country_code: 49
-#  platform: smart_life
 
 sonoff:
   username: !secret defaultmail
@@ -626,7 +582,6 @@ input_select:
     initial: Idle
 
 input_boolean: !include input_boolean.yaml
-# Enables the frontend (Themes)
 frontend:
   themes: !include_dir_merge_named themes
 group: !include groups.yaml

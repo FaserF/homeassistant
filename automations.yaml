@@ -870,6 +870,21 @@
           target: "{{ trigger.event.data.user_id }}"
           message: 'Strom im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
+  - alias: 'Notify on HA restart'
+    initial_state: 'true'
+    trigger:
+      platform: homeassistant
+      event: start
+    condition:
+      - condition: time
+        after: '03:02:00'
+        before: '03:00:00'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Homeassistant wurde soeben gestartet.'
+
   - alias: 'on HA restart'
     initial_state: 'true'
     trigger:
@@ -879,10 +894,6 @@
       - service: frontend.set_theme
         data:
           name: 'Google Dark Theme'
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: 'Homeassistant wurde soeben gestartet.'
       - service: shell_command.start_apache
           
   - alias: 'Restart Homeassistant every sunday'
@@ -1034,6 +1045,7 @@
             - Fabian-PC
             - Fabian-Hackbook
             - Chrome-Arbeit
+            - fabiantablet
         data:
           data:
             tag: 'notification-about-sensor'
@@ -1053,8 +1065,9 @@
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
-        data:
-          message: 'Fabian wird soeben von angerufen!'
+        data_template: 
+          message: "Fabian wird soeben von {{ states('sensor.fs_smspin') }} angerufen!"
+      - delay: '00:00:10'
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -1062,6 +1075,12 @@
       - service: automation.turn_off
         data:
           entity_id: automation.incoming_call_fabian
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.wohnzimmer_mini
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.schlafzimmer
 
   - alias: 'Incoming Call Nessie'
     initial_state: off
@@ -1079,7 +1098,8 @@
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
         data:
-          message: 'Nessie wird soeben von angerufen!'
+          message: 'Nessie wird soeben angerufen!'
+      - delay: '00:00:10'
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -1087,6 +1107,12 @@
       - service: automation.turn_off
         data:
           entity_id: automation.incoming_call_nessie
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.wohnzimmer_mini
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.schlafzimmer
 
   # - alias: "Check for SBahn Delay"
   # 
@@ -1170,25 +1196,24 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  #- alias: connect to adb on tv startup and change volume
-
-    #initial_state: on
-    #trigger:
-      #- platform: state
-        #entity_id:
-          #- device_tracker.tv
-        #from: 'not_home'
-        #to: 'home'
-    #action:
-      #service: androidtv.adb_command
-      #data:
-        #entity_id: media_player.mibox_s
-        #command: "HOME"
-      #- delay: '00:00:03'
-      #- service: media_player.volume_set
-        #data:
-          #volume_level: 0.5
-          #entity_id: media_player.mibox_s
+  - alias: connect to adb on tv startup and change volume
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.tv
+        from: 'not_home'
+        to: 'home'
+    action:
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.mibox_s
+          command: "HOME"
+      - delay: '00:00:03'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.5
+          entity_id: media_player.mibox_s
 
   - alias: Mute Spotify ads wohnzimmer mini
     initial_state: on
@@ -1215,15 +1240,6 @@
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1262,15 +1278,6 @@
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1309,15 +1316,6 @@
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.mi_box.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.mi_box.attributes.media_title != 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1356,15 +1354,6 @@
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1385,13 +1374,6 @@
         value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1410,15 +1392,6 @@
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1439,13 +1412,6 @@
         value_template: "{{ states.media_player.keller_tv.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.keller_tv.attributes.media_title == 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
@@ -1464,15 +1430,6 @@
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.keller_tv.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.keller_tv.attributes.media_title != 'Spotify' }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
