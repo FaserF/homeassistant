@@ -4,7 +4,6 @@
 
   Wohnzimmer:
     name: Wohnzimmer
-    view: yes
     icon: mdi:television-classic
     entities:
       - media_player.mi_box
@@ -23,7 +22,6 @@
 
   Schlafzimmer:
     name: Schlafzimmer
-    view: yes
     icon: mdi:hotel
     entities:
       - media_player.schlafzimmer
@@ -41,7 +39,6 @@
 
   Gästezimmer:
     name: Gästezimmer
-    view: yes
     icon: mdi:laptop
     entities:
       - media_player.guest_mini
@@ -53,7 +50,6 @@
 
   Keller:
     name: Keller
-    view: yes
     icon: mdi:washing-machine
     entities:
       - media_player.keller_tv

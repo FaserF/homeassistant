@@ -213,9 +213,6 @@ telegram_bot:
   #auth_token: !secret twilio_token
 
 notify:
-  - name: pushbullet_fabian
-    platform: pushbullet
-    api_key: !secret pushbullet_fabian_api
   - name: telegram_fabian
     platform: telegram
     chat_id: !secret telegram_chat_fabian
@@ -376,6 +373,11 @@ sensor:
       fs_smspin:
         friendly_name: 'Mi9T SMS PIN'
         value_template: 'not_set'
+  - platform: template
+    sensors:
+      fs_caller:
+        friendly_name: 'Mi9T Anrufer'
+        value_template: 'unbekannter'
   # Getting Firmware from JSON for Tasmota
   - platform: rest
     resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
