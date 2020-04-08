@@ -705,7 +705,7 @@
             {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Turn on climate if Nessie PC started'
-    initial_state: on
+    initial_state: off
     trigger:
       platform: state
       entity_id:
@@ -720,7 +720,7 @@
           hvac_mode: heat
 
   - alias: 'Turn off climate if Nessie PC stopped'
-    initial_state: on
+    initial_state: off
     trigger:
       platform: state
       entity_id:
@@ -1940,7 +1940,7 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_when_washing_machine_starts.attributes.last_triggered) | int > 7200 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_when_washing_machine_starts.attributes.last_triggered) | int > 5400 }}"
     action:
       - service: automation.turn_off
         data:
@@ -1964,8 +1964,6 @@
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
         above: 6
-        for:
-          seconds: 50
     condition:
       condition: or
       conditions:
@@ -2017,7 +2015,7 @@
         entity_id: input_select.washing_machine_status
         to: Finishing
         for:
-          minutes: 10
+          minutes: 8
     condition:
       condition: and
       conditions:
@@ -3163,7 +3161,7 @@
             Genesene Corona Fälle: {{ states.sensor.germany_coronavirus_recovered.state }}
       - service: telegram_bot.send_message
         data_template:
-          target: !secret telegram_chat_adri
+          target: !secret telegram_chat_adrian
           disable_notification: true
           message: >
             Aktuelle Corona Zahlen für Deutschland. (Falls du diese Nachricht nicht haben möchtest, gib Fabi bescheid)

@@ -130,8 +130,6 @@ http:
   ssl_certificate: !secret ssl_certificate
   ssl_key: !secret ssl_key
   base_url: !secret baseurl
-  ip_ban_enabled: false
-  login_attempts_threshold: 5
 
 recorder:
   purge_keep_days: 7
@@ -249,6 +247,7 @@ media_player:
       com.zdf.android.mediathek: "ZDF Mediathek"
       tv.emby.embyatv: "Emby"
       com.google.android.apps.mediashell: "Chromecast"
+      de.prosiebensat1digital.prosieben: "Pro7"
     state_detection_rules:
       'com.google.android.tvlauncher':
         - 'standby'
@@ -379,17 +378,17 @@ sensor:
         friendly_name: 'Mi9T Anrufer'
         value_template: 'unbekannter'
   # Getting Firmware from JSON for Tasmota
-  - platform: rest
-    resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
-    name: Tasmota Firmware available
-    username: !secret githubuser
-    password: !secret githubpass
-    authentication: basic
-    value_template: '{{ value_json.tag_name }}'
-    headers:
-      Accept: application/vnd.github.v3+json
-      Content-Type: application/json
-      User-Agent: Home Assistant REST sensor
+  #- platform: rest
+  #  resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
+  #  name: Tasmota Firmware available
+  #  username: !secret githubuser
+  #  password: !secret githubpass
+  #  authentication: basic
+  #  value_template: '{{ value_json.tag_name }}'
+  #  headers:
+  #    Accept: application/vnd.github.v3+json
+  #    Content-Type: application/json
+  #    User-Agent: Home Assistant REST sensor
   - platform: darksky
     api_key: !secret darksky
     scan_interval:
@@ -431,6 +430,7 @@ light:
         name: LEDs Gästezimmer
       192.168.178.248:
         name: LEDs Tisch
+        mode: rgb
   - platform: hyperion
     host: 192.168.178.3
 
