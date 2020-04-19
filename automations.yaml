@@ -1453,18 +1453,21 @@
         data:
           message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
 
-  - alias: Fritzbox Internet no access
+  - alias: Fritzbox no Internet access
     initial_state: on
     trigger:
       platform: template 
-      value_template: "{% if is_state('sensor.fritz_netmonitor.attributes.is_connected', 'false') %}true{% endif %}"
-      for: "00:01:00"
+      value_template: "{{ is_state('sensor.fritz_netmonitor.attributes.is_connected', 'false') }}"
+      for: "00:00:10"
     condition:
       condition: and
       conditions:
         - condition: time
           after: '10:30:00'
           before: '22:30:00'
+        - condition: state
+          entity_id: 'input_boolean.silent_mode'
+          state: 'off'
         - condition: or
           conditions:
           - condition: state
@@ -1473,9 +1476,6 @@
           - condition: state
             entity_id: device_tracker.fabianphone
             state: home
-          - condition: state
-            entity_id: 'input_boolean.silent_mode'
-            state: 'off'
     action:
       - service: tts.google_translate_say
         entity_id: 
@@ -1483,24 +1483,25 @@
         - media_player.wohnzimmer_mini
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung!'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.fritzbox_internet_access_returned
 
-  # - alias: Fritzbox Internet access returned
-  # 
-  #   initial_state: on
-  #   trigger:
-  #     platform: template 
-  #     value_template: "{{ states.sensor.fritz_netmonitor.attributes.is_connected == 'false') }}"
-  #   condition:
-  #     - condition: time
-  #       after: '06:30:00'
-  #       before: '07:10:00'
-  #   action:
-  #     - service: tts.google_translate_say
-  #       entity_id: 
-  #       - media_player.schlafzimmer
-  #       - media_player.wohnzimmer_mini
-  #       data:
-  #         message: 'Die Fritzbox hat keine Internet Verbindung!'
+  - alias: Fritzbox Internet access returned
+    initial_state: off
+    trigger:
+      platform: template 
+      value_template: "{{ is_state('sensor.fritz_netmonitor.attributes.is_connected', 'true') }}"
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Internetverbindung ist wieder aufgebaut.'
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Internetverbindung ist wieder aufgebaut.'
+      - service: automation.turn_off
+        data:
+          entity_id: automation.fritzbox_internet_access_returned
 
   # - alias: Internet Speed Test Poor Fabian
   # 

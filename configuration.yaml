@@ -140,7 +140,6 @@ recorder:
       - updater
       - scene
       - calendar
-      - device_tracker
     entities:
       - sun.sun # Don't record sun data
       - sensor.last_boot # Comes from 'systemmonitor' sensor platform
@@ -148,6 +147,11 @@ recorder:
       - sensor.fsphone_charging
       - sensor.vkphone_charging
       - sensor.fs_smspin
+      - sensor.fs_caller
+      - device_tracker.fabianpc
+      - device_tracker.fabiantablet
+      - device_tracker.nessiepc
+      - device_tracker.tv
 
 # Checks for available updates
 updater:
@@ -556,18 +560,18 @@ panel_iframe:
     title: TasmoAdmin
     icon: mdi:lightbulb-on
     url: https://smartlife.ddns.net:8124
-  fritzbox:
-    title: FritzBox
-    icon: mdi:router-wireless
-    url: https://smartlife.ddns.net:32270
+  #fritzbox:
+  #  title: FritzBox
+  #  icon: mdi:router-wireless
+  #  url: https://smartlife.ddns.net:32270
   bookstack:
     title: Bookstack
     icon: mdi:format-vertical-align-bottom
     url: https://smartlife.ddns.net:2665
-  hyperion:
-    title: Hyperion
-    icon: mdi:lightbulb-on
-    url: http://192.168.178.3:8090
+  #hyperion:
+  #  title: Hyperion
+  #  icon: mdi:lightbulb-on
+  #  url: http://192.168.178.3:8090
   #mdiindex:
   #  title: MDI Icon Index
   #  icon: mdi:vector-square
