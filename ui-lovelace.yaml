@@ -1,27 +1,15 @@
 animated_background:
-  default_url: /community_plugin/lovelace-animated-background/night.html
+  default_url: /hacsfiles/lovelace-animated-background/background-animations/night.html
   entity: weather.wetter_darksky
   state_url:
-    clear-night: /community_plugin/lovelace-animated-background/night.html
-    cloudy: /community_plugin/lovelace-animated-background/cloudy.html
-    fog: /community_plugin/lovelace-animated-background/fog.html
-    mostlycloudy: /community_plugin/lovelace-animated-background/mostlycloudy.html
-    partlycloudy: /community_plugin/lovelace-animated-background/cloudy.html
-    sunny: /community_plugin/lovelace-animated-background/sunny.html
+    clear-night: /hacsfiles/lovelace-animated-background/background-animations/night.html
+    cloudy: /hacsfiles/lovelace-animated-background/background-animations/cloudy.html
+    fog: /hacsfiles/lovelace-animated-background/background-animations/fog.html
+    mostlycloudy: >-
+      /hacsfiles/lovelace-animated-background/background-animations/mostlycloudy.html
+    partlycloudy: /hacsfiles/lovelace-animated-background/background-animations/cloudy.html
+    sunny: /hacsfiles/lovelace-animated-background/background-animations/sunny.html
 path: default_view
-resources:
-  - type: module
-    url: /community_plugin/mini-media-player/mini-media-player-bundle.js
-  - type: module
-    url: /community_plugin/simple-thermostat/simple-thermostat.js
-  - type: module
-    url: /local/slider-entity-row.js
-  - type: module
-    url: /community_plugin/lovelace-slider-entity-row/slider-entity-row.js
-  - type: module
-    url: /community_plugin/weather-card/weather-card.js
-  - type: module
-    url: /community_plugin/lovelace-animated-background/animated-background.js
 title: Fabian's Smart Home
 views:
   - badges:
@@ -34,12 +22,14 @@ views:
       - entity: sensor.washing_machine_state
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.gastezimmer_humidity
-      - entity: sensor.tasmota_firmware_available
       - entity: sensor.fernseher_energy_today
       - entity: sensor.fernseher_energy_power
       - entity: sensor.fabian_strom_energy_today
       - entity: sensor.fabian_strom_energy_power
       - entity: sensor.waschmaschine_energy_power
+      - entity: sensor.coinbase_btc_wallet
+      - entity: sensor.btc_exchange_rate
+      - entity: sensor.zorneding_to_trudering
     cards:
       - entities:
           - switch.lichtschalter
@@ -73,6 +63,10 @@ views:
             group: true
             toggle: true
             type: 'custom:slider-entity-row'
+          - entity: light.hyperion
+            group: true
+            toggle: true
+            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
@@ -83,7 +77,6 @@ views:
           - switch.nessie_pc
           - switch.fernseher
           - switch.ventilator
-          - switch.sonoff_100018bc6c
           - input_boolean.kuehlschrank_keller
           - input_boolean.strom_keller
           - input_boolean.strom2_keller
@@ -97,6 +90,14 @@ views:
           - input_boolean.silent_mode
         show_header_toggle: true
         title: PC & mehr
+        type: entities
+      - entities:
+          - sensor.germany_coronavirus_deaths
+          - sensor.germany_coronavirus_current
+          - sensor.germany_coronavirus_confirmed
+          - sensor.germany_coronavirus_recovered
+        show_header_toggle: false
+        title: Coronavirus Deutschland
         type: entities
       - entity: climate.wohnzimmer
         sensors:
@@ -140,17 +141,55 @@ views:
       - entity: sensor.fernseher_energy_today
       - entity: sensor.fernseher_energy_power
     cards:
+      - broadlink_host: 192.168.178.41
+        buttons:
+          back: >-
+            JgBoACMRFiQUExQcFiQVEhYRFRsVLhUlFRwVAAGbIhIVJRURFhsVJRQTFRIWGhUvFCYUHBUAAZokERUlFRIUHBUlFBMUEhUcFC8VJRUbFQABmyMRFSUVEhQcFiQVEhUSFRsWLRUlFhsUAA0F
+          bottom: >-
+            JgBOACMSFSUVEhUbFSYUEhUSFRwUJRQmFRIUAAGvIxEUJhUSFBwUJhUSFRIUHBUlFCYUExUAAa0jEhQlFRIWGxUkFhEWERYaFSUVJRUSFQANBQAAAAAAAAAAAAA=
+          clickleft: >-
+            JgBOACMSFCYUExUbFCYVEhQSFSUVLhYbFRsWAAGaIxEVJRUSFhoVJRUSFRIVJRQvFRsVHBQAAZwjERUlFhAWGxYkFRIVERUmFC8VGxUcEwANBQAAAAAAAAAAAAA=
+          clickright: >-
+            JgBOACMSFiQVERUdFCUUExUSFC8VEhUSFSUUAAGuJBEUJhMUEx0UJhUSFBMULxUSFRIVJBUAAa8iEhUkFRIWGxUkFhEWERUuFhEVEhUlFAANBQAAAAAAAAAAAAA=
+          exit: >-
+            JgBOACMSFSUVEhUbFSUVEhYQFhsVLhUmEx0VAAGbIhEVJRUSFB0VJRQTFBMUHBQvFSUVGxYAAZojEhMmFRIVHBQlFRIVEhUbFDAVJRcZFAANBQAAAAAAAAAAAAA=
+          home: >-
+            JgCCACMSFCYUExMdFSUVEhURFSUWEhMcFiQVAAGuIhIWJBUSFRsWJBUSFRIVJhMSFhwUJRUAAa4hFBQlFxAWGxQlFBMUExQmFRIUHBQmFQABrSQRFCYUExQcFCYUExQTFCUWERUcFSQWAAGuIxAWJBYRFRwVJBYRFRIWJBQTFRwTJxQADQUAAAAAAAA=
+          info: >-
+            JgBoACMSEycUEhUcFCUWERYRFRwVJBUlFRIWAAGtIxEVJRUSFRsVJRUSFRIUHBQmFSUUExUAAa4hExUlFRIVGxQmFBMTFBMdFCYUJhQTFAABriMSEycUEhQdEycVERQTFRwVJBYkFhEVAA0F
+          ok: >-
+            JgBOACISFyMVEhQcFiQVEhUSFS8UHBUSFS8VAAGaIhMUJhQSFRwTJxQTFREWLhQcFRITMBUAAZsiEhUlFBMTHRUlFRIVEhQvFRsWERUuFwANBQAAAAAAAAAAAAA=
+          power: >-
+            JgBOACMSFRIVLhUvFRIULxUSFC8VEhQvFi4UAAFiJBETFBMwFS4VEhUvFREWLhUSFS4VLhYAAWEjEhURFS8ULxUSFS4VEhUuFRIVLxUuFQANBQAAAAAAAAAAAAA=
+          top: >-
+            JgBOACITFSQWERYaFiQVEhUSFRsWGxQmFC8VAAGaJBEVJRQTFBwVJRQTFREWGxUbFSUULxQAAZ0iERYkFBMVGxYkFRIUExUbFRwVJRUvFAANBQAAAAAAAAAAAAA=
+          volumedown: >-
+            JgBOACMRFSUVEhQcFSUVEhUSFS4VLhUSFRwVAAGbIhIVJBYRFRwUJRYRFRIWLhUvFBIVHBQAAZskERQmFBMUHBYkFRIUEhUvFC8VEhQcFQANBQAAAAAAAAAAAAA=
+          volumeup: >-
+            JgBOACQQFSUVEhUbFSUVEhUSFS4VJhQTFBMUAAGuIhIVJRUSFRwTJhUSFRIVLhQmFBMTFBUAAa0jEhUlFRIUHBUlFBMUExQvFSUVEhURFQANBQAAAAAAAAAAAAA=
+        name: Mibox
+        remote_template: mibox
+        type: 'custom:content-card-remote-control'
       - entities:
-          - light.leds_wohnzimmer
+          - entity: light.leds_wohnzimmer
+            group: true
+            toggle: true
+            type: 'custom:slider-entity-row'
           - switch.deckenlampe
-          - light.yeelight_color1_34ce008bcc9d
+          - entity: light.yeelight_color1_34ce008bcc9d
+            group: true
+            toggle: true
+            type: 'custom:slider-entity-row'
+          - entity: light.hyperion
+            group: true
+            toggle: true
+            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
       - entities:
           - switch.fernseher
           - switch.ventilator
-          - switch.sonoff_100018bc6c
         show_header_toggle: true
         title: Strom
         type: entities
@@ -224,17 +263,21 @@ views:
     icon: 'mdi:desktop-tower'
     path: gastezimmer
     title: Gästezimmer
-  - badges:
-      - entity: sensor.washing_machine_state
-      - entity: sensor.waschmaschine_energy_power
+  - badges: null
     cards:
       - entities:
-          - switch.waschmaschine
           - input_boolean.kuehlschrank_keller
           - input_boolean.strom_keller
           - input_boolean.strom2_keller
         show_header_toggle: true
-        title: Strom
+        title: Mehrfachsteckdose
+        type: entities
+      - entities:
+          - switch.waschmaschine
+          - sensor.washing_machine_state
+          - sensor.waschmaschine_energy_power
+        show_header_toggle: false
+        title: Waschmaschine
         type: entities
       - artwork: cover
         entity: media_player.keller_tv
@@ -242,3 +285,4 @@ views:
     icon: 'mdi:washing-machine'
     path: keller
     title: Keller
+

@@ -233,9 +233,9 @@ notify:
     name: sbahn_txt
     filename: /mnt/usb-drive/smarthome/sbahndelay.txt
     timestamp: false
-  - name: twilio_whatsapp
-    platform: twilio_whatsapp
-    from_number: whatsapp:+14155238886
+  #- name: twilio_whatsapp
+    #platform: twilio_whatsapp
+    #from_number: whatsapp:+14155238886
 
 media_player:
   - platform: androidtv
@@ -437,11 +437,6 @@ light:
         mode: rgb
   - platform: hyperion
     host: 192.168.178.3
-
-sonoff:
-  username: !secret defaultmail
-  password: !secret default
-  api_region: 'eu'
 
 ifttt:
   key: !secret ifttt
