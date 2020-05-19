@@ -291,7 +291,7 @@
         value_template: >
           {% set domain = 'light' %}
           {% set state = 'on' %}
-          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
+          {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -316,7 +316,7 @@
         value_template: >
           {% set domain = 'light' %}
           {% set state = 'on' %}
-          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
+          {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
     action:
@@ -1067,7 +1067,10 @@
         - media_player.schlafzimmer
         data_template: 
           message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
-      - delay: '00:00:10'
+      - service: media_player.media_pause
+        data:
+          entity_id: media_player.mibox_s
+      - delay: '00:00:09'
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -1212,7 +1215,7 @@
       - delay: '00:00:03'
       - service: media_player.volume_set
         data:
-          volume_level: 0.5
+          volume_level: 0.8
           entity_id: media_player.mibox_s
 
   - alias: Mute Spotify ads wohnzimmer mini
@@ -1539,7 +1542,7 @@
     trigger: 
       - entity_id: sensor.deckenlampe
         platform: state
-        to: 'HOLD'
+        to: '{"TRIG":"HOLD"}'
     condition:
       condition: or
       conditions:
@@ -1562,7 +1565,7 @@
     trigger: 
       - entity_id: sensor.deckenlampe
         platform: state
-        to: 'HOLD'
+        to: '{"TRIG":"HOLD"}'
     condition:
       - condition: state
         entity_id: light.leds_wohnzimmer
@@ -1580,7 +1583,7 @@
     trigger: 
       - entity_id: sensor.deckenlampe
         platform: state
-        to: 'DOUBLE'
+        to: '{"TRIG":"DOUBLE"}'
     condition:
       - condition: state
         entity_id: switch.fernseher
@@ -1595,7 +1598,7 @@
     trigger: 
       - entity_id: sensor.deckenlampe
         platform: state
-        to: 'DOUBLE'
+        to: '{"TRIG":"DOUBLE"}'
     condition:
       - condition: state
         entity_id: switch.fernseher
@@ -1610,7 +1613,7 @@
     trigger: 
       - entity_id: sensor.lichtschalter
         platform: state
-        to: 'HOLD'
+        to: '{"TRIG":"HOLD"}'
     condition:
       condition: or
       conditions:
@@ -1642,7 +1645,7 @@
     trigger: 
       - entity_id: sensor.lichtschalter
         platform: state
-        to: 'HOLD'
+        to: '{"TRIG":"HOLD"}'
     condition:
       - condition: state
         entity_id: light.yeelight_strip1_34ce008b1863
@@ -1669,7 +1672,7 @@
     trigger: 
       - entity_id: sensor.lichtschalter
         platform: state
-        to: 'DOUBLE'
+        to: '{"TRIG":"DOUBLE"}'
     condition:
       - condition: state
         entity_id: switch.fabian_strom
@@ -1684,7 +1687,7 @@
     trigger: 
       - entity_id: sensor.lichtschalter
         platform: state
-        to: 'DOUBLE'
+        to: '{"TRIG":"DOUBLE"}'
     condition:
       - condition: state
         entity_id: switch.fabian_strom
@@ -1703,17 +1706,19 @@
         entity_id: sensor.wohnzimmer_humidity
         above: 55
     condition:
-      - condition: state
-        entity_id: device_tracker.fabianphone
-        state: home
-      - condition: state
-        entity_id: device_tracker.nessiephone
-        state: home
-      - condition: state
-        entity_id: 'input_boolean.silent_mode'
-        state: 'off'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: device_tracker.fabianphone
+          state: home
+        - condition: state
+          entity_id: device_tracker.nessiephone
+          state: home
+        - condition: state
+          entity_id: 'input_boolean.silent_mode'
+          state: 'off'
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
     action:
       - service: media_player.volume_set
         data:
@@ -1789,6 +1794,13 @@
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
       - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+      - condition: time
         before: '22:00:00'
       - condition: time
         after: '05:00:00'
@@ -1814,68 +1826,58 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-
-  # - alias: washing machine finished
-  # 
-  #   initial_state: off
-  #   trigger:
-  #     platform: numeric_state
-  #     entity_id: sensor.waschmaschine_energy_power
-  #     below: 4
-  #     for: '00:12:00'
-  #   action:
-  #     - service: notify.telegram_nessie
-  #       data:
-  #         message: 'Die Waschmaschine ist fertig.'
-  #     - service: notify.telegram_fabian
-  #       data:
-  #         message: 'Die Waschmaschine ist fertig.'
-  #     - service: tts.google_translate_say
-  #       entity_id: media_player.schlafzimmer
-  #       data:
-  #         message: 'Die Waschmaschine ist fertig!'
-  #     - service: automation.turn_off
-  #       data:
-  #         entity_id: automation.washing_machine_finished
-  #     - service: tts.google_translate_say
-  #       entity_id: media_player.wohnzimmer_mini
-  #       data:
-  #         message: 'Die Waschmaschine ist fertig!'
-  #     - service: switch.turn_off
-  #       data:
-  #         entity_id: switch.waschmaschine
-  #     - service: automation.turn_on
-  #       data:
-  #         entity_id: automation.washing_machine_started
-
-  # - alias: washing machine started
-  # 
-  #   initial_state: on
-  #   trigger:
-  #     platform: numeric_state
-  #     entity_id: sensor.waschmaschine_energy_power
-  #     above: 4
-  #     for: '00:00:15'
-  #   action:
-  #     - service: notify.telegram_nessie
-  #       data:
-  #         message: 'Die Waschmaschine wurde gestartet.'
-  #     - service: notify.telegram_fabian
-  #       data:
-  #         message: 'Die Waschmaschine wurde gestartet.'
-  #     - service: automation.turn_on
-  #       data:
-  #         entity_id: automation.washing_machine_finished
-  #     - service: automation.turn_off
-  #       data:
-  #         entity_id: automation.washing_machine_started
-
-# When power is detected, and the washing machine is not in 
-# the Running state, change the status of the washing machine
-# to Running. 
-# The status check will ensure we don't try to put the state 
-# to Running each time the power level changes, and we're already
-# in the Running state.
+          
+  - alias: Notify for high humidity when coming home weekend
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: device_tracker.nessiephone
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.fabianphone
+        from: 'not_home'
+        to: 'home'
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.gastezimmer_humidity
+        above: 54
+      - condition: numeric_state
+        entity_id: sensor.wohnzimmer_humidity
+        above: 54
+      - condition: state
+        entity_id: 'input_boolean.silent_mode'
+        state: 'off'
+      - condition: time
+        weekday:
+          - sat
+          - sun
+      - condition: time
+        before: '22:00:00'
+      - condition: time
+        after: '11:00:00'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 7200 }}"
+    action:
+      - delay: 00:03:00
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+      - service: tts.google_translate_say
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
+        data:
+          message: 'Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
 
   - alias: Detect if Washing machine is currently active
     trigger:
@@ -1890,25 +1892,36 @@
         data:
           entity_id: automation.notify_when_washing_machine_starts
 
-  - alias: Detect if coal lighter is currently active
+  - alias: Detect if coal lighter is currently active 5 Freunde
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
         above: 460
         below: 520
         for:
-          seconds: 40
+          seconds: 35
     condition:
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 1200 }}"
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.flophone
+            state: home
+          - condition: state
+            entity_id: device_tracker.maxiphone
+            state: home
     action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_5friends
           message: 'Kohleanzünder wurde eingeschaltet. '
           disable_notification: true
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -1930,6 +1943,125 @@
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+          
+  - alias: Detect if coal lighter is currently active AFK
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 460
+        below: 520
+        for:
+          seconds: 40
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int > 1200 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 1200 }}"
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.google_maps_104418453164779945782
+            state: home
+          - condition: state
+            entity_id: device_tracker.google_maps_103127589611220223167
+            state: home
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_afk
+          message: 'Kohleanzünder wurde eingeschaltet. '
+          disable_notification: true
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+      - delay: '00:11:00'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_afk
+          message: 'Bitte Kohle wenden.'
+      - service: tts.google_translate_say
+        entity_id: media_player.keller_tv
+        data:
+          message: 'Bitte die Kohle wenden.'
+      - delay: '00:11:00'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_afk
+          message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
+      - service: tts.google_translate_say
+        entity_id: media_player.keller_tv
+        data:
+          message: 'Die Kohle sollte jetzt fertig sein.'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.waschmaschine
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+          
+  - alias: Detect if coal lighter is currently active
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 460
+        below: 520
+        for:
+          seconds: 40
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+        - condition: state
+          entity_id: device_tracker.google_maps_104418453164779945782
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.google_maps_103127589611220223167
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.flophone
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.maxiphone
+          state: not_home
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Kohleanzünder wurde eingeschaltet. '
+          disable_notification: true
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+      - delay: '00:11:00'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Bitte Kohle wenden.'
+      - service: tts.google_translate_say
+        entity_id: media_player.keller_tv
+        data:
+          message: 'Bitte die Kohle wenden.'
+      - delay: '00:11:00'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
+      - service: tts.google_translate_say
+        entity_id: media_player.keller_tv
+        data:
+          message: 'Die Kohle sollte jetzt fertig sein.'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.waschmaschine
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
 
   - alias: Notify when washing machine starts
     initial_state: off
@@ -1948,10 +2080,19 @@
           entity_id: automation.detect_if_coal_lighter_is_currently_active
       - service: automation.turn_off
         data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_afk
+      - service: automation.turn_off
+        data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
       - service: automation.turn_on
         data:
           entity_id: automation.set_washing_machine_active_when_power_detected
+      - service: automation.turn_on
+        data:
+          entity_id: automation.set_washing_machine_finished_when_power_drops
       - service: notify.telegram_nessie
         data:
           message: 'Die Waschmaschine wurde gestartet.'
@@ -1979,6 +2120,10 @@
           state: Finishing
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int > 50 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 50 }}"
     action:
       - service: input_select.select_option
         data:
@@ -1989,6 +2134,7 @@
   # Finishing.
   
   - alias: Set washing machine finished when power drops
+    initial_state: off
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
@@ -2016,7 +2162,7 @@
         entity_id: input_select.washing_machine_status
         to: Finishing
         for:
-          minutes: 8
+          minutes: 7
     condition:
       condition: and
       conditions:
@@ -2048,12 +2194,21 @@
       - service: automation.turn_off
         data:
           entity_id: automation.notify_when_washing_machine_starts
+      - service: automation.turn_off
+        data:
+          entity_id: automation.set_washing_machine_finished_when_power_drops
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_afk
 
   - alias: 'Remind for going off Nessie'
     initial_state: on
@@ -3110,6 +3265,35 @@
       - service: notify.telegram_fabian
         data:
           message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+
+  - alias: 'Notify Fabian Nessie on way home - ghome'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112056758146194246561
+        from: 'Arbeit Nessie'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '13:15:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+      - condition: state
+        entity_id: device_tracker.fabianphone
+        state: home
+    action:
+      - service: tts.google_translate_say
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
+        - media_player.gastezimmer_mini
+        data:
+          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
   - alias: 'Telegram send weekly corona stats'
     initial_state: true

@@ -5,6 +5,7 @@ homeassistant:
     trusted_networks:
       - 127.0.0.1
       - ::1
+      - 192.168.1.0/24
       - 192.168.178.0/24
       - fd00::/8
     allow_bypass_login: true
@@ -26,61 +27,6 @@ homeassistant:
   #whitelist_external_dirs:
   #- '/mnt/usb-drive/smarthome/'
   #- '/home/cadmin/scripts/'
-  customize_glob:
-    "sensor.fsphone_charging":
-      hidden: true
-    "sensor.vkphone_charging":
-      hidden: true
-    "sensor.openweather*":
-      hidden: true
-    "sensor.dark_sky*":
-      hidden: true
-    "scene*":
-      hidden: true
-    "calendar*":
-      hidden: true
-    "automation*":
-      hidden: true
-    "binary_sensor.updater":
-      hidden: true
-    "sensor.sonoff_1000915e4d_voltage":
-      hidden: true
-    "sensor.sonoff_1000915e4d_current":
-      hidden: true
-    "sensor.silberhornstrasse_to_zorneding":
-      hidden: true
-    "sensor.trudering_to_zorneding":
-      hidden: true
-    "sensor.starnberg_nord_to_zorneding":
-      hidden: true
-    "sensor.*status*":
-      hidden: true
-    "binary_sensor.*button*":
-      hidden: true
-    "device_tracker.fabianphone":
-      hidden: true
-    "device_tracker.nessiephone":
-      hidden: true
-    "switch.sonoff_100016e326":
-      hidden: true
-    "sensor.wohnzimmer_temperature":
-      hidden: true
-    "sensor.gastezimmer_temperature":
-      hidden: true
-    "switch.reserve*":
-      hidden: true
-    "light.reserve*":
-      hidden: true
-    "binary_sensor.snapshots_stale":
-      hidden: true
-    "sensor.snapshot_backup":
-      hidden: true
-    "*snapshots_*":
-      hidden: true
-    "input_select.washing_machine_status":
-      hidden: true
-    "sensor.battery_state_ipad":
-      hidden: true
     
 zone:
   # This will override the default home zone
@@ -148,6 +94,8 @@ recorder:
       - sensor.vkphone_charging
       - sensor.fs_smspin
       - sensor.fs_caller
+      - sensor.lichtschalter
+      - sensor.deckenlampe
       - device_tracker.fabianpc
       - device_tracker.fabiantablet
       - device_tracker.nessiepc
@@ -208,6 +156,7 @@ telegram_bot:
       - !secret telegram_chat_maxi
       - !secret telegram_chat_fabio
       - !secret telegram_chat_5friends
+      - !secret telegram_chat_afk
       - !secret telegram_chat_jek_group
       
 #twilio:
@@ -270,24 +219,17 @@ media_player:
       'com.liskovsoft.videomanager':
         - 'playing':
             'media_session_state': 3
-  # - platform: spotify
-  #   client_id: !secret spotifyid
-  #   client_secret: !secret spotifysecret
-  #- platform: emby
-    #host: !secret emby_jek_mail
-    #api_key: !secret emby_jek
-    #port: 29004
 
 #speedtestdotnet:
 #  server_id: 21514
 
-climate:
-  - platform: eq3btsmart
-    devices:
-      Bad:
-        mac: !secret eq3btsmart1
-      Schlafzimmer:
-        mac: !secret eq3btsmart2
+#climate:
+#  - platform: eq3btsmart
+#    devices:
+#      Bad:
+#        mac: !secret eq3btsmart1
+#      Schlafzimmer:
+#        mac: !secret eq3btsmart2
 
 tado:
   username: !secret defaultmail
@@ -320,12 +262,12 @@ coinbase:
 
 sensor:
   - platform: mqtt
-    state_topic: "lichtschalter/HOLD/BUTTON1"
+    state_topic: "lichtschalter/stat/BUTTON1T"
     name: lichtschalter
     #qos: 1
     #expire_after: "1"  # Forget what just happen
   - platform: mqtt
-    state_topic: "deckenlampe/HOLD/BUTTON1"
+    state_topic: "deckenlampe/stat/BUTTON1T"
     name: deckenlampe
   - platform: template
     sensors:
@@ -539,6 +481,8 @@ google_assistant:
       expose: false
     switch.fabian_pc_shutdown:
       expose: false
+    switch.reserve_switch_kleiin:
+      expose: false
 
 google:
   client_id: !secret google_calendar_client_id
@@ -581,6 +525,14 @@ input_select:
       - Finishing
       - Clean
     initial: Idle
+  coal_lighter_status:
+    name: Kohleanzünder Status
+    options:
+      - Unbenutzt
+      - unter22min
+      - unter11min
+      - Fertig
+    initial: Unbenutzt
 
 input_boolean: !include input_boolean.yaml
 frontend:

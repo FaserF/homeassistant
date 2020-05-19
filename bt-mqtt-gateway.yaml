@@ -1,0 +1,28 @@
+mqtt:
+  host: 127.0.0.1
+  port: 1883
+  username: mqtt
+  password: hassio
+  client_id: bt-mqtt-gateway
+  availability_topic: lwt_topic
+                                              
+manager:
+  sensor_config:
+    topic: homeassistant
+    retain: true
+  topic_subscription:
+    update_all:
+      topic: homeassistant/status
+      payload: online
+  command_timeout: 35
+  workers:
+    thermostat:
+      args:
+        devices:
+          Bad:
+            mac: 00:1A:22:0A:F7:66
+          Schlafzimmer:
+           mac: 00:1A:22:0B:A8:0E
+        topic_prefix: thermostat
+      topic_subscription: thermostat/+/+/set
+      update_interval: 60
