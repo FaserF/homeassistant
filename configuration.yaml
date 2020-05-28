@@ -13,6 +13,9 @@ homeassistant:
     api_password: !secret http_password
   # Name of the location where Home Assistant is running
   name: Fabian's Smart Home
+  #URLs
+  external_url: !secret baseurl
+  internal_url: "https://192.168.178.2:8123"
   # Location required to calculate the time the sun rises and sets
   latitude: !secret latitude
   longitude: !secret longitude
@@ -75,7 +78,6 @@ mobile_app:
 http:
   ssl_certificate: !secret ssl_certificate
   ssl_key: !secret ssl_key
-  base_url: !secret baseurl
 
 recorder:
   purge_keep_days: 7
@@ -108,8 +110,6 @@ updater:
 
 # Discover some devices automatically
 discovery:
-  ignore:
-    - igd
 
 # Enables support for tracking state changes over time
 history:
@@ -158,10 +158,6 @@ telegram_bot:
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
       - !secret telegram_chat_jek_group
-      
-#twilio:
-  #account_sid: !secret twilio_sid
-  #auth_token: !secret twilio_token
 
 notify:
   - name: telegram_fabian
@@ -178,19 +174,15 @@ notify:
     vapid_pub_key: !secret vapid_pub_key
     vapid_prv_key: !secret vapid_prv_key
     vapid_email: !secret vapid_email
-  - platform: file
-    name: sbahn_txt
-    filename: /mnt/usb-drive/smarthome/sbahndelay.txt
-    timestamp: false
   #- name: twilio_whatsapp
     #platform: twilio_whatsapp
     #from_number: whatsapp:+14155238886
 
 media_player:
   - platform: androidtv
-    name: MiBox S
+    name: Wohnzimmer TV
     device_class: androidtv
-    host: 192.168.178.41
+    host: 192.168.178.82
     adb_server_ip: 127.0.0.1
     apps:
       com.liskovsoft.videomanager: "Smart YoutTube TV"
@@ -201,8 +193,46 @@ media_player:
       tv.emby.embyatv: "Emby"
       com.google.android.apps.mediashell: "Chromecast"
       de.prosiebensat1digital.prosieben: "Pro7"
+      com.tcl.tv: "HDMI"
     state_detection_rules:
       'com.google.android.tvlauncher':
+        - 'standby'
+      'com.tcl.tv':
+        - 'standby'
+      'com.netflix.ninja':
+        - 'playing':
+            'media_session_state': 3
+        - 'paused':
+            'media_session_state': 2
+      'com.spotify.tv.android':
+        - 'playing':
+            'media_session_state': 3
+        - 'paused':
+            'media_session_state': 2
+      'com.google.android.apps.mediashell':
+        - 'audio_state'
+      'com.liskovsoft.videomanager':
+        - 'playing':
+            'media_session_state': 3
+  - platform: androidtv
+    name: Keller TV
+    device_class: androidtv
+    host: 192.168.178.83
+    adb_server_ip: 127.0.0.1
+    apps:
+      com.liskovsoft.videomanager: "Smart YoutTube TV"
+      exp.animo.fireanime: "FireAnime"
+      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
+      com.valvesoftware.steamlink: "Steam Link"
+      com.zdf.android.mediathek: "ZDF Mediathek"
+      tv.emby.embyatv: "Emby"
+      com.google.android.apps.mediashell: "Chromecast"
+      de.prosiebensat1digital.prosieben: "Pro7"
+      com.tcl.tv: "HDMI"
+    state_detection_rules:
+      'com.google.android.tvlauncher':
+        - 'standby'
+      'com.tcl.tv':
         - 'standby'
       'com.netflix.ninja':
         - 'playing':
@@ -223,13 +253,13 @@ media_player:
 #speedtestdotnet:
 #  server_id: 21514
 
-#climate:
-#  - platform: eq3btsmart
-#    devices:
-#      Bad:
-#        mac: !secret eq3btsmart1
-#      Schlafzimmer:
-#        mac: !secret eq3btsmart2
+climate:
+  - platform: eq3btsmart
+    devices:
+      Bad:
+        mac: !secret eq3btsmart1
+      Schlafzimmer:
+        mac: !secret eq3btsmart2
 
 tado:
   username: !secret defaultmail
@@ -245,8 +275,7 @@ shell_command:
   randomfood: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}'
   foodyes: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes'
   jek_telegram: !secret telegram_jek_open_command
-  start_apache: 'ssh cadmin@7208ad356903 "sudo /bin/bash /home/cadmin/scripts/onreboot.sh "'
-  restartha: 'ha host reboot'
+  #restartha: 'ha host reboot'
   hibernatefpc: 'curl http://192.168.178.65:5001/hibernate'
   hibernatenpc: 'curl http://192.168.178.92:5001/hibernate'
   shutdownnpc: 'curl http://192.168.178.92:5001/shutdown'
@@ -377,8 +406,6 @@ light:
       192.168.178.248:
         name: LEDs Tisch
         mode: rgb
-  - platform: hyperion
-    host: 192.168.178.3
 
 ifttt:
   key: !secret ifttt
@@ -483,6 +510,8 @@ google_assistant:
       expose: false
     switch.reserve_switch_kleiin:
       expose: false
+    light.keller_gluhbirne:
+      expose: false
 
 google:
   client_id: !secret google_calendar_client_id
@@ -492,13 +521,15 @@ google:
 # Text to speech
 tts:
   - platform: google_translate
+    service_name: google_say
     language: 'de'
+    base_url: !secret baseurl
 
 panel_iframe:
   tasmoadmin:
     title: TasmoAdmin
     icon: mdi:lightbulb-on
-    url: https://smartlife.ddns.net:8124
+    url: http://smartlife.ddns.net:8124
   #fritzbox:
   #  title: FritzBox
   #  icon: mdi:router-wireless
@@ -507,10 +538,6 @@ panel_iframe:
     title: Bookstack
     icon: mdi:format-vertical-align-bottom
     url: https://smartlife.ddns.net:2665
-  #hyperion:
-  #  title: Hyperion
-  #  icon: mdi:lightbulb-on
-  #  url: http://192.168.178.3:8090
   #mdiindex:
   #  title: MDI Icon Index
   #  icon: mdi:vector-square

@@ -6,8 +6,8 @@
     name: Wohnzimmer
     icon: mdi:television-classic
     entities:
-      - media_player.mi_box
-      - media_player.mibox_s
+      - media_player.wohnzimmer_tv
+      - media_player.wohnzimmer_tv_cast
       - media_player.wohnzimmer_mini
       - light.yeelight_color1_34ce008bcc9d #Stehlampe
       - liht.stehlampe
@@ -15,7 +15,6 @@
       - light.leds_wohnzimmer
       - light.wohnzimmer_lampe
       - climate.wohnzimmer
-      - switch.sonoff_100018bc6c
       - switch.fernseher
       - switch.ventilator
       - switch.deckenlampe
@@ -27,7 +26,6 @@
       - media_player.schlafzimmer
       - light.yeelight_strip1_34ce008b1863 #Bett LEDs
       - light.leds_bett
-      - light.bett_gluhbirne
       - light.leds_tisch
       - climate.schlafzimmer
       - switch.bett
@@ -53,7 +51,9 @@
     icon: mdi:washing-machine
     entities:
       - media_player.keller_tv
+      - media_player.keller_tv_cast
       - switch.waschmaschine
+      - light.keller_gluhbirne
       - input_boolean.strom_keller
       - input_boolean.strom2_keller
       - input_boolean.kuehlschrank_keller

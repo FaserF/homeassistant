@@ -664,7 +664,7 @@
             entity_id: 'input_boolean.silent_mode'
             state: 'off'
     action:
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.wohnzimmer_mini
         data_template: 
           message: >
@@ -695,7 +695,7 @@
         entity_id: device_tracker.nessiephone
         state: home
     action:
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.schlafzimmer
         data_template: 
           message: >
@@ -851,6 +851,41 @@
           inline_keyboard:
             - 'Ausschalten:/fridgeoff'
 
+  - alias: 'Turn on bulb in Keller Fabi'
+    initial_state: True
+    trigger:
+      platform: template
+      value_template: "{% if is_state_attr('device_tracker.fabianphone', 'scanner', 'LuciDeviceScanner') %}true{% endif %}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_fabi.attributes.last_triggered) | int > 7200 }}"
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.keller_gluhbirne
+          brightness: 255
+          rgb_color: [0,200,255]
+
+  - alias: 'Turn on bulb in Keller Nessie'
+    initial_state: True
+    trigger:
+      platform: template
+      value_template: "{% if is_state_attr('device_tracker.nessiephone', 'scanner', 'LuciDeviceScanner') %}true{% endif %}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_nessie.attributes.last_triggered) | int > 7200 }}"
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.keller_gluhbirne
+          brightness: 255
+          rgb_color: [255,255,255]
+          white_value: 255
+
   - alias: 'Turn on Strom Keller'
     initial_state: on
     trigger:
@@ -894,7 +929,6 @@
       - service: frontend.set_theme
         data:
           name: 'Google Dark Theme'
-      - service: shell_command.start_apache
           
   - alias: 'Restart Homeassistant every sunday'
     initial_state: true
@@ -1061,7 +1095,7 @@
         data:
           volume_level: 0.4
           entity_id: media_player.wohnzimmer_mini
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
@@ -1069,7 +1103,7 @@
           message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
       - service: media_player.media_pause
         data:
-          entity_id: media_player.mibox_s
+          entity_id: media_player.wohnzimmer_tv
       - delay: '00:00:09'
       - service: media_player.volume_set
         data:
@@ -1096,7 +1130,7 @@
         data:
           volume_level: 0.7
           entity_id: media_player.wohnzimmer_mini
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
@@ -1199,25 +1233,6 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  - alias: connect to adb on tv startup and change volume
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.tv
-        from: 'not_home'
-        to: 'home'
-    action:
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.mibox_s
-          command: "HOME"
-      - delay: '00:00:03'
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.8
-          entity_id: media_player.mibox_s
-
   - alias: Mute Spotify ads wohnzimmer mini
     initial_state: on
     trigger:
@@ -1294,43 +1309,43 @@
         data:
           entity_id: automation.mute_spotify_ads_schlafzimmer
 
-  - alias: Mute Spotify ads mi box
+  - alias: Mute Spotify ads wohnzimmer tv
     initial_state: on
     trigger:
       - platform: template 
-        value_template: "{{ states.media_player.mi_box.attributes.media_title == 'Advertisement' }}"
+        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title == 'Advertisement' }}"
       - platform: template 
-        value_template: "{{ states.media_player.mi_box.attributes.media_title == 'Spotify' }}"
+        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title == 'Spotify' }}"
     action:
       - service: media_player.volume_mute
         data:
-          entity_id: media_player.mi_box
+          entity_id: media_player.wohnzimmer_tv
           is_volume_muted: true
       - service: automation.turn_off
         data:
-          entity_id: automation.mute_spotify_ads_mi_box
+          entity_id: automation.mute_spotify_ads_wohnzimmer_tv
       - delay: '00:00:07'
       - service: automation.turn_on
         data:
-          entity_id: automation.unmute_after_spotify_ads_mi_box
+          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_tv
 
-  - alias: Unmute after Spotify ads mi box
+  - alias: Unmute after Spotify ads wohnzimmer tv
     initial_state: off
     trigger:
       - platform: template 
-        value_template: "{{ states.media_player.mi_box.attributes.media_title != 'Advertisement' }}"
+        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Advertisement' }}"
     action:
       - service: media_player.volume_mute
         data:
-          entity_id: media_player.mi_box
+          entity_id: media_player.wohnzimmer_tv
           is_volume_muted: false
       - service: automation.turn_off
         data:
-          entity_id: automation.unmute_after_spotify_ads_mi_box
+          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_tv
       - delay: '00:00:07'
       - service: automation.turn_on
         data:
-          entity_id: automation.mute_spotify_ads_mi_box
+          entity_id: automation.mute_spotify_ads_wohnzimmer_tv
 
   - alias: Mute Spotify ads mini Gruppe
     initial_state: on
@@ -1480,7 +1495,7 @@
             entity_id: device_tracker.fabianphone
             state: home
     action:
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.schlafzimmer
         - media_player.wohnzimmer_mini
@@ -1621,9 +1636,6 @@
           entity_id: light.yeelight_strip1_34ce008b1863
           state: 'on'
         - condition: state
-          entity_id: light.bett_gluhbirne
-          state: 'on'
-        - condition: state
           entity_id: light.leds_tisch
           state: 'on'
         - condition: state
@@ -1649,9 +1661,6 @@
     condition:
       - condition: state
         entity_id: light.yeelight_strip1_34ce008b1863
-        state: 'off'
-      - condition: state
-        entity_id: light.bett_gluhbirne
         state: 'off'
       - condition: state
         entity_id: light.leds_tisch
@@ -1701,24 +1710,26 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.gastezimmer_humidity
-        above: 55
+        above: 57
       - platform: numeric_state
         entity_id: sensor.wohnzimmer_humidity
-        above: 55
+        above: 57
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: state
-          entity_id: device_tracker.fabianphone
-          state: home
-        - condition: state
-          entity_id: device_tracker.nessiephone
-          state: home
         - condition: state
           entity_id: 'input_boolean.silent_mode'
           state: 'off'
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.fabianphone
+            state: home
+          - condition: state
+            entity_id: device_tracker.nessiephone
+            state: home
     action:
       - service: media_player.volume_set
         data:
@@ -1726,15 +1737,13 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-          - media_player.gastezimmer_mini
       - service: media_player.media_pause
         data:
-          entity_id: media_player.mibox_s
-      - service: tts.google_translate_say
+          entity_id: media_player.wohnzimmer_tv
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
-        - media_player.gastezimmer_mini
         data:
           message: 'Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
       - service: media_player.volume_set
@@ -1743,8 +1752,7 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-          - media_player.gastezimmer_mini
-          
+
   - alias: Notify for extreme high humidity
     trigger:
       - platform: numeric_state
@@ -1803,7 +1811,7 @@
       - condition: time
         before: '22:00:00'
       - condition: time
-        after: '05:00:00'
+        after: '08:00:00'
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
     action:
@@ -1814,7 +1822,7 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
@@ -1866,7 +1874,7 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
@@ -1879,25 +1887,12 @@
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
 
-  - alias: Detect if Washing machine is currently active
-    trigger:
-      - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
-        above: 4
-        below: 430
-        for:
-          seconds: 40
-    action:
-      - service: automation.turn_on
-        data:
-          entity_id: automation.notify_when_washing_machine_starts
-
   - alias: Detect if coal lighter is currently active 5 Freunde
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        above: 460
-        below: 520
+        above: 470
+        below: 540
         for:
           seconds: 35
     condition:
@@ -1927,7 +1922,7 @@
         data_template:
           target: !secret telegram_chat_5friends
           message: 'Bitte Kohle wenden.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Bitte die Kohle wenden.'
@@ -1936,7 +1931,7 @@
         data_template:
           target: !secret telegram_chat_5friends
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Die Kohle sollte jetzt fertig sein.'
@@ -1951,8 +1946,8 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        above: 460
-        below: 520
+        above: 470
+        below: 540
         for:
           seconds: 40
     condition:
@@ -1984,7 +1979,7 @@
         data_template:
           target: !secret telegram_chat_afk
           message: 'Bitte Kohle wenden.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Bitte die Kohle wenden.'
@@ -1993,7 +1988,7 @@
         data_template:
           target: !secret telegram_chat_afk
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Die Kohle sollte jetzt fertig sein.'
@@ -2008,8 +2003,8 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        above: 460
-        below: 520
+        above: 470
+        below: 540
         for:
           seconds: 40
     condition:
@@ -2043,7 +2038,7 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Bitte Kohle wenden.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Bitte die Kohle wenden.'
@@ -2052,7 +2047,7 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Die Kohle sollte jetzt fertig sein.'
@@ -2063,17 +2058,19 @@
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
 
-  - alias: Notify when washing machine starts
-    initial_state: off
+  - alias: Detect if Washing machine is currently active
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
         above: 4
+        below: 469
+        for:
+          seconds: 40
     condition:
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_when_washing_machine_starts.attributes.last_triggered) | int > 5400 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 5400 }}"
     action:
       - service: automation.turn_off
         data:
@@ -2180,20 +2177,17 @@
       - service: notify.telegram_fabian
         data:
           message: 'Die Waschmaschine ist fertig.'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.schlafzimmer
         data:
           message: 'Die Waschmaschine ist fertig!'
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.wohnzimmer_mini
         data:
           message: 'Die Waschmaschine ist fertig!'
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
-      - service: automation.turn_off
-        data:
-          entity_id: automation.notify_when_washing_machine_starts
       - service: automation.turn_off
         data:
           entity_id: automation.set_washing_machine_finished_when_power_drops
@@ -2508,7 +2502,7 @@
         data:
           volume_level: 0.7
           entity_id: media_player.wohnzimmer_mini
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
@@ -2548,9 +2542,6 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      - service: switch.turn_off
-        data:
-          entity_id: switch.schloss
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
@@ -2565,9 +2556,6 @@
         command: '/alohomora'
     action:
       - service: switch.turn_on
-        data:
-          entity_id: switch.schloss
-      - service: switch.turn_off
         data:
           entity_id: switch.schloss
       - service: telegram_bot.send_message
@@ -2591,7 +2579,7 @@
         data:
           volume_level: 0.7
           entity_id: media_player.wohnzimmer_mini
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.wohnzimmer_mini
         data_template:
           message: >
@@ -2608,7 +2596,7 @@
             Jemand
             {% endif %}
             ist da.
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.keller_tv
         data:
           message: 'Ding Dong, es klingelt.'
@@ -2650,7 +2638,7 @@
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 10800 }}"
     action:
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: media_player.schlafzimmer
         data:
           message: 'Nessie, du hast die Pille vergessen'
@@ -3287,12 +3275,12 @@
         entity_id: device_tracker.fabianphone
         state: home
     action:
-      - service: tts.google_translate_say
+      - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
         - media_player.gastezimmer_mini
-        data:
+        data_template:
           message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
   - alias: 'Telegram send weekly corona stats'
