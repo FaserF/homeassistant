@@ -586,13 +586,6 @@
     trigger:
       - platform: state
         entity_id:
-          - switch.sonoff_100016e326
-        from: 'off'
-        to: 'on'
-        for:
-            minutes: 150
-      - platform: state
-        entity_id:
           - switch.switch_bett
         from: 'off'
         to: 'on'
@@ -601,10 +594,36 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100016e326
+          entity_id: switch.switch_bett
+
+  - alias: 'Turn off staubsauger after 3,5 hours'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - switch.staubsauger
+        from: 'off'
+        to: 'on'
+        for:
+            minutes: 210
+    action:
       - service: switch.turn_off
         data:
-          entity_id: switch.switch_bett
+          entity_id: switch.staubsauger
+
+  - alias: 'Turn on staubsauger weekly'
+    initial_state: on
+    trigger:
+      platform: time
+      at: '13:00:00'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.staubsauger
 
   - alias: 'Turn on lights in morning'
     initial_state: on
@@ -825,7 +844,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '13:00'
+        at: '14:30'
     condition:
       condition: and
       conditions:
@@ -1737,9 +1756,13 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-      - service: media_player.media_pause
+      #- service: media_player.media_pause
+        #data:
+          #entity_id: media_player.wohnzimmer_tv
+      - service: androidtv.adb_command
         data:
           entity_id: media_player.wohnzimmer_tv
+          command: "am start -t image/* -d file:///sdcard/open_window.gif"
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
@@ -1926,15 +1949,21 @@
         entity_id: media_player.keller_tv
         data:
           message: 'Bitte die Kohle wenden.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/referee-whistle.wav -t audio/wav"
+          #command: "am start -t image/* -d file:///sdcard/perfect_dive.gif"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_5friends
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Die Kohle sollte jetzt fertig sein.'
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/shisha.wav -t audio/wav"
+          #command: "am start -t image/* -d file:///sdcard/cat.gif"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -1983,15 +2012,21 @@
         entity_id: media_player.keller_tv
         data:
           message: 'Bitte die Kohle wenden.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/referee-whistle.wav -t audio/wav"
+          #command: "am start -t image/* -d file:///sdcard/perfect_dive.gif"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_afk
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Die Kohle sollte jetzt fertig sein.'
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/shisha.wav -t audio/wav"
+          #command: "am start -t image/* -d file:///sdcard/cat.gif"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -2042,15 +2077,21 @@
         entity_id: media_player.keller_tv
         data:
           message: 'Bitte die Kohle wenden.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/referee-whistle.wav -t audio/wav"
+          #command: "am start -t image/* -d file:///sdcard/perfect_dive.gif"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Die Kohle sollte jetzt fertig sein.'
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/shisha.wav -t audio/wav"
+          #command: "am start -t image/* -d file:///sdcard/cat.gif"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -2538,14 +2579,40 @@
       event_type: telegram_command
       event_data:
         command: '/open'
+    condition:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: switch.schloss
+          state: unavailable
     action:
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      - service: telegram_bot.answer_callback_query
+      - service: telegram_bot.send_message
         data_template:
-          callback_query_id: '{{ trigger.event.data.id }}'
+          target: "{{ trigger.event.data.user_id }}"
           message: 'Gartentor wurde geöffnet.'
+
+  - alias: 'Telegram open door not working'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/open'
+    condition:
+      - condition: state
+        entity_id: switch.schloss
+        state: 'unavailable'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Der Gartentoröffner ist aktuell offline. Das Gartentor wurde NICHT geöffnet. Fabian wurde informiert.'
+      - service: notify.telegram_fabian
+        data:
+          message: "Gartentoröffner ist offline! Bitte neustarten."
 
   - alias: 'Telegram open door - secretly'
     initial_state: on
@@ -2571,10 +2638,6 @@
       event_data:
         command: '/klingel'
     action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: "{{ trigger.event.data.user_id }}"
-          message: 'Klingel in Wohnung aktiviert.'
       - service: media_player.volume_set
         data:
           volume_level: 0.7
@@ -2596,10 +2659,14 @@
             Jemand
             {% endif %}
             ist da.
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Ding Dong, es klingelt.'
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Klingel in Wohnung aktiviert.'
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -3274,6 +3341,9 @@
       - condition: state
         entity_id: device_tracker.fabianphone
         state: home
+      - condition: state
+        entity_id: 'input_boolean.silent_mode'
+        state: 'off'
     action:
       - service: tts.google_say
         entity_id: 
@@ -3490,4 +3560,3 @@
       #  data_template:
       #    target: !secret telegram_chat_jek_group
       #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
-          

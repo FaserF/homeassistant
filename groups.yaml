@@ -17,6 +17,7 @@
       - climate.wohnzimmer
       - switch.fernseher
       - switch.ventilator
+      - switch.staubsauger
       - switch.deckenlampe
 
   Schlafzimmer:

@@ -217,7 +217,7 @@ media_player:
   - platform: androidtv
     name: Keller TV
     device_class: androidtv
-    host: 192.168.178.83
+    host: 192.168.1.225
     adb_server_ip: 127.0.0.1
     apps:
       com.liskovsoft.videomanager: "Smart YoutTube TV"

@@ -1,40 +1,40 @@
 animated_background:
-  default_url: "https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4"
-  entity: "weather.wetter_darksky"
+  default_url: 'https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4'
+  entity: weather.wetter_darksky
   state_url:
-    'sunny':
-      - "https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4"
-      - "https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4"
-      - "https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4"
-      - "https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4"
-      - "https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4"
-    'partlycloudy':
-      - "https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4"
-      - "https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4"
-      - "https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4"
-      - "https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4"
-      - "https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4"
-      - "https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4"
-    'cloudy':
-      - "https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4"
-      - "https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4"
-      - "https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4"
-      - "https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4"
-      - "https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4"
-      - "https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4"
-    'mostlycloudy':
-      - "https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4"
-      - "https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4"
-      - "https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4"
-    'clear-night':
-      - "https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4"
-      - "https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4"
-      - "https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4"
-      - "https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4"
-    'fog':
-      - "https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4"
-      - "https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4"
-    'rainy': "https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4"
+    clear-night:
+      - 'https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4'
+    cloudy:
+      - 'https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
+    fog:
+      - 'https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4'
+    mostlycloudy:
+      - 'https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4'
+    partlycloudy:
+      - 'https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
+    rainy: 'https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4'
+    sunny:
+      - 'https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4'
 path: default_view
 title: Fabian's Smart Home
 views:
@@ -61,7 +61,7 @@ views:
           - switch.lichtschalter
           - switch.deckenlampe
           - switch.regal_leds
-          - entity: light.bett_gluhbirne
+          - entity: light.keller_gluhbirne
             group: true
             toggle: true
             type: 'custom:slider-entity-row'
@@ -89,10 +89,6 @@ views:
             group: true
             toggle: true
             type: 'custom:slider-entity-row'
-          - entity: light.hyperion
-            group: true
-            toggle: true
-            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
@@ -103,6 +99,7 @@ views:
           - switch.nessie_pc
           - switch.fernseher
           - switch.ventilator
+          - switch.staubsauger
           - input_boolean.kuehlschrank_keller
           - input_boolean.strom_keller
           - input_boolean.strom2_keller
@@ -138,10 +135,10 @@ views:
       - entity: climate.bad
         type: 'custom:simple-thermostat'
       - artwork: cover
-        entity: media_player.mi_box
+        entity: media_player.wohnzimmer_tv
         type: 'custom:mini-media-player'
       - artwork: cover
-        entity: media_player.mibox_s
+        entity: media_player.wohnzimmer_tv_cast
         type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.wohnzimmer_mini
@@ -150,10 +147,13 @@ views:
         entity: media_player.schlafzimmer
         type: 'custom:mini-media-player'
       - artwork: cover
-        entity: media_player.gastezimmer_mini
+        entity: media_player.keller_tv
         type: 'custom:mini-media-player'
       - artwork: cover
-        entity: media_player.keller_tv
+        entity: media_player.keller_tv_cast
+        type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.gastezimmer_mini
         type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.mini_gruppe
@@ -177,16 +177,13 @@ views:
             group: true
             toggle: true
             type: 'custom:slider-entity-row'
-          - entity: light.hyperion
-            group: true
-            toggle: true
-            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
       - entities:
           - switch.fernseher
           - switch.ventilator
+          - switch.staubsauger
         show_header_toggle: true
         title: Strom
         type: entities
@@ -195,10 +192,10 @@ views:
           - sensor.wohnzimmer_humidity
         type: 'custom:simple-thermostat'
       - artwork: cover
-        entity: media_player.mibox_s
+        entity: media_player.wohnzimmer_tv
         type: 'custom:mini-media-player'
       - artwork: cover
-        entity: media_player.mi_box
+        entity: media_player.wohnzimmer_tv_cast
         type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.wohnzimmer_mini
@@ -208,7 +205,6 @@ views:
     title: Wohnzimmer
   - cards:
       - entities:
-          - light.bett_gluhbirne
           - switch.regal_leds
           - switch.lichtschalter
           - light.leds_tisch
@@ -263,6 +259,14 @@ views:
   - badges: null
     cards:
       - entities:
+          - entity: light.keller_gluhbirne
+            group: true
+            toggle: true
+            type: 'custom:slider-entity-row'
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
           - input_boolean.kuehlschrank_keller
           - input_boolean.strom_keller
           - input_boolean.strom2_keller
@@ -279,6 +283,9 @@ views:
       - artwork: cover
         entity: media_player.keller_tv
         type: 'custom:mini-media-player'
+      - artwork: cover
+        entity: media_player.keller_tv_cast
+        type: 'custom:mini-media-player'
     icon: 'mdi:washing-machine'
     path: keller
     title: Keller
@@ -289,53 +296,107 @@ views:
             call: androidtv.adb_command
             data:
               command: input keyevent 4
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           bottom:
             call: androidtv.adb_command
             data:
               command: input keyevent 20
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           clickleft:
             call: androidtv.adb_command
             data:
               command: input keyevent 21
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           clickright:
             call: androidtv.adb_command
             data:
               command: input keyevent 22
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           home:
             call: androidtv.adb_command
             data:
               command: input keyevent 3
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           ok:
             call: androidtv.adb_command
             data:
               command: input keyevent 66
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           power:
             call: androidtv.adb_command
             data:
               command: input keyevent 26
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           top:
             call: androidtv.adb_command
             data:
               command: input keyevent 19
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           volumedown:
             call: androidtv.adb_command
             data:
               command: input keyevent 25
-              entity_id: media_player.mibox_s
+              entity_id: media_player.wohnzimmer_tv
           volumeup:
             call: androidtv.adb_command
             data:
               command: input keyevent 24
-              entity_id: media_player.mibox_s
-        name: Mibox
+              entity_id: media_player.wohnzimmer_tv
+        name: Wohnzimmer TV
+        remote_template: mibox
+        type: 'custom:generic-remote-control-card'
+      - buttons:
+          back:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 4
+              entity_id: media_player.keller_tv
+          bottom:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 20
+              entity_id: media_player.keller_tv
+          clickleft:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 21
+              entity_id: media_player.keller_tv
+          clickright:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 22
+              entity_id: media_player.keller_tv
+          home:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 3
+              entity_id: media_player.keller_tv
+          ok:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 66
+              entity_id: media_player.keller_tv
+          power:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 26
+              entity_id: media_player.keller_tv
+          top:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 19
+              entity_id: media_player.keller_tv
+          volumedown:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 25
+              entity_id: media_player.keller_tv
+          volumeup:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 24
+              entity_id: media_player.keller_tv
+        name: Keller TV
         remote_template: mibox
         type: 'custom:generic-remote-control-card'
     icon: 'mdi:remote-tv'
