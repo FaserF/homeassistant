@@ -596,7 +596,7 @@
         data:
           entity_id: switch.switch_bett
 
-  - alias: 'Turn off staubsauger after 3,5 hours'
+  - alias: 'Turn off staubsauger after 3 hours'
     initial_state: on
     trigger:
       - platform: state
@@ -605,7 +605,7 @@
         from: 'off'
         to: 'on'
         for:
-            minutes: 210
+            minutes: 180
     action:
       - service: switch.turn_off
         data:
@@ -620,6 +620,7 @@
       - condition: time
         weekday:
           - mon
+          - fri
     action:
       - service: switch.turn_on
         data:
@@ -966,9 +967,16 @@
     - platform: time
       at: '00:02:00'
     action:
+    - service: hassio.addon_stop
+      data:
+        addon: 605cee21_apache2
     - service: hassio.addon_restart
       data:
         addon: core_letsencrypt
+    - delay: '00:10:00'
+    - service: hassio.addon_start
+      data:
+        addon: 605cee21_apache2
 
   - alias: Turn on Steckerleiste1 Keller
     initial_state: on
@@ -1952,8 +1960,8 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/referee-whistle.wav -t audio/wav"
-          #command: "am start -t image/* -d file:///sdcard/perfect_dive.gif"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
+          #command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.wav -t audio/wav"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -1962,8 +1970,8 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/shisha.wav -t audio/wav"
-          #command: "am start -t image/* -d file:///sdcard/cat.gif"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+          #command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.wav -t audio/wav"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -2015,8 +2023,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/referee-whistle.wav -t audio/wav"
-          #command: "am start -t image/* -d file:///sdcard/perfect_dive.gif"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -2025,8 +2032,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/shisha.wav -t audio/wav"
-          #command: "am start -t image/* -d file:///sdcard/cat.gif"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -2080,8 +2086,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/referee-whistle.wav -t audio/wav"
-          #command: "am start -t image/* -d file:///sdcard/perfect_dive.gif"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -2090,8 +2095,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/shisha.wav -t audio/wav"
-          #command: "am start -t image/* -d file:///sdcard/cat.gif"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -3352,6 +3356,18 @@
         - media_player.gastezimmer_mini
         data_template:
           message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
+
+  - alias: 'Telegram - Check for TCL Updates'
+    initial_state: on
+    trigger:
+      - platform: time
+        at: '06:00:00'
+      - platform: time
+        at: '14:00:00'
+      - platform: time
+        at: '19:00:00'
+    action:
+      - service: shell_command.tclupdate
 
   - alias: 'Telegram send weekly corona stats'
     initial_state: true
