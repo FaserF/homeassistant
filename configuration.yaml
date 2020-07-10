@@ -277,7 +277,7 @@ shell_command:
   tclupdate: /share/scripts/tclupdate.sh
   jek_telegram: !secret telegram_jek_open_command
   #restartha: 'ha host reboot'
-  hibernatefpc: 'curl http://192.168.178.65:5001/hibernate'
+  hibernatefpc: 'curl http://192.168.178.59:5001/hibernate'
   hibernatenpc: 'curl http://192.168.178.92:5001/hibernate'
   shutdownnpc: 'curl http://192.168.178.92:5001/shutdown'
   overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
@@ -428,7 +428,7 @@ switch:
   - platform: command_line
     switches:
       fabian_pc_shutdown:
-        command_off: 'curl http://192.168.178.65:5001/shutdown'
+        command_off: 'curl http://192.168.178.59:5001/shutdown'
   - platform: command_line
     switches:
       nessie_pc_shutdown:

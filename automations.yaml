@@ -1764,13 +1764,9 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-      #- service: media_player.media_pause
-        #data:
-          #entity_id: media_player.wohnzimmer_tv
-      - service: androidtv.adb_command
+      - service: media_player.media_pause
         data:
           entity_id: media_player.wohnzimmer_tv
-          command: "am start -t image/* -d file:///sdcard/open_window.gif"
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
@@ -1953,15 +1949,14 @@
         data_template:
           target: !secret telegram_chat_5friends
           message: 'Bitte Kohle wenden.'
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Bitte die Kohle wenden.'
+          entity_id: media_player.keller_tv
+          command: "am force-stop com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
           command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
-          #command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.wav -t audio/wav"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -1970,8 +1965,11 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
+          command: "am force-stop com.tcl.videoplayer"
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
           command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
-          #command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.wav -t audio/wav"
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -2016,10 +2014,10 @@
         data_template:
           target: !secret telegram_chat_afk
           message: 'Bitte Kohle wenden.'
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Bitte die Kohle wenden.'
+          entity_id: media_player.keller_tv
+          command: "am force-stop com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -2029,6 +2027,10 @@
         data_template:
           target: !secret telegram_chat_afk
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am force-stop com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -2079,10 +2081,10 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Bitte Kohle wenden.'
-      - service: tts.google_say
-        entity_id: media_player.keller_tv
+      - service: androidtv.adb_command
         data:
-          message: 'Bitte die Kohle wenden.'
+          entity_id: media_player.keller_tv
+          command: "am force-stop com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -2092,6 +2094,10 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am force-stop com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -2642,6 +2648,9 @@
       event_data:
         command: '/klingel'
     action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
       - service: media_player.volume_set
         data:
           volume_level: 0.7
@@ -2663,14 +2672,14 @@
             Jemand
             {% endif %}
             ist da.
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
           command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
-      - service: telegram_bot.send_message
-        data_template:
-          target: "{{ trigger.event.data.user_id }}"
-          message: 'Klingel in Wohnung aktiviert.'
       - service: media_player.volume_set
         data:
           volume_level: 0.3
