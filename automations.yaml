@@ -19,7 +19,7 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+          value_template: "{{ states.device_tracker.google_maps_1121746591108605358l69.state != 'home' }}"
         - condition: template
           value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
         - condition: state
@@ -291,7 +291,7 @@
         value_template: >
           {% set domain = 'light' %}
           {% set state = 'on' %}
-          {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
+          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -316,7 +316,7 @@
         value_template: >
           {% set domain = 'light' %}
           {% set state = 'on' %}
-          {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
+          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
     action:
@@ -872,7 +872,7 @@
             - 'Ausschalten:/fridgeoff'
 
   - alias: 'Turn on bulb in Keller Fabi'
-    initial_state: True
+    initial_state: False
     trigger:
       platform: template
       value_template: "{% if is_state_attr('device_tracker.fabianphone', 'scanner', 'LuciDeviceScanner') %}true{% endif %}"
@@ -1267,36 +1267,38 @@
         value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title == 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.is_volume_muted != 'false' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.wohnzimmer_mini
           is_volume_muted: true
-      - service: automation.turn_off
-        data:
-          entity_id: automation.mute_spotify_ads_wohnzimmer_mini
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
 
   - alias: Unmute after Spotify ads wohnzimmer mini
-    initial_state: off
+    initial_state: on
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
+      - platform: template 
+        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.is_volume_muted != 'true' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.wohnzimmer_mini
           is_volume_muted: false
-      - service: automation.turn_off
-        data:
-          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_mini
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_wohnzimmer_mini
 
   - alias: Mute Spotify ads schlafzimmer
     initial_state: on
@@ -1305,36 +1307,38 @@
         value_template: "{{ states.media_player.schlafzimmer.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.schlafzimmer.attributes.media_title == 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.schlafzimmer.attributes.is_volume_muted != 'false' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.schlafzimmer
           is_volume_muted: true
-      - service: automation.turn_off
-        data:
-          entity_id: automation.mute_spotify_ads_schlafzimmer
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_schlafzimmer
 
   - alias: Unmute after Spotify ads schlafzimmer
-    initial_state: off
+    initial_state: on
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Advertisement' }}"
+      - platform: template 
+        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Advertisement' }}"
+        - condition: template
+          value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Spotify' }}"
+        - condition: template
+          value_template: "{{ states.media_player.schlafzimmer.attributes.is_volume_muted != 'true' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.schlafzimmer
           is_volume_muted: false
-      - service: automation.turn_off
-        data:
-          entity_id: automation.unmute_after_spotify_ads_schlafzimmer
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_schlafzimmer
 
   - alias: Mute Spotify ads wohnzimmer tv
     initial_state: on
@@ -1343,36 +1347,38 @@
         value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title == 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.is_volume_muted != 'false' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.wohnzimmer_tv
           is_volume_muted: true
-      - service: automation.turn_off
-        data:
-          entity_id: automation.mute_spotify_ads_wohnzimmer_tv
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_tv
 
   - alias: Unmute after Spotify ads wohnzimmer tv
-    initial_state: off
+    initial_state: on
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Advertisement' }}"
+      - platform: template 
+        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Advertisement' }}"
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Spotify' }}"
+        - condition: template
+          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.is_volume_muted != 'true' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.wohnzimmer_tv
           is_volume_muted: false
-      - service: automation.turn_off
-        data:
-          entity_id: automation.unmute_after_spotify_ads_wohnzimmer_tv
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_wohnzimmer_tv
 
   - alias: Mute Spotify ads mini Gruppe
     initial_state: on
@@ -1381,36 +1387,38 @@
         value_template: "{{ states.media_player.mini_gruppe.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.mini_gruppe.attributes.media_title == 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.mini_gruppe.attributes.is_volume_muted != 'false' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.mini_gruppe
           is_volume_muted: true
-      - service: automation.turn_off
-        data:
-          entity_id: automation.mute_spotify_ads_mini_gruppe
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_mini_gruppe
 
   - alias: Unmute after Spotify ads mini Gruppe
-    initial_state: off
+    initial_state: on
     trigger:
       - platform: template 
         value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Advertisement' }}"
+      - platform: template 
+        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Advertisement' }}"
+        - condition: template
+          value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Spotify' }}"
+        - condition: template
+          value_template: "{{ states.media_player.mini_gruppe.attributes.is_volume_muted != 'true' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.mini_gruppe
           is_volume_muted: false
-      - service: automation.turn_off
-        data:
-          entity_id: automation.unmute_after_spotify_ads_mini_gruppe
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_mini_gruppe
 
   - alias: Mute Spotify ads guest mini
     initial_state: on
@@ -1419,74 +1427,38 @@
         value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Advertisement' }}"
       - platform: template 
         value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.gastezimmer_mini.attributes.is_volume_muted != 'false' }}"
     action:
       - service: media_player.volume_mute
         data:
           entity_id: media_player.gastezimmer_mini
           is_volume_muted: true
-      - service: automation.turn_off
-        data:
-          entity_id: automation.mute_spotify_ads_gastezimmer_mini
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_gastezimmer_mini
 
   - alias: Unmute after Spotify ads guest mini
-    initial_state: off
-    trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.gastezimmer_mini
-          is_volume_muted: false
-      - service: automation.turn_off
-        data:
-          entity_id: automation.unmute_after_spotify_ads_gastezimmer_mini
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_gastezimmer_mini
-
-  - alias: Mute Spotify ads keller tv
     initial_state: on
     trigger:
       - platform: template 
-        value_template: "{{ states.media_player.keller_tv.attributes.media_title == 'Advertisement' }}"
+        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
       - platform: template 
-        value_template: "{{ states.media_player.keller_tv.attributes.media_title == 'Spotify' }}"
+        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Spotify' }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
+        - condition: template
+          value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Spotify' }}"
+        - condition: template
+          value_template: "{{ states.media_player.gastezimmer_mini.attributes.is_volume_muted != 'true' }}"
     action:
       - service: media_player.volume_mute
         data:
-          entity_id: media_player.keller_tv
-          is_volume_muted: true
-      - service: automation.turn_off
-        data:
-          entity_id: automation.mute_spotify_ads_keller_tv
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.unmute_after_spotify_ads_keller_tv
-
-  - alias: Unmute after Spotify ads keller tv
-    initial_state: off
-    trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.keller_tv.attributes.media_title != 'Advertisement' }}"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.keller_tv
+          entity_id: media_player.gastezimmer_mini
           is_volume_muted: false
-      - service: automation.turn_off
-        data:
-          entity_id: automation.unmute_after_spotify_ads_keller_tv
-      - delay: '00:00:07'
-      - service: automation.turn_on
-        data:
-          entity_id: automation.mute_spotify_ads_keller_tv
 
   - alias: Fritzbox Public IP Change
     initial_state: on
@@ -1595,12 +1567,12 @@
           entity_id: light.yeelight_color1_34ce008bcc9d
           state: 'on'
     action:
-      - service: light.turn_off
-        data:
-          entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
           entity_id: switch.deckenlampe
+      - service: light.turn_off
+        data:
+          entity_id: group.wohnzimmer
           
   - alias: Deckenlampe Button Hold On
     initial_state: on
@@ -1609,12 +1581,24 @@
         platform: state
         to: '{"TRIG":"HOLD"}'
     condition:
-      - condition: state
-        entity_id: light.leds_wohnzimmer
-        state: 'off'
-      - condition: state
-        entity_id: light.yeelight_color1_34ce008bcc9d
-        state: 'off'
+      condition: and
+      conditions:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: light.leds_wohnzimmer
+              state: 'off'
+            - condition: state
+              entity_id: light.leds_wohnzimmer
+              state: 'unavailable'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: light.yeelight_color1_34ce008bcc9d
+              state: 'off'
+            - condition: state
+              entity_id: light.yeelight_color1_34ce008bcc9d
+              state: 'unavailable'
     action:
       - service: light.turn_on
         data:
@@ -1669,15 +1653,15 @@
           entity_id: switch.regal_leds
           state: 'on'
     action:
-      - service: light.turn_off
-        data:
-          entity_id: group.schlafzimmer
       - service: switch.turn_off
         data:
           entity_id: switch.regal_leds
       - service: switch.turn_off
         data:
           entity_id: switch.lichtschalter
+      - service: light.turn_off
+        data:
+          entity_id: group.schlafzimmer
           
   - alias: Lichtschalter Button Hold On
     initial_state: on
@@ -1686,15 +1670,32 @@
         platform: state
         to: '{"TRIG":"HOLD"}'
     condition:
-      - condition: state
-        entity_id: light.yeelight_strip1_34ce008b1863
-        state: 'off'
-      - condition: state
-        entity_id: light.leds_tisch
-        state: 'off'
-      - condition: state
-        entity_id: switch.regal_leds
-        state: 'off'
+      condition: and
+      conditions:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: switch.regal_leds
+              state: 'off'
+            - condition: state
+              entity_id: switch.regal_leds
+              state: 'unavailable'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: light.leds_tisch
+              state: 'off'
+            - condition: state
+              entity_id: light.leds_tisch
+              state: 'unavailable'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: light.yeelight_strip1_34ce008b1863
+              state: 'off'
+            - condition: state
+              entity_id: light.yeelight_strip1_34ce008b1863
+              state: 'unavailable'
     action:
       - service: light.turn_on
         data:
@@ -1737,10 +1738,10 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.gastezimmer_humidity
-        above: 57
+        above: 59
       - platform: numeric_state
         entity_id: sensor.wohnzimmer_humidity
-        above: 57
+        above: 59
     condition:
       condition: and
       conditions:
@@ -1915,6 +1916,7 @@
           - media_player.schlafzimmer
 
   - alias: Detect if coal lighter is currently active 5 Freunde
+    mode: single
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
@@ -1952,11 +1954,11 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am force-stop com.tcl.videoplayer"
+          command: "pm clear com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -1965,7 +1967,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am force-stop com.tcl.videoplayer"
+          command: "pm clear com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -1978,6 +1980,7 @@
           entity_id: automation.detect_if_washing_machine_is_currently_active
           
   - alias: Detect if coal lighter is currently active AFK
+    mode: single
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
@@ -2017,11 +2020,11 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am force-stop com.tcl.videoplayer"
+          command: "pm clear com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -2030,7 +2033,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am force-stop com.tcl.videoplayer"
+          command: "pm clear com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -2043,6 +2046,7 @@
           entity_id: automation.detect_if_washing_machine_is_currently_active
           
   - alias: Detect if coal lighter is currently active
+    mode: single
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
@@ -2084,11 +2088,11 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am force-stop com.tcl.videoplayer"
+          command: "pm clear com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/digga_lass_mal_shisha_bar.mp4 -t video/mp4"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
       - delay: '00:11:00'
       - service: telegram_bot.send_message
         data_template:
@@ -2097,7 +2101,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am force-stop com.tcl.videoplayer"
+          command: "pm clear com.tcl.videoplayer"
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -2110,6 +2114,7 @@
           entity_id: automation.detect_if_washing_machine_is_currently_active
 
   - alias: Detect if Washing machine is currently active
+    mode: single
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
@@ -2282,7 +2287,7 @@
         data:
           data:
             tag: 'notification-about-sensor'
-      - service: notify.mobile_app_mi_9t_nessie
+      - service: notify.mobile_app_redmi_note_9_pro
         data_template:
           title: "Zeit off zu gehen"
           message: "Es ist 22 Uhr."
@@ -2337,8 +2342,10 @@
   - alias: 'Turn on Airplane Mode Fabi'
     initial_state: on
     trigger:
-      platform: time
-      at: '23:30:00'
+      - platform: time
+        at: '23:30:00'
+      - platform: time
+        at: '03:30:00'
     condition:
       condition: and
       conditions:
@@ -2358,39 +2365,14 @@
             {% set state = 'off' %}
             {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
     action:
-      - service: notify.mobile_app_mi_9t
+      - service: notify.mobile_app_fabian_mi9t
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
         data:
           data:
             tag: 'notification-about-sensor'
-
-  - alias: 'Turn on Airplane Mode Nessie'
-    initial_state: on
-    trigger:
-      platform: time
-      at: '23:30:00'
-    condition:
-      condition: and
-      conditions:
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - sun
-        - condition: state
-          entity_id: device_tracker.nessiephone
-          state: home
-        - condition: template
-          value_template: >
-            {% set domain = 'light' %}
-            {% set state = 'off' %}
-            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
-    action:
-      - service: notify.mobile_app_mi_9t_2
+      - service: notify.mobile_app_mi_9t
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -3263,6 +3245,8 @@
           - wed
           - thu
           - fri
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_gil.attributes.last_triggered) | int > 3600 }}"
     action:
       - service: notify.telegram_nessie
         data:

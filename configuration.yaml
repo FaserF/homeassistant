@@ -353,18 +353,6 @@ sensor:
       fs_caller:
         friendly_name: 'Mi9T Anrufer'
         value_template: 'unbekannter'
-  # Getting Firmware from JSON for Tasmota
-  #- platform: rest
-  #  resource: https://api.github.com/repos/arendst/Tasmota/releases/latest
-  #  name: Tasmota Firmware available
-  #  username: !secret githubuser
-  #  password: !secret githubpass
-  #  authentication: basic
-  #  value_template: '{{ value_json.tag_name }}'
-  #  headers:
-  #    Accept: application/vnd.github.v3+json
-  #    Content-Type: application/json
-  #    User-Agent: Home Assistant REST sensor
   - platform: darksky
     api_key: !secret darksky
     scan_interval:
@@ -410,13 +398,34 @@ light:
 
 ifttt:
   key: !secret ifttt
+  
+no_ip:
+  domain: smartlife.ddns.net
+  username: !secret noip_username
+  password: !secret noip_pw
 
 homekit:
   filter:
     exclude_domains:
       - automation
       - script
-      - devices
+      - sensor
+    exclude_entity_globs:
+      - sensor.dark_sky*
+      - device_tracker.google_maps*
+      - device_tracker.*mi_9t*
+      - device_tracker.*note_9_pro*
+      - device_tracker.fabiantablet*
+      - media_player.*_cast
+      - switch.*_shutdown
+    exclude_entities:
+      - binary_sensor.updater
+      - device_tracker.flophone
+      - device_tracker.maxiphone
+      - device_tracker.nessie_iphone6
+      - device_tracker.fabianhackbook
+      - input_boolean.silent_mode
+      - media_player.mini_gruppe
 
 mqtt:
   broker: core-mosquitto
@@ -553,14 +562,6 @@ input_select:
       - Finishing
       - Clean
     initial: Idle
-  coal_lighter_status:
-    name: Kohleanzünder Status
-    options:
-      - Unbenutzt
-      - unter22min
-      - unter11min
-      - Fertig
-    initial: Unbenutzt
 
 input_boolean: !include input_boolean.yaml
 frontend:
