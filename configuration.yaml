@@ -154,6 +154,7 @@ telegram_bot:
       - !secret telegram_chat_flo
       - !secret telegram_chat_maxi
       - !secret telegram_chat_fabio
+      - !secret telegram_chat_yannick
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
       - !secret telegram_chat_jek_group
@@ -181,7 +182,7 @@ media_player:
   - platform: androidtv
     name: Wohnzimmer TV
     device_class: androidtv
-    host: 192.168.178.82
+    host: 192.168.178.14
     adb_server_ip: 127.0.0.1
     apps:
       com.liskovsoft.videomanager: "Smart YoutTube TV"
@@ -274,7 +275,6 @@ shell_command:
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
   randomfood: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}'
   foodyes: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes'
-  tclupdate: /share/scripts/tclupdate.sh
   jek_telegram: !secret telegram_jek_open_command
   #restartha: 'ha host reboot'
   hibernatefpc: 'curl http://192.168.178.59:5001/hibernate'
@@ -305,6 +305,17 @@ sensor:
         value_template: '{{ states.input_select.washing_machine_status.state}}'
         friendly_name: 'Waschmaschine Status'
   - platform: fritzbox_netmonitor
+  #- platform: emby_upcoming_media
+  #  api_key: YOUR_EMBY_API_KEY
+  #  user_id: YOUR_EMBY_USER_ID
+  #  host: stream.eidolf.de
+  #  port: 8096
+  #  ssl: True
+  #  max: 5
+  #  use_backdrop: true
+  #  include:
+  #    - Movies
+  #    - TV Shows
   - platform: deutsche_bahn
     from: !secret fabian_work
     to: !secret sbahn_home
@@ -312,14 +323,10 @@ sensor:
   - platform: deutsche_bahn
     from: !secret nessie_work
     to: !secret sbahn_home
-    only_direct: false
-  - platform: deutsche_bahn
-    from: !secret sbahn_home
-    to: Trudering
     only_direct: true
   - platform: deutsche_bahn
-    from: Trudering
-    to: !secret sbahn_home
+    from: !secret sbahn_home
+    to: !secret nessie_work
     only_direct: true
   - platform: template
     sensors:
