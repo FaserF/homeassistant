@@ -55,7 +55,7 @@ views:
       - entity: sensor.waschmaschine_energy_power
       - entity: sensor.coinbase_btc_wallet
       - entity: sensor.btc_exchange_rate
-      - entity: sensor.zorneding_to_trudering
+      - entity: sensor.zorneding_to_leuchtenbergring
     cards:
       - entities:
           - switch.lichtschalter
@@ -403,3 +403,42 @@ views:
     panel: true
     path: remote
     title: remote
+  - title: Weiteres
+    path: other
+    badges: []
+    cards:
+      - type: button
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        show_icon: true
+        show_name: true
+        show_state: false
+        entity: switch.adguard_protection
+      - type: button
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        show_icon: true
+        show_name: true
+        show_state: true
+        entity: switch.adguard_filtering
+      - type: gauge
+        entity: sensor.adguard_dns_queries
+        min: 0
+        max: 100
+      - type: entities
+        title: FritzBox WLAN Verwaltung
+        entities:
+          - switch.fritzbox_wifi
+          - switch.fritzbox_wifi_5ghz
+          - switch.fritzbox_guest_wifi
+      - type: entities
+        title: FritzBox Portforwarding
+        entities:
+          - entity: switch.fritzbox_portforward_http_server
+          - entity: switch.fritzbox_portforward_https_server
+          - entity: switch.fritzbox_portforward_ssh
+          - entity: switch.fritzbox_portforward_bitwarden

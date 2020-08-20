@@ -693,8 +693,8 @@
           message: >
             Es ist 
             {{ now().hour }}: {{ now().minute }} Uhr.
-            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
+            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Remind for leaving schlafzimmer'
     initial_state: True
@@ -727,8 +727,8 @@
           message: >
             Es ist 
             {{ now().hour }} {{ now().minute }} Uhr.
-            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
+            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Turn on climate if Nessie PC started'
     initial_state: off
@@ -3049,7 +3049,7 @@
   #   initial_state: on
   #   trigger:
   #     - platform: template
-  #       value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 3 }}"
+  #       value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 3 }}"
   #   condition:
   #     condition: and
   #     conditions:
@@ -3065,14 +3065,14 @@
   #   action:
   #     - service: notify.telegram_nessie
   #       data:
-  #         title: "Ubahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} hat +{{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
-  #         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
+  #         title: "Ubahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
+  #         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
 
   - alias: "Notify Fabi on sbahn delay Home -> Work"
     initial_state: on
     trigger:
       - platform: template
-        value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 5 }}"
+        value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 5 }}"
     condition:
       condition: and
       conditions:
@@ -3090,8 +3090,8 @@
     action:
       - service: notify.telegram_fabian
         data:
-          title: "Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} hat +{{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
-          message: "Nächste Sbahn: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
+          title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
+          message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
 
   - alias: "Notify on Sbahn delay Work -> Home"
     initial_state: on
@@ -3127,11 +3127,11 @@
         to: 'not_home'
     condition:
       - condition: template
-        value_template: "{{ states.sensor.trudering_to_zorneding.attributes.delay | int > 3 }}"
+        value_template: "{{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay | int > 3 }}"
     action:
       - service: notify.telegram_nessie
         data:
-          message: "Sbahn in Trudering um {{ states.sensor.trudering_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.trudering_to_zorneding.attributes.delay }} min Verspätung."
+          message: "Sbahn in leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
 
   - alias: 'Notify Nessie Fabian on way home'
     initial_state: on
