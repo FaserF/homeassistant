@@ -46,13 +46,14 @@
           entity_id: switch.deckenlampe
       - service: switch.turn_off
         data:
-          entity_id: switch.sonoff_100018bc6c
-      - service: switch.turn_off
-        data:
           entity_id: switch.regal_leds
       - service: switch.turn_off
         data:
           entity_id: switch.ventilator
+      #Turn off 5ghz Wifi to save battery
+      - service: switch.turn_off
+        data: 
+          entity_id: switch.fritzbox_wifi_5ghz
       # - service: climate.set_away_mode
       #   data:
       #     entity_id: climate.wohnzimmer
@@ -253,8 +254,8 @@
         data:
           entity_id: switch.ventilator
 
-  - alias: 'Turn on lights if coming home'
-    initial_state: off
+  - alias: 'Turn on 5ghz wifi if coming home'
+    initial_state: true
     trigger:
       - platform: state
         entity_id:
@@ -266,23 +267,10 @@
           - device_tracker.google_maps_112056758146194246561
         from: 'not_home'
         to: 'home'
-    condition:
-      condition: and
-      conditions:
-      - condition: time
-        before: '21:45:00'
-      - condition: sun
-        after: sunset
-      - condition: state
-        entity_id: sensor.fscharging
-        state: 'not_charging'
-      - condition: state
-        entity_id: sensor.vkcharging
-        state: 'not_charging'
     action:
-      - service: light.turn_on
+      - service: switch.turn_on
         data:
-          entity_id: group.wohnzimmer
+          entity_id: switch.fritzbox_wifi_5ghz
 
   - alias: 'Turn off light at night - notify'
     initial_state: true
@@ -693,8 +681,8 @@
           message: >
             Es ist 
             {{ now().hour }}: {{ now().minute }} Uhr.
-            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Remind for leaving schlafzimmer'
     initial_state: True
@@ -727,8 +715,8 @@
           message: >
             Es ist 
             {{ now().hour }} {{ now().minute }} Uhr.
-            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+            Die Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_trudering.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Turn on climate if Nessie PC started'
     initial_state: off
@@ -779,9 +767,6 @@
       - service: light.turn_off
         data:
           entity_id: group.wohnzimmer
-      - service: switch.turn_off
-        data:
-          entity_id: switch.sonoff_100018bc6c
       - service: switch.turn_off
         data:
           entity_id: switch.deckenlampe
@@ -1514,7 +1499,7 @@
         - media_player.gastezimmer_mini
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
-      - service: fritzbox_tools.reboot
+      - service: fritzbox_tools.reconnect
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_internet_access_returned
@@ -2486,6 +2471,15 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
@@ -2977,20 +2971,14 @@
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
 
-  - alias: Turn off everything in keller if TV is unavailable
+  - alias: Turn off everything in keller if bulb is unavailable
     initial_state: on
     trigger:
       platform: state
-      entity_id: media_player.keller_tv
+      entity_id: light.keller_gluhbirne
       to: 'unavailable'
       for:
-        minutes: 60
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: media_player.keller_tv
-          state: unavailable
+        minutes: 15
     action:
     - service: input_boolean.turn_off
       data:
@@ -3049,7 +3037,7 @@
   #   initial_state: on
   #   trigger:
   #     - platform: template
-  #       value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 3 }}"
+  #       value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 3 }}"
   #   condition:
   #     condition: and
   #     conditions:
@@ -3065,14 +3053,14 @@
   #   action:
   #     - service: notify.telegram_nessie
   #       data:
-  #         title: "Ubahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-  #         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
+  #         title: "Ubahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} hat +{{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
+  #         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
 
   - alias: "Notify Fabi on sbahn delay Home -> Work"
     initial_state: on
     trigger:
       - platform: template
-        value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 5 }}"
+        value_template: "{{ states.sensor.zorneding_to_trudering.attributes.delay | int > 5 }}"
     condition:
       condition: and
       conditions:
@@ -3090,8 +3078,8 @@
     action:
       - service: notify.telegram_fabian
         data:
-          title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-          message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
+          title: "Sbahn um {{ states.sensor.zorneding_to_trudering.attributes.departure }} hat +{{ states.sensor.zorneding_to_trudering.attributes.delay }} min Verspätung."
+          message: "Nächste Sbahn: {{ states.sensor.zorneding_to_trudering.attributes.next }} Uhr"
 
   - alias: "Notify on Sbahn delay Work -> Home"
     initial_state: on
@@ -3127,11 +3115,11 @@
         to: 'not_home'
     condition:
       - condition: template
-        value_template: "{{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay | int > 3 }}"
+        value_template: "{{ states.sensor.trudering_to_zorneding.attributes.delay | int > 3 }}"
     action:
       - service: notify.telegram_nessie
         data:
-          message: "Sbahn in leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
+          message: "Sbahn in Trudering um {{ states.sensor.trudering_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.trudering_to_zorneding.attributes.delay }} min Verspätung."
 
   - alias: 'Notify Nessie Fabian on way home'
     initial_state: on
@@ -3243,7 +3231,7 @@
     action:
       - service: notify.telegram_fabian
         data:
-          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
 
   - alias: 'Notify Fabian Nessie on way home - ghome'
     initial_state: on
@@ -3275,7 +3263,7 @@
         - media_player.schlafzimmer
         - media_player.gastezimmer_mini
         data_template:
-          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.silberhornstrasse_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.silberhornstrasse_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
+          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
   - alias: 'Telegram send weekly corona stats'
     initial_state: true
@@ -3359,22 +3347,14 @@
           target: '{{ trigger.event.data.user_id }}'
           disable_notification: true
           message: >
-            {{ states.sensor.dark_sky_hourly_summary.state }}
+            Wettervorhersage für heute
+            {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.condition }}
 
+            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }}*
 
-            *Momentan {{ states.sensor.dark_sky_temperature.state_with_unit }}*
-
-
-            {{ states.sensor.dark_sky_overnight_low_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_temperature_0d.state_with_unit }}
-
-            {{ states.sensor.dark_sky_overnight_low_apparent_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_apparent_temperature_0d.state_with_unit }} (gefühlt)
-
-
-            Regen: {{ states.sensor.dark_sky_precip_probability.state_with_unit }}, {{ states.sensor.dark_sky_precip_intensity.state_with_unit }}
-            {% if not is_state('sensor.dark_sky_precip', 'unknown') %}
-
-            Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
-            {% endif %}
+            {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.templow }} {{ '\u21F5' }} {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.temperature }}
+            
+            Niederschlag: {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.precipitation }}, Wahrscheinlichkeit: {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.precipitation_probability }}
 
   - alias: 'Telegram send weekly weather forecast'
     initial_state: true

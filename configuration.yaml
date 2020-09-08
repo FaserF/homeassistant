@@ -158,6 +158,7 @@ telegram_bot:
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
       - !secret telegram_chat_jek_group
+      - !secret telegram_chat_triemagisch
 
 notify:
   - name: telegram_fabian
@@ -174,9 +175,6 @@ notify:
     vapid_pub_key: !secret vapid_pub_key
     vapid_prv_key: !secret vapid_prv_key
     vapid_email: !secret vapid_email
-  #- name: twilio_whatsapp
-    #platform: twilio_whatsapp
-    #from_number: whatsapp:+14155238886
 
 media_player:
   - platform: androidtv
@@ -276,10 +274,10 @@ shell_command:
   randomfood: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}'
   foodyes: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes'
   jek_telegram: !secret telegram_jek_open_command
-  #restartha: 'ha host reboot'
+  restartha: 'ha host reboot'
   hibernatefpc: 'curl http://192.168.178.59:5001/hibernate'
-  hibernatenpc: 'curl http://192.168.178.92:5001/hibernate'
-  shutdownnpc: 'curl http://192.168.178.92:5001/shutdown'
+  hibernatenpc: 'curl http://192.168.178.44:5001/hibernate'
+  shutdownnpc: 'curl http://192.168.178.44:5001/shutdown'
   overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
 
 coinbase:
@@ -448,7 +446,7 @@ switch:
   - platform: command_line
     switches:
       nessie_pc_shutdown:
-        command_off: 'curl http://192.168.178.92:5001/shutdown'
+        command_off: 'curl http://192.168.178.44:5001/shutdown'
   #- platform: sonoff_lan_mode_r3
     #name: Bett
     #device_id: 100016e326
@@ -529,6 +527,31 @@ google_assistant:
       expose: false
     light.keller_gluhbirne:
       expose: false
+    switch.fritzbox_guest_wifi:
+      expose: false
+    switch.fritzbox_portforward_bitwarden:
+      expose: false
+    switch.fritzbox_portforward_bookstracks:
+      expose: false
+    switch.fritzbox_portforward_homeassistant:
+      expose: false
+    switch.fritzbox_portforward_http_server:
+      expose: false
+    switch.fritzbox_portforward_https_server:
+      expose: false
+    switch.fritzbox_portforward_ssh:
+      expose: false
+    switch.fritzbox_portforward_tasmoadmin:
+      expose: false
+    switch.fritzbox_wifi:
+      expose: false
+    switch.fritzbox_wifi_5ghz:
+      expose: false
+    switch.adguard_protection:
+      expose: false
+    switch.adguard_filtering:
+      expose: false
+      name: Adblocker
 
 google:
   client_id: !secret google_calendar_client_id
@@ -543,22 +566,14 @@ tts:
     base_url: !secret baseurl
 
 panel_iframe:
-  tasmoadmin:
-    title: TasmoAdmin
-    icon: mdi:lightbulb-on
-    url: http://smartlife.ddns.net:8124
+  #tasmoadmin:
+  #  title: TasmoAdmin
+  #  icon: mdi:lightbulb-on
+  #  url: http://smartlife.ddns.net:8124
   #fritzbox:
   #  title: FritzBox
   #  icon: mdi:router-wireless
   #  url: https://smartlife.ddns.net:32270
-  bookstack:
-    title: Bookstack
-    icon: mdi:format-vertical-align-bottom
-    url: https://smartlife.ddns.net:2665
-  #mdiindex:
-  #  title: MDI Icon Index
-  #  icon: mdi:vector-square
-  #  url: https://cdn.rawgit.com/james-fry/home-assistant-mdi/efd95d7a/home-assistant-mdi.html
 
 input_select:
   washing_machine_status:

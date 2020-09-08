@@ -158,8 +158,9 @@ views:
       - artwork: cover
         entity: media_player.mini_gruppe
         type: 'custom:mini-media-player'
-      - entity: weather.wetter_darksky
-        type: 'custom:weather-card'
+      - type: 'custom:weather-card'
+        number_of_forecasts: '5'
+        entity: weather.dwd_weather_ebersberg_halbing
     icon: 'mdi:home-variant'
     title: Home
   - badges:
@@ -403,42 +404,42 @@ views:
     panel: true
     path: remote
     title: remote
-  - title: Weiteres
-    path: other
-    badges: []
+  - badges: []
     cards:
-      - type: button
-        tap_action:
-          action: toggle
+      - entity: switch.adguard_protection
         hold_action:
           action: more-info
         show_icon: true
         show_name: true
         show_state: false
-        entity: switch.adguard_protection
-      - type: button
         tap_action:
           action: toggle
+        type: button
+      - entity: switch.adguard_filtering
         hold_action:
           action: more-info
         show_icon: true
         show_name: true
         show_state: true
-        entity: switch.adguard_filtering
-      - type: gauge
-        entity: sensor.adguard_dns_queries
-        min: 0
+        tap_action:
+          action: toggle
+        type: button
+      - entity: sensor.adguard_dns_queries
         max: 100
-      - type: entities
-        title: FritzBox WLAN Verwaltung
-        entities:
+        min: 0
+        type: gauge
+      - entities:
           - switch.fritzbox_wifi
           - switch.fritzbox_wifi_5ghz
           - switch.fritzbox_guest_wifi
-      - type: entities
-        title: FritzBox Portforwarding
-        entities:
+        title: FritzBox WLAN Verwaltung
+        type: entities
+      - entities:
           - entity: switch.fritzbox_portforward_http_server
           - entity: switch.fritzbox_portforward_https_server
           - entity: switch.fritzbox_portforward_ssh
           - entity: switch.fritzbox_portforward_bitwarden
+        title: FritzBox Portforwarding
+        type: entities
+    path: other
+    title: Weiteres
