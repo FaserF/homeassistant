@@ -395,9 +395,9 @@ light:
   #MagicHue LEDs
   - platform: flux_led
     devices:
-      192.168.178.249:
+      192.168.178.250:
         name: LEDs Gästezimmer
-      192.168.178.248:
+      192.168.178.249:
         name: LEDs Tisch
         mode: rgb
 
@@ -458,15 +458,6 @@ switch:
   #   api_key: 11604ccd-1f58-47f2-acd1-816861348b1a
   #   icon: mdi:washing-machine
   # - platform: sonoff_lan_mode_r3
-  #   name: Diffusor
-  #   device_id: 100018bc6c
-  #   api_key: 289c955f-8015-4413-b3d8-8c815805928c
-  #   icon: mdi:weather-windy
-  # - platform: sonoff_lan_mode
-  #   name: Diffusor
-  #   host: 192.168.178.222
-  #   icon: mdi:weather-windy
-  # - platform: sonoff_lan_mode_r3
   #   name: Sonoff Steckdose
   #   device_id: 1000134649
   #   api_key: b7bbed8a-33b2-4260-ae2e-89a00fbd85c2
@@ -483,47 +474,16 @@ google_assistant:
     - light
   expose_by_default: true
   entity_config:
-    light.hyperion:
-      expose: false
-    switch.fabian_strom:
-      name: Strom Schlafzimmer
-      expose: true
-      room: Schlafzimmer
-    light.lampe_gastezimmer:
-      name: Nachtlampe
-      expose: true
-    switch.deckenlampe:
-      name: Deckenlampe Licht
-      expose: true
+  #Disabled Entitys
     climate.gastezimmer:
       expose: false
     climate.wohnzimmer:
-      expose: false
-    group.all_automations:
-      expose: false
-    switch.sonoff_100016e326:
-      name: Bett
-      expose: false
-    switch.bett:
-      name: Bett
-      expose: false
-    switch.sonoff_100018bc6c:
-      name: Diffusor
-      expose: true
-    switch.sonoff_1000915e4d:
-      name: Waschmaschine
-      expose: false
-    switch.reserve_coosa:
-      expose: false
-    light.reserve_bulb_blue:
       expose: false
     switch.schloss:
       expose: false
     switch.nessie_pc_shutdown:
       expose: false
     switch.fabian_pc_shutdown:
-      expose: false
-    switch.reserve_switch_kleiin:
       expose: false
     light.keller_gluhbirne:
       expose: false
@@ -552,6 +512,71 @@ google_assistant:
     switch.adguard_filtering:
       expose: false
       name: Adblocker
+    #Enabled Entitys
+    ##Schlafzimmer
+    switch.fabian_strom:
+      name: Strom Schlafzimmer
+      expose: true
+      room: Schlafzimmer
+    switch.bett:
+      expose: true
+      room: Schlafzimmer
+    switch.regal_leds: 
+      expose: True
+      room: Schlafzimmer
+    switch.lichtschalter:
+      name: Licht Schalter
+      expose: True
+      room: Schlafzimmer
+    switch.bett_gluhbirne: 
+      name: Bett Licht
+      expose: true
+      room: Schlafzimmer
+    light.leds_tisch:
+      expose: true
+      room: Schlafzimmer
+    light.yeelight_strip1_34ce008b1863:
+      expose: true
+      room: Schlafzimmer
+    climate.schlafzimmer:
+      expose: true
+      room: Schlafzimmer
+    ##Gästezimmer
+    light.lampe_gastezimmer:
+      name: Nachtlampe
+      expose: true
+      room: Gästezimmer
+    light.leds_gastezimmer:
+      expose: true
+      room: Gästezimmer
+    switch.nessie_pc:
+      expose: True
+      room: Gästezimmer
+    ##Wohnzimmer
+    switch.deckenlampe:
+      name: Deckenlampe Licht
+      expose: true
+      room: Wohnzimmer
+    light.leds_wohnzimmer:
+      expose: true
+      room: Wohnzimmer
+    light.yeelight_color1_34ce008bcc9d:
+      expose: True
+      room: Wohnzimmer
+    switch.fernseher:
+      name: Strom
+      expose: True
+      room: Wohnzimmer
+    switch.staubsauger: 
+      expose: True
+      room: Wohnzimmer
+    ##Keller & Bad
+    switch.waschmaschine:
+      expose: true
+      room: Keller
+    climate.bad:
+      expose: true
+      room: Bad
 
 google:
   client_id: !secret google_calendar_client_id
