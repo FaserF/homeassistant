@@ -358,6 +358,8 @@ sensor:
       fs_caller:
         friendly_name: 'Mi9T Anrufer'
         value_template: 'unbekannter'
+  - platform: dwd_weather_warnings
+    region_name: !secret dwd_cell_id
   - platform: darksky
     api_key: !secret darksky
     scan_interval:
@@ -384,14 +386,13 @@ sensor:
       - uv_index
 
 light:
-  #Xiaomi Yeelight
-  #- platform: yeelight
-  #  devices:
-  #    192.168.178.247:
-  #      name: Stehlampe
-  #      transition: 1000
-  #    192.168.178.246:
-  #      name: LEDs Bett
+  - platform: yeelight
+    devices:
+      192.168.178.247:
+        name: Stehlampe
+        transition: 1000
+      192.168.178.246:
+        name: LEDs Bett
   #MagicHue LEDs
   - platform: flux_led
     devices:

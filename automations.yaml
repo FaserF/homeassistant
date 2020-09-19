@@ -74,7 +74,7 @@
         data:
           entity_id: media_player.gastezimmer_mini
 
-  - alias: 'Turn off 5ghz wifi if nobody is at home'
+  - alias: 'Turn off 5ghz wifi and turn on ssh if nobody is at home'
     initial_state: on
     trigger:
       - platform: state
@@ -104,6 +104,9 @@
       - service: switch.turn_off
         data: 
           entity_id: switch.fritzbox_wifi_5ghz
+      - service: switch.turn_on
+        data: 
+          entity_id: switch.fritzbox_portforward_ssh
 
   - alias: 'Turn off fabian pc if nobody is at home'
     initial_state: on
@@ -281,7 +284,7 @@
         data:
           entity_id: switch.ventilator
 
-  - alias: 'Turn on 5ghz wifi if coming home'
+  - alias: 'Turn on 5ghz wifi and ssh off if coming home'
     initial_state: true
     trigger:
       - platform: state
@@ -312,6 +315,9 @@
       - service: switch.turn_on
         data:
           entity_id: switch.fritzbox_wifi_5ghz
+      - service: switch.turn_off
+        data: 
+          entity_id: switch.fritzbox_portforward_ssh
 
   - alias: 'Turn off light at night - notify'
     initial_state: true
@@ -349,8 +355,10 @@
           {% set domain = 'light' %}
           {% set state = 'on' %}
           {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
+      - condition: numeric_state
+        entity_id: automation.telegram_answer_cancel_light_turn_off
+        attribute: last_triggered
+        above: 1500
     action:
       - service: light.turn_off
         entity_id: all
@@ -881,8 +889,10 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.calendar.fabianseitz98_gmail_com.attributes.message == 'Gruppentreffen' }}"
+        - condition: state
+          entity_id: calendar.fabianseitz98_gmail_com
+          attribute: message
+          state: "Gruppentreffen"  
         - condition: template
           value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
         - condition: state
@@ -911,8 +921,10 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_fabi.attributes.last_triggered) | int > 7200 }}"
+        - condition: numeric_state
+          entity_id: automation.turn_on_bulb_in_keller_fabi
+          attribute: last_triggered
+          above: 7200
     action:
       - service: light.turn_on
         data:
@@ -928,8 +940,10 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_nessie.attributes.last_triggered) | int > 7200 }}"
+        - condition: numeric_state
+          entity_id: automation.turn_on_bulb_in_keller_nessie
+          attribute: last_triggered
+          above: 7200
     action:
       - service: light.turn_on
         data:
@@ -998,16 +1012,6 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
-
-#  - alias: 'on HA restart'
-#    initial_state: 'true'
-#    trigger:
-#      platform: homeassistant
-#      event: start
-#    action:
-#      - service: frontend.set_theme
-#        data:
-#          name: 'Google Dark Theme'
           
   - alias: 'Restart Homeassistant every sunday'
     initial_state: true
@@ -1229,13 +1233,18 @@
   - alias: 'Coinbase balance high'
     initial_state: on
     trigger:
-      - platform: template
-        value_template: '{{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] | int > 250 }}'
+      - platform: numeric_state
+        entity_id: sensor.coinbase_btc_wallet
+        attribute: "Balance in native currency"
+        above: 220
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.coinbase_balance_high.attributes.last_triggered) | int > 86400 }}" #Maximal einmal am Tag schreiben
+        #Maximal einmal am Tag schreiben
+        - condition: numeric_state
+          entity_id: automation.coinbase_balance_high
+          attribute: last_triggered
+          above: 86400
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1245,6 +1254,33 @@
         data_template:
           target: !secret telegram_chat_nessie
           message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
+
+  - alias: 'DWD Weather Warnings'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.dwd_weather_warnings_advance_warning_level
+        above: 0
+      - platform: numeric_state
+        entity_id: sensor.dwd_weather_warnings_current_warning_level
+        above: 0
+    condition:
+      condition: and
+      conditions:
+        #Maximal zwei mal am Tag schreiben
+        - condition: numeric_state
+          entity_id: automation.dwd_weather_warnings
+          attribute: last_triggered
+          above: 43200
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_5friends
+          message: 'ACHTUNG! Aktuelle Wetter Warnung. Mehr Infos: https://www.dwd.de/DE/wetter/warnungen_gemeinden/warntabellen/warntab_bay_node.html'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          message: 'ACHTUNG! Aktuelle Wetter Warnung. Mehr Infos: https://www.dwd.de/DE/wetter/warnungen_gemeinden/warntabellen/warntab_bay_node.html'
 
   - alias: Turn Schloss off after turning on
     initial_state: on
@@ -1287,15 +1323,21 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title == 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title == 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.wohnzimmer_mini
+        attribute: media_title
+        to: "Advertisement"
+      - platform: state
+        entity_id: media_player.wohnzimmer_mini
+        attribute: media_title
+        to: "Spotify"
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.is_volume_muted != 'false' }}"
+        - condition: state
+          entity_id: media_player.wohnzimmer_mini
+          attribute: is_volume_muted
+          state: "false"
     action:
       - service: media_player.volume_mute
         data:
@@ -1306,19 +1348,31 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.wohnzimmer_mini
+        attribute: media_title
+        from: "Advertisement"
+      - platform: state
+        entity_id: media_player.wohnzimmer_mini
+        attribute: media_title
+        from: "Spotify"
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.media_title != 'Spotify' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_mini.attributes.is_volume_muted != 'true' }}"
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: media_player.wohnzimmer_mini
+            attribute: media_title
+            state: "Advertisement"
+          - condition: state
+            entity_id: media_player.wohnzimmer_mini
+            attribute: media_title
+            state: "Spotify"
+          - condition: state
+            entity_id: media_player.wohnzimmer_mini
+            attribute: is_volume_muted
+            state: "true"
     action:
       - service: media_player.volume_mute
         data:
@@ -1329,15 +1383,21 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title == 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title == 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.schlafzimmer
+        attribute: media_title
+        to: "Advertisement"
+      - platform: state
+        entity_id: media_player.schlafzimmer
+        attribute: media_title
+        to: "Spotify"
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.schlafzimmer.attributes.is_volume_muted != 'false' }}"
+        - condition: state
+          entity_id: media_player.schlafzimmer
+          attribute: is_volume_muted
+          state: "false"
     action:
       - service: media_player.volume_mute
         data:
@@ -1348,19 +1408,31 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.schlafzimmer
+        attribute: media_title
+        from: "Advertisement"
+      - platform: state
+        entity_id: media_player.schlafzimmer
+        attribute: media_title
+        from: "Spotify"
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.schlafzimmer.attributes.media_title != 'Spotify' }}"
-        - condition: template
-          value_template: "{{ states.media_player.schlafzimmer.attributes.is_volume_muted != 'true' }}"
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: media_player.schlafzimmer
+            attribute: media_title
+            state: "Advertisement"
+          - condition: state
+            entity_id: media_player.schlafzimmer
+            attribute: media_title
+            state: "Spotify"
+          - condition: state
+            entity_id: media_player.schlafzimmer
+            attribute: is_volume_muted
+            state: "true"
     action:
       - service: media_player.volume_mute
         data:
@@ -1371,15 +1443,21 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title == 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title == 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        attribute: media_title
+        to: "Advertisement"
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        attribute: media_title
+        to: "Spotify"
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.is_volume_muted != 'false' }}"
+        - condition: state
+          entity_id: media_player.wohnzimmer_tv
+          attribute: is_volume_muted
+          state: "false"
     action:
       - service: media_player.volume_mute
         data:
@@ -1390,19 +1468,31 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        attribute: media_title
+        from: "Advertisement"
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        attribute: media_title
+        from: "Spotify"
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.media_title != 'Spotify' }}"
-        - condition: template
-          value_template: "{{ states.media_player.wohnzimmer_tv.attributes.is_volume_muted != 'true' }}"
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: media_player.wohnzimmer_tv
+            attribute: media_title
+            state: "Advertisement"
+          - condition: state
+            entity_id: media_player.wohnzimmer_tv
+            attribute: media_title
+            state: "Spotify"
+          - condition: state
+            entity_id: media_player.wohnzimmer_tv
+            attribute: is_volume_muted
+            state: "true"
     action:
       - service: media_player.volume_mute
         data:
@@ -1413,15 +1503,21 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title == 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title == 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.mini_gruppe
+        attribute: media_title
+        to: "Advertisement"
+      - platform: state
+        entity_id: media_player.mini_gruppe
+        attribute: media_title
+        to: "Spotify"
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.mini_gruppe.attributes.is_volume_muted != 'false' }}"
+        - condition: state
+          entity_id: media_player.mini_gruppe
+          attribute: is_volume_muted
+          state: "false"
     action:
       - service: media_player.volume_mute
         data:
@@ -1432,19 +1528,31 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.mini_gruppe
+        attribute: media_title
+        from: "Advertisement"
+      - platform: state
+        entity_id: media_player.mini_gruppe
+        attribute: media_title
+        from: "Spotify"
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.mini_gruppe.attributes.media_title != 'Spotify' }}"
-        - condition: template
-          value_template: "{{ states.media_player.mini_gruppe.attributes.is_volume_muted != 'true' }}"
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: media_player.mini_gruppe
+            attribute: media_title
+            state: "Advertisement"
+          - condition: state
+            entity_id: media_player.mini_gruppe
+            attribute: media_title
+            state: "Spotify"
+          - condition: state
+            entity_id: media_player.mini_gruppe
+            attribute: is_volume_muted
+            state: "true"
     action:
       - service: media_player.volume_mute
         data:
@@ -1455,15 +1563,21 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title == 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.gastezimmer_mini
+        attribute: media_title
+        to: "Advertisement"
+      - platform: state
+        entity_id: media_player.gastezimmer_mini
+        attribute: media_title
+        to: "Spotify"
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.gastezimmer_mini.attributes.is_volume_muted != 'false' }}"
+        - condition: state
+          entity_id: media_player.gastezimmer_mini
+          attribute: is_volume_muted
+          state: "false"
     action:
       - service: media_player.volume_mute
         data:
@@ -1474,19 +1588,31 @@
     initial_state: on
     mode: single
     trigger:
-      - platform: template 
-        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
-      - platform: template 
-        value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Spotify' }}"
+      - platform: state
+        entity_id: media_player.gastezimmer_mini
+        attribute: media_title
+        from: "Advertisement"
+      - platform: state
+        entity_id: media_player.gastezimmer_mini
+        attribute: media_title
+        from: "Spotify"
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Advertisement' }}"
-        - condition: template
-          value_template: "{{ states.media_player.gastezimmer_mini.attributes.media_title != 'Spotify' }}"
-        - condition: template
-          value_template: "{{ states.media_player.gastezimmer_mini.attributes.is_volume_muted != 'true' }}"
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: media_player.gastezimmer_mini
+            attribute: media_title
+            state: "Advertisement"
+          - condition: state
+            entity_id: media_player.gastezimmer_mini
+            attribute: media_title
+            state: "Spotify"
+          - condition: state
+            entity_id: media_player.gastezimmer_mini
+            attribute: is_volume_muted
+            state: "true"
     action:
       - service: media_player.volume_mute
         data:
@@ -1496,8 +1622,9 @@
   - alias: Fritzbox Public IP Change
     initial_state: on
     trigger:
-      platform: template 
-      value_template: "{{ states('sensor.fritz_netmonitor.attributes.external_ip') }}"
+      - platform: state
+        entity_id: sensor.fritz_netmonitor
+        attribute: external_ip
     action:
       - service: notify.telegram_fabian
         data:
@@ -1511,10 +1638,7 @@
         from: 'online'
         to: 'offline'
         for:
-          seconds: 10
-      #- platform: template 
-      #  value_template: "{{ is_state('sensor.fritz_netmonitor.attributes.is_connected', 'false') }}"
-      #  for: "00:00:10"
+          seconds: 25
     condition:
       condition: and
       conditions:
@@ -1548,13 +1672,30 @@
         data:
           entity_id: automation.fritzbox_no_internet_access
 
-  - alias: Fritzbox Internet access returned
+  - alias: Fritzbox Internet access returned home
     initial_state: off
     trigger:
       - platform: state
         entity_id: sensor.fritz_netmonitor
         from: 'offline'
         to: 'online'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '10:30:00'
+          before: '22:30:00'
+        - condition: state
+          entity_id: 'input_boolean.silent_mode'
+          state: 'off'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: device_tracker.nessiephone
+            state: home
+          - condition: state
+            entity_id: device_tracker.fabianphone
+            state: home
     action:
       - service: tts.google_say
         entity_id: 
@@ -1569,6 +1710,28 @@
       - service: automation.turn_off
         data:
           entity_id: automation.fritzbox_internet_access_returned
+
+  - alias: Fritzbox Internet access returned
+    initial_state: off
+    trigger:
+      - platform: state
+        entity_id: sensor.fritz_netmonitor
+        from: 'offline'
+        to: 'online'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: device_tracker.nessiephone
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.fabianphone
+          state: not_home
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Die Fritzbox Internet Verbundung wurde verloren und wurde soeben wiederhergestellt.'
 
   # - alias: Internet Speed Test Poor Fabian
   # 
@@ -1798,10 +1961,14 @@
         - condition: state
           entity_id: 'input_boolean.silent_mode'
           state: 'off'
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
+        - condition: numeric_state
+          entity_id: automation.notify_for_high_humidity
+          attribute: last_triggered
+          above: 7200
+        - condition: numeric_state
+          entity_id: automation.notify_for_high_humidity_when_coming_home
+          attribute: last_triggered
+          above: 7200
         - condition: or
           conditions:
           - condition: state
@@ -1848,8 +2015,10 @@
       - condition: state
         entity_id: device_tracker.nessiephone
         state: not_home
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
+      - condition: numeric_state
+        entity_id: automation.notify_for_extreme_high_humidity
+        attribute: last_triggered
+        above: 32400
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1892,10 +2061,14 @@
         before: '22:00:00'
       - condition: time
         after: '08:00:00'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
+      - condition: numeric_state
+        entity_id: automation.notify_for_high_humidity
+        attribute: last_triggered
+        above: 7200
+      - condition: numeric_state
+        entity_id: automation.notify_for_high_humidity_when_coming_home
+        attribute: last_triggered
+        above: 7200
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
@@ -1946,8 +2119,10 @@
         before: '22:00:00'
       - condition: time
         after: '11:00:00'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 7200 }}"
+      - condition: numeric_state
+        entity_id: automation.notify_for_high_humidity_when_coming_home_weekend
+        attribute: last_triggered
+        above: 7200
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
@@ -1982,8 +2157,10 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 1200 }}"
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
+          attribute: last_triggered
+          above: 1200
         - condition: or
           conditions:
           - condition: state
@@ -2047,10 +2224,14 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int > 1200 }}"
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 1200 }}"
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_afk
+          attribute: last_triggered
+          above: 1200
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
+          attribute: last_triggered
+          above: 1200
         - condition: or
           conditions:
           - condition: state
@@ -2114,8 +2295,10 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
+          attribute: last_triggered
+          above: 1200
         - condition: state
           entity_id: device_tracker.google_maps_104418453164779945782
           state: not_home
@@ -2183,8 +2366,10 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 5400 }}"
+        - condition: numeric_state
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+          attribute: last_triggered
+          above: 5400
     action:
       - service: automation.turn_off
         data:
@@ -2229,12 +2414,18 @@
         - condition: state
           entity_id: sensor.washing_machine_state
           state: Finishing
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int > 50 }}"
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 50 }}"
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
+          attribute: last_triggered
+          above: 50
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_afk
+          attribute: last_triggered
+          above: 50
+        - condition: numeric_state
+          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
+          attribute: last_triggered
+          above: 50
     action:
       - service: input_select.select_option
         data:
@@ -2422,13 +2613,6 @@
             {% set state = 'off' %}
             {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
     action:
-      - service: notify.mobile_app_fabian_mi9t
-        data_template:
-          title: "Flugmodus"
-          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
-        data:
-          data:
-            tag: 'notification-about-sensor'
       - service: notify.mobile_app_mi_9t
         data_template:
           title: "Flugmodus"
@@ -2637,8 +2821,10 @@
           value_template: "{{ states.automation.telegram_pill_marked_done.attributes.last_triggered != 'null' }}"
         - condition: template
           value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 10800 }}"
+        - condition: numeric_state
+          entity_id: automation.telegram_pill_marked_done
+          attribute: last_triggered
+          above: 10800
     action:
       - service: tts.google_say
         entity_id: media_player.schlafzimmer
@@ -3105,8 +3291,11 @@
     condition:
       condition: and
       conditions:
+        - condition: state
+          entity_id: device_tracker.fabianphone
+          state: home
         - condition: template
-          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.last_seen)) < 3600 }}"
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.last_seen)) > 3600 }}"
         - condition: time
           after: '06:30:00'
           before: '07:10:00'
@@ -3118,6 +3307,10 @@
             - fri
     action:
       - service: notify.telegram_fabian
+        data:
+          title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
+          message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
+      - service: notify.telegram_nessie
         data:
           title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
           message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
