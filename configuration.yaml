@@ -386,13 +386,6 @@ sensor:
       - uv_index
 
 light:
-  - platform: yeelight
-    devices:
-      192.168.178.247:
-        name: Stehlampe
-        transition: 1000
-      192.168.178.246:
-        name: LEDs Bett
   #MagicHue LEDs
   - platform: flux_led
     devices:
@@ -520,6 +513,7 @@ google_assistant:
       expose: true
       room: Schlafzimmer
     switch.bett:
+      name: Bett Steckdose
       expose: true
       room: Schlafzimmer
     switch.regal_leds: 
@@ -565,7 +559,7 @@ google_assistant:
       expose: True
       room: Wohnzimmer
     switch.fernseher:
-      name: Strom
+      name: Strom Fernseher
       expose: True
       room: Wohnzimmer
     switch.staubsauger: 
@@ -576,6 +570,7 @@ google_assistant:
       expose: true
       room: Keller
     climate.bad:
+      name: Badezimmer
       expose: true
       room: Bad
 

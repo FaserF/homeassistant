@@ -79,18 +79,14 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.fabianphone
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 1
+          - device_tracker.google_maps_112174659110860535869
+        from: 'not_home'
+        to: 'home'
       - platform: state
         entity_id:
-          - device_tracker.nessiephone
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 1
+          - device_tracker.google_maps_112056758146194246561
+        from: 'not_home'
+        to: 'home'
     condition:
       condition: and
       conditions:
@@ -1230,30 +1226,31 @@
         data:
           entity_id: media_player.schlafzimmer
 
-  - alias: 'Coinbase balance high'
-    initial_state: on
-    trigger:
-      - platform: numeric_state
-        entity_id: sensor.coinbase_btc_wallet
-        attribute: "Balance in native currency"
-        above: 220
-    condition:
-      condition: and
-      conditions:
+#not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
+#  - alias: 'Coinbase balance high'
+#    initial_state: on
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.coinbase_btc_wallet
+#        attribute: "Balance in native currency"
+#        above: 220
+#    condition:
+#      condition: and
+#      conditions:
         #Maximal einmal am Tag schreiben
-        - condition: numeric_state
-          entity_id: automation.coinbase_balance_high
-          attribute: last_triggered
-          above: 86400
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_nessie
-          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
+#        - condition: numeric_state
+#          entity_id: automation.coinbase_balance_high
+#          attribute: last_triggered
+#          above: 86400
+#    action:
+#      - service: telegram_bot.send_message
+#        data_template:
+#          target: !secret telegram_chat_fabian
+#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
+#      - service: telegram_bot.send_message
+#        data_template:
+#          target: !secret telegram_chat_nessie
+#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
 
   - alias: 'DWD Weather Warnings'
     initial_state: on
