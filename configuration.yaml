@@ -258,6 +258,21 @@ climate:
         mac: !secret eq3btsmart1
       Schlafzimmer:
         mac: !secret eq3btsmart2
+  - platform: generic_thermostat
+    name: RPI Cooling Fan Controller
+    heater: switch.rpi_cooling_fan
+    target_sensor: sensor.processor_temperature
+    min_temp: 55
+    max_temp: 80
+    ac_mode: true
+    target_temp: 55
+    cold_tolerance: 0.1
+    hot_tolerance: 0.1
+    min_cycle_duration:
+      seconds: 30
+    keep_alive:
+      minutes: 5
+    initial_hvac_mode: "cool"
 
 tado:
   username: !secret defaultmail
@@ -302,6 +317,12 @@ sensor:
       washing_machine_state:
         value_template: '{{ states.input_select.washing_machine_status.state}}'
         friendly_name: 'Waschmaschine Status'
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /
+      - type: memory_use_percent
+      - type: processor_temperature
   - platform: fritzbox_netmonitor
   #- platform: emby_upcoming_media
   #  api_key: YOUR_EMBY_API_KEY
@@ -425,6 +446,20 @@ homekit:
       - device_tracker.fabianhackbook
       - input_boolean.silent_mode
       - media_player.mini_gruppe
+      - climate.rpi_cooling_fan_controller
+      - switch.rpi_cooling_fan
+      - switch.adguard_protection
+      - switch.adguard_filtering
+      - switch.fritzbox_guest_wifi
+      - switch.fritzbox_portforward_bitwarden
+      - switch.fritzbox_portforward_bookstracks
+      - switch.fritzbox_portforward_homeassistant
+      - switch.fritzbox_portforward_http_server
+      - switch.fritzbox_portforward_https_server
+      - switch.fritzbox_portforward_ssh
+      - switch.fritzbox_portforward_tasmoadmin
+      - switch.fritzbox_wifi
+      - switch.fritzbox_wifi_5ghz
 
 mqtt:
   broker: core-mosquitto
@@ -433,6 +468,9 @@ mqtt:
   discovery: true
     
 switch:
+  - platform: rpi_gpio
+    ports:
+      4: RPI Cooling Fan
   - platform: command_line
     switches:
       fabian_pc_shutdown:
@@ -500,6 +538,10 @@ google_assistant:
     switch.fritzbox_wifi:
       expose: false
     switch.fritzbox_wifi_5ghz:
+      expose: false
+    switch.rpi_cooling_fan:
+      expose: false
+    climate.rpi_cooling_fan_controller: 
       expose: false
     switch.adguard_protection:
       expose: false

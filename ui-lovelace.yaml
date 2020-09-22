@@ -48,8 +48,8 @@ views:
       - entity: sensor.washing_machine_state
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.gastezimmer_humidity
-      - entity: sensor.fernseher_energy_today
-      - entity: sensor.fernseher_energy_power
+      - entity: sensor.bett_energy_today
+      - entity: sensor.bett_energy_power
       - entity: sensor.fabian_strom_energy_today
       - entity: sensor.fabian_strom_energy_power
       - entity: sensor.waschmaschine_energy_power
@@ -61,6 +61,7 @@ views:
           - switch.lichtschalter
           - switch.deckenlampe
           - switch.regal_leds
+          - switch.bett_gluhbirne
           - entity: light.keller_gluhbirne
             group: true
             toggle: true
@@ -93,17 +94,16 @@ views:
         title: Licht
         type: entities
       - entities:
-          - switch.waschmaschine
-          - switch.switch_bett
-          - switch.fabian_strom
-          - switch.nessie_pc
-          - switch.fernseher
-          - switch.ventilator
-          - switch.staubsauger
-          - input_boolean.kuehlschrank_keller
-          - input_boolean.strom_keller
-          - input_boolean.strom2_keller
-          - switch.schloss
+          - entity: switch.waschmaschine
+          - entity: switch.bett
+          - entity: switch.fabian_strom
+          - entity: switch.nessie_pc
+          - entity: switch.fernseher
+          - entity: switch.staubsauger
+          - entity: input_boolean.kuehlschrank_keller
+          - entity: input_boolean.strom_keller
+          - entity: input_boolean.strom2_keller
+          - entity: switch.schloss
         show_header_toggle: true
         title: Strom
         type: entities
@@ -158,11 +158,40 @@ views:
       - artwork: cover
         entity: media_player.mini_gruppe
         type: 'custom:mini-media-player'
-      - type: 'custom:weather-card'
+      - entity: weather.dwd_weather_ebersberg_halbing
         number_of_forecasts: '5'
-        entity: weather.dwd_weather_ebersberg_halbing
+        type: 'custom:weather-card'
     icon: 'mdi:home-variant'
     title: Home
+  - icon: 'mdi:bed-empty'
+    path: schlafzimmer
+    title: Schlafzimmer
+    badges: []
+    cards:
+      - entities:
+          - entity: switch.regal_leds
+          - entity: switch.lichtschalter
+          - entity: light.leds_tisch
+          - entity: light.yeelight_strip1_34ce008b1863
+          - entity: switch.bett_gluhbirne
+          - entity: switch.bett
+        show_header_toggle: true
+        title: Licht & Strom
+        type: entities
+      - entities:
+          - switch.fabian_strom
+          - device_tracker.fabianpc
+          - switch.fabian_pc_shutdown
+          - sensor.fabian_strom_energy_today
+          - sensor.fabian_strom_energy_power
+        show_header_toggle: true
+        title: Fabian PC
+        type: entities
+      - entity: climate.schlafzimmer
+        type: 'custom:simple-thermostat'
+      - artwork: cover
+        entity: media_player.schlafzimmer
+        type: 'custom:mini-media-player'
   - badges:
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.fernseher_energy_today
@@ -182,9 +211,8 @@ views:
         title: Licht
         type: entities
       - entities:
-          - switch.fernseher
-          - switch.ventilator
-          - switch.staubsauger
+          - entity: switch.fernseher
+          - entity: switch.staubsauger
         show_header_toggle: true
         title: Strom
         type: entities
@@ -204,33 +232,6 @@ views:
     icon: 'mdi:television'
     path: wohnzimmer
     title: Wohnzimmer
-  - cards:
-      - entities:
-          - switch.regal_leds
-          - switch.lichtschalter
-          - light.leds_tisch
-          - light.yeelight_strip1_34ce008b1863
-          - switch.switch_bett
-        show_header_toggle: true
-        title: Licht & Strom
-        type: entities
-      - entities:
-          - switch.fabian_strom
-          - device_tracker.fabianpc
-          - switch.fabian_pc_shutdown
-          - sensor.fabian_strom_energy_today
-          - sensor.fabian_strom_energy_power
-        show_header_toggle: true
-        title: Fabian PC
-        type: entities
-      - entity: climate.schlafzimmer
-        type: 'custom:simple-thermostat'
-      - artwork: cover
-        entity: media_player.schlafzimmer
-        type: 'custom:mini-media-player'
-    icon: 'mdi:hotel'
-    path: schlafzimmer
-    title: Schlafzimmer
   - badges:
       - entity: sensor.gastezimmer_humidity
     cards:
@@ -404,7 +405,10 @@ views:
     panel: true
     path: remote
     title: remote
-  - badges: []
+  - path: router
+    title: Frtizbox
+    icon: 'mdi:router-wireless'
+    badges: []
     cards:
       - entity: switch.adguard_protection
         hold_action:
@@ -441,5 +445,27 @@ views:
           - entity: switch.fritzbox_portforward_bitwarden
         title: FritzBox Portforwarding
         type: entities
-    path: other
-    title: Weiteres
+      - type: calendar
+        entities:
+          - calendar.fabianseitz98_gmail_com
+          - calendar.vani_nessie98_gmail_com
+  - title: RaspberryPi
+    path: raspberrypi
+    icon: 'mdi:raspberry-pi'
+    badges: []
+    cards:
+      - entity: climate.rpi_cooling_fan_controller
+        type: 'custom:simple-thermostat'
+      - type: entities
+        entities:
+          - entity: switch.rpi_cooling_fan
+          - entity: sensor.processor_temperature
+          - entity: sensor.memory_use_percent
+          - entity: sensor.disk_use_percent
+      - type: sensor
+        entity: sensor.processor_temperature
+        graph: line
+        icon: 'mdi:cpu-64-bit'
+      - type: sensor
+        entity: sensor.memory_use_percent
+        graph: line
