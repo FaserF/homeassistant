@@ -11,7 +11,6 @@
       - media_player.wohnzimmer_mini
       - light.yeelight_color1_34ce008bcc9d #Stehlampe
       - liht.stehlampe
-      - light.hyperion
       - light.leds_wohnzimmer
       - light.wohnzimmer_lampe
       - climate.wohnzimmer
@@ -30,7 +29,7 @@
       - light.leds_tisch
       - climate.schlafzimmer
       - switch.bett
-      - switch.switch_bett
+      - switch.bett_gluhbirne
       - switch.fabian_strom
       - switch.fabian_pc_shutdown
       - switch.regal_leds

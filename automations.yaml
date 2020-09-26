@@ -16,18 +16,20 @@
         for:
           minutes: 1
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_1121746591108605358l69.state != 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: device_tracker.google_maps_1121746591108605358l69
+          state: home
+        - condition: state
+          entity_id: device_tracker.google_maps_112056758146194246561
+          state: home
         - condition: state
           entity_id: device_tracker.fabianphone
-          state: not_home
+          state: home
         - condition: state
           entity_id: device_tracker.nessiephone
-          state: not_home
+          state: home
     action:
       - service: light.turn_off
         data:
@@ -296,7 +298,7 @@
       - platform: state
         entity_id:
           - device_tracker.nessiephone
-        from: 'nothome'
+        from: 'not_home'
         to: 'home'
         for:
           minutes: 1
@@ -351,10 +353,8 @@
           {% set domain = 'light' %}
           {% set state = 'on' %}
           {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
-      - condition: numeric_state
-        entity_id: automation.telegram_answer_cancel_light_turn_off
-        attribute: last_triggered
-        above: 1500
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
     action:
       - service: light.turn_off
         entity_id: all
@@ -917,10 +917,8 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: automation.turn_on_bulb_in_keller_fabi
-          attribute: last_triggered
-          above: 7200
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_fabi.attributes.last_triggered) | int > 7200 }}"
     action:
       - service: light.turn_on
         data:
@@ -936,10 +934,8 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: automation.turn_on_bulb_in_keller_nessie
-          attribute: last_triggered
-          above: 7200
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_nessie.attributes.last_triggered) | int > 7200 }}"
     action:
       - service: light.turn_on
         data:
@@ -1238,19 +1234,17 @@
 #      condition: and
 #      conditions:
         #Maximal einmal am Tag schreiben
-#        - condition: numeric_state
-#          entity_id: automation.coinbase_balance_high
-#          attribute: last_triggered
-#          above: 86400
+#        - condition: template
+#          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.coinbase_balance_high.attributes.last_triggered) | int > 86400 }}"
 #    action:
 #      - service: telegram_bot.send_message
 #        data_template:
 #          target: !secret telegram_chat_fabian
-#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
+#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
 #      - service: telegram_bot.send_message
 #        data_template:
 #          target: !secret telegram_chat_nessie
-#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes["Balance in native currency"] }} .'
+#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
 
   - alias: 'DWD Weather Warnings'
     initial_state: on
@@ -1265,10 +1259,8 @@
       condition: and
       conditions:
         #Maximal zwei mal am Tag schreiben
-        - condition: numeric_state
-          entity_id: automation.dwd_weather_warnings
-          attribute: last_triggered
-          above: 43200
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.dwd_weather_warnings.attributes.last_triggered) | int > 43200 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1278,6 +1270,23 @@
         data_template:
           target: !secret telegram_chat_nessie
           message: 'ACHTUNG! Aktuelle Wetter Warnung. Mehr Infos: https://www.dwd.de/DE/wetter/warnungen_gemeinden/warntabellen/warntab_bay_node.html'
+
+  - alias: 'RaspberryPi Temp Warning'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.processor_temperature
+        above: 75
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.raspberrypi_temp_warning.attributes.last_triggered) | int > 3600 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'ACHTUNG! RaspberryPi Temperatur sehr hoch: {{ states.sensor.processor_temperature.state }}'
 
   - alias: Turn Schloss off after turning on
     initial_state: on
@@ -1622,6 +1631,12 @@
       - platform: state
         entity_id: sensor.fritz_netmonitor
         attribute: external_ip
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: 'sensor.fritz_netmonitor'
+          state: 'None'
     action:
       - service: notify.telegram_fabian
         data:
@@ -1635,7 +1650,7 @@
         from: 'online'
         to: 'offline'
         for:
-          seconds: 25
+          seconds: 50
     condition:
       condition: and
       conditions:
@@ -1958,14 +1973,12 @@
         - condition: state
           entity_id: 'input_boolean.silent_mode'
           state: 'off'
-        - condition: numeric_state
-          entity_id: automation.notify_for_high_humidity
-          attribute: last_triggered
-          above: 7200
-        - condition: numeric_state
-          entity_id: automation.notify_for_high_humidity_when_coming_home
-          attribute: last_triggered
-          above: 7200
+        - condition: template
+          value_template: "{{ states.automation.notify_for_high_humidity.attributes.last_triggered != 'null' }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
         - condition: or
           conditions:
           - condition: state
@@ -2012,10 +2025,8 @@
       - condition: state
         entity_id: device_tracker.nessiephone
         state: not_home
-      - condition: numeric_state
-        entity_id: automation.notify_for_extreme_high_humidity
-        attribute: last_triggered
-        above: 32400
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -2040,10 +2051,10 @@
     condition:
       - condition: numeric_state
         entity_id: sensor.gastezimmer_humidity
-        above: 54
+        above: 57
       - condition: numeric_state
         entity_id: sensor.wohnzimmer_humidity
-        above: 54
+        above: 57
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
@@ -2058,14 +2069,12 @@
         before: '22:00:00'
       - condition: time
         after: '08:00:00'
-      - condition: numeric_state
-        entity_id: automation.notify_for_high_humidity
-        attribute: last_triggered
-        above: 7200
-      - condition: numeric_state
-        entity_id: automation.notify_for_high_humidity_when_coming_home
-        attribute: last_triggered
-        above: 7200
+      - condition: template
+        value_template: "{{ states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered != 'null' }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
@@ -2116,10 +2125,8 @@
         before: '22:00:00'
       - condition: time
         after: '11:00:00'
-      - condition: numeric_state
-        entity_id: automation.notify_for_high_humidity_when_coming_home_weekend
-        attribute: last_triggered
-        above: 7200
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 7200 }}"
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
@@ -2154,10 +2161,8 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
-          attribute: last_triggered
-          above: 1200
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 1200 }}"
         - condition: or
           conditions:
           - condition: state
@@ -2221,14 +2226,10 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active_afk
-          attribute: last_triggered
-          above: 1200
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
-          attribute: last_triggered
-          above: 1200
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int > 1200 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 1200 }}"
         - condition: or
           conditions:
           - condition: state
@@ -2292,10 +2293,8 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active
-          attribute: last_triggered
-          above: 1200
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1200 }}"
         - condition: state
           entity_id: device_tracker.google_maps_104418453164779945782
           state: not_home
@@ -2363,10 +2362,8 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: automation.detect_if_washing_machine_is_currently_active
-          attribute: last_triggered
-          above: 5400
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 5400 }}"
     action:
       - service: automation.turn_off
         data:
@@ -2411,18 +2408,12 @@
         - condition: state
           entity_id: sensor.washing_machine_state
           state: Finishing
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active
-          attribute: last_triggered
-          above: 50
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active_afk
-          attribute: last_triggered
-          above: 50
-        - condition: numeric_state
-          entity_id: automation.detect_if_coal_lighter_is_currently_active_5_freunde
-          attribute: last_triggered
-          above: 50
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int > 50 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int > 50 }}"
     action:
       - service: input_select.select_option
         data:
@@ -2816,12 +2807,11 @@
       conditions:
         - condition: template
           value_template: "{{ states.automation.telegram_pill_marked_done.attributes.last_triggered != 'null' }}"
+        - condition: state
+          entity_id: device_tracker.google_maps_112056758146194246561
+          state: home
         - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
-        - condition: numeric_state
-          entity_id: automation.telegram_pill_marked_done
-          attribute: last_triggered
-          above: 10800
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 10800 }}"
     action:
       - service: tts.google_say
         entity_id: media_player.schlafzimmer
