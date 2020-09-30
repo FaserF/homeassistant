@@ -682,6 +682,7 @@
         after: '05:00:00'
       - condition: sun
         before: sunrise
+        before_offset: "1:00:00"
       - condition: state
         entity_id: device_tracker.fabianphone
         state: home
@@ -725,7 +726,7 @@
         data_template: 
           message: >
             Es ist 
-            {{ now().hour }}: {{ now().minute }} Uhr.
+            {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
@@ -759,7 +760,7 @@
         data_template: 
           message: >
             Es ist 
-            {{ now().hour }} {{ now().minute }} Uhr.
+            {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
@@ -3342,6 +3343,40 @@
         data:
           message: "Sbahn in leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
 
+  - alias: 'Notify Nessie Fabian on way home ghome'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id:
+          - device_tracker.google_maps_112174659110860535869
+        from: 'Arbeit Fabi'
+        to: 'not_home'
+    condition:
+      - condition: time
+        after: '14:15:00'
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+      - condition: state
+        entity_id: device_tracker.nessiephone
+        state: home
+      - condition: state
+        entity_id: 'input_boolean.silent_mode'
+        state: 'off'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_ghome.attributes.last_triggered) | int > 3600 }}"
+    action:
+      - service: tts.google_say
+        entity_id: 
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
+        - media_player.gastezimmer_mini
+        data_template:
+          message: 'Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
+
   - alias: 'Notify Nessie Fabian on way home'
     initial_state: on
     trigger:
@@ -3449,12 +3484,14 @@
           - wed
           - thu
           - fri
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home.attributes.last_triggered) | int > 3600 }}"
     action:
       - service: notify.telegram_fabian
         data:
           message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
 
-  - alias: 'Notify Fabian Nessie on way home - ghome'
+  - alias: 'Notify Fabian Nessie on way home ghome'
     initial_state: on
     trigger:
       - platform: state
@@ -3477,12 +3514,13 @@
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_ghome.attributes.last_triggered) | int > 3600 }}"
     action:
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
-        - media_player.gastezimmer_mini
         data_template:
           message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
