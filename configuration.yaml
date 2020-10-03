@@ -289,12 +289,11 @@ shell_command:
   randomfood: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}'
   foodyes: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes'
   jek_telegram: !secret telegram_jek_open_command
-  git_push: 'bash /share/scripts/gitpush.sh'
   restartha: 'ha host reboot'
   hibernatefpc: 'curl http://192.168.178.59:5001/hibernate'
   hibernatenpc: 'curl http://192.168.178.44:5001/hibernate'
   shutdownnpc: 'curl http://192.168.178.44:5001/shutdown'
-  overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
+  #overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
 
 coinbase:
   api_key: !secret coinbase_key
