@@ -621,8 +621,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - switch.bett
+        entity_id: switch.bett
         from: 'off'
         to: 'on'
         for:
@@ -636,8 +635,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - switch.staubsauger
+        entity_id: switch.staubsauger
         from: 'off'
         to: 'on'
         for:
@@ -765,7 +763,7 @@
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Turn on climate if Nessie PC started'
-    initial_state: off
+    initial_state: on
     trigger:
       platform: state
       entity_id:
@@ -780,7 +778,7 @@
           hvac_mode: heat
 
   - alias: 'Turn off climate if Nessie PC stopped'
-    initial_state: off
+    initial_state: on
     trigger:
       platform: state
       entity_id:
@@ -802,9 +800,17 @@
       from: 'home'
       to: 'not_home'
     condition:
-      condition: time
-      after: '21:15:00'
-      before: '23:50:00'
+      - condition: time
+        after: '21:15:00'
+        before: '23:50:00'
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: device_tracker.google_maps_104418453164779945782
+            state: not_home
+          - condition: state
+            entity_id: device_tracker.google_maps_103127589611220223167
+            state: not_home
     action:
       - service: light.turn_on
         data:
@@ -1017,6 +1023,20 @@
           - sun
     action:
       - service: shell_command.restartha
+      
+  - alias: 'Git push to GitHub'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '03:00:00'
+    condition:
+      - condition: time
+        weekday:
+          - sun
+          - wed
+          - fri
+    action:
+      - service: shell_command.git_push
           
   - alias: "Let's Encrypt Renewal"
     trigger:
@@ -1265,7 +1285,7 @@
     action:
       - service: telegram_bot.send_message
         data_template:
-          target: !secret telegram_chat_5friends
+          target: !secret telegram_chat_fabian
           message: 'ACHTUNG! Aktuelle Wetter Warnung. Mehr Infos: https://www.dwd.de/DE/wetter/warnungen_gemeinden/warntabellen/warntab_bay_node.html'
       - service: telegram_bot.send_message
         data_template:
@@ -1633,11 +1653,13 @@
         entity_id: sensor.fritz_netmonitor
         attribute: external_ip
     condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: 'sensor.fritz_netmonitor'
-          state: 'None'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 60 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: 'sensor.fritz_netmonitor'
+            state: 'None'
     action:
       - service: notify.telegram_fabian
         data:
@@ -1669,6 +1691,8 @@
           - condition: state
             entity_id: device_tracker.fabianphone
             state: home
+          - condition: template
+            value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
     action:
       - service: tts.google_say
         entity_id: 
@@ -1681,6 +1705,9 @@
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_internet_access_returned
+      - service: automation.turn_on
+        data:
+          entity_id: automation.fritzbox_internet_access_returned_home
       - service: automation.turn_off
         data:
           entity_id: automation.fritzbox_no_internet_access
@@ -1723,6 +1750,9 @@
       - service: automation.turn_off
         data:
           entity_id: automation.fritzbox_internet_access_returned
+      - service: automation.turn_off
+        data:
+          entity_id: automation.fritzbox_internet_access_returned_home
 
   - alias: Fritzbox Internet access returned
     initial_state: off
@@ -1745,6 +1775,15 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Die Fritzbox Internet Verbundung wurde verloren und wurde soeben wiederhergestellt.'
+      - service: automation.turn_on
+        data:
+          entity_id: automation.fritzbox_no_internet_access
+      - service: automation.turn_off
+        data:
+          entity_id: automation.fritzbox_internet_access_returned
+      - service: automation.turn_off
+        data:
+          entity_id: automation.fritzbox_internet_access_returned_home
 
   # - alias: Internet Speed Test Poor Fabian
   # 
@@ -1878,10 +1917,16 @@
         - condition: state
           entity_id: switch.regal_leds
           state: 'on'
+        - condition: state
+          entity_id: switch.bett_gluhbirne
+          state: 'on'
     action:
       - service: switch.turn_off
         data:
           entity_id: switch.regal_leds
+      - service: switch.turn_off
+        data:
+          entity_id: switch.bett_gluhbirne
       - service: switch.turn_off
         data:
           entity_id: switch.lichtschalter
@@ -1971,6 +2016,10 @@
     condition:
       condition: and
       conditions:
+        - condition: time
+          before: '22:00:00'
+        - condition: time
+          after: '10:00:00'
         - condition: state
           entity_id: 'input_boolean.silent_mode'
           state: 'off'
