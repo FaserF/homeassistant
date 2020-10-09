@@ -102,7 +102,7 @@ views:
           - entity: switch.staubsauger
           - entity: input_boolean.kuehlschrank_keller
           - entity: input_boolean.strom_keller
-          - entity: input_boolean.strom2_keller
+          - entity: input_boolean.steckerleiste_keller
           - entity: switch.schloss
         show_header_toggle: true
         title: Strom
@@ -269,9 +269,9 @@ views:
         title: Licht
         type: entities
       - entities:
-          - input_boolean.kuehlschrank_keller
-          - input_boolean.strom_keller
-          - input_boolean.strom2_keller
+          - entity: input_boolean.kuehlschrank_keller
+          - entity: input_boolean.strom_keller
+          - entity: input_boolean.steckerleiste_keller
         show_header_toggle: true
         title: Mehrfachsteckdose
         type: entities
@@ -445,10 +445,6 @@ views:
           - entity: switch.fritzbox_portforward_bitwarden
         title: FritzBox Portforwarding
         type: entities
-      - type: calendar
-        entities:
-          - calendar.fabianseitz98_gmail_com
-          - calendar.vani_nessie98_gmail_com
   - title: RaspberryPi
     path: raspberrypi
     icon: 'mdi:raspberry-pi'

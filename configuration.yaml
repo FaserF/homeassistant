@@ -295,6 +295,25 @@ shell_command:
   shutdownnpc: 'curl http://192.168.178.44:5001/shutdown'
   #overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
 
+rest_command:
+  assistant_broadcast:
+    url: http://192.168.178.2:3000/assistant
+    method: POST
+    content_type: 'application/json'
+    payload: '{"command":"{{ command }}", "user":"username", "broadcast":true}'
+    
+  assistant_converse:
+    url: http://192.168.178.2:3000/assistant
+    method: POST
+    content_type: 'application/json'
+    payload: '{"command":"{{ command }}", "user":"username", "converse":true}'
+
+  assistant_relay:
+    url: http://192.168.178.2:3000/assistant
+    method: POST
+    content_type: 'application/json'
+    payload: '{"command":"{{ command }}", "user":"username"}'
+
 coinbase:
   api_key: !secret coinbase_key
   api_secret: !secret coinbase_secret
@@ -415,9 +434,6 @@ light:
       192.168.178.249:
         name: LEDs Tisch
         mode: rgb
-
-ifttt:
-  key: !secret ifttt
   
 no_ip:
   domain: smartlife.ddns.net

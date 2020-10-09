@@ -62,10 +62,13 @@
       #     away_mode: 'on'
       - service: input_boolean.turn_off
         data:
-          entity_id: input_boolean.kuehlschrank_keller
+          entity_id: input_boolean.steckerleiste_keller
       - service: input_boolean.turn_off
         data:
-          entity_id:  input_boolean.strom_keller
+          entity_id: input_boolean.strom_keller
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
       - service: media_player.turn_off
         data:
           entity_id: media_player.wohnzimmer_mini
@@ -82,13 +85,13 @@
       - platform: state
         entity_id:
           - device_tracker.google_maps_112174659110860535869
-        from: 'not_home'
-        to: 'home'
+        from: 'home'
+        to: 'not_home'
       - platform: state
         entity_id:
           - device_tracker.google_maps_112056758146194246561
-        from: 'not_home'
-        to: 'home'
+        from: 'home'
+        to: 'not_home'
     condition:
       condition: and
       conditions:
@@ -414,7 +417,7 @@
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabiantablet
+        entity_id: device_tracker.fabian_dock
         from: 'not_home'
         to: 'home'
     condition:
@@ -434,13 +437,8 @@
       - service: switch.turn_on
         data:
           entity_id: switch.regal_leds
-      - service: climate.set_temperature
-        data:
-          entity_id: climate.schlafzimmer
-          temperature: 21
-          hvac_mode: heat
-
-  - alias: 'Turn off tleds if fpc starts'
+          
+  - alias: 'Turn on climate if fpc starts'
     initial_state: on
     trigger:
       - platform: state
@@ -448,16 +446,33 @@
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabiantablet
+        entity_id: device_tracker.fabian_dock
         from: 'not_home'
         to: 'home'
     condition:
       condition: and
       conditions:
-      - condition: sun
-        after: sunrise
-      - condition: sun
-        before: sunset
+      - condition: state
+        entity_id: device_tracker.tv
+        state: 'not_home'
+    action:
+      - service: climate.set_temperature
+        data:
+          entity_id: climate.schlafzimmer
+          temperature: 21
+          hvac_mode: heat
+
+  - alias: 'Turn off tleds if fpc stops'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        from: 'home'
+        to: 'not_home'
+      - platform: state
+        entity_id: device_tracker.fabian_dock
+        from: 'home'
+        to: 'not_home'
     action:
       - service: light.turn_off
         data:
@@ -514,7 +529,7 @@
         from: 'home'
         to: 'not_home'
         for:
-            minutes: 90
+            minutes: 60
     action:
       - service: switch.turn_off
         data:
@@ -530,7 +545,7 @@
         for:
             minutes: 1
       - platform: state
-        entity_id: device_tracker.fabiantablet
+        entity_id: device_tracker.fabian_dock
         from: 'home'
         to: 'not_home'
         for:
@@ -549,7 +564,14 @@
         from: 'home'
         to: 'not_home'
         for:
-            minutes: 90
+            minutes: 60
+      - platform: state
+        entity_id:
+          - device_tracker.fabian_dock
+        from: 'home'
+        to: 'not_home'
+        for:
+            minutes: 5
     action:
       - service: switch.turn_off
         data:
@@ -774,7 +796,7 @@
       - service: climate.set_temperature
         data:
           entity_id: climate.gastezimmer
-          temperature: 21
+          temperature: 20
           hvac_mode: heat
 
   - alias: 'Turn off climate if Nessie PC stopped'
@@ -859,7 +881,7 @@
               entity_id: 'device_tracker.fabianpc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.fabiantablet'
+              entity_id: 'device_tracker.fabian_dock'
               state: 'home'
     action:
       - service: light.turn_on
@@ -1040,83 +1062,95 @@
       data:
         addon: 605cee21_apache2
 
-  - alias: Turn on Steckerleiste1 Keller
+  - alias: Turn on Strom and Kuhlschrank Keller
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.steckerleiste_keller
+        to: 'on'
+    action:
+      - data:
+          command: "Schalte die Steckerleiste ein"
+          user: "fabian"
+        service: rest_command.assistant_relay
+
+  - alias: Turn off Strom and Kuhlschrank Keller
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.steckerleiste_keller
+        to: 'off'
+    action:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom_keller
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      - data:
+          command: "Schalte die Steckerleiste aus"
+          user: "fabian"
+        service: rest_command.assistant_relay
+
+  - alias: Turn on Kuhlschrank Keller
     initial_state: on
     trigger: 
       - platform: state
         entity_id: input_boolean.kuehlschrank_keller
         to: 'on'
     action:
-      - service: ifttt.trigger
-        data: {"event":"turn_on_steckerleiste1"}
+      - data:
+          command: "Aktiviere die Szene TurnOnKuhl"
+          user: "fabian"
+        service: rest_command.assistant_relay
 
-  - alias: Turn off Steckerleiste1 Keller
+  - alias: Turn off Kuhlschrank Keller
     initial_state: on
     trigger: 
       - platform: state
         entity_id: input_boolean.kuehlschrank_keller
         to: 'off'
     action:
-      - service: ifttt.trigger
-        data: {"event":"turn_off_steckerleiste"}
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.steckerleiste_keller
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.strom_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom2_keller
+      - data:
+          command: "Schalte die Steckerleiste aus"
+          user: "fabian"
+        service: rest_command.assistant_relay
 
-  - alias: Turn on Steckerleiste2 Keller
+  - alias: Turn on TV Keller
     initial_state: on
     trigger: 
       - platform: state
         entity_id: input_boolean.strom_keller
         to: 'on'
     action:
-      - service: ifttt.trigger
-        data: {"event":"turn_on_steckerleiste2"}
+      - data:
+          command: "Aktiviere die Szene TurnOnTV"
+          user: "fabian"
+        service: rest_command.assistant_relay
 
-  - alias: Turn off Steckerleiste2 Keller
+  - alias: Turn off TV Keller
     initial_state: on
     trigger: 
       - platform: state
         entity_id: input_boolean.strom_keller
         to: 'off'
     action:
-      - service: ifttt.trigger
-        data: {"event":"turn_off_steckerleiste"}
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.steckerleiste_keller
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.kuehlschrank_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom2_keller
-
-  - alias: Turn on Steckerleiste3 Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.strom2_keller
-        to: 'on'
-    action:
-      - service: ifttt.trigger
-        data: {"event":"turn_on_steckerleiste3"}
-
-  - alias: Turn off Steckerleiste3 Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.strom2_keller
-        to: 'off'
-    action:
-      - service: ifttt.trigger
-        data: {"event":"turn_off_steckerleiste"}
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.kuehlschrank_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom_keller
+      - data:
+          command: "Schalte die Steckerleiste aus"
+          user: "fabian"
+        service: rest_command.assistant_relay
 
   - alias: 'HA Update Available'
     initial_state: on
@@ -1133,26 +1167,26 @@
           inline_keyboard:
           - 'Update starten:/updateha'
 
-  - alias: 'Notify for SMS PIN Fabian'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: sensor.fs_smspin
-    condition:
-      - condition: template
-        value_template: "{{ states.sensor.fs_smspin.state != 'not_set' }}"
-    action:
-      - service: notify.browser
-        data_template:
-          message: "Der Security Code lautet: {{ states('sensor.fs_smspin') }}"
-          target: 
-            - Fabian-PC
-            - Fabian-Hackbook
-            - Chrome-Arbeit
-            - fabiantablet
-        data:
-          data:
-            tag: 'notification-about-sensor'
+#  - alias: 'Notify for SMS PIN Fabian'
+#    initial_state: on
+#    trigger:
+#      - platform: state
+#        entity_id: sensor.fs_smspin
+#    condition:
+#      - condition: template
+#        value_template: "{{ states.sensor.fs_smspin.state != 'not_set' }}"
+#    action:
+#      - service: notify.browser
+#        data_template:
+#          message: "Der Security Code lautet: {{ states('sensor.fs_smspin') }}"
+#          target: 
+#            - Fabian-PC
+#            - Fabian-Hackbook
+#            - Chrome-Arbeit
+#            - fabiantablet
+#        data:
+#          data:
+#            tag: 'notification-about-sensor'
 
   - alias: 'Incoming Call Fabian'
     initial_state: off
@@ -1638,7 +1672,7 @@
         attribute: external_ip
     condition:
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 60 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 360 }}"
       - condition: not
         conditions:
           - condition: state
@@ -1657,7 +1691,7 @@
         from: 'online'
         to: 'offline'
         for:
-          seconds: 50
+          seconds: 40
     condition:
       condition: and
       conditions:
@@ -2583,13 +2617,10 @@
         - condition: or
           conditions:
           - condition: state
-            entity_id: device_tracker.fabianhackbook
-            state: home
-          - condition: state
             entity_id: device_tracker.fabianpc
             state: home
           - condition: state
-            entity_id: device_tracker.fabiantablet
+            entity_id: device_tracker.fabian_dock
             state: home
     action:
       - service: notify.browser
@@ -3230,10 +3261,7 @@
     action:
     - service: input_boolean.turn_off
       data:
-        entity_id:  input_boolean.strom_keller
-    - service: input_boolean.turn_off
-      data:
-        entity_id: input_boolean.kuehlschrank_keller
+        entity_id:  input_boolean.steckerleiste_keller
 
   - alias: Turn off fridge
     initial_state: on
@@ -3685,7 +3713,7 @@
       - condition: time
         after: '05:00:00'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 10800 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 36000 }}"
     action:
       - service: telegram_bot.send_message
         data_template:

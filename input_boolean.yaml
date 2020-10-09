@@ -1,15 +1,15 @@
+  steckerleiste_keller:
+    name: Strom & Kühlschrank Keller
+    initial: off  
+    icon: mdi:power-plug
   kuehlschrank_keller:
     name: Kühlschrank Keller
     initial: off  
     icon: mdi:fridge
   strom_keller:
-    name: Strom Keller DEFEKT
-    initial: off  
-    icon: mdi:power-plug
-  strom2_keller:
     name: Strom Keller
     initial: off  
-    icon: mdi:power-plug
+    icon: mdi:tv
   silent_mode:
     name: Leiser Modus
     initial: off  
