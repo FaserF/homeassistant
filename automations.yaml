@@ -718,7 +718,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '06:55'
+        at: '06:55:00'
     condition:
       condition: and
       conditions:
@@ -754,7 +754,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '06:55'
+        at: '06:55:00'
     condition:
       condition: and
       conditions:
@@ -910,7 +910,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '14:30'
+        at: '14:30:00'
     condition:
       condition: and
       conditions:
@@ -1020,13 +1020,13 @@
           message: 'Kühlschrank im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
   - alias: 'Notify on HA restart'
-    initial_state: 'true'
+    initial_state: True
     trigger:
       platform: homeassistant
       event: start
     condition:
       - condition: time
-        after: '03:02:00'
+        after: '03:10:00'
         before: '03:00:00'
     action:
       - service: telegram_bot.send_message
@@ -1069,10 +1069,10 @@
         entity_id: input_boolean.steckerleiste_keller
         to: 'on'
     action:
-      - data:
+      - service: rest_command.assistant_relay
+        data:
           command: "Schalte die Steckerleiste ein"
           user: "fabian"
-        service: rest_command.assistant_relay
 
   - alias: Turn off Strom and Kuhlschrank Keller
     initial_state: on
@@ -1087,10 +1087,10 @@
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.kuehlschrank_keller
-      - data:
+      - service: rest_command.assistant_relay
+        data:
           command: "Schalte die Steckerleiste aus"
           user: "fabian"
-        service: rest_command.assistant_relay
 
   - alias: Turn on Kuhlschrank Keller
     initial_state: on
@@ -1099,10 +1099,10 @@
         entity_id: input_boolean.kuehlschrank_keller
         to: 'on'
     action:
-      - data:
+      - service: rest_command.assistant_relay
+        data:
           command: "Aktiviere die Szene TurnOnKuhl"
           user: "fabian"
-        service: rest_command.assistant_relay
 
   - alias: Turn off Kuhlschrank Keller
     initial_state: on
@@ -1117,10 +1117,10 @@
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.strom_keller
-      - data:
+      - service: rest_command.assistant_relay
+        data:
           command: "Schalte die Steckerleiste aus"
           user: "fabian"
-        service: rest_command.assistant_relay
 
   - alias: Turn on TV Keller
     initial_state: on
@@ -1129,10 +1129,10 @@
         entity_id: input_boolean.strom_keller
         to: 'on'
     action:
-      - data:
+      - service: rest_command.assistant_relay
+        data:
           command: "Aktiviere die Szene TurnOnTV"
           user: "fabian"
-        service: rest_command.assistant_relay
 
   - alias: Turn off TV Keller
     initial_state: on
@@ -1147,10 +1147,10 @@
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.kuehlschrank_keller
-      - data:
+      - service: rest_command.assistant_relay
+        data:
           command: "Schalte die Steckerleiste aus"
           user: "fabian"
-        service: rest_command.assistant_relay
 
   - alias: 'HA Update Available'
     initial_state: on
@@ -1334,6 +1334,7 @@
         entity_id: switch.schloss
         to: 'on'
     action:
+      - delay: '00:00:02'
       - service: switch.turn_off
         data:
           entity_id: switch.schloss
@@ -1712,13 +1713,17 @@
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
     action:
-      - service: tts.google_say
-        entity_id: 
-        - media_player.schlafzimmer
-        - media_player.wohnzimmer_mini
-        - media_player.gastezimmer_mini
+      - service: rest_command.assistant_broadcast
         data:
-          message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
+          command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
+          user: "homeassistant"
+      #- service: tts.google_say
+      #  entity_id: 
+      #  - media_player.schlafzimmer
+      #  - media_player.wohnzimmer_mini
+      #  - media_player.gastezimmer_mini
+      #  data:
+      #    message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
       - service: fritzbox_tools.reboot
       - service: automation.turn_on
         data:
@@ -1755,13 +1760,10 @@
             entity_id: device_tracker.fabianphone
             state: home
     action:
-      - service: tts.google_say
-        entity_id: 
-        - media_player.schlafzimmer
-        - media_player.wohnzimmer_mini
-        - media_player.gastezimmer_mini
+      - service: rest_command.assistant_broadcast
         data:
-          message: 'Die Internetverbindung ist wiederhergestellt.'
+          command: Die Internetverbindung ist wiederhergestellt.
+          user: "homeassistant"
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_no_internet_access
@@ -2065,12 +2067,10 @@
       - service: media_player.media_pause
         data:
           entity_id: media_player.wohnzimmer_tv
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
+      - service: rest_command.assistant_broadcast
         data:
-          message: 'Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
+          command: Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.
+          user: "homeassistant"
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -2151,12 +2151,10 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
+      - service: rest_command.assistant_broadcast
         data:
-          message: 'Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
+          command: Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.
+          user: "homeassistant"
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -2749,15 +2747,6 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      - service: switch.turn_on
-        data:
-          entity_id: switch.schloss
-      - service: switch.turn_on
-        data:
-          entity_id: switch.schloss
-      - service: switch.turn_on
-        data:
-          entity_id: switch.schloss
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
@@ -2866,7 +2855,7 @@
     initial_state: on
     trigger:
       - platform: time
-        at: '23:00'
+        at: '23:00:00'
     condition:
       condition: and
       conditions:
