@@ -1,40 +1,40 @@
 animated_background:
-  default_url: 'https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4'
+  default_url: "https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4"
   entity: weather.wetter_darksky
   state_url:
     clear-night:
-      - 'https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4'
+      - "https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4"
+      - "https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4"
+      - "https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4"
+      - "https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4"
     cloudy:
-      - 'https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
+      - "https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4"
+      - "https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4"
+      - "https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4"
+      - "https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4"
+      - "https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4"
+      - "https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4"
     fog:
-      - 'https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4'
+      - "https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4"
+      - "https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4"
     mostlycloudy:
-      - 'https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4'
+      - "https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4"
+      - "https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4"
+      - "https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4"
     partlycloudy:
-      - 'https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
-    rainy: 'https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4'
+      - "https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4"
+      - "https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4"
+      - "https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4"
+      - "https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4"
+      - "https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4"
+      - "https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4"
+    rainy: "https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4"
     sunny:
-      - 'https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4'
-      - 'https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4'
+      - "https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4"
+      - "https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4"
+      - "https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4"
+      - "https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4"
+      - "https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4"
 path: default_view
 title: Fabian's Smart Home
 views:
@@ -43,11 +43,13 @@ views:
       - entity: person.nessie
       - entity: sensor.fsphone_battery
       - entity: sensor.vkphone_battery
-      - entity: sensor.battery_level_ipad
+      - entity: sensor.ipad_battery_level
       - entity: sensor.fs_smspin
       - entity: sensor.washing_machine_state
       - entity: sensor.wohnzimmer_humidity
       - entity: sensor.gastezimmer_humidity
+      - entity: sensor.schlafzimmer_humidity
+      - entity: sensor.bad_humidity
       - entity: sensor.bett_energy_today
       - entity: sensor.bett_energy_power
       - entity: sensor.fabian_strom_energy_today
@@ -65,31 +67,31 @@ views:
           - entity: light.keller_gluhbirne
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - entity: light.lampe_gastezimmer
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - entity: light.leds_tisch
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - entity: light.leds_gastezimmer
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - entity: light.yeelight_strip1_34ce008b1863
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - entity: light.yeelight_color1_34ce008bcc9d
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
         show_header_toggle: true
         title: Licht
         type: entities
@@ -114,59 +116,52 @@ views:
         show_header_toggle: true
         title: PC & mehr
         type: entities
-      - entities:
-          - sensor.germany_coronavirus_deaths
-          - sensor.germany_coronavirus_current
-          - sensor.germany_coronavirus_confirmed
-          - sensor.germany_coronavirus_recovered
-        show_header_toggle: false
-        title: Coronavirus Deutschland
-        type: entities
       - entity: climate.wohnzimmer
         sensors:
           - sensor.wohnzimmer_humidity
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - entity: climate.schlafzimmer
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - entity: climate.gastezimmer
         sensors:
           - sensor.gastezimmer_humidity
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - entity: climate.bad
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - artwork: cover
         entity: media_player.wohnzimmer_tv
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.wohnzimmer_mini
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.schlafzimmer
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.keller_tv
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.keller_tv_cast
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.gastezimmer_mini
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.mini_gruppe
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - entity: weather.dwd_weather_ebersberg_halbing
-        number_of_forecasts: '5'
-        type: 'custom:weather-card'
-    icon: 'mdi:home-variant'
+        number_of_forecasts: "5"
+        type: "custom:weather-card"
+    icon: "mdi:home-variant"
     title: Home
-  - icon: 'mdi:bed-empty'
+  - icon: "mdi:bed-empty"
     path: schlafzimmer
     title: Schlafzimmer
-    badges: []
+    badges:
+      - entity: sensor.schlafzimmer_humidity
     cards:
       - entities:
           - entity: switch.regal_leds
@@ -188,25 +183,23 @@ views:
         title: Fabian PC
         type: entities
       - entity: climate.schlafzimmer
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - artwork: cover
         entity: media_player.schlafzimmer
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
   - badges:
       - entity: sensor.wohnzimmer_humidity
-      - entity: sensor.fernseher_energy_today
-      - entity: sensor.fernseher_energy_power
     cards:
       - entities:
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
           - switch.deckenlampe
           - entity: light.yeelight_color1_34ce008bcc9d
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
         show_header_toggle: true
         title: Licht
         type: entities
@@ -219,17 +212,17 @@ views:
       - entity: climate.wohnzimmer
         sensors:
           - sensor.wohnzimmer_humidity
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - artwork: cover
         entity: media_player.wohnzimmer_tv
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.wohnzimmer_mini
-        type: 'custom:mini-media-player'
-    icon: 'mdi:television'
+        type: "custom:mini-media-player"
+    icon: "mdi:television"
     path: wohnzimmer
     title: Wohnzimmer
   - badges:
@@ -251,11 +244,11 @@ views:
       - entity: climate.gastezimmer
         sensors:
           - sensor.gastezimmer_humidity
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - artwork: cover
         entity: media_player.gastezimmer_mini
-        type: 'custom:mini-media-player'
-    icon: 'mdi:desktop-tower'
+        type: "custom:mini-media-player"
+    icon: "mdi:desktop-tower"
     path: gastezimmer
     title: Gästezimmer
   - badges: null
@@ -264,7 +257,7 @@ views:
           - entity: light.keller_gluhbirne
             group: true
             toggle: true
-            type: 'custom:slider-entity-row'
+            type: "custom:slider-entity-row"
         show_header_toggle: true
         title: Licht
         type: entities
@@ -284,11 +277,11 @@ views:
         type: entities
       - artwork: cover
         entity: media_player.keller_tv
-        type: 'custom:mini-media-player'
+        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.keller_tv_cast
-        type: 'custom:mini-media-player'
-    icon: 'mdi:washing-machine'
+        type: "custom:mini-media-player"
+    icon: "mdi:washing-machine"
     path: keller
     title: Keller
   - badges: []
@@ -346,7 +339,7 @@ views:
               entity_id: media_player.wohnzimmer_tv
         name: Wohnzimmer TV
         remote_template: mibox
-        type: 'custom:generic-remote-control-card'
+        type: "custom:generic-remote-control-card"
       - buttons:
           back:
             call: androidtv.adb_command
@@ -400,14 +393,14 @@ views:
               entity_id: media_player.keller_tv
         name: Keller TV
         remote_template: mibox
-        type: 'custom:generic-remote-control-card'
-    icon: 'mdi:remote-tv'
+        type: "custom:generic-remote-control-card"
+    icon: "mdi:remote-tv"
     panel: true
     path: remote
     title: remote
   - path: router
     title: Frtizbox
-    icon: 'mdi:router-wireless'
+    icon: "mdi:router-wireless"
     badges: []
     cards:
       - entity: switch.adguard_protection
@@ -447,11 +440,11 @@ views:
         type: entities
   - title: RaspberryPi
     path: raspberrypi
-    icon: 'mdi:raspberry-pi'
+    icon: "mdi:raspberry-pi"
     badges: []
     cards:
       - entity: climate.rpi_cooling_fan_controller
-        type: 'custom:simple-thermostat'
+        type: "custom:simple-thermostat"
       - type: entities
         entities:
           - entity: switch.rpi_cooling_fan
@@ -461,7 +454,15 @@ views:
       - type: sensor
         entity: sensor.processor_temperature
         graph: line
-        icon: 'mdi:cpu-64-bit'
+        icon: "mdi:cpu-64-bit"
       - type: sensor
         entity: sensor.memory_use_percent
         graph: line
+      - type: entities
+        entities:
+          - sensor.germany_coronavirus_deaths
+          - sensor.germany_coronavirus_current
+          - sensor.germany_coronavirus_confirmed
+          - sensor.germany_coronavirus_recovered
+        show_header_toggle: false
+        title: Coronavirus Deutschland

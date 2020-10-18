@@ -667,8 +667,8 @@
       - platform: state
         entity_id:
           - device_tracker.tv
-        from: 'not_home'
-        to: 'home'
+        from: 'home'
+        to: 'not_home'
     action:
       - service: climate.set_hvac_mode
         data:
@@ -2353,8 +2353,22 @@
         entity_id: 
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
-        data:
-          message: 'Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch! Bitte lüften.'
+        data_template:
+          message: >
+            Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im
+            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+            Gästezimmer, 
+            {% endif %}
+            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+            Wohnzimmer,
+            {% endif %}
+            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+            Schlafzimmer,
+            {% endif %}
+            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+            Bad
+            {% endif %}
+            Bitte lüften.
       - service: media_player.volume_set
         data:
           volume_level: 0.3
