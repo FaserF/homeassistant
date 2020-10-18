@@ -360,6 +360,10 @@ sensor:
     from: !secret sbahn_home
     to: !secret nessie_work
     only_direct: true
+  - platform: deutsche_bahn
+    from: georg_brauchle_ring
+    to: !secret sbahn_home
+    only_direct: true
   - platform: template
     sensors:
       fsphone_battery:
@@ -430,7 +434,7 @@ light:
         mode: rgb
 
 no_ip:
-  domain: smartlife.ddns.net
+  domain: !secret domain
   username: !secret noip_username
   password: !secret noip_pw
 
@@ -440,19 +444,24 @@ homekit:
       - automation
       - script
       - sensor
+      - climate
     exclude_entity_globs:
       - sensor.dark_sky*
       - device_tracker.google_maps*
       - device_tracker.*mi_9t*
       - device_tracker.*note_9_pro*
-      - device_tracker.fabiantablet*
+      - device_tracker.*tablet*
+      - device_tracker.*iPad*
       - media_player.*_cast
       - switch.*_shutdown
+      - sensor.*_open_window
+      - binary_sensor.thermostat_*_window_open
+      - binary_sensor.thermostat_*_locked
+      - binary_sensor.thermostat_*_low_battery
     exclude_entities:
       - binary_sensor.updater
       - device_tracker.flophone
       - device_tracker.maxiphone
-      - device_tracker.nessie_iphone6
       - device_tracker.fabianhackbook
       - input_boolean.silent_mode
       - media_player.mini_gruppe
@@ -637,16 +646,6 @@ tts:
     service_name: google_say
     language: "de"
     base_url: !secret baseurl
-
-#panel_iframe:
-#tasmoadmin:
-#  title: TasmoAdmin
-#  icon: mdi:lightbulb-on
-#  url: http://smartlife.ddns.net:8124
-#fritzbox:
-#  title: FritzBox
-#  icon: mdi:router-wireless
-#  url: https://smartlife.ddns.net:32270
 
 input_select:
   washing_machine_status:
