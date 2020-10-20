@@ -361,31 +361,9 @@ sensor:
     to: !secret nessie_work
     only_direct: true
   - platform: deutsche_bahn
-    from: georg_brauchle_ring
+    from: Westkreuz
     to: !secret sbahn_home
     only_direct: true
-  - platform: template
-    sensors:
-      fsphone_battery:
-        friendly_name: "Fabi-Phone"
-        value_template: "{{states.device_tracker.google_maps_112174659110860535869.attributes.battery_level | round}}"
-        unit_of_measurement: "%"
-  - platform: template
-    sensors:
-      vkphone_battery:
-        friendly_name: "Nessie-Phone"
-        value_template: "{{states.device_tracker.google_maps_112056758146194246561.attributes.battery_level | round}}"
-        unit_of_measurement: "%"
-  - platform: template
-    sensors:
-      fsphone_charging:
-        friendly_name: "Fabi Charging"
-        value_template: "not_charging"
-  - platform: template
-    sensors:
-      vkphone_charging:
-        friendly_name: "Nessie Charging"
-        value_template: "not_charging"
   - platform: template
     sensors:
       fs_smspin:

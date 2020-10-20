@@ -41,15 +41,11 @@ views:
   - badges:
       - entity: person.fabian
       - entity: person.nessie
-      - entity: sensor.fsphone_battery
-      - entity: sensor.vkphone_battery
+      - entity: sensor.mi_9t_battery_level
+      - entity: sensor.redmi_note_9_pro_battery_level
       - entity: sensor.ipad_battery_level
       - entity: sensor.fs_smspin
       - entity: sensor.washing_machine_state
-      - entity: sensor.wohnzimmer_humidity
-      - entity: sensor.gastezimmer_humidity
-      - entity: sensor.schlafzimmer_humidity
-      - entity: sensor.bad_humidity
       - entity: sensor.bett_energy_today
       - entity: sensor.bett_energy_power
       - entity: sensor.fabian_strom_energy_today
@@ -64,10 +60,6 @@ views:
           - switch.deckenlampe
           - switch.regal_leds
           - switch.bett_gluhbirne
-          - entity: light.keller_gluhbirne
-            group: true
-            toggle: true
-            type: "custom:slider-entity-row"
           - entity: light.lampe_gastezimmer
             group: true
             toggle: true
@@ -89,6 +81,10 @@ views:
             toggle: true
             type: "custom:slider-entity-row"
           - entity: light.yeelight_color1_34ce008bcc9d
+            group: true
+            toggle: true
+            type: "custom:slider-entity-row"
+          - entity: light.keller_gluhbirne
             group: true
             toggle: true
             type: "custom:slider-entity-row"
@@ -117,14 +113,10 @@ views:
         title: PC & mehr
         type: entities
       - entity: climate.wohnzimmer
-        sensors:
-          - sensor.wohnzimmer_humidity
         type: "custom:simple-thermostat"
       - entity: climate.schlafzimmer
         type: "custom:simple-thermostat"
       - entity: climate.gastezimmer
-        sensors:
-          - sensor.gastezimmer_humidity
         type: "custom:simple-thermostat"
       - entity: climate.bad
         type: "custom:simple-thermostat"
@@ -146,6 +138,13 @@ views:
       - artwork: cover
         entity: media_player.keller_tv_cast
         type: "custom:mini-media-player"
+      - type: glance
+        entities:
+          - entity: sensor.wohnzimmer_humidity
+          - entity: sensor.schlafzimmer_humidity
+          - entity: sensor.gastezimmer_humidity
+          - entity: sensor.bad_humidity
+        title: Luftfeuchtigkeit
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: "custom:mini-media-player"
@@ -174,11 +173,12 @@ views:
         title: Licht & Strom
         type: entities
       - entities:
-          - switch.fabian_strom
-          - device_tracker.fabianpc
-          - switch.fabian_pc_shutdown
-          - sensor.fabian_strom_energy_today
-          - sensor.fabian_strom_energy_power
+          - entity: switch.fabian_strom
+          - entity: device_tracker.fabianpc
+          - entity: device_tracker.fabian_dock
+          - entity: switch.fabian_pc_shutdown
+          - entity: sensor.fabian_strom_energy_today
+          - entity: sensor.fabian_strom_energy_power
         show_header_toggle: true
         title: Fabian PC
         type: entities

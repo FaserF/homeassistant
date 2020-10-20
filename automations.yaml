@@ -366,49 +366,6 @@
           target: !secret telegram_chat_fabian
           message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
 
-  # - alias: 'Turn on thermostats if coming home'
-  # 
-  #   initial_state: on
-  #   trigger:
-  #     - platform: state
-  #       entity_id:
-  #         - device_tracker.google_maps_112174659110860535869
-  #       from: 'not_home'
-  #       to: 'home'
-  #     - platform: state
-  #       entity_id:
-  #         - device_tracker.google_maps_112056758146194246561
-  #       from: 'not_home'
-  #       to: 'home'
-  #   condition:
-  #     condition: and
-  #     conditions:
-  #     - condition: state
-  #       entity_id: sensor.fscharging
-  #       state: 'not_charging'
-  #     - condition: state
-  #       entity_id: sensor.vkcharging
-  #       state: 'not_charging'
-  #   action:
-  #     - service: climate.set_away_mode
-  #       data:
-  #         entity_id: climate.wohnzimmer1
-  #         away_mode: 'off'
-  #     - service: climate.set_away_mode
-  #       data:
-  #         entity_id: climate.wohnzimmer2
-  #         away_mode: 'off'
-  #     - service: climate.set_temperature
-  #       data:
-  #         entity_id: climate.wohnzimmer1
-  #         temperature: 20
-  #         operation_mode: Heat
-  #     - service: climate.set_temperature
-  #       data:
-  #         entity_id: climate.wohnzimmer2
-  #         temperature: 20
-  #         operation_mode: Heat
-
   - alias: 'Turn on tleds if fpc starts'
     initial_state: on
     trigger:
@@ -682,36 +639,50 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.fsphone_charging
-        from: 'charging'
-        to: 'not_charging'
+        entity_id: 
+        - sensor.ipad_battery_state
+        - sensor.mi_9t_battery_state
+        - sensor.redmi_note_9_pro_battery_state
+        to: 'discharging'
       - platform: state
-        entity_id: sensor.vkphone_charging
-        from: 'charging'
-        to: 'not_charging'
-      #- condition: state
-      #  entity_id: 'sensor.battery_state_ipad'
-      #  state: 'Not Charging'
-      #- condition: state
-      #  entity_id: 'sensor.battery_level_ipad'
-      #  state: '100'
+        entity_id: 
+        - sensor.ipad_battery_state
+        - sensor.mi_9t_battery_state
+        - sensor.redmi_note_9_pro_battery_state
+        to: 'Not Charging'
+      - platform: numeric_state
+        entity_id: 
+        - sensor.ipad_battery_level
+        - sensor.mi_9t_battery_level
+        - sensor.redmi_note_9_pro_battery_level
+        above: 90
     condition:
       condition: and
       conditions:
-      - condition: state
-        entity_id: 'sensor.fsphone_charging'
-        state: 'not_charging'
-      - condition: state
-        entity_id: 'sensor.vkphone_charging'
-        state: 'not_charging'
-      #- condition: or
-      #  conditions:
-      #  - condition: state
-      #    entity_id: 'sensor.battery_state_ipad'
-      #    state: 'Not Charging'
-      #  - condition: state
-      #    entity_id: 'sensor.battery_level_ipad'
-      #    state: '100'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: sensor.ipad_battery_state
+              state: 'discharging'
+            - condition: numeric_state
+              entity_id: sensor.ipad_battery_level
+              above: 90
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: sensor.mi_9t_battery_state
+              state: 'discharging'
+            - condition: numeric_state
+              entity_id: sensor.mi_9t_battery_level
+              above: 90
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: sensor.redmi_note_9_pro_battery_state
+              state: 'discharging'
+            - condition: numeric_state
+              entity_id: sensor.redmi_note_9_pro_battery_level
+              above: 90
     action:
       - service: switch.turn_off
         data:
@@ -807,11 +778,33 @@
             - condition: state
               entity_id: device_tracker.google_maps_112056758146194246561
               state: not_home
-
     action:
       - service: light.turn_on
         data:
           entity_id: group.schlafzimmer
+          brightness: 10
+      - delay: '00:00:20'
+      - service: light.turn_on
+        data:
+          entity_id: group.schlafzimmer
+          brightness_step: 20
+      - delay: '00:00:20'
+      - service: light.turn_on
+        data:
+          entity_id: group.schlafzimmer
+          brightness_step: 20
+      - delay: '00:00:20'
+      - service: automation.trigger
+        entity_id: automation.notify_for_high_humidity
+      - service: light.turn_on
+        data:
+          entity_id: group.schlafzimmer
+          brightness_step: 20
+      - delay: '00:00:20'
+      - service: light.turn_on
+        data:
+          entity_id: group.schlafzimmer
+          brightness_step: 170
 
   - alias: 'Remind for leaving wohnzimmer'
     initial_state: True
@@ -1455,7 +1448,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.vkphone_battery
+      entity_id: sensor.redmi_note_9_pro_battery_level
       below: 5
     action:
       - service: telegram_bot.send_message
@@ -1468,7 +1461,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.fsphone_battery
+      entity_id: sensor.mi_9t_battery_level
       below: 5
     action:
       - service: telegram_bot.send_message
@@ -1776,6 +1769,36 @@
         data:
           entity_id: media_player.gastezimmer_mini
           is_volume_muted: false
+
+  - alias: Low battery thermostats
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: 
+        - binary_sensor.thermostat_bad_low_battery
+        - binary_sensor.thermostat_wohnzimmer_low_battery
+        - binary_sensor.thermostat_gastezimmer_low_battery
+        - binary_sensor.thermostat_schlafzimmer_low_battery
+        from: 'off'
+        to: 'on'
+    action:
+      - service: notify.telegram_fabian
+        data_template:
+          message: > 
+            Die Batterie im Thermostat
+            {% if is_state('binary_sensor.thermostat_gastezimmer_low_battery', 'on') %}
+            Gästezimmer 
+            {% endif %}
+            {% if is_state('binary_sensor.thermostat_wohnzimmer_low_battery', 'on') %}
+            Wohnzimmer
+            {% endif %}
+            {% if is_state('binary_sensor.thermostat_schlafzimmer_low_battery', 'on') %}
+            Schlafzimmer
+            {% endif %}
+            {% if is_state('binary_sensor.thermostat_bad_low_battery', 'on') %}
+            Bad
+            {% endif %}
+            ist bald leer. Bitte auswechseln!
 
   - alias: Fritzbox Public IP Change
     initial_state: on
@@ -2140,13 +2163,10 @@
   - alias: Notify for high humidity
     trigger:
       - platform: numeric_state
-        entity_id: sensor.gastezimmer_humidity
-        above: 60
-      - platform: numeric_state
-        entity_id: sensor.wohnzimmer_humidity
-        above: 60
-      - platform: numeric_state
-        entity_id: sensor.schlafzimmer_humidity
+        entity_id: 
+          - sensor.gastezimmer_humidity
+          - sensor.wohnzimmer_humidity
+          - sensor.schlafzimmer_humidity
         above: 60
     condition:
       condition: and
@@ -2185,7 +2205,7 @@
       - service: rest_command.assistant_broadcast
         data_template:
           command: > 
-            Die Luftfeuchtigkeit ist zu hoch im
+            Die Luftfeuchtigkeit ist zu hoch im Raum
             {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
             Gästezimmer, 
             {% endif %}
@@ -3748,7 +3768,7 @@
     action:
       - service: notify.telegram_fabian
         data:
-          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.georg_brauchle_ring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.georg_brauchle_ring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
 
   - alias: 'Notify Fabian Nessie on way home ghome Berufsschule'
     initial_state: true
@@ -3781,7 +3801,7 @@
         - media_player.wohnzimmer_mini
         - media_player.schlafzimmer
         data_template:
-          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.georg_brauchle_ring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.georg_brauchle_ring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
+          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
   - alias: 'Telegram send weekly corona stats'
     initial_state: true

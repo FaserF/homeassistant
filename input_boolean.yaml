@@ -1,16 +1,16 @@
-  steckerleiste_keller:
-    name: Strom & Kühlschrank Keller
-    initial: off  
-    icon: mdi:power-plug
-  kuehlschrank_keller:
-    name: Kühlschrank Keller
-    initial: off  
-    icon: mdi:fridge
-  strom_keller:
-    name: Strom Keller
-    initial: off  
-    icon: mdi:tv
-  silent_mode:
-    name: Leiser Modus
-    initial: off  
-    icon: mdi:volume-low
+steckerleiste_keller:
+  name: Strom & Kühlschrank Keller
+  initial: off
+  icon: mdi:power-plug
+kuehlschrank_keller:
+  name: Kühlschrank Keller
+  initial: off
+  icon: mdi:fridge
+strom_keller:
+  name: Strom Keller
+  initial: off
+  icon: mdi:television-box
+silent_mode:
+  name: Leiser Modus
+  initial: off
+  icon: mdi:volume-low
