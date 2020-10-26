@@ -340,7 +340,7 @@ sensor:
   #- platform: emby_upcoming_media
   #  api_key: YOUR_EMBY_API_KEY
   #  user_id: YOUR_EMBY_USER_ID
-  #  host: stream.eidolf.de
+  #  host: !secret emby_host
   #  port: 8096
   #  ssl: True
   #  max: 5
