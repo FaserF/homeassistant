@@ -272,10 +272,21 @@ tado:
   username: !secret defaultmail
   password: !secret githubpass
 
-weather:
-  - platform: darksky
-    api_key: !secret darksky
-    name: Wetter darksky
+localtuya:
+  - host: 192.168.178.65
+    device_id: 581715448caab5efc26d
+    local_key: 961dc5b481cdea74
+    friendly_name: Bettlicht
+    protocol_version: "3.3"
+    entities:
+      - platform: light
+        friendly_name: Bettlicht
+        id: 1 # Usually 1 or 20
+
+#weather:
+#- platform: darksky
+#  api_key: !secret darksky
+#  name: Wetter darksky
 
 shell_command:
   #create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
@@ -308,13 +319,13 @@ rest_command:
     content_type: "application/json"
     payload: '{"command":"{{ command }}", "user":"username"}'
 
-coinbase:
-  api_key: !secret coinbase_key
-  api_secret: !secret coinbase_secret
-  account_balance_currencies:
-    - BTC
-  exchange_rate_currencies:
-    - BTC
+#coinbase:
+#  api_key: !secret coinbase_key
+#  api_secret: !secret coinbase_secret
+#  account_balance_currencies:
+#    - BTC
+#  exchange_rate_currencies:
+#    - BTC
 
 sensor:
   - platform: mqtt
@@ -498,17 +509,14 @@ google_assistant:
   report_state: true
   #api_key: !secret google_assistant_api
   exposed_domains:
-    - climate
     - switch
     - light
   expose_by_default: true
   entity_config:
     #Disabled Entitys
-    climate.gastezimmer:
-      expose: false
-    climate.wohnzimmer:
-      expose: false
     switch.schloss:
+      expose: false
+    switch.frei:
       expose: false
     switch.nessie_pc_shutdown:
       expose: false
@@ -516,25 +524,27 @@ google_assistant:
       expose: false
     light.keller_gluhbirne:
       expose: false
-    switch.fritzbox_guest_wifi:
+    switch.fritzbox_7530_guest_wifi:
       expose: false
-    switch.fritzbox_portforward_bitwarden:
+    switch.fritzbox_7530_portforward_bitwarden:
       expose: false
-    switch.fritzbox_portforward_bookstracks:
+    switch.fritzbox_7530_portforward_bookstracks:
       expose: false
-    switch.fritzbox_portforward_homeassistant:
+    switch.fritzbox_7530_portforward_homeassistant:
       expose: false
-    switch.fritzbox_portforward_http_server:
+    switch.fritzbox_7530_portforward_http_server:
       expose: false
-    switch.fritzbox_portforward_https_server:
+    switch.fritzbox_7530_portforward_https_server:
       expose: false
-    switch.fritzbox_portforward_ssh:
+    switch.fritzbox_7530_portforward_ssh:
       expose: false
-    switch.fritzbox_portforward_tasmoadmin:
+    switch.fritzbox_7530_portforward_tasmoadmin:
       expose: false
-    switch.fritzbox_wifi:
+    switch.fritzbox_7530_portforward_nginx_proxy:
       expose: false
-    switch.fritzbox_wifi_5ghz:
+    switch.fritzbox_7530_wifi:
+      expose: false
+    switch.fritzbox_7530_wifi_5ghz:
       expose: false
     switch.rpi_cooling_fan:
       expose: false
@@ -562,7 +572,7 @@ google_assistant:
       name: Licht Schalter
       expose: True
       room: Schlafzimmer
-    switch.bett_gluhbirne:
+    light.bett_gluhbirne:
       name: Bett Licht
       expose: true
       room: Schlafzimmer
@@ -570,9 +580,6 @@ google_assistant:
       expose: true
       room: Schlafzimmer
     light.yeelight_strip1_34ce008b1863:
-      expose: true
-      room: Schlafzimmer
-    climate.schlafzimmer:
       expose: true
       room: Schlafzimmer
     ##Gästezimmer
@@ -608,10 +615,6 @@ google_assistant:
     switch.waschmaschine:
       expose: true
       room: Keller
-    climate.bad:
-      name: Badezimmer
-      expose: true
-      room: Bad
 
 google:
   client_id: !secret google_calendar_client_id

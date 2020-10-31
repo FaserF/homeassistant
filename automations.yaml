@@ -19,7 +19,7 @@
       condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.google_maps_1121746591108605358l69
+          entity_id: device_tracker.google_maps_112174659110860535869
           state: home
         - condition: state
           entity_id: device_tracker.google_maps_112056758146194246561
@@ -466,6 +466,15 @@
         entity_id: device_tracker.fabian_dock
         from: 'home'
         to: 'not_home'
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.fabianpc
+        state: 'not_home'
+      - condition: state
+        entity_id: device_tracker.fabian_dock
+        state: 'not_home'
     action:
       - service: light.turn_off
         data:
@@ -543,6 +552,15 @@
         to: 'not_home'
         for:
             minutes: 1
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.fabianpc
+        state: 'not_home'
+      - condition: state
+        entity_id: device_tracker.fabian_dock
+        state: 'not_home'
     action:
       - service: light.turn_off
         data:
@@ -564,14 +582,14 @@
         for:
             minutes: 5
     condition:
-      condition: not
+      condition: and
       conditions:
-        - condition: state
-          entity_id: device_tracker.fabianpc
-          state: home
-        - condition: state
-          entity_id: device_tracker.fabian_dock
-          state: home
+      - condition: state
+        entity_id: device_tracker.fabianpc
+        state: 'not_home'
+      - condition: state
+        entity_id: device_tracker.fabian_dock
+        state: 'not_home'
     action:
       - service: switch.turn_off
         data:
@@ -648,20 +666,20 @@
       - platform: state
         entity_id: 
         - sensor.ipad_battery_state
-        - sensor.mi_9t_battery_state
-        - sensor.redmi_note_9_pro_battery_state
+        - sensor.fabianphone_battery_state
+        - sensor.nessiephone_battery_state
         to: 'discharging'
       - platform: state
         entity_id: 
         - sensor.ipad_battery_state
-        - sensor.mi_9t_battery_state
-        - sensor.redmi_note_9_pro_battery_state
+        - sensor.fabianphone_battery_state
+        - sensor.nessiephone_battery_state
         to: 'Not Charging'
       - platform: numeric_state
         entity_id: 
         - sensor.ipad_battery_level
-        - sensor.mi_9t_battery_level
-        - sensor.redmi_note_9_pro_battery_level
+        - sensor.fabianphone_battery_level
+        - sensor.nessiephone_battery_level
         above: 90
     condition:
       condition: and
@@ -677,18 +695,18 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: sensor.mi_9t_battery_state
+              entity_id: sensor.fabianphone_battery_state
               state: 'discharging'
             - condition: numeric_state
-              entity_id: sensor.mi_9t_battery_level
+              entity_id: sensor.fabianphone_battery_level
               above: 90
         - condition: or
           conditions:
             - condition: state
-              entity_id: sensor.redmi_note_9_pro_battery_state
+              entity_id: sensor.nessiephone_battery_state
               state: 'discharging'
             - condition: numeric_state
-              entity_id: sensor.redmi_note_9_pro_battery_level
+              entity_id: sensor.nessiephone_battery_level
               above: 90
     action:
       - service: switch.turn_off
@@ -756,9 +774,18 @@
       conditions:
       - condition: time
         after: '05:00:00'
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
       - condition: sun
         before: sunrise
         before_offset: "1:00:00"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_morning.attributes.last_triggered) | int > 1800 }}"
       - condition: or
         conditions:
           - condition: and
@@ -775,7 +802,7 @@
               entity_id: device_tracker.nessiephone
               state: home
             - condition: template
-              value_template: "{{ states.device_tracker.google_maps_1121746591108605358l69.state != 'home' }}"
+              value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
           - condition: and
             conditions:
             - condition: state
@@ -1473,7 +1500,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.redmi_note_9_pro_battery_level
+      entity_id: sensor.nessiephone_battery_level
       below: 5
     action:
       - service: telegram_bot.send_message
@@ -1486,7 +1513,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.mi_9t_battery_level
+      entity_id: sensor.fabianphone_battery_level
       below: 5
     action:
       - service: telegram_bot.send_message
@@ -2796,7 +2823,7 @@
         data:
           data:
             tag: 'notification-about-sensor'
-      - service: notify.mobile_app_redmi_note_9_pro
+      - service: notify.mobile_app_nessiephone
         data_template:
           title: "Zeit off zu gehen"
           message: "Es ist 22 Uhr."
@@ -2837,7 +2864,7 @@
         data:
           data:
             tag: 'notification-about-sensor'
-      - service: notify.mobile_app_mi_9t
+      - service: notify.mobile_app_fabianphone
         data_template:
           title: "Zeit off zu gehen"
           message: "Es ist 22 Uhr."
@@ -2871,7 +2898,7 @@
             {% set state = 'off' %}
             {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
     action:
-      - service: notify.mobile_app_mi_9t
+      - service: notify.mobile_app_fabianphone
         data_template:
           title: "Flugmodus"
           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -3899,48 +3926,19 @@
       event_data:
         command: '/weather'
     action:
-      - service: telegram_bot.send_photo
-        data_template:
-          target: '{{ trigger.event.data.user_id }}'
-          disable_notification: true
-          file: '/home/homeassistant/.homeassistant/www/climacons/{{ states.sensor.dark_sky_icon.state }}.png'
-          caption: '{{ states.sensor.dark_sky_summary.state }}'
       - service: telegram_bot.send_message
         data_template:
           target: '{{ trigger.event.data.user_id }}'
           disable_notification: true
           message: >
             Wettervorhersage für heute
-            {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.condition }}
+            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition']}}
 
-            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }}*
+            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C*
 
-            {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.templow }} {{ '\u21F5' }} {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.temperature }}
+            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
             
-            Niederschlag: {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.precipitation }}, Wahrscheinlichkeit: {{ states.weather.dwd_weather_ebersberg_halbing.attributes.forecast.precipitation_probability }}
-
-  - alias: 'Telegram send weekly weather forecast'
-    initial_state: true
-    trigger:
-      platform: time
-      at: '06:20:00'
-    condition:
-      - condition: time
-        weekday:
-          - mon
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          disable_notification: false
-          message: "Wettervorhersage für diese Woche: 
-          {{ states.sensor.dark_sky_daily_summary.state }}"
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_nessie
-          disable_notification: false
-          message: "Wettervorhersage für diese Woche: 
-          {{ states.sensor.dark_sky_daily_summary.state }}"
+            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
   - alias: 'Telegram send daily weather forecast fabian'
     initial_state: true
@@ -3964,19 +3962,13 @@
           disable_notification: true
           message: >
             Wettervorhersage für heute
-            {{ states.sensor.dark_sky_hourly_summary.state }}
+            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition']}}
 
-            *Momentan {{ states.sensor.dark_sky_temperature.state_with_unit }}*
+            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C*
 
-            {{ states.sensor.dark_sky_overnight_low_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_temperature_0d.state_with_unit }}
-
-            {{ states.sensor.dark_sky_overnight_low_apparent_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_apparent_temperature_0d.state_with_unit }} (gefühlt)
-
-            Regen: {{ states.sensor.dark_sky_precip_probability.state_with_unit }}, {{ states.sensor.dark_sky_precip_intensity.state_with_unit }}
-            {% if not is_state('sensor.dark_sky_precip', 'unknown') %}
-
-            Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
-            {% endif %}
+            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
+            
+            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
   - alias: 'Telegram send daily weather forecast nessie'
     initial_state: true
@@ -4000,19 +3992,13 @@
           disable_notification: true
           message: >
             Wettervorhersage für heute
-            {{ states.sensor.dark_sky_hourly_summary.state }}
+            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition']}}
 
-            *Momentan {{ states.sensor.dark_sky_temperature.state_with_unit }}*
+            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C*
 
-            {{ states.sensor.dark_sky_overnight_low_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_temperature_0d.state_with_unit }}
-
-            {{ states.sensor.dark_sky_overnight_low_apparent_temperature_0d.state_with_unit }} {{ '\u21F5' }} {{ states.sensor.dark_sky_daytime_high_apparent_temperature_0d.state_with_unit }} (gefühlt)
-
-            Regen: {{ states.sensor.dark_sky_precip_probability.state_with_unit }}, {{ states.sensor.dark_sky_precip_intensity.state_with_unit }}
-            {% if not is_state('sensor.dark_sky_precip', 'unknown') %}
-
-            Art des Niederschlags: {{ states.sensor.dark_sky_precip.state }}
-            {% endif %}
+            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
+            
+            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
   - alias: 'remind for jek'
     initial_state: True
