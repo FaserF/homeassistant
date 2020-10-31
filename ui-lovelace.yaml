@@ -261,7 +261,7 @@ views:
     icon: "mdi:desktop-tower"
     path: gastezimmer
     title: Gästezimmer
-  - badges: null
+  - badges: []
     cards:
       - entities:
           - entity: light.keller_gluhbirne
@@ -418,7 +418,6 @@ views:
           action: more-info
         show_icon: true
         show_name: true
-        show_state: false
         tap_action:
           action: toggle
         type: button
@@ -427,7 +426,6 @@ views:
           action: more-info
         show_icon: true
         show_name: true
-        show_state: true
         tap_action:
           action: toggle
         type: button

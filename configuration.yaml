@@ -283,11 +283,6 @@ localtuya:
         friendly_name: Bettlicht
         id: 1 # Usually 1 or 20
 
-#weather:
-#- platform: darksky
-#  api_key: !secret darksky
-#  name: Wetter darksky
-
 shell_command:
   #create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
@@ -387,30 +382,6 @@ sensor:
         value_template: "unbekannter"
   - platform: dwd_weather_warnings
     region_name: !secret dwd_cell_id
-  - platform: darksky
-    api_key: !secret darksky
-    scan_interval:
-      minutes: 5
-    language: "de"
-    forecast:
-      - 0
-      - 1
-      - 2
-      - 3
-    monitored_conditions:
-      - summary
-      - hourly_summary
-      - daily_summary
-      - icon
-      - temperature
-      - temperature_high
-      - temperature_low
-      - apparent_temperature_high
-      - apparent_temperature_low
-      - precip_probability
-      - precip_intensity
-      - precip_type
-      - uv_index
 
 light:
   #MagicHue LEDs
