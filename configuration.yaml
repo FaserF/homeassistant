@@ -252,6 +252,8 @@ media_player:
       "com.liskovsoft.videomanager":
         - "playing":
             "media_session_state": 3
+  - platform: vlc
+    #arguments: "--alsa-audio-device=hw:0,0"
 
 #speedtestdotnet:
 #  server_id: 21514
