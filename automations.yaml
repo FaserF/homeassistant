@@ -2230,6 +2230,9 @@
         - condition: state
           entity_id: 'input_boolean.silent_mode'
           state: 'off'
+        - condition: state
+          entity_id: device_tracker.fabian_dock
+          state: 'not_home'
         - condition: template
           value_template: "{{ states.automation.notify_for_high_humidity.attributes.last_triggered != 'null' }}"
         - condition: template
