@@ -27,8 +27,8 @@ homeassistant:
   time_zone: Europe/Berlin
   # Customization file
   customize: !include customize.yaml
-  allowlist_external_dirs:
-    - "/share/scripts"
+  #allowlist_external_dirs:
+  #  - "/share/scripts"
 
 zone:
   # This will override the default home zone

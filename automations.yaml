@@ -1186,6 +1186,8 @@
         after: '03:10:00'
         before: '03:00:00'
     action:
+      - service: shell_command.mountusb_backup
+      - service: shell_command.mountusb_share
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -3549,8 +3551,10 @@
   - alias: "Notify Fabi on sbahn delay Home -> Work"
     initial_state: on
     trigger:
-      - platform: template
-        value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 5 }}"
+      - platform: numeric_state
+        entity_id: 'sensor.zorneding_to_leuchtenbergring'
+        attribute: delay
+        above: 5
     condition:
       condition: and
       conditions:
@@ -3558,7 +3562,7 @@
           entity_id: device_tracker.fabianphone
           state: home
         - condition: template
-          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.last_seen)) > 3600 }}"
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.last_seen)) < 3600 }}"
         - condition: time
           after: '06:30:00'
           before: '07:10:00'
@@ -3581,8 +3585,10 @@
   - alias: "Notify on Sbahn delay Work -> Home"
     initial_state: on
     trigger:
-      - platform: template
-        value_template: "{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay | int > 3 }}"
+      - platform: numeric_state
+        entity_id: 'sensor.starnberg_nord_to_zorneding'
+        attribute: delay
+        above: 3
     condition:
       condition: and
       conditions:
@@ -3611,8 +3617,10 @@
         from: 'Arbeit Nessie'
         to: 'not_home'
     condition:
-      - condition: template
-        value_template: "{{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay | int > 3 }}"
+      - condition: numeric_state
+        entity_id: 'sensor.leuchtenbergring_to_zorneding'
+        attribute: delay
+        above: 3
     action:
       - service: notify.telegram_nessie
         data:
