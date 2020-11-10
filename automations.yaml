@@ -2,15 +2,13 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'home'
         to: 'not_home'
         for:
           minutes: 1
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'home'
         to: 'not_home'
         for:
@@ -19,16 +17,10 @@
       condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.google_maps_112174659110860535869
+          entity_id: person.fabian
           state: home
         - condition: state
-          entity_id: device_tracker.google_maps_112056758146194246561
-          state: home
-        - condition: state
-          entity_id: device_tracker.fabianphone
-          state: home
-        - condition: state
-          entity_id: device_tracker.nessiephone
+          entity_id: person.nessie
           state: home
     action:
       - service: light.turn_off
@@ -48,10 +40,7 @@
           entity_id: switch.deckenlampe
       - service: switch.turn_off
         data:
-          entity_id: switch.regal_leds
-      - service: switch.turn_off
-        data:
-          entity_id: switch.ventilator
+          entity_id: switch.schreibtisch
       # - service: climate.set_away_mode
       #   data:
       #     entity_id: climate.wohnzimmer
@@ -83,24 +72,13 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'home'
         to: 'not_home'
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'home'
         to: 'not_home'
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: device_tracker.fabianphone
-          state: not_home
-        - condition: state
-          entity_id: device_tracker.nessiephone
-          state: not_home
     action:
       - service: switch.turn_off
         data: 
@@ -109,33 +87,52 @@
         data: 
           entity_id: switch.fritzbox_portforward_ssh
 
+  - alias: 'Turn on 5ghz wifi and ssh off if coming home'
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: person.fabian
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id: person.nessie
+        from: 'not_home'
+        to: 'home'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.fritzbox_wifi_5ghz
+      - service: switch.turn_off
+        data: 
+          entity_id: switch.fritzbox_portforward_ssh
+
   - alias: 'Turn off fabian pc if nobody is at home'
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'home'
         to: 'not_home'
         for:
           minutes: 2
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'home'
         to: 'not_home'
         for:
           minutes: 2
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: person.fabian
+          state: home
+        - condition: state
+          entity_id: person.nessie
+          state: home
         - condition: state
           entity_id: device_tracker.fabianpc
-          state: home
+          state: not_home
     action:
       - service: notify.telegram_fabian
         data:
@@ -148,29 +145,29 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'home'
         to: 'not_home'
         for:
           minutes: 2
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'home'
         to: 'not_home'
         for:
           minutes: 2
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: person.fabian
+          state: home
+        - condition: state
+          entity_id: person.nessie
+          state: home
         - condition: state
           entity_id: device_tracker.nessiepc
-          state: home
+          state: not_home
     action:
       - service: notify.telegram_fabian
         data:
@@ -196,25 +193,29 @@
         for:
           minutes: 2
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'home'
         to: 'not_home'
+        for:
+          minutes: 2
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'home'
         to: 'not_home'
+        for:
+          minutes: 2
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: person.fabian
+          state: home
+        - condition: state
+          entity_id: person.nessie
+          state: home
         - condition: state
           entity_id: device_tracker.nessiepc
-          state: 'not_home'
+          state: home
           for:
             minutes: 2
     action:
@@ -234,24 +235,29 @@
           minutes: 2
       - platform: state
         entity_id:
-          - device_tracker.google_maps_112174659110860535869
+          - device_tracker.nessiepc
         from: 'home'
         to: 'not_home'
+        for:
+          minutes: 2
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.fabian
         from: 'home'
         to: 'not_home'
+        for:
+          minutes: 2
     condition:
-      condition: and
+      condition: not
       conditions:
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: state
+          entity_id: person.fabian
+          state: home
+        - condition: state
+          entity_id: person.nessie
+          state: home
         - condition: state
           entity_id: device_tracker.fabianpc
-          state: 'not_home'
+          state: home
           for:
             minutes: 2
     action:
@@ -259,66 +265,31 @@
         data:
           entity_id: switch.fabian_strom
 
-  - alias: 'Turn on ventilator if coming home'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
-        from: 'not_home'
-        to: 'home'
-      - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
-        from: 'not_home'
-        to: 'home'
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ states.sensor.openweather_temperature.temperature >= '22' }}"
-        - condition: time
-          after: '12:00:00'
-          before: '21:00:00'
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.ventilator
-
-  - alias: 'Turn on 5ghz wifi and ssh off if coming home'
-    initial_state: true
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
-        from: 'not_home'
-        to: 'home'
-      - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
-        from: 'not_home'
-        to: 'home'
-      - platform: state
-        entity_id:
-          - device_tracker.nessiephone
-        from: 'not_home'
-        to: 'home'
-        for:
-          minutes: 1
-      - platform: state
-        entity_id:
-          - device_tracker.fabianphone
-        from: 'not_home'
-        to: 'home'
-        for:
-          minutes: 1
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.fritzbox_wifi_5ghz
-      - service: switch.turn_off
-        data: 
-          entity_id: switch.fritzbox_portforward_ssh
+#  - alias: 'Turn on ventilator if coming home'
+#    initial_state: on
+#    trigger:
+#      - platform: state
+#        entity_id: person.fabian
+#        from: 'not_home'
+#        to: 'home'
+#      - platform: state
+#        entity_id: person.nessie
+#        from: 'not_home'
+#        to: 'home'
+#    condition:
+#      condition: and
+#      conditions:
+#        - condition: numeric_state
+#          entity_id: 'weather.dwd_weather_ebersberg_halbing'
+#          attribute: temperature
+#          above: 22
+#        - condition: time
+#          after: '12:00:00'
+#          before: '21:00:00'
+#    action:
+#      - service: switch.turn_on
+#        data:
+#          entity_id: switch.ventilator
 
   - alias: 'Turn off light at night - notify'
     initial_state: true
@@ -391,9 +362,7 @@
       - service: light.turn_on
         data:
           entity_id: light.leds_tisch
-      - service: switch.turn_on
-        data:
-          entity_id: switch.regal_leds
+          brightness: 255
           
   - alias: 'Turn on climate if fpc starts'
     initial_state: on
@@ -479,9 +448,6 @@
       - service: light.turn_off
         data:
           entity_id: light.leds_tisch
-      - service: switch.turn_off
-        data:
-          entity_id: switch.regal_leds
       - service: climate.set_hvac_mode
         data:
           entity_id: climate.schlafzimmer
@@ -893,6 +859,14 @@
             {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+      - service: tts.google_say
+        entity_id: media_player.mpd
+        data_template: 
+          message: >
+            Es ist 
+            {{ now().hour }} Uhr {{ now().minute }} .
+            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
+            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
   - alias: 'Remind for leaving schlafzimmer'
     initial_state: True
@@ -974,22 +948,13 @@
     initial_state: on
     trigger:
       platform: state
-      entity_id:
-        - device_tracker.tv
+      entity_id: device_tracker.tv
       from: 'home'
       to: 'not_home'
     condition:
       - condition: time
-        after: '21:15:00'
+        after: '21:00:00'
         before: '23:50:00'
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: device_tracker.google_maps_104418453164779945782
-            state: not_home
-          - condition: state
-            entity_id: device_tracker.google_maps_103127589611220223167
-            state: not_home
     action:
       - service: light.turn_on
         data:
@@ -1044,9 +1009,7 @@
       - service: light.turn_on
         data:
           entity_id: light.leds_tisch
-      - service: switch.turn_on
-        data:
-          entity_id: switch.regal_leds
+          brightness: 255
 
   - alias: 'Turn on lights in guest room room when sun set'
     initial_state: on
@@ -2122,18 +2085,9 @@
           entity_id: light.leds_tisch
           state: 'on'
         - condition: state
-          entity_id: switch.regal_leds
-          state: 'on'
-        - condition: state
-          entity_id: switch.bett_gluhbirne
+          entity_id: light.bett_gluhbirne
           state: 'on'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.regal_leds
-      - service: switch.turn_off
-        data:
-          entity_id: switch.bett_gluhbirne
       - service: switch.turn_off
         data:
           entity_id: switch.lichtschalter
@@ -2153,10 +2107,10 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: switch.regal_leds
+              entity_id: light.bett_gluhbirne
               state: 'off'
             - condition: state
-              entity_id: switch.regal_leds
+              entity_id: light.bett_gluhbirne
               state: 'unavailable'
         - condition: or
           conditions:
@@ -2178,9 +2132,7 @@
       - service: light.turn_on
         data:
           entity_id: group.schlafzimmer
-      - service: switch.turn_on
-        data:
-          entity_id: switch.regal_leds
+          brightness: 255
           
   - alias: Lichtschalter Button double press Off
     initial_state: on
@@ -2248,12 +2200,6 @@
             entity_id: device_tracker.nessiephone
             state: home
     action:
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.7
-          entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
       - service: media_player.media_pause
         data: 
           entity_id: media_player.wohnzimmer_tv
@@ -2275,12 +2221,24 @@
             {% endif %}
             Bitte lüften.
           user: "homeassistant"
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
+      - service: tts.google_say
+        entity_id: media_player.mpd
+        data_template: 
+          message: >
+            Die Luftfeuchtigkeit ist zu hoch im Raum
+            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+            Gästezimmer, 
+            {% endif %}
+            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+            Wohnzimmer,
+            {% endif %}
+            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+            Schlafzimmer,
+            {% endif %}
+            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+            Bad,
+            {% endif %}
+            Bitte lüften.
 
   - alias: Notify for extreme high humidity
     trigger:
@@ -3087,7 +3045,7 @@
         - condition: template
           value_template: "{{ states.automation.telegram_pill_marked_done.attributes.last_triggered != 'null' }}"
         - condition: state
-          entity_id: device_tracker.google_maps_112056758146194246561
+          entity_id: person.nessie
           state: home
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 10800 }}"
@@ -3292,7 +3250,7 @@
           Last system reboot was on {{ states('sensor.last_boot') }}."
 
   - alias: 'Tägliche Essensvorschläge'
-    initial_state: on
+    initial_state: off
     trigger:
       platform: time
       at: '16:00:00'
@@ -3476,6 +3434,12 @@
     - service: input_boolean.turn_off
       data:
         entity_id:  input_boolean.steckerleiste_keller
+    - service: input_boolean.turn_off
+      data:
+        entity_id:  input_boolean.strom_keller
+    - service: input_boolean.turn_off
+      data:
+        entity_id:  input_boolean.kuehlschrank_keller
 
   - alias: Turn off fridge
     initial_state: on

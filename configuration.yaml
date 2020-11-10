@@ -252,8 +252,8 @@ media_player:
       "com.liskovsoft.videomanager":
         - "playing":
             "media_session_state": 3
-  - platform: vlc
-    #arguments: "--alsa-audio-device=hw:0,0"
+  - platform: mpd
+    host: 127.0.0.1
 
 #speedtestdotnet:
 #  server_id: 21514
@@ -401,19 +401,17 @@ homekit:
       - script
       - sensor
       - climate
+      - binary_sensor
     exclude_entity_globs:
-      - sensor.dark_sky*
       - device_tracker.google_maps*
-      - device_tracker.*mi_9t*
-      - device_tracker.*note_9_pro*
+      - device_tracker.*iPhone*
+      - device_tracker.*9_pro*
       - device_tracker.*tablet*
       - device_tracker.*iPad*
       - media_player.*_cast
       - switch.*_shutdown
       - sensor.*_open_window
-      - binary_sensor.thermostat_*_window_open
-      - binary_sensor.thermostat_*_locked
-      - binary_sensor.thermostat_*_low_battery
+      - switch.fritzbox_*
     exclude_entities:
       - binary_sensor.updater
       - device_tracker.flophone
@@ -435,6 +433,8 @@ homekit:
       - switch.fritzbox_portforward_tasmoadmin
       - switch.fritzbox_wifi
       - switch.fritzbox_wifi_5ghz
+      - media_player.mpd
+      - switch.frei
 
 mqtt:
   broker: core-mosquitto
