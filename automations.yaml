@@ -72,20 +72,33 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: person.fabian
+        entity_id: device_tracker.fabianphone
         from: 'home'
         to: 'not_home'
+        for:
+          minutes: 2
       - platform: state
-        entity_id: person.nessie
+        entity_id: device_tracker.nessiephone
         from: 'home'
         to: 'not_home'
+        for:
+          minutes: 2
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: device_tracker.fabianphone
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.nessiephone
+          state: not_home
     action:
       - service: switch.turn_off
         data: 
-          entity_id: switch.fritzbox_wifi_5ghz
+          entity_id: switch.fritzbox_7530_wifi_5ghz
       - service: switch.turn_on
         data: 
-          entity_id: switch.fritzbox_portforward_ssh
+          entity_id: switch.fritzbox_7530_portforward_ssh
 
   - alias: 'Turn on 5ghz wifi and ssh off if coming home'
     initial_state: true
@@ -101,10 +114,10 @@
     action:
       - service: switch.turn_on
         data:
-          entity_id: switch.fritzbox_wifi_5ghz
+          entity_id: switch.fritzbox_7530_wifi_5ghz
       - service: switch.turn_off
         data: 
-          entity_id: switch.fritzbox_portforward_ssh
+          entity_id: switch.fritzbox_7530_portforward_ssh
 
   - alias: 'Turn off fabian pc if nobody is at home'
     initial_state: on
@@ -337,7 +350,7 @@
           target: !secret telegram_chat_fabian
           message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
 
-  - alias: 'Turn on tleds if fpc starts'
+  - alias: 'Turn on light if fpc starts'
     initial_state: on
     trigger:
       - platform: state
@@ -349,15 +362,27 @@
         from: 'not_home'
         to: 'home'
     condition:
-      condition: and
+      condition: or
       conditions:
-      - condition: time
-        before: '23:59:00'
-      - condition: sun
-        after: sunset
-      - condition: state
-        entity_id: device_tracker.tv
-        state: 'not_home'
+        - condition: and
+          conditions:
+            - condition: sun
+              after: sunrise
+              before: sunset
+            - condition: state
+              entity_id: device_tracker.tv
+              state: 'not_home'
+        - condition: and
+          conditions:
+            - condition: sun
+              after: sunset
+              after_offset: "-02:30:00"
+            - condition: state
+              entity_id: weather.dwd_weather_ebersberg_halbing
+              state: 'cloudy'
+            - condition: state
+              entity_id: device_tracker.tv
+              state: 'not_home'
     action:
       - service: light.turn_on
         data:
@@ -431,10 +456,14 @@
         entity_id: device_tracker.fabianpc
         from: 'home'
         to: 'not_home'
+        for:
+            minutes: 1
       - platform: state
         entity_id: device_tracker.fabian_dock
         from: 'home'
         to: 'not_home'
+        for:
+            minutes: 1
     condition:
       condition: and
       conditions:
@@ -462,12 +491,23 @@
         from: 'not_home'
         to: 'home'
     condition:
-      condition: and
+      condition: or
       conditions:
-      - condition: time
-        before: '23:59:00'
-      - condition: sun
-        after: sunset
+        - condition: and
+          conditions:
+            - condition: sun
+              after: sunrise
+              before: sunset
+            - condition: sun
+              after: sunset
+        - condition: and
+          conditions:
+            - condition: sun
+              after: sunset
+              after_offset: "-02:30:00"
+            - condition: state
+              entity_id: weather.dwd_weather_ebersberg_halbing
+              state: 'cloudy'
     action:
       - service: light.turn_on
         data:
@@ -502,35 +542,6 @@
       - service: switch.turn_off
         data:
           entity_id: switch.nessie_pc
-
-  - alias: 'Turn off tleds if fpc stops'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: device_tracker.fabianpc
-        from: 'home'
-        to: 'not_home'
-        for:
-            minutes: 1
-      - platform: state
-        entity_id: device_tracker.fabian_dock
-        from: 'home'
-        to: 'not_home'
-        for:
-            minutes: 1
-    condition:
-      condition: and
-      conditions:
-      - condition: state
-        entity_id: device_tracker.fabianpc
-        state: 'not_home'
-      - condition: state
-        entity_id: device_tracker.fabian_dock
-        state: 'not_home'
-    action:
-      - service: light.turn_off
-        data:
-          entity_id: light.leds_tisch
 
   - alias: 'Turn off strom if fpc stops'
     initial_state: on
@@ -570,12 +581,21 @@
         from: 'not_home'
         to: 'home'
     condition:
-      condition: and
+      condition: or
       conditions:
-      - condition: time
-        before: '23:59:00'
-      - condition: sun
-        after: sunset
+        - condition: and
+          conditions:
+            - condition: sun
+              after: sunrise
+              before: sunset
+        - condition: and
+          conditions:
+            - condition: sun
+              after: sunset
+              after_offset: "-02:30:00"
+            - condition: state
+              entity_id: weather.dwd_weather_ebersberg_halbing
+              state: 'cloudy'
     action:
       - service: light.turn_on
         data:
@@ -818,13 +838,13 @@
       - service: automation.trigger
         data_template:
           entity_id: > 
-            {% if not is_state('states.light.yeelight_strip1_34ce008b1863.brightness', '255') %} 
+            {% if not is_state('states.light.yeelight_strip1_34ce008b1863.attributes.brightness', '255') %} 
               automation.increase_lights_in_morning
             {% else %}
               automation.test
             {% endif %}
 
-  - alias: 'Remind for leaving wohnzimmer'
+  - alias: 'Remind for leaving floor'
     initial_state: True
     trigger:
       - platform: time
@@ -832,6 +852,9 @@
     condition:
       condition: and
       conditions:
+        - condition: state
+          entity_id: 'input_boolean.silent_mode'
+          state: 'off'
         - condition: time
           weekday:
             - mon
@@ -847,18 +870,7 @@
           - condition: state
             entity_id: device_tracker.fabianphone
             state: home
-          - condition: state
-            entity_id: 'input_boolean.silent_mode'
-            state: 'off'
     action:
-      - service: tts.google_say
-        entity_id: media_player.wohnzimmer_mini
-        data_template: 
-          message: >
-            Es ist 
-            {{ now().hour }} Uhr {{ now().minute }} .
-            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
       - service: tts.google_say
         entity_id: media_player.mpd
         data_template: 
@@ -906,8 +918,7 @@
     initial_state: on
     trigger:
       platform: state
-      entity_id:
-        - device_tracker.nessiepc
+      entity_id: device_tracker.nessiepc
       from: 'not_home'
       to: 'home'
     condition:
@@ -931,8 +942,7 @@
     initial_state: off
     trigger:
       platform: state
-      entity_id:
-        - device_tracker.nessiepc
+      entity_id: device_tracker.nessiepc
       from: 'home'
       to: 'not_home'
     action:
@@ -951,6 +961,8 @@
       entity_id: device_tracker.tv
       from: 'home'
       to: 'not_home'
+      for:
+        seconds: 40
     condition:
       - condition: time
         after: '21:00:00'
@@ -980,10 +992,33 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: light.leds_wohnzimmer
+          entity_id: group.wohnzimmer
+
+  - alias: 'Turn on lights in livingroom when cloudy'
+    initial_state: on
+    trigger:
+      - platform: sun
+        event: sunset
+        offset: "-02:30:00"
+      - platform: state
+        entity_id: weather.dwd_weather_ebersberg_halbing
+        to: 'cloudy'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: device_tracker.tv
+          state: home
+        - condition: state
+          entity_id: weather.dwd_weather_ebersberg_halbing
+          state: cloudy
+        - condition: sun
+          after: sunset
+          after_offset: "-02:30:00"
+    action:
       - service: light.turn_on
         data:
-          entity_id: light.yeelight_color1_34ce008bcc9d
+          entity_id: group.wohnzimmer
 
   - alias: 'Turn on lights in sleeping room when sun set'
     initial_state: on
@@ -1011,6 +1046,41 @@
           entity_id: light.leds_tisch
           brightness: 255
 
+  - alias: 'Turn on lights in sleeping room when cloudy'
+    initial_state: on
+    trigger:
+      - platform: sun
+        event: sunset
+        offset: "-02:30:00"
+      - platform: state
+        entity_id: weather.dwd_weather_ebersberg_halbing
+        to: 'cloudy'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: 'device_tracker.tv'
+          state: 'not_home'
+        - condition: state
+          entity_id: weather.dwd_weather_ebersberg_halbing
+          state: cloudy
+        - condition: sun
+          after: sunset
+          after_offset: "-02:30:00"
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'device_tracker.fabianpc'
+              state: 'home'
+            - condition: state
+              entity_id: 'device_tracker.fabian_dock'
+              state: 'home'
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.leds_tisch
+          brightness: 255
+
   - alias: 'Turn on lights in guest room room when sun set'
     initial_state: on
     trigger:
@@ -1021,6 +1091,32 @@
       condition: state
       entity_id: device_tracker.nessiepc
       state: home
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: group.gastezimmer
+
+  - alias: 'Turn on lights in guest room room when cloudy'
+    initial_state: on
+    trigger:
+      - platform: sun
+        event: sunset
+        offset: "-02:30:00"
+      - platform: state
+        entity_id: weather.dwd_weather_ebersberg_halbing
+        to: 'cloudy'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: device_tracker.nessiepc
+          state: home
+        - condition: state
+          entity_id: weather.dwd_weather_ebersberg_halbing
+          state: cloudy
+        - condition: sun
+          after: sunset
+          after_offset: "-02:30:00"
     action:
       - service: light.turn_on
         data:
@@ -1424,11 +1520,11 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'ACHTUNG! Aktuelle Wetter Warnung. Mehr Infos: https://www.dwd.de/DE/wetter/warnungen_gemeinden/warntabellen/warntab_bay_node.html'
+          message: 'ACHTUNG! Aktuelle Wetter Warnung in Zorneding.'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'ACHTUNG! Aktuelle Wetter Warnung. Mehr Infos: https://www.dwd.de/DE/wetter/warnungen_gemeinden/warntabellen/warntab_bay_node.html'
+          message: 'ACHTUNG! Aktuelle Wetter Warnung in Zorneding.'
 
   - alias: 'RaspberryPi Temp Warning'
     initial_state: on
@@ -2180,7 +2276,7 @@
         - condition: time
           after: '10:00:00'
         - condition: state
-          entity_id: 'input_boolean.silent_mode'
+          entity_id: input_boolean.silent_mode
           state: 'off'
         - condition: state
           entity_id: device_tracker.fabian_dock
@@ -2203,27 +2299,16 @@
       - service: media_player.media_pause
         data: 
           entity_id: media_player.wohnzimmer_tv
-      - service: rest_command.assistant_broadcast
-        data_template:
-          command: > 
-            Die Luftfeuchtigkeit ist zu hoch im Raum
-            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-            Gästezimmer, 
-            {% endif %}
-            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
-            Wohnzimmer,
-            {% endif %}
-            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
-            Schlafzimmer,
-            {% endif %}
-            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
-            Bad,
-            {% endif %}
-            Bitte lüften.
-          user: "homeassistant"
       - service: tts.google_say
-        entity_id: media_player.mpd
-        data_template: 
+        data_template:
+          entity_id: >
+            {% if (is_state("media_player.wohnzimmer_mini", "off")) -%}
+            - media_player.wohnzimmer_mini
+            {%- endif %}
+            {% if (is_state("media_player.schlafzimmer", "off")) -%}
+            - media_player.schlafzimmer
+            {%- endif %}
+            - media_player.mpd
           message: >
             Die Luftfeuchtigkeit ist zu hoch im Raum
             {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
@@ -2239,6 +2324,12 @@
             Bad,
             {% endif %}
             Bitte lüften.
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
 
   - alias: Notify for extreme high humidity
     trigger:
@@ -2318,10 +2409,14 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-      - service: rest_command.assistant_broadcast
-        data:
-          command: >
-            Die Luftfeuchtigkeit ist zu hoch im
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+          - media_player.mpd
+        data_template: 
+          message: >
+            Die Luftfeuchtigkeit ist zu hoch im Raum
             {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
             Gästezimmer, 
             {% endif %}
@@ -2332,10 +2427,9 @@
             Schlafzimmer,
             {% endif %}
             {% if (states.climate.bad.attributes.current_humidity) > 60 %}
-            Bad
+            Bad,
             {% endif %}
             Bitte lüften.
-          user: "homeassistant"
       - service: media_player.volume_set
         data:
           volume_level: 0.3

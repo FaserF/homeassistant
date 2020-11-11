@@ -10,12 +10,9 @@ Wohnzimmer:
     - media_player.wohnzimmer_tv_cast
     - media_player.wohnzimmer_mini
     - light.yeelight_color1_34ce008bcc9d #Stehlampe
-    - liht.stehlampe
     - light.leds_wohnzimmer
-    - light.wohnzimmer_lampe
     - climate.wohnzimmer
     - switch.fernseher
-    - switch.ventilator
     - switch.staubsauger
     - switch.deckenlampe
 
@@ -54,5 +51,5 @@ Keller:
     - switch.waschmaschine
     - light.keller_gluhbirne
     - input_boolean.strom_keller
-    - input_boolean.strom2_keller
+    - input_boolean.steckerleiste_keller
     - input_boolean.kuehlschrank_keller
