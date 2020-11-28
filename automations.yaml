@@ -367,8 +367,8 @@
         - condition: and
           conditions:
             - condition: sun
-              after: sunrise
-              before: sunset
+              after: sunset
+              before: sunrise
             - condition: state
               entity_id: device_tracker.tv
               state: 'not_home'
@@ -496,10 +496,8 @@
         - condition: and
           conditions:
             - condition: sun
-              after: sunrise
-              before: sunset
-            - condition: sun
               after: sunset
+              before: sunrise
         - condition: and
           conditions:
             - condition: sun
@@ -586,8 +584,8 @@
         - condition: and
           conditions:
             - condition: sun
-              after: sunrise
-              before: sunset
+              after: sunset
+              before: sunrise
         - condition: and
           conditions:
             - condition: sun
@@ -799,7 +797,9 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: group.schlafzimmer
+          entity_id: 
+            - light.leds_tisch
+            - light.yeelight_strip1_34ce008b1863
           brightness: 10
       - delay: '00:00:20'
       - service: automation.trigger
@@ -832,8 +832,10 @@
     action:
       - delay: '00:00:10'
       - service: light.turn_on
-        data: 
-          entity_id: group.schlafzimmer    
+        data:
+          entity_id: 
+            - light.leds_tisch
+            - light.yeelight_strip1_34ce008b1863 
           brightness_step: 30
       - service: automation.trigger
         data_template:
@@ -1518,13 +1520,13 @@
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.dwd_weather_warnings.attributes.last_triggered) | int > 43200 }}"
     action:
       - service: telegram_bot.send_message
-        data_template:
+        data:
           target: !secret telegram_chat_fabian
-          message: 'ACHTUNG! Aktuelle Wetter Warnung in Zorneding.'
+          message: 'ACHTUNG! Aktuelle Wetter Warnung zu Hause.'
       - service: telegram_bot.send_message
-        data_template:
+        data:
           target: !secret telegram_chat_nessie
-          message: 'ACHTUNG! Aktuelle Wetter Warnung in Zorneding.'
+          message: 'ACHTUNG! Aktuelle Wetter Warnung zu Hause.'
 
   - alias: 'RaspberryPi Temp Warning'
     initial_state: on
@@ -2227,7 +2229,9 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: group.schlafzimmer
+          entity_id: 
+            - light.leds_tisch
+            - light.yeelight_strip1_34ce008b1863
           brightness: 255
           
   - alias: Lichtschalter Button double press Off
