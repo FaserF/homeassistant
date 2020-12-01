@@ -574,8 +574,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.tv
+        entity_id: device_tracker.tv
         from: 'not_home'
         to: 'home'
     condition:

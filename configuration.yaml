@@ -136,12 +136,12 @@ device_tracker:
     new_device_defaults:
       track_new_devices: False
     #OpenWRT Router
-  - platform: luci
-    host: 192.168.178.8
-    username: root
-    password: !secret fritzbox
-    new_device_defaults:
-      track_new_devices: False
+  #- platform: luci
+  #  host: 192.168.178.8
+  #  username: root
+  #  password: !secret fritzbox
+  #  new_device_defaults:
+  #    track_new_devices: False
   - platform: google_maps
     username: !secret gmaps_mail
     max_gps_accuracy: 1000
