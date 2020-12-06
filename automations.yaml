@@ -41,14 +41,6 @@
       - service: switch.turn_off
         data:
           entity_id: switch.schreibtisch
-      # - service: climate.set_away_mode
-      #   data:
-      #     entity_id: climate.wohnzimmer
-      #     away_mode: 'on'
-      # - service: climate.set_away_mode
-      #   data:
-      #     entity_id: climate.schlafzimmer
-      #     away_mode: 'on'
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.steckerleiste_keller
@@ -83,6 +75,18 @@
         to: 'not_home'
         for:
           minutes: 2
+      - platform: state
+        entity_id: person.fabian
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
+      - platform: state
+        entity_id: person.nessie
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 2
     condition:
       condition: and
       conditions:
@@ -103,6 +107,14 @@
   - alias: 'Turn on 5ghz wifi and ssh off if coming home'
     initial_state: true
     trigger:
+      - platform: state
+        entity_id: device_tracker.fabianphone
+        from: 'not_home'
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.nessiephone
+        from: 'not_home'
+        to: 'home'
       - platform: state
         entity_id: person.fabian
         from: 'not_home'
@@ -349,6 +361,20 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
+
+  - alias: 'Set climate to auto at night'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '00:50:00'
+    action:
+      - service: climate.set_hvac_mode
+        data:
+          entity_id: 
+            - climate.wohnzimmer
+            - climate.schlafzimmer
+            - climate.bad
+          hvac_mode: auto
 
   - alias: 'Turn on light if fpc starts'
     initial_state: on
@@ -743,13 +769,11 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.fabianphone
+        entity_id: device_tracker.fabianphone
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id:
-          - device_tracker.nessiephone
+        entity_id: device_tracker.nessiephone
         from: 'not_home'
         to: 'home'
     condition:
@@ -873,7 +897,9 @@
             state: home
     action:
       - service: tts.google_say
-        entity_id: media_player.mpd
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.mpd
         data_template: 
           message: >
             Es ist 
@@ -933,7 +959,7 @@
       - service: climate.set_temperature
         data:
           entity_id: climate.gastezimmer
-          temperature: 19
+          temperature: 21
           hvac_mode: heat
       - service: automation.turn_on
         data:
@@ -963,7 +989,7 @@
       from: 'home'
       to: 'not_home'
       for:
-        seconds: 40
+        seconds: 5
     condition:
       - condition: time
         after: '21:00:00'
@@ -1155,33 +1181,18 @@
           inline_keyboard:
             - 'Ausschalten:/fridgeoff'
 
-  - alias: 'Turn on bulb in Keller Fabi'
-    initial_state: False
-    trigger:
-      platform: template
-      value_template: "{% if is_state_attr('device_tracker.fabianphone', 'scanner', 'LuciDeviceScanner') %}true{% endif %}"
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_fabi.attributes.last_triggered) | int > 7200 }}"
-    action:
-      - service: light.turn_on
-        data:
-          entity_id: light.keller_gluhbirne
-          brightness: 255
-          rgb_color: [0,200,255]
-
-  - alias: 'Turn on bulb in Keller Nessie'
+  - alias: 'Turn on bulb in Keller'
     initial_state: True
     trigger:
-      platform: template
-      value_template: "{% if is_state_attr('device_tracker.nessiephone', 'scanner', 'LuciDeviceScanner') %}true{% endif %}"
+      - platform: state
+        entity_id: light.keller_gluhbirne
+        from: 'unavailable'
+        to: 'off'
     condition:
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller_nessie.attributes.last_triggered) | int > 7200 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller.attributes.last_triggered) | int > 7200 }}"
     action:
       - service: light.turn_on
         data:
@@ -2304,13 +2315,13 @@
           entity_id: media_player.wohnzimmer_tv
       - service: tts.google_say
         data_template:
-          entity_id: >
-            {% if (is_state("media_player.wohnzimmer_mini", "off")) -%}
+          entity_id: #>
+            #{% if (is_state("media_player.wohnzimmer_mini", "off")) -%}
             - media_player.wohnzimmer_mini
-            {%- endif %}
-            {% if (is_state("media_player.schlafzimmer", "off")) -%}
+            #{%- endif %}
+            #{% if (is_state("media_player.schlafzimmer", "off")) -%}
             - media_player.schlafzimmer
-            {%- endif %}
+            #{%- endif %}
             - media_player.mpd
           message: >
             Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -2713,7 +2724,7 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        above: 3
+        above: 22
         below: 469
         for:
           seconds: 40
@@ -2740,10 +2751,16 @@
           entity_id: automation.set_washing_machine_finished_when_power_drops
       - service: notify.telegram_nessie
         data:
-          message: 'Die Waschmaschine wurde gestartet.'
+          message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
+          data:
+            inline_keyboard:
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'
       - service: notify.telegram_fabian
         data:
           message: 'Die Waschmaschine wurde gestartet.'
+          data:
+            inline_keyboard:
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'
       - service: automation.turn_off
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
@@ -2753,7 +2770,7 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        above: 6
+        above: 22
     condition:
       condition: or
       conditions:
@@ -2786,7 +2803,7 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        below: 6
+        below: 22
     condition:
       condition: and
       conditions:
@@ -2975,7 +2992,7 @@
           message: "Pille nehmen nicht vergessen!"
           data:
             inline_keyboard:
-            - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
+            - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'
 
   - alias: 'Telegram urgent message'
     initial_state: on
@@ -3182,6 +3199,54 @@
           data:
             inline_keyboard:
             - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
+
+  - alias: 'Telegram Washing mashine set program 30 degrees pflegeleicht'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/washerstart30'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay, Programm gesetzt.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: notify.telegram_nessie
+        data:
+          message: '30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }} Uhr.'
+      - service: notify.telegram_fabian
+        data:
+          message: '30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }} Uhr.'
+
+  - alias: 'Telegram Washing mashine set program 40 degrees pflegeleicht'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/washerstart40'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay, Programm gesetzt.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: notify.telegram_nessie
+        data:
+          message: 'NOCH NICHT KORREKT PROGRAMMIERT!!!  40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (120*60) ) | timestamp_custom("%H:%M", false) }} Uhr.'
+      - service: notify.telegram_fabian
+        data:
+          message: 'NOCH NICHT KORREKT PROGRAMMIERT!!!  40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (120*60) ) | timestamp_custom("%H:%M", false) }} Uhr.'
 
   - alias: 'Telegram shutdown fpc'
     initial_state: on
@@ -3519,11 +3584,11 @@
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
 
-  - alias: Turn off everything in keller if bulb is unavailable
+  - alias: Turn off everything in keller if tv is unavailable
     initial_state: on
     trigger:
       platform: state
-      entity_id: light.keller_gluhbirne
+      entity_id: media_player.keller_tv
       to: 'unavailable'
       for:
         minutes: 5
@@ -3538,6 +3603,38 @@
       data:
         entity_id:  input_boolean.kuehlschrank_keller
 
+  - alias: Remind for light keller
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: media_player.keller_tv
+      from: 'unavailable'
+    condition:
+      condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ states.group.schlafzimmer.state != 'off' }}"
+        - condition: template
+          value_template: "{{ states.group.wohnzimmer.state != 'off' }}"
+        #- condition: template
+        #  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 3600 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: >
+            Es ist noch Licht oder Strom an im
+            {% if (is_state("group.schlafzimmer", "on")) -%}
+            Schlafzimmer 
+            {% endif %}
+            {% if (is_state("group.wohnzimmer", "on")) -%}
+            Wohnzimmer 
+            {% endif %}
+            {% if (is_state("group.gastezimmer", "on")) -%}
+            & Gästezimmer 
+            {% endif %}
+            Ausschalten?
+
   - alias: Turn off fridge
     initial_state: on
     trigger:
@@ -3546,23 +3643,23 @@
       event_data:
         data: '/fridgeoff'
     action:
-    - service: input_boolean.turn_off
-      data:
-        entity_id: input_boolean.kuehlschrank_keller
-    # - service: telegram_bot.answer_callback_query
-    #   data_template:
-    #     callback_query_id: '{{ trigger.event.data.id }}'
-    #     message: 'Okay, wird ausgeschaltet.'
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_5friends
-        message: 'Kühlschrank wurde wieder ausgeschaltet.'
-        disable_notification: true
-    - service: telegram_bot.edit_replymarkup
-      data_template:
-        message_id: '{{ trigger.event.data.message.message_id }}'
-        chat_id: '{{ trigger.event.data.user_id }}'
-        inline_keyboard: []
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.kuehlschrank_keller
+      # - service: telegram_bot.answer_callback_query
+      #   data_template:
+      #     callback_query_id: '{{ trigger.event.data.id }}'
+      #     message: 'Okay, wird ausgeschaltet.'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_5friends
+          message: 'Kühlschrank wurde wieder ausgeschaltet.'
+          disable_notification: true
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
 
   - alias: Telegram HA Update
     initial_state: on
@@ -4083,3 +4180,23 @@
       #  data_template:
       #    target: !secret telegram_chat_jek_group
       #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
+
+  - alias: 'Telegram test command'
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/test'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: '{{ trigger.event.data.user_id }}'
+          disable_notification: true
+          message: Test gestartet. 
+      - service: notify.telegram_fabian
+        data:
+          message: Die Waschmaschine wurde gestartet. Voraussichtlich fertig um - {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (120*60) ) | timestamp_custom("%H:%M", false) }}
+          data:
+            inline_keyboard:
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'

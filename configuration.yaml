@@ -160,6 +160,7 @@ telegram_bot:
       - !secret telegram_chat_maxi
       - !secret telegram_chat_fabio
       - !secret telegram_chat_yannick
+      - !secret telegram_chat_lars
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
       - !secret telegram_chat_jek_group
@@ -332,6 +333,40 @@ sensor:
       washing_machine_state:
         value_template: "{{ states.input_select.washing_machine_status.state}}"
         friendly_name: "Waschmaschine Status"
+      washing_machine_mode:
+        value_template: >
+          {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+            30° Pflegeleicht
+          {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+            40° Pflegeleicht
+          {% else %}
+            Unbekannt
+          {% endif %}
+        friendly_name: "Waschmaschinen Modus"
+      washing_machine_finish_time:
+        value_template: >
+          {% if not (as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_clean_after_timeout.attributes.last_triggered) ) > 3600 %}
+            0
+          {% else %}
+          {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }}
+          {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }}
+          {% else %}
+            0
+          {% endif %}
+          {% endif %}
+        friendly_name: "Waschmaschine Uhrzeit ca. fertig"
+        unit_of_measurement: "Uhr"
+      washing_machine_finish_duration:
+        value_template: >
+          {% if (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 9780 - as_timestamp(now()) > 0 ) %}
+            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+          {% else %}
+            0
+          {% endif %}
+        friendly_name: "Waschmaschine Dauer ca. fertig"
+        unit_of_measurement: "Stunden"
   - platform: systemmonitor
     resources:
       - type: disk_use_percent

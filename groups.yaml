@@ -11,7 +11,7 @@ Wohnzimmer:
     - media_player.wohnzimmer_mini
     - light.yeelight_color1_34ce008bcc9d #Stehlampe
     - light.leds_wohnzimmer
-    - climate.wohnzimmer
+    #- climate.wohnzimmer
     - switch.fernseher
     - switch.staubsauger
     - switch.deckenlampe
@@ -24,7 +24,7 @@ Schlafzimmer:
     - light.yeelight_strip1_34ce008b1863 #Bett LEDs
     - light.leds_tisch
     - light.bett_gluhbirne
-    - climate.schlafzimmer
+    #- climate.schlafzimmer
     - switch.bett
     - switch.fabian_strom
     - switch.fabian_pc_shutdown
@@ -38,7 +38,7 @@ Gästezimmer:
     - media_player.guest_mini
     - light.lampe_gastezimmer
     - light.leds_gastezimmer
-    - climate.gastezimmer
+    #- climate.gastezimmer
     - switch.nessie_pc
     - switch.nessie_pc_shutdown
 
@@ -53,3 +53,17 @@ Keller:
     - input_boolean.strom_keller
     - input_boolean.steckerleiste_keller
     - input_boolean.kuehlschrank_keller
+#1-OG:
+#  name: 1. OG gesamt ohne Klima und ohne Gastezimmer
+#  entities:
+#    - light.yeelight_color1_34ce008bcc9d #Stehlampe
+#    - light.leds_wohnzimmer
+#    - switch.fernseher
+#    - switch.staubsauger
+#    - switch.deckenlampe
+#    - light.yeelight_strip1_34ce008b1863 #Bett LEDs
+#    - light.leds_tisch
+#    - light.bett_gluhbirne
+#    - switch.fabian_strom
+#    - switch.schreibtisch
+#    - switch.lichtschalter
