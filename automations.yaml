@@ -28,37 +28,28 @@
           entity_id: all
       - service: switch.turn_off
         data:
-          entity_id: group.wohnzimmer
-      - service: switch.turn_off
-        data:
-          entity_id: switch.bett
-      - service: switch.turn_off
-        data:
-          entity_id: switch.lichtschalter
-      - service: switch.turn_off
-        data:
-          entity_id: switch.deckenlampe
-      - service: switch.turn_off
-        data:
-          entity_id: switch.schreibtisch
+          entity_id: 
+            - group.wohnzimmer
+            - switch.bett
+            - switch.lichtschalter
+            - switch.deckenlampe
+            - switch.schreibtisch
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.steckerleiste_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.kuehlschrank_keller
       - service: media_player.turn_off
         data:
-          entity_id: media_player.wohnzimmer_mini
-      - service: media_player.turn_off
+          entity_id: 
+            - media_player.schlafzimmer
+            - media_player.wohnzimmer_mini
+            - media_player.gastezimmer_mini
+      - service: climate.set_hvac_mode
         data:
-          entity_id: media_player.schlafzimmer
-      - service: media_player.turn_off
-        data:
-          entity_id: media_player.gastezimmer_mini
+          entity_id: 
+            - climate.wohnzimmer
+            - climate.schlafzimmer
+            - climate.bad
+          hvac_mode: auto
 
   - alias: 'Turn off 5ghz wifi and turn on ssh if nobody is at home'
     initial_state: on
