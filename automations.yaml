@@ -90,10 +90,10 @@
     action:
       - service: switch.turn_off
         data: 
-          entity_id: switch.fritzbox_7530_wifi_5ghz
+          entity_id: switch.fritzbox_7590_wifi_5ghz
       - service: switch.turn_on
         data: 
-          entity_id: switch.fritzbox_7530_portforward_ssh
+          entity_id: switch.fritzbox_7590_portforward_ssh
 
   - alias: 'Turn on 5ghz wifi and ssh off if coming home'
     initial_state: true
@@ -117,10 +117,10 @@
     action:
       - service: switch.turn_on
         data:
-          entity_id: switch.fritzbox_7530_wifi_5ghz
+          entity_id: switch.fritzbox_7590_wifi_5ghz
       - service: switch.turn_off
         data: 
-          entity_id: switch.fritzbox_7530_portforward_ssh
+          entity_id: switch.fritzbox_7590_portforward_ssh
 
   - alias: 'Turn off fabian pc if nobody is at home'
     initial_state: on
@@ -1178,7 +1178,6 @@
       - platform: state
         entity_id: light.keller_gluhbirne
         from: 'unavailable'
-        to: 'off'
     condition:
       condition: and
       conditions:
@@ -3601,14 +3600,19 @@
       entity_id: media_player.keller_tv
       from: 'unavailable'
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.group.schlafzimmer.state != 'off' }}"
-        - condition: template
-          value_template: "{{ states.group.wohnzimmer.state != 'off' }}"
-        #- condition: template
-        #  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 3600 }}"
+        - condition: sun
+          after: sunset
+          before: sunrise
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ states.group.schlafzimmer.state != 'off' }}"
+            - condition: template
+              value_template: "{{ states.group.wohnzimmer.state != 'off' }}"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 3600 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -3625,6 +3629,43 @@
             & Gästezimmer 
             {% endif %}
             Ausschalten?
+
+  - alias: Set climate living room if in keller
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: media_player.keller_tv
+      from: 'unavailable'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '17:00:00'
+          before: '00:00:00'
+    action:
+      - service: climate.turn_off
+        data:
+          entity_id: climate.wohnzimmer
+
+  - alias: Set climate living room if keller left
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: media_player.keller_tv
+      to: 'unavailable'
+      for:
+        minutes: 10
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '17:00:00'
+          before: '00:00:00'
+    action:
+      - service: climate.set_hvac_mode
+        data:
+          entity_id: climate.schlafzimmer
+          hvac_mode: auto
 
   - alias: Turn off fridge
     initial_state: on

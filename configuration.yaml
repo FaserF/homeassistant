@@ -259,6 +259,10 @@ media_player:
 #speedtestdotnet:
 #  server_id: 21514
 
+spotcast:
+  sp_dc: !secret sp_dc
+  sp_key: !secret sp_key
+
 climate:
   - platform: generic_thermostat
     name: RPI Cooling Fan Controller
@@ -413,6 +417,7 @@ sensor:
         value_template: "unbekannter"
   - platform: dwd_weather_warnings
     region_name: !secret dwd_cell_id
+  - platform: spotcast
 
 light:
   #MagicHue LEDs
@@ -526,27 +531,27 @@ google_assistant:
       expose: false
     light.keller_gluhbirne:
       expose: false
-    switch.fritzbox_7530_guest_wifi:
+    switch.fritzbox_7590_guest_wifi:
       expose: false
-    switch.fritzbox_7530_portforward_bitwarden:
+    switch.fritzbox_7590_portforward_bitwarden:
       expose: false
-    switch.fritzbox_7530_portforward_bookstracks:
+    switch.fritzbox_7590_portforward_bookstracks:
       expose: false
-    switch.fritzbox_7530_portforward_homeassistant:
+    switch.fritzbox_7590_portforward_homeassistant:
       expose: false
-    switch.fritzbox_7530_portforward_http_server:
+    switch.fritzbox_7590_portforward_http_server:
       expose: false
-    switch.fritzbox_7530_portforward_https_server:
+    switch.fritzbox_7590_portforward_https_server:
       expose: false
-    switch.fritzbox_7530_portforward_ssh:
+    switch.fritzbox_7590_portforward_ssh:
       expose: false
-    switch.fritzbox_7530_portforward_tasmoadmin:
+    switch.fritzbox_7590_portforward_tasmoadmin:
       expose: false
-    switch.fritzbox_7530_portforward_nginx_proxy:
+    switch.fritzbox_7590_portforward_nginx_proxy:
       expose: false
-    switch.fritzbox_7530_wifi:
+    switch.fritzbox_7590_wifi:
       expose: false
-    switch.fritzbox_7530_wifi_5ghz:
+    switch.fritzbox_7590_wifi_5ghz:
       expose: false
     switch.rpi_cooling_fan:
       expose: false
