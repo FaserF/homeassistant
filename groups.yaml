@@ -24,6 +24,7 @@ Schlafzimmer:
     - light.yeelight_strip1_34ce008b1863 #Bett LEDs
     - light.leds_tisch
     - light.bett_gluhbirne
+    - light.yeelight_bslamp2_0x0000000013fea10f
     #- climate.schlafzimmer
     - switch.bett
     - switch.fabian_strom
