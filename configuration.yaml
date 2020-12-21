@@ -428,6 +428,10 @@ light:
       192.168.178.252:
         name: LEDs Tisch
         mode: rgb
+  - platform: prismatik
+    host: 192.168.178.59
+    name: "Prismatik"
+    profile_name: homeassistant
 
 homekit:
   filter:

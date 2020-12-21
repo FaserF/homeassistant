@@ -1586,7 +1586,7 @@
 #          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
 
   - alias: 'DWD Weather Warnings'
-    initial_state: on
+    initial_state: off
     trigger:
       - platform: numeric_state
         entity_id: sensor.dwd_weather_warnings_advance_warning_level
@@ -4172,69 +4172,6 @@
         - media_player.schlafzimmer
         data_template:
           message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
-
-  - alias: 'Telegram send weekly corona stats'
-    initial_state: true
-    trigger:
-      platform: time
-      at: '18:00:00'
-    condition:
-      - condition: time
-        weekday:
-          - sat
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_nessie
-          disable_notification: true
-          message: >
-            Aktuelle Corona Zahlen für Deutschland. 
-            
-            
-            Bestätigte Corona Infizierte: {{ states.sensor.germany_coronavirus_confirmed.state }}
-            
-            Bestätigte Corona Todesfälle: {{ states.sensor.germany_coronavirus_deaths.state }}
-            
-            Genesene Corona Fälle: {{ states.sensor.germany_coronavirus_recovered.state }}
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          disable_notification: true
-          message: >
-            Aktuelle Corona Zahlen für Deutschland. 
-            
-            
-            Bestätigte Corona Infizierte: {{ states.sensor.germany_coronavirus_confirmed.state }}
-            
-            Bestätigte Corona Todesfälle: {{ states.sensor.germany_coronavirus_deaths.state }}
-            
-            Genesene Corona Fälle: {{ states.sensor.germany_coronavirus_recovered.state }}
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_kai
-          disable_notification: true
-          message: >
-            Aktuelle Corona Zahlen für Deutschland.
-            
-            
-            Bestätigte Corona Infizierte: {{ states.sensor.germany_coronavirus_confirmed.state }}
-            
-            Bestätigte Corona Todesfälle: {{ states.sensor.germany_coronavirus_deaths.state }}
-            
-            Genesene Corona Fälle: {{ states.sensor.germany_coronavirus_recovered.state }}
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_adrian
-          disable_notification: true
-          message: >
-            Aktuelle Corona Zahlen für Deutschland.
-            
-            
-            Bestätigte Corona Infizierte: {{ states.sensor.germany_coronavirus_confirmed.state }}
-            
-            Bestätigte Corona Todesfälle: {{ states.sensor.germany_coronavirus_deaths.state }}
-            
-            Genesene Corona Fälle: {{ states.sensor.germany_coronavirus_recovered.state }}
 
   - alias: 'Telegram send weather forecast'
     initial_state: true
