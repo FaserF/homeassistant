@@ -41,7 +41,7 @@ views:
   - badges:
       - entity: person.fabian
       - entity: person.nessie
-      - entity: sensor.fabianphone_battery_level
+      - entity: sensor.fabian_phone_battery_level
       - entity: sensor.nessiephone_battery_level
       - entity: sensor.ipad_battery_level
       - entity: sensor.fs_smspin
@@ -80,6 +80,10 @@ views:
             group: true
             toggle: true
             type: "custom:slider-entity-row"
+          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+            group: true
+            toggle: true
+            type: "custom:slider-entity-row"
           - entity: light.yeelight_color1_34ce008bcc9d
             group: true
             toggle: true
@@ -107,11 +111,11 @@ views:
         title: Strom
         type: entities
       - entities:
-          - switch.nessie_pc_shutdown
-          - switch.fabian_pc_shutdown
-          - input_boolean.silent_mode
+          - entity: input_boolean.silent_mode
+          - entity: input_boolean.guest_mode
+          - entity: input_boolean.away_mode
         show_header_toggle: true
-        title: PC & mehr
+        title: Weiteres
         type: entities
       - entity: climate.wohnzimmer
         type: "custom:simple-thermostat"
@@ -165,46 +169,14 @@ views:
         type: "custom:mini-media-player"
     icon: "mdi:home-variant"
     title: Home
-  - icon: "mdi:bed-empty"
-    path: schlafzimmer
-    title: Schlafzimmer
-    badges: []
-    cards:
-      - entities:
-          - entity: switch.lichtschalter
-          - entity: light.yeelight_strip1_34ce008b1863
-          - entity: light.bett_gluhbirne
-          - entity: light.leds_tisch
-          - entity: switch.bett
-        show_header_toggle: true
-        title: Licht & Strom
-        type: entities
-      - entities:
-          - entity: switch.schreibtisch
-          - entity: switch.fabian_strom
-          - entity: device_tracker.fabianpc
-          - entity: device_tracker.fabian_dock
-          - entity: switch.fabian_pc_shutdown
-          - entity: sensor.fabian_strom_energy_today
-          - entity: sensor.fabian_strom_energy_power
-        show_header_toggle: true
-        title: Fabian PC
-        type: entities
-      - entity: climate.schlafzimmer
-        type: "custom:simple-thermostat"
-        sensors:
-          - entity: sensor.schlafzimmer_humidity
-      - artwork: cover
-        entity: media_player.schlafzimmer
-        type: "custom:mini-media-player"
   - badges: []
     cards:
       - entities:
+          - switch.deckenlampe
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
             type: "custom:slider-entity-row"
-          - switch.deckenlampe
           - entity: light.yeelight_color1_34ce008bcc9d
             group: true
             toggle: true
@@ -234,6 +206,40 @@ views:
     icon: "mdi:television"
     path: wohnzimmer
     title: Wohnzimmer
+  - icon: "mdi:bed-empty"
+    path: schlafzimmer
+    title: Schlafzimmer
+    badges: []
+    cards:
+      - entities:
+          - entity: switch.lichtschalter
+          - entity: light.yeelight_strip1_34ce008b1863
+          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+          - entity: light.bett_gluhbirne
+          - entity: light.leds_tisch
+          - entity: switch.bett
+        show_header_toggle: true
+        title: Licht & Strom
+        type: entities
+      - entities:
+          - entity: switch.schreibtisch
+          - entity: switch.fabian_strom
+          - entity: light.prismatik
+          - entity: device_tracker.fabianpc
+          - entity: device_tracker.fabian_dock
+          - entity: switch.fabian_pc_shutdown
+          - entity: sensor.fabian_strom_energy_today
+          - entity: sensor.fabian_strom_energy_power
+        show_header_toggle: true
+        title: Fabian PC
+        type: entities
+      - entity: climate.schlafzimmer
+        type: "custom:simple-thermostat"
+        sensors:
+          - entity: sensor.schlafzimmer_humidity
+      - artwork: cover
+        entity: media_player.schlafzimmer
+        type: "custom:mini-media-player"
   - badges: []
     cards:
       - entities:

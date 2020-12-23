@@ -632,6 +632,12 @@
         to: 'not_home'
         for:
             minutes: 60
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.nessiepc
+        state: 'not_home'
     action:
       - service: switch.turn_off
         data:
@@ -939,7 +945,7 @@
               automation.test
             {% endif %}
 
-  - alias: 'Remind for leaving floor'
+  - alias: 'Remind for leaving wohnzimmer'
     initial_state: True
     trigger:
       - platform: time
@@ -969,7 +975,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
-          - media_player.mpd
+          #- media_player.mpd
         data_template: 
           message: >
             Es ist 
@@ -1070,7 +1076,10 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: group.schlafzimmer
+          entity_id: 
+            - light.yeelight_bslamp2_0x0000000013fea10f
+            - light.bett_gluhbirne
+            - light.yeelight_strip1_34ce008b1863
       - delay: '00:04:00'
       - service: light.turn_off
         data:
@@ -1120,6 +1129,29 @@
         data:
           entity_id: group.wohnzimmer
 
+  - alias: 'Turn off Prismatik during the day'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        from: 'not_home'
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+        - condition: sun
+          before: sunset
+          before_offset: "-00:30:00"
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: weather.dwd_weather_ebersberg_halbing
+            state: cloudy
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: light.prismatik
+
   - alias: 'Turn on lights in sleeping room when sun set'
     initial_state: on
     trigger:
@@ -1145,6 +1177,9 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
+      - service: light.turn_on
+        data:
+          entity_id: light.prismatik
 
   - alias: 'Turn on lights in sleeping room when cloudy'
     initial_state: on
@@ -1180,6 +1215,9 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
+      - service: light.turn_on
+        data:
+          entity_id: light.prismatik
 
   - alias: 'Turn on lights in guest room room when sun set'
     initial_state: on
@@ -1353,14 +1391,76 @@
     action:
     - service: hassio.addon_stop
       data:
-        addon: 605cee21_apache2
+        addon: a0d7b954_nginxproxymanager
     - service: hassio.addon_restart
       data:
         addon: core_letsencrypt
     - delay: '00:10:00'
     - service: hassio.addon_start
       data:
-        addon: 605cee21_apache2
+        addon: a0d7b954_nginxproxymanager
+
+  - alias: Turn on Away Mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.away_mode
+        to: 'on'
+    action:
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.silent_mode
+      - service: climate.set_preset_mode
+        data:
+          entity_id: all
+          preset_mode: 'away'
+
+  - alias: Turn off Away Mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.away_mode
+        to: 'off'
+    action:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.silent_mode
+      - service: climate.set_preset_mode
+        data:
+          entity_id: all
+          preset_mode: 'home'
+
+  - alias: Warn for state change if in away mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: 
+          - group.wohnzimmer
+          - group.schlafzimmer
+          - group.gastezimmer
+        from: 'off'
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.warn_for_state_change_if_in_away_mode.attributes.last_triggered) | int > 3600 }}"
+    action:
+      - service: telegram_bot.send_message
+        data:
+          target: !secret telegram_chat_fabian
+          message: 'ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!'
+      - service: telegram_bot.send_message
+        data:
+          target: !secret telegram_chat_nessie
+          message: 'ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!'
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.gastezimmer_mini
+          - media_player.schlafzimmer
+        data: 
+          message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
 
   - alias: Turn on Strom and Kuhlschrank Keller
     initial_state: on
@@ -4268,23 +4368,3 @@
       #  data_template:
       #    target: !secret telegram_chat_jek_group
       #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
-
-  - alias: 'Telegram test command'
-    initial_state: true
-    trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/test'
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: '{{ trigger.event.data.user_id }}'
-          disable_notification: true
-          message: Test gestartet. 
-      - service: notify.telegram_fabian
-        data:
-          message: Die Waschmaschine wurde gestartet. Voraussichtlich fertig um - {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (120*60) ) | timestamp_custom("%H:%M", false) }}
-          data:
-            inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'

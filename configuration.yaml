@@ -97,10 +97,6 @@ recorder:
       - sensor.fs_caller
       - sensor.lichtschalter
       - sensor.deckenlampe
-      - device_tracker.fabianpc
-      - device_tracker.fabiantablet
-      - device_tracker.nessiepc
-      - device_tracker.tv
 
 # Checks for available updates
 updater:
@@ -115,11 +111,6 @@ history:
 
 # View all events in a logbook
 logbook:
-
-logger:
-  default: warning
-  logs:
-    custom_components.localtuya: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -287,14 +278,14 @@ tado:
 shell_command:
   #create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
-  randomfood: "curl https://smartlife.ddns.net/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}"
-  foodyes: "curl https://smartlife.ddns.net/api/index.php?key=hassio&action=foodyes"
+  randomfood: "curl https://web.fseitz.tk/api/index.php?key=hassio&action=randomfood&input={{ telegram_sender }}&secinput={{ vegetarisch }}"
+  foodyes: "curl https://web.fseitz.tk/api/index.php?key=hassio&action=foodyes"
   jek_telegram: !secret telegram_jek_open_command
   restartha: "hassio.host_reboot"
   hibernatefpc: "curl http://192.168.178.59:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.44:5001/hibernate"
   shutdownnpc: "curl http://192.168.178.44:5001/shutdown"
-  #overtime_input: 'curl https://smartlife.ddns.net/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
+  #overtime_input: 'curl https://web.fseitz.tk/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
 
 rest_command:
   assistant_broadcast:
@@ -349,9 +340,6 @@ sensor:
         friendly_name: "Waschmaschinen Modus"
       washing_machine_finish_time:
         value_template: >
-          {% if not (as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_clean_after_timeout.attributes.last_triggered) ) > 3600 %}
-            0
-          {% else %}
           {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
             {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }}
           {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
@@ -359,6 +347,8 @@ sensor:
           {% else %}
             0
           {% endif %}
+          {% if not (as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_clean_after_timeout.attributes.last_triggered) ) > 3600 %}
+            0
           {% endif %}
         friendly_name: "Waschmaschine Uhrzeit ca. fertig"
         unit_of_measurement: "Uhr"
@@ -496,10 +486,12 @@ switch:
     switches:
       fabian_pc_shutdown:
         command_off: "curl http://192.168.178.59:5001/shutdown"
+        friendly_name: Fabian PC herunterfahren
   - platform: command_line
     switches:
       nessie_pc_shutdown:
         command_off: "curl http://192.168.178.44:5001/shutdown"
+        friendly_name: Nessie PC herunterfahren
   #- platform: sonoff_lan_mode_r3
   #name: Bett
   #device_id: 100016e326
