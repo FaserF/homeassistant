@@ -34,9 +34,6 @@
             - switch.lichtschalter
             - switch.deckenlampe
             - switch.schreibtisch
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.steckerleiste_keller
       - service: media_player.turn_off
         data:
           entity_id: 
@@ -1137,7 +1134,7 @@
         from: 'not_home'
         to: 'home'
         for:
-          minutes: 2
+          minutes: 6
     condition:
       condition: and
       conditions:
@@ -1279,15 +1276,12 @@
         - condition: template
           value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
         - condition: state
-          entity_id: 'input_boolean.kuehlschrank_keller'
+          entity_id: 'switch.kuhlschrank'
           state: 'off'
     action:
-      - service: input_boolean.turn_off
+      - service: switch.turn_off
         data:
-          entity_id: input_boolean.kuehlschrank_keller
-      - service: input_boolean.turn_on
-        data:
-          entity_id: input_boolean.kuehlschrank_keller
+          entity_id: switch.kuhlschrank 
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_5friends
@@ -1323,12 +1317,9 @@
       event_data:
         command: '/keller'
     action:
-      - service: input_boolean.turn_off
+      - service: switch.turn_off
         data:
-          entity_id: input_boolean.strom_keller
-      - service: input_boolean.turn_on
-        data:
-          entity_id: input_boolean.strom_keller
+          entity_id: switch.kuhlschrank
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
@@ -1350,12 +1341,9 @@
         event_data:
           command: '/fridge'
     action:
-      - service: input_boolean.turn_off
+      - service: switch.turn_off
         data:
-          entity_id: input_boolean.kuehlschrank_keller
-      - service: input_boolean.turn_on
-        data:
-          entity_id: input_boolean.kuehlschrank_keller
+          entity_id: switch.kuhlschrank
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
@@ -1469,96 +1457,6 @@
         data: 
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
 
-  - alias: Turn on Strom and Kuhlschrank Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.steckerleiste_keller
-        to: 'on'
-    action:
-      - service: rest_command.assistant_relay
-        data:
-          command: "Schalte die Steckerleiste ein"
-          user: "fabian"
-
-  - alias: Turn off Strom and Kuhlschrank Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.steckerleiste_keller
-        to: 'off'
-    action:
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.kuehlschrank_keller
-      - service: rest_command.assistant_relay
-        data:
-          command: "Schalte die Steckerleiste aus"
-          user: "fabian"
-
-  - alias: Turn on Kuhlschrank Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.kuehlschrank_keller
-        to: 'on'
-    action:
-      - service: rest_command.assistant_relay
-        data:
-          command: "Aktiviere die Szene TurnOnKuhl"
-          user: "fabian"
-
-  - alias: Turn off Kuhlschrank Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.kuehlschrank_keller
-        to: 'off'
-    action:
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.steckerleiste_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom_keller
-      - service: rest_command.assistant_relay
-        data:
-          command: "Schalte die Steckerleiste aus"
-          user: "fabian"
-
-  - alias: Turn on TV Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.strom_keller
-        to: 'on'
-    action:
-      - service: rest_command.assistant_relay
-        data:
-          command: "Aktiviere die Szene TurnOnTV"
-          user: "fabian"
-
-  - alias: Turn off TV Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.strom_keller
-        to: 'off'
-    action:
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.steckerleiste_keller
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.kuehlschrank_keller
-      - service: rest_command.assistant_relay
-        data:
-          command: "Schalte die Steckerleiste aus"
-          user: "fabian"
-
   - alias: 'HA Update Available'
     initial_state: on
     trigger:
@@ -1573,27 +1471,6 @@
           target: !secret telegram_chat_fabian
           inline_keyboard:
           - 'Update starten:/updateha'
-
-#  - alias: 'Notify for SMS PIN Fabian'
-#    initial_state: on
-#    trigger:
-#      - platform: state
-#        entity_id: sensor.fs_smspin
-#    condition:
-#      - condition: template
-#        value_template: "{{ states.sensor.fs_smspin.state != 'not_set' }}"
-#    action:
-#      - service: notify.browser
-#        data_template:
-#          message: "Der Security Code lautet: {{ states('sensor.fs_smspin') }}"
-#          target: 
-#            - Fabian-PC
-#            - Fabian-Hackbook
-#            - Chrome-Arbeit
-#            - fabiantablet
-#        data:
-#          data:
-#            tag: 'notification-about-sensor'
 
   - alias: 'Incoming Call Fabian'
     initial_state: off
@@ -1693,11 +1570,8 @@
 #          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
 
   - alias: 'DWD Weather Warnings'
-    initial_state: off
+    initial_state: on
     trigger:
-      - platform: numeric_state
-        entity_id: sensor.dwd_weather_warnings_advance_warning_level
-        above: 0
       - platform: numeric_state
         entity_id: sensor.dwd_weather_warnings_current_warning_level
         above: 0
@@ -1709,13 +1583,27 @@
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.dwd_weather_warnings.attributes.last_triggered) | int > 43200 }}"
     action:
       - service: telegram_bot.send_message
-        data:
+        data_template:
           target: !secret telegram_chat_fabian
-          message: 'ACHTUNG! Aktuelle Wetter Warnung zu Hause.'
+          message: >
+            Aktuell {{ states.sensor.dwd_weather_warnings_current_warning_level.state }} Wetter Warnung in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+
+            *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+            {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
+            Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
       - service: telegram_bot.send_message
-        data:
+        data_template:
           target: !secret telegram_chat_nessie
-          message: 'ACHTUNG! Aktuelle Wetter Warnung zu Hause.'
+          message: >
+            Aktuell {{ states.sensor.dwd_weather_warnings_current_warning_level.state }} Wetter Warnung in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+
+            *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+            {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
+            Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
 
   - alias: 'RaspberryPi Temp Warning'
     initial_state: on
@@ -2229,7 +2117,7 @@
           state: not_home
     action:
       - service: telegram_bot.send_message
-        data_template:
+        data:
           target: !secret telegram_chat_fabian
           message: 'Die Fritzbox Internet Verbundung wurde verloren und wurde soeben wiederhergestellt.'
       - service: automation.turn_on
@@ -2325,6 +2213,40 @@
       - service: light.turn_on
         data:
           entity_id: group.wohnzimmer
+
+  - alias: Strip Keller Button Hold Off
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.strip_keller
+        platform: state
+        to: '{"TRIG":"HOLD"}'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: switch.usb
+          state: 'on'
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.usb
+          
+  - alias: Strip Keller Button Hold On
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.strip_keller
+        platform: state
+        to: '{"TRIG":"HOLD"}'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: switch.usb
+          state: 'off'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.usb
           
   - alias: Deckenlampe Button double press Off
     initial_state: on
@@ -2463,6 +2385,32 @@
       - service: switch.turn_on
         data:
           entity_id: switch.fabian_strom
+
+  - alias: Restart Bluetooth on TV
+    initial_state: off
+    trigger:
+      - platform: state
+        entity_id: automation.restart_bluetooth_on_tv
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: device_tracker.tv
+          state: 'home'
+    action:
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.wohnzimmer_tv
+          command: "settings put global bluetooth_disabled_profiles 0"
+      - delay: '00:00:01'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.wohnzimmer_tv
+          command: "settings put global bluetooth_disabled_profiles 1"
+      - service: automation.turn_off
+        data:
+          entity_id: automation.restart_bluetooth_on_tv
 
   - alias: Notify for high humidity
     trigger:
@@ -2993,7 +2941,7 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.waschmaschine_energy_power
-        below: 22
+        below: 5
     condition:
       condition: and
       conditions:
@@ -3018,7 +2966,7 @@
         entity_id: input_select.washing_machine_status
         to: Finishing
         for:
-          minutes: 10
+          minutes: 4
     condition:
       condition: and
       conditions:
@@ -3781,17 +3729,25 @@
       entity_id: media_player.keller_tv
       to: 'unavailable'
       for:
-        minutes: 5
+        minutes: 10
     action:
-    - service: input_boolean.turn_off
+    - service: switch.turn_off
       data:
-        entity_id:  input_boolean.steckerleiste_keller
-    - service: input_boolean.turn_off
+        entity_id: switch.kuhlschrank
+    - service: switch.turn_off
       data:
-        entity_id:  input_boolean.strom_keller
-    - service: input_boolean.turn_off
+        entity_id: switch.usb
+
+  - alias: Turn on usb ports if keller tv isnt unavailable
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: media_player.keller_tv
+      from: 'unavailable'
+    action:
+    - service: switch.turn_on
       data:
-        entity_id:  input_boolean.kuehlschrank_keller
+        entity_id: switch.usb
 
   - alias: Remind for light keller
     initial_state: on
@@ -3812,7 +3768,7 @@
             - condition: template
               value_template: "{{ states.group.wohnzimmer.state != 'off' }}"
             - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 3600 }}"
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 12000 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -3820,15 +3776,15 @@
           message: >
             Es ist noch Licht oder Strom an im
             {% if (is_state("group.schlafzimmer", "on")) -%}
-            Schlafzimmer 
+            Schlafzimmer
             {% endif %}
             {% if (is_state("group.wohnzimmer", "on")) -%}
-            Wohnzimmer 
+            Wohnzimmer
             {% endif %}
             {% if (is_state("group.gastezimmer", "on")) -%}
-            & Gästezimmer 
+            & Gästezimmer
             {% endif %}
-            Ausschalten?
+            . Ausschalten?
 
   - alias: Set climate living room if in keller
     initial_state: on
@@ -3899,9 +3855,9 @@
       event_data:
         data: '/fridgeoff'
     action:
-      - service: input_boolean.turn_off
+      - service: switch.turn_off
         data:
-          entity_id: input_boolean.kuehlschrank_keller
+          entity_id: switch.kuhlschrank
       # - service: telegram_bot.answer_callback_query
       #   data_template:
       #     callback_query_id: '{{ trigger.event.data.id }}'

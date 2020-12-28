@@ -18,7 +18,7 @@ Wohnzimmer:
 
 Schlafzimmer:
   name: Schlafzimmer
-  icon: mdi:hotel
+  icon: mdi:bed
   entities:
     - media_player.schlafzimmer
     - light.yeelight_strip1_34ce008b1863 #Bett LEDs
@@ -51,9 +51,8 @@ Keller:
     - media_player.keller_tv_cast
     - switch.waschmaschine
     - light.keller_gluhbirne
-    - input_boolean.strom_keller
-    - input_boolean.steckerleiste_keller
-    - input_boolean.kuehlschrank_keller
+    - switch.kuhlschrank
+    - switch.usb
 #1-OG:
 #  name: 1. OG gesamt ohne Klima und ohne Gastezimmer
 #  entities:

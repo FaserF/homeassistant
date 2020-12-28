@@ -179,16 +179,22 @@ media_player:
     device_class: androidtv
     host: 192.168.178.11
     adb_server_ip: 127.0.0.1
+    exclude_unnamed_apps: true
     apps:
       com.liskovsoft.videomanager: "Smart YoutTube TV"
+      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
       exp.animo.fireanime: "FireAnime"
+      com.crunchyroll.crunchyroid: "Crunchyroll"
       com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
+      com.netflix.ninja: "Netflix"
       com.valvesoftware.steamlink: "Steam Link"
       com.zdf.android.mediathek: "ZDF Mediathek"
       tv.emby.embyatv: "Emby"
       com.google.android.apps.mediashell: "Chromecast"
       de.prosiebensat1digital.prosieben: "Pro7"
       com.tcl.tv: "HDMI"
+      com.tcl.settings: "Einstellungen TCL"
+      com.android.tv.settings: "Einstellungen"
     state_detection_rules:
       "com.google.android.tvlauncher":
         - "standby"
@@ -214,16 +220,22 @@ media_player:
     device_class: androidtv
     host: 192.168.178.13
     adb_server_ip: 127.0.0.1
+    exclude_unnamed_apps: true
     apps:
       com.liskovsoft.videomanager: "Smart YoutTube TV"
+      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
       exp.animo.fireanime: "FireAnime"
+      com.crunchyroll.crunchyroid: "Crunchyroll"
       com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
+      com.netflix.ninja: "Netflix"
       com.valvesoftware.steamlink: "Steam Link"
       com.zdf.android.mediathek: "ZDF Mediathek"
       tv.emby.embyatv: "Emby"
       com.google.android.apps.mediashell: "Chromecast"
       de.prosiebensat1digital.prosieben: "Pro7"
       com.tcl.tv: "HDMI"
+      com.tcl.settings: "Einstellungen TCL"
+      com.android.tv.settings: "Einstellungen"
     state_detection_rules:
       "com.google.android.tvlauncher":
         - "standby"
@@ -323,6 +335,9 @@ sensor:
   - platform: mqtt
     state_topic: "deckenlampe/stat/BUTTON1T"
     name: deckenlampe
+  - platform: mqtt
+    state_topic: "strip_keller/stat/BUTTON1T"
+    name: strip_keller
   - platform: template
     sensors:
       washing_machine_state:
@@ -335,7 +350,7 @@ sensor:
           {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
             40° Pflegeleicht
           {% else %}
-            Unbekannt
+            Läuft nicht
           {% endif %}
         friendly_name: "Waschmaschinen Modus"
       washing_machine_finish_time:
@@ -348,7 +363,7 @@ sensor:
             0
           {% endif %}
           {% if not (as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_clean_after_timeout.attributes.last_triggered) ) > 3600 %}
-            0
+            Läuft nicht
           {% endif %}
         friendly_name: "Waschmaschine Uhrzeit ca. fertig"
         unit_of_measurement: "Uhr"
@@ -395,11 +410,6 @@ sensor:
     from: Westkreuz
     to: !secret sbahn_home
     only_direct: true
-  - platform: template
-    sensors:
-      fs_smspin:
-        friendly_name: "Fabi SMS PIN"
-        value_template: "not_set"
   - platform: template
     sensors:
       fs_caller:
@@ -519,9 +529,17 @@ google_assistant:
   expose_by_default: true
   entity_config:
     #Disabled Entitys
+    light.prismatik:
+      expose: false
     switch.schloss:
       expose: false
+    switch.schreibtisch:
+      expose: false
     switch.frei:
+      expose: false
+    switch.stom_keller_defekt:
+      expose: false
+    switch.switch_keller_defekt:
       expose: false
     switch.nessie_pc_shutdown:
       expose: false
@@ -532,6 +550,8 @@ google_assistant:
     switch.fritzbox_7590_guest_wifi:
       expose: false
     switch.fritzbox_7590_portforward_bitwarden:
+      expose: false
+    switch.fritzbox_7590_portforward_nextcloud:
       expose: false
     switch.fritzbox_7590_portforward_bookstracks:
       expose: false
@@ -578,13 +598,17 @@ google_assistant:
       expose: True
       room: Schlafzimmer
     light.bett_gluhbirne:
-      name: Bett Licht
+      name: Bett Glühbirne
       expose: true
       room: Schlafzimmer
     light.leds_tisch:
       expose: true
       room: Schlafzimmer
     light.yeelight_strip1_34ce008b1863:
+      expose: true
+      room: Schlafzimmer
+    light.yeelight_bslamp2_0x0000000013fea10f:
+      name: Bett Licht
       expose: true
       room: Schlafzimmer
     ##Gästezimmer
@@ -616,8 +640,15 @@ google_assistant:
     switch.staubsauger:
       expose: True
       room: Wohnzimmer
-    ##Keller & Bad
+    ##Keller
     switch.waschmaschine:
+      expose: true
+      room: Keller
+    switch.kuhlschrank:
+      expose: true
+      room: Keller
+    switch.usb:
+      name: USB Ports
       expose: true
       room: Keller
 
