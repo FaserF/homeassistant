@@ -1,4 +1,4 @@
-  - alias: 'Turn off everything if nobody is at home'
+  - alias: 'Turn off everything except guest room if nobody is at home'
     initial_state: on
     trigger:
       - platform: state
@@ -25,7 +25,9 @@
     action:
       - service: light.turn_off
         data:
-          entity_id: all
+          entity_id: 
+            - group.schlafzimmer
+            - group.wohnzimmer
       - service: switch.turn_off
         data:
           entity_id: 
@@ -39,13 +41,53 @@
           entity_id: 
             - media_player.schlafzimmer
             - media_player.wohnzimmer_mini
-            - media_player.gastezimmer_mini
       - service: climate.set_hvac_mode
         data:
           entity_id: 
             - climate.wohnzimmer
             - climate.schlafzimmer
             - climate.bad
+          hvac_mode: auto
+
+  - alias: 'Turn off everything in guest room if nobody is at home'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: person.fabian
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1
+      - platform: state
+        entity_id: person.nessie
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.guest_mode
+          state: 'off'
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: person.fabian
+              state: home
+            - condition: state
+              entity_id: person.nessie
+              state: home
+    action:
+      - service: light.turn_off
+        data:
+          entity_id: group.gastezimmer
+      - service: media_player.turn_off
+        data:
+          entity_id: media_player.gastezimmer_mini
+      - service: climate.set_hvac_mode
+        data:
+          entity_id: climate.gastezimmer
           hvac_mode: auto
 
   - alias: 'Turn off 5ghz wifi and turn on ssh if nobody is at home'
@@ -78,6 +120,9 @@
     condition:
       condition: and
       conditions:
+        - condition: state
+          entity_id: input_boolean.guest_mode
+          state: 'off'
         - condition: state
           entity_id: device_tracker.fabianphone
           state: not_home
@@ -115,6 +160,9 @@
       - service: switch.turn_on
         data:
           entity_id: switch.fritzbox_7590_wifi_5ghz
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.away_mode
       - service: switch.turn_off
         data: 
           entity_id: switch.fritzbox_7590_portforward_ssh
@@ -906,6 +954,7 @@
 
   - alias: 'Increase lights in morning'
     initial_state: off
+    mode: restart
     trigger:
       - platform: state
         entity_id: automation.increase_lights_in_morning
@@ -919,28 +968,44 @@
       - condition: state
         entity_id: device_tracker.nessiephone
         state: home
+      - condition: sun
+        before: sunrise
+        before_offset: "1:00:00"
       - condition: state
         entity_id: light.leds_tisch
         state: 'on'
       - condition: state
         entity_id: light.yeelight_strip1_34ce008b1863
         state: 'on'
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: light.leds_tisch
+            attribute: brightness
+            state: '255'
+          - condition: state
+            entity_id: light.yeelight_strip1_34ce008b1863
+            attribute: brightness
+            state: '255'
     action:
       - delay: '00:00:10'
+      #- service: light.turn_on
+      #  data:
+      #    entity_id: 
+      #      - light.leds_tisch
+      #      - light.yeelight_strip1_34ce008b1863 
+      #    brightness_step: 30
       - service: light.turn_on
-        data:
-          entity_id: 
-            - light.leds_tisch
-            - light.yeelight_strip1_34ce008b1863 
-          brightness_step: 30
-      - service: automation.trigger
+        entity_id: light.leds_tisch
         data_template:
-          entity_id: > 
-            {% if not is_state('states.light.yeelight_strip1_34ce008b1863.attributes.brightness', '255') %} 
-              automation.increase_lights_in_morning
-            {% else %}
-              automation.test
-            {% endif %}
+          brightness: '{{states.light.leds_tisch.attributes.brightness + 5}}'
+      - service: light.turn_on
+        entity_id: light.yeelight_strip1_34ce008b1863
+        data_template:
+          brightness: '{{states.light.yeelight_strip1_34ce008b1863.attributes.brightness + 5}}'
+      - service: automation.trigger
+        data:
+          entity_id: automation.increase_lights_in_morning
 
   - alias: 'Remind for leaving wohnzimmer'
     initial_state: True
@@ -1421,6 +1486,45 @@
         data:
           entity_id: all
           preset_mode: 'home'
+
+  - alias: 'Remind for away mode'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: person.fabian
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1440
+      - platform: state
+        entity_id: person.nessie
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1440
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: person.fabian
+          state: not_home
+          for:
+            minutes: 1440
+        - condition: state
+          entity_id: person.nessie
+          state: home
+          for:
+            minutes: 1440
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Away Mode wurde aktiviert, da keiner seit 24 Stunden daheim ist."
+      - service: notify.telegram_nessie
+        data:
+          message: "Away Mode wurde aktiviert, da keiner seit 24 Stunden daheim ist."
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.away_mode
 
   - alias: Warn for state change if in away mode
     initial_state: on
@@ -2017,7 +2121,7 @@
         from: 'online'
         to: 'offline'
         for:
-          seconds: 40
+          seconds: 25
     condition:
       condition: and
       conditions:
@@ -2448,19 +2552,23 @@
             entity_id: device_tracker.nessiephone
             state: home
     action:
+      - service: media_player.volume_set
+        data_template:
+          volume_level: 0.6
+          entity_id:
+            - media_player.schlafzimmer
+            - media_player.wohnzimmer_mini
       - service: media_player.media_pause
         data: 
           entity_id: media_player.wohnzimmer_tv
       - service: tts.google_say
         data_template:
           entity_id: #>
-            #{% if (is_state("media_player.wohnzimmer_mini", "off")) -%}
-            - media_player.wohnzimmer_mini
-            #{%- endif %}
-            #{% if (is_state("media_player.schlafzimmer", "off")) -%}
+            #{% if is_state('media_player.wohnzimmer_mini', 'off') %}- media_player.wohnzimmer_mini{% else %}None{%- endif %}
+            #{% if is_state('media_player.schlafzimmer', 'off') %}- media_player.schlafzimmer{% else %}None{%- endif %}
+            #{% if is_state('input_boolean.guest_mode', 'off') %}- media_player.gastezimmer{% else %}None{%- endif %}
             - media_player.schlafzimmer
-            #{%- endif %}
-            - media_player.mpd
+            - media_player.wohnzimmer_mini
           message: >
             Die Luftfeuchtigkeit ist zu hoch im Raum
             {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
@@ -2556,16 +2664,16 @@
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
-        data:
+        data_template:
           volume_level: 0.7
-          entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
+          entity_id:
+            - media_player.schlafzimmer
+            - media_player.wohnzimmer_mini
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
-          - media_player.mpd
+          #- media_player.mpd
         data_template: 
           message: >
             Die Luftfeuchtigkeit ist zu hoch im Raum

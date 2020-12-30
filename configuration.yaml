@@ -5,28 +5,27 @@ homeassistant:
       trusted_networks:
         - 127.0.0.1
         - ::1
-        - 192.168.1.0/24
-        - 192.168.178.0/24
+        - 192.168.0.0/24
+        - 2001:DB8:ABCD::/48
         - fd00::/8
+        - 172.30.33.0/24
       allow_bypass_login: true
-    - type: legacy_api_password
-      api_password: !secret http_password
+    #- type: legacy_api_password
+    #  api_password: !secret http_password
   # Name of the location where Home Assistant is running
-  name: Fabian's Smart Home
+  #name: Fabian's Smart Home
   #URLs
-  external_url: !secret baseurl
-  internal_url: "https://192.168.178.2:8123"
+  #external_url: !secret baseurl
+  #internal_url: "https://192.168.178.2:8123"
   # Location required to calculate the time the sun rises and sets
-  latitude: !secret latitude
-  longitude: !secret longitude
+  #latitude: !secret latitude
+  #longitude: !secret longitude
   # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: !secret elevation
+  #elevation: !secret elevation
   # metric for Metric, imperial for Imperialf
   #unit_system: metricbinary_sensor.snapshots_stale
   # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  time_zone: Europe/Berlin
-  # Customization file
-  customize: !include customize.yaml
+  #time_zone: Europe/Berlin
   #allowlist_external_dirs:
   #  - "/share/scripts"
 
@@ -77,6 +76,11 @@ mobile_app:
 http:
   ssl_certificate: !secret ssl_certificate
   ssl_key: !secret ssl_key
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.11
+    - 127.0.0.1
+    - 172.30.0.0/24
 
 recorder:
   purge_keep_days: 7
@@ -97,6 +101,7 @@ recorder:
       - sensor.fs_caller
       - sensor.lichtschalter
       - sensor.deckenlampe
+      - sensor.strip_keller
 
 # Checks for available updates
 updater:
@@ -218,7 +223,7 @@ media_player:
   - platform: androidtv
     name: Keller TV
     device_class: androidtv
-    host: 192.168.178.13
+    host: 192.168.178.12
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
@@ -295,8 +300,8 @@ shell_command:
   jek_telegram: !secret telegram_jek_open_command
   restartha: "hassio.host_reboot"
   hibernatefpc: "curl http://192.168.178.59:5001/hibernate"
-  hibernatenpc: "curl http://192.168.178.44:5001/hibernate"
-  shutdownnpc: "curl http://192.168.178.44:5001/shutdown"
+  hibernatenpc: "curl http://192.168.178.49:5001/hibernate"
+  shutdownnpc: "curl http://192.168.178.49:5001/shutdown"
   #overtime_input: 'curl https://web.fseitz.tk/api/index.php?key=hassio&action=overtime_input&input={{ hours_overtime }}'
 
 rest_command:
@@ -360,7 +365,7 @@ sensor:
           {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
             {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }}
           {% else %}
-            0
+            Läuft nicht
           {% endif %}
           {% if not (as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_clean_after_timeout.attributes.last_triggered) ) > 3600 %}
             Läuft nicht
@@ -383,17 +388,6 @@ sensor:
       - type: memory_use_percent
       - type: processor_temperature
   - platform: fritzbox_netmonitor
-  #- platform: emby_upcoming_media
-  #  api_key: YOUR_EMBY_API_KEY
-  #  user_id: YOUR_EMBY_USER_ID
-  #  host: !secret emby_host
-  #  port: 8096
-  #  ssl: True
-  #  max: 5
-  #  use_backdrop: true
-  #  include:
-  #    - Movies
-  #    - TV Shows
   - platform: deutsche_bahn
     from: !secret fabian_work
     to: !secret sbahn_home
