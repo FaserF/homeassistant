@@ -523,6 +523,10 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
+      - delay: '00:02:00'
+      - service: light.turn_on
+        data:
+          entity_id: light.prismatik
           
   - alias: 'Turn on climate if fpc starts'
     initial_state: on
@@ -1243,6 +1247,7 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
+      - delay: '00:02:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
@@ -1281,6 +1286,7 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
+      - delay: '00:02:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
