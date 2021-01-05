@@ -47,11 +47,10 @@ views:
       - entity: sensor.nessiephone_battery_level
       - entity: sensor.ipad_battery_level
       - entity: sensor.washing_machine_state
-      - entity: sensor.nessie_pc_energy_today
       - entity: sensor.nessie_pc_energy_power
-      - entity: sensor.fabian_strom_energy_today
       - entity: sensor.fabian_strom_energy_power
       - entity: sensor.waschmaschine_energy_power
+      - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
     cards:
       - entities:
@@ -101,11 +100,13 @@ views:
           - entity: switch.staubsauger
           - entity: switch.fabian_strom
           - entity: switch.schreibtisch
-          - entity: switch.bett
+          - entity: switch.bett_usb_ports
           - entity: switch.nessie_pc
           - entity: switch.waschmaschine
           - entity: switch.kuhlschrank
-          - entity: switch.usb
+          - entity: switch.fernseher_keller
+          - entity: switch.strom_keller
+          - entity: switch.keller_usb_ports
           - entity: switch.schloss
         show_header_toggle: true
         title: Strom
@@ -273,6 +274,7 @@ views:
           - entity: light.yeelight_strip1_34ce008b1863
           - entity: light.leds_tisch
           - entity: light.bett_gluhbirne
+          - entity: switch.bett_usb_ports
           - entity: switch.bett
         show_header_toggle: true
         title: Licht & Strom
@@ -323,7 +325,12 @@ views:
     icon: "mdi:desktop-tower"
     path: gastezimmer
     title: Gästezimmer
-  - badges: []
+  - icon: "mdi:washing-machine"
+    path: keller
+    title: Keller
+    badges:
+      - entity: sensor.steckerleiste_keller_energy_power
+      - entity: sensor.steckerleiste_keller_energy_today
     cards:
       - entities:
           - entity: light.keller_gluhbirne
@@ -335,9 +342,9 @@ views:
         type: entities
       - entities:
           - entity: switch.kuhlschrank
-          - entity: switch.stom_keller_defekt
-          - entity: switch.switch_keller_defekt
-          - entity: switch.usb
+          - entity: switch.fernseher_keller
+          - entity: switch.strom_keller
+          - entity: switch.keller_usb_ports
         show_header_toggle: true
         title: Mehrfachsteckdose
         type: entities
@@ -411,9 +418,6 @@ views:
         name: Keller TV
         remote_template: mibox
         type: "custom:generic-remote-control-card"
-    icon: "mdi:washing-machine"
-    path: keller
-    title: Keller
   - path: router
     title: Frtizbox
     icon: "mdi:router-wireless"

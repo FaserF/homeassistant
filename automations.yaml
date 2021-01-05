@@ -32,7 +32,10 @@
         data:
           entity_id: 
             - group.wohnzimmer
+            - switch.bett_usb_ports
             - switch.bett
+            - switch.keller_usb_ports
+            - switch.strom_keller
             - switch.lichtschalter
             - switch.deckenlampe
             - switch.schreibtisch
@@ -528,6 +531,30 @@
         data:
           entity_id: light.prismatik
           
+  - alias: 'Turn on bett if bett usb ports turned on'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: switch.bett_usb_ports
+        from: 'off'
+        to: 'on'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.bett
+
+  - alias: 'Turn off bett if bett usb ports turned off'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: switch.bett_usb_ports
+        from: 'on'
+        to: 'off'
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.bett
+
   - alias: 'Turn on climate if fpc starts'
     initial_state: on
     trigger:
@@ -845,13 +872,13 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.bett
+          entity_id: switch.bett_usb_ports
 
   - alias: 'Turn off bett after 2,5 hours'
     initial_state: on
     trigger:
       - platform: state
-        entity_id: switch.bett
+        entity_id: switch.bett_usb_ports
         from: 'off'
         to: 'on'
         for:
@@ -859,7 +886,7 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.bett
+          entity_id: switch.bett_usb_ports
 
   - alias: 'Turn off staubsauger after 3 hours'
     initial_state: on
@@ -1336,7 +1363,7 @@
     initial_state: True
     trigger:
       - platform: time
-        at: '14:30:00'
+        at: '15:30:00'
     condition:
       condition: and
       conditions:
@@ -1350,9 +1377,9 @@
           entity_id: 'switch.kuhlschrank'
           state: 'off'
     action:
-      - service: switch.turn_off
+      - service: switch.turn_on
         data:
-          entity_id: switch.kuhlschrank 
+          entity_id: switch.kuhlschrank
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_5friends
@@ -1379,22 +1406,6 @@
           brightness: 255
           rgb_color: [255,255,255]
           white_value: 255
-
-  - alias: 'Turn on Strom Keller'
-    initial_state: on
-    trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/keller'
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.kuhlschrank
-      - service: telegram_bot.send_message
-        data_template:
-          target: "{{ trigger.event.data.user_id }}"
-          message: 'Strom im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
           
   - alias: 'Turn on Strom Kühlschrank'
     initial_state: on
@@ -1412,7 +1423,7 @@
         event_data:
           command: '/fridge'
     action:
-      - service: switch.turn_off
+      - service: switch.turn_on
         data:
           entity_id: switch.kuhlschrank
       - service: telegram_bot.send_message
@@ -2323,40 +2334,6 @@
       - service: light.turn_on
         data:
           entity_id: group.wohnzimmer
-
-  - alias: Strip Keller Button Hold Off
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.strip_keller
-        platform: state
-        to: '{"TRIG":"HOLD"}'
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: switch.usb
-          state: 'on'
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.usb
-          
-  - alias: Strip Keller Button Hold On
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.strip_keller
-        platform: state
-        to: '{"TRIG":"HOLD"}'
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: switch.usb
-          state: 'off'
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.usb
           
   - alias: Deckenlampe Button double press Off
     initial_state: on
@@ -3850,18 +3827,7 @@
         entity_id: switch.kuhlschrank
     - service: switch.turn_off
       data:
-        entity_id: switch.usb
-
-  - alias: Turn on usb ports if keller tv isnt unavailable
-    initial_state: on
-    trigger:
-      platform: state
-      entity_id: media_player.keller_tv
-      from: 'unavailable'
-    action:
-    - service: switch.turn_on
-      data:
-        entity_id: switch.usb
+        entity_id: switch.keller_usb_ports
 
   - alias: Remind for light keller
     initial_state: on
@@ -3875,14 +3841,16 @@
         - condition: time
           after: '17:00:00'
           before: '00:00:00'
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 12000 }}"
         - condition: or
           conditions:
-            - condition: template
-              value_template: "{{ states.group.schlafzimmer.state != 'off' }}"
-            - condition: template
-              value_template: "{{ states.group.wohnzimmer.state != 'off' }}"
-            - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_light_keller.attributes.last_triggered) | int > 12000 }}"
+            - condition: state
+              entity_id: group.schlafzimmer
+              state: 'on'
+            - condition: state
+              entity_id: group.wohnzimmer
+              state: 'on'
     action:
       - service: telegram_bot.send_message
         data_template:

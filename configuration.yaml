@@ -527,6 +527,8 @@ google_assistant:
       expose: false
     switch.schloss:
       expose: false
+    switch.bett:
+      expose: false
     switch.schreibtisch:
       expose: false
     switch.frei:
@@ -580,7 +582,7 @@ google_assistant:
       name: Strom Schlafzimmer
       expose: true
       room: Schlafzimmer
-    switch.bett:
+    switch.bett_usb_ports:
       name: Bett Steckdose
       expose: true
       room: Schlafzimmer
@@ -641,8 +643,14 @@ google_assistant:
     switch.kuhlschrank:
       expose: true
       room: Keller
-    switch.usb:
+    switch.keller_usb_ports:
       name: USB Ports
+      expose: true
+      room: Keller
+    switch.fernseher_keller:
+      expose: true
+      room: Keller
+    switch.switch_keller:
       expose: true
       room: Keller
 
