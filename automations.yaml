@@ -643,6 +643,10 @@
       - service: light.turn_off
         data:
           entity_id: light.leds_tisch
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.4
+          entity_id: media_player.schlafzimmer
       - service: climate.set_hvac_mode
         data:
           entity_id: climate.schlafzimmer
@@ -697,6 +701,10 @@
       - service: light.turn_off
         data:
           entity_id: group.gastezimmer
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.4
+          entity_id: media_player.gastezimmer_mini
 
   - alias: 'Turn off strom if npc stops'
     initial_state: on
@@ -1131,7 +1139,7 @@
       - service: climate.set_temperature
         data:
           entity_id: climate.gastezimmer
-          temperature: 21
+          temperature: 20
           hvac_mode: heat
       - service: automation.turn_on
         data:
