@@ -1,12 +1,9 @@
 silent_mode:
   name: Leiser Modus
-  initial: off
   icon: mdi:volume-low
 guest_mode:
   name: Gast Modus
-  initial: off
   icon: mdi:bed
 away_mode:
   name: Abwesend Modus
-  initial: off
   icon: mdi:google-maps

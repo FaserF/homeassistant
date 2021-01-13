@@ -13,6 +13,12 @@
         to: 'not_home'
         for:
           minutes: 1
+      - platform: state
+        entity_id: person.samuel
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 1
     condition:
       condition: not
       conditions:
@@ -22,12 +28,16 @@
         - condition: state
           entity_id: person.nessie
           state: home
+        - condition: state
+          entity_id: person.samuel
+          state: home
     action:
       - service: light.turn_off
         data:
           entity_id: 
             - group.schlafzimmer
             - group.wohnzimmer
+            - group.keller
       - service: switch.turn_off
         data:
           entity_id: 
@@ -298,13 +308,6 @@
         for:
           minutes: 2
       - platform: state
-        entity_id:
-          - device_tracker.nessiepc
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
         entity_id: person.fabian
         from: 'home'
         to: 'not_home'
@@ -526,7 +529,7 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
-      - delay: '00:02:00'
+      - delay: '00:03:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
@@ -658,6 +661,7 @@
       - platform: state
         entity_id:
           - device_tracker.nessiepc
+          - device_tracker.nessie_macbook
         from: 'not_home'
         to: 'home'
     condition:
@@ -687,16 +691,23 @@
       - platform: state
         entity_id:
           - device_tracker.nessiepc
+          - device_tracker.nessie_macbook
         from: 'home'
         to: 'not_home'
         for:
-            minutes: 2
+          minutes: 2
     condition:
       condition: and
       conditions:
         - condition: state
           entity_id: input_boolean.guest_mode
           state: 'off'
+        - condition: state
+          entity_id: device_tracker.nessiepc
+          state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.nessie_macbook
+          state: 'not_home'
     action:
       - service: light.turn_off
         data:
@@ -710,17 +721,25 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.nessiepc
+        entity_id: device_tracker.nessiepc
         from: 'home'
         to: 'not_home'
         for:
-            minutes: 60
+          minutes: 60
+      - platform: state
+        entity_id: device_tracker.nessie_macbook
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 5
     condition:
       condition: and
       conditions:
       - condition: state
         entity_id: device_tracker.nessiepc
+        state: 'not_home'
+      - condition: state
+        entity_id: device_tracker.nessie_macbook
         state: 'not_home'
     action:
       - service: switch.turn_off
@@ -735,13 +754,13 @@
         from: 'home'
         to: 'not_home'
         for:
-            minutes: 60
+          minutes: 60
       - platform: state
         entity_id: device_tracker.fabian_dock
         from: 'home'
         to: 'not_home'
         for:
-            minutes: 5
+          minutes: 5
     condition:
       condition: and
       conditions:
@@ -798,22 +817,19 @@
     condition:
       condition: and
       conditions:
-      - condition: numeric_state
-        entity_id: 'weather.dwd_weather_ebersberg_halbing'
-        attribute: temperature
-        below: 17
+        - condition: numeric_state
+          entity_id: 'weather.dwd_weather_ebersberg_halbing'
+          attribute: temperature
+          below: 17
     action:
       - service: climate.set_temperature
         data:
           entity_id: climate.wohnzimmer
           temperature: 21
           hvac_mode: heat
-      - service: automation.turn_on
-        data:
-          entity_id: automation.turn_off_climate_if_tv_stops
 
   - alias: 'Turn off climate if tv stops'
-    initial_state: off
+    initial_state: on
     trigger:
       - platform: state
         entity_id:
@@ -825,9 +841,52 @@
         data:
           entity_id: climate.schlafzimmer
           hvac_mode: 'auto'
-      - service: automation.turn_off
-        data:
-          entity_id: automation.turn_off_climate_if_tv_stops
+
+  - alias: 'Remind for open window bathroom'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.bad_open_window
+        to: 'False'
+        for:
+            minutes: 15
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.bad'
+          attribute: current_temperature
+          below: 16
+    action:
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+        data: 
+          message: Es wurde vergessen das Fenster im Bad zu schließen.
+
+  - alias: 'Remind for open window after 5 minutes in bathroom'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.bad_open_window
+        to: 'True'
+        for:
+            minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.bad'
+          attribute: current_temperature
+          below: 18
+    action:
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.schlafzimmer
+        data: 
+          message: Das Fenster im Bad kann wieder geschlossen werden.
 
   - alias: 'Turn off bett if no device is charging'
     initial_state: on
@@ -853,14 +912,14 @@
     condition:
       condition: and
       conditions:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: sensor.ipad_battery_state
-              state: 'discharging'
-            - condition: numeric_state
-              entity_id: sensor.ipad_battery_level
-              above: 90
+        #- condition: or
+        #  conditions:
+        #    - condition: state
+        #      entity_id: sensor.ipad_battery_state
+        #      state: 'discharging'
+        #    - condition: numeric_state
+        #      entity_id: sensor.ipad_battery_level
+        #      above: 90
         - condition: or
           conditions:
             - condition: state
@@ -868,7 +927,7 @@
               state: 'discharging'
             - condition: numeric_state
               entity_id: sensor.fabianphone_battery_level
-              above: 90
+              above: 80
         - condition: or
           conditions:
             - condition: state
@@ -876,7 +935,7 @@
               state: 'discharging'
             - condition: numeric_state
               entity_id: sensor.nessiephone_battery_level
-              above: 90
+              above: 80
     action:
       - service: switch.turn_off
         data:
@@ -1001,31 +1060,36 @@
     condition:
       condition: and
       conditions:
-      - condition: state
-        entity_id: device_tracker.fabianphone
-        state: home
-      - condition: state
-        entity_id: device_tracker.nessiephone
-        state: home
-      - condition: sun
-        before: sunrise
-        before_offset: "1:00:00"
-      - condition: state
-        entity_id: light.leds_tisch
-        state: 'on'
-      - condition: state
-        entity_id: light.yeelight_strip1_34ce008b1863
-        state: 'on'
       - condition: not
         conditions:
-          - condition: state
-            entity_id: light.leds_tisch
-            attribute: brightness
-            state: '255'
-          - condition: state
-            entity_id: light.yeelight_strip1_34ce008b1863
-            attribute: brightness
-            state: '255'
+        - condition: state
+          entity_id: light.yeelight_strip1_34ce008b1863
+          state: 'off'
+        - condition: state
+          entity_id: light.leds_tisch
+          state: 'off'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: light.leds_tisch
+          state: 'unavailable'
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: light.leds_tisch
+              attribute: brightness
+              state: '255'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: light.yeelight_strip1_34ce008b1863
+          state: 'unavailable'
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: light.yeelight_strip1_34ce008b1863
+              attribute: brightness
+              state: '255'
     action:
       - delay: '00:00:10'
       #- service: light.turn_on
@@ -1122,7 +1186,9 @@
     initial_state: on
     trigger:
       platform: state
-      entity_id: device_tracker.nessiepc
+      entity_id: 
+        - device_tracker.nessiepc
+        - device_tracker.nessie_macbook
       from: 'not_home'
       to: 'home'
     condition:
@@ -1141,25 +1207,30 @@
           entity_id: climate.gastezimmer
           temperature: 20
           hvac_mode: heat
-      - service: automation.turn_on
-        data:
-          entity_id: automation.turn_off_climate_if_nessie_pc_stopped
 
   - alias: 'Turn off climate if Nessie PC stopped'
-    initial_state: off
+    initial_state: on
     trigger:
       platform: state
-      entity_id: device_tracker.nessiepc
+      entity_id: 
+        - device_tracker.nessiepc
+        - device_tracker.nessie_macbook
       from: 'home'
       to: 'not_home'
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.nessiepc
+        state: not_home
+      - condition: state
+        entity_id: device_tracker.nessie_macbook
+        state: not_home
     action:
       - service: climate.set_hvac_mode
         data:
           entity_id: climate.gastezimmer
           hvac_mode: 'auto'
-      - service: automation.turn_off
-        data:
-          entity_id: automation.turn_off_climate_if_nessie_pc_stopped
 
   - alias: 'Turn on light in sleeping room if fernseher turned off'
     initial_state: on
@@ -1253,6 +1324,7 @@
             entity_id: weather.dwd_weather_ebersberg_halbing
             state: cloudy
     action:
+      - delay: '00:03:00'
       - service: light.turn_off
         data:
           entity_id: light.prismatik
@@ -1282,7 +1354,7 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
-      - delay: '00:02:00'
+      - delay: '00:03:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
@@ -1321,7 +1393,7 @@
         data:
           entity_id: light.leds_tisch
           brightness: 255
-      - delay: '00:02:00'
+      - delay: '00:03:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
@@ -1333,9 +1405,14 @@
       event: sunset
       offset: "-00:15:00"
     condition:
-      condition: state
-      entity_id: device_tracker.nessiepc
-      state: home
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: 'device_tracker.nessiepc'
+          state: 'home'
+        - condition: state
+          entity_id: 'device_tracker.nessie_macbook'
+          state: 'home'
     action:
       - service: light.turn_on
         data:
@@ -1353,9 +1430,14 @@
     condition:
       condition: and
       conditions:
-        - condition: state
-          entity_id: device_tracker.nessiepc
-          state: home
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'device_tracker.nessiepc'
+              state: 'home'
+            - condition: state
+              entity_id: 'device_tracker.nessie_macbook'
+              state: 'home'
         - condition: state
           entity_id: weather.dwd_weather_ebersberg_halbing
           state: cloudy
@@ -1395,25 +1477,6 @@
           disable_notification: true
           inline_keyboard:
             - 'Ausschalten:/fridgeoff'
-
-  - alias: 'Turn on bulb in Keller'
-    initial_state: True
-    trigger:
-      - platform: state
-        entity_id: light.keller_gluhbirne
-        from: 'unavailable'
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_bulb_in_keller.attributes.last_triggered) | int > 7200 }}"
-    action:
-      - service: light.turn_on
-        data:
-          entity_id: light.keller_gluhbirne
-          brightness: 255
-          rgb_color: [255,255,255]
-          white_value: 255
           
   - alias: 'Turn on Strom Kühlschrank'
     initial_state: on
@@ -2167,17 +2230,17 @@
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
     action:
-      - service: rest_command.assistant_broadcast
-        data:
-          command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
-          user: "homeassistant"
-      #- service: tts.google_say
-      #  entity_id: 
-      #  - media_player.schlafzimmer
-      #  - media_player.wohnzimmer_mini
-      #  - media_player.gastezimmer_mini
+      #- service: rest_command.assistant_broadcast
       #  data:
-      #    message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
+      #    command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
+      #    user: "homeassistant"
+      - service: tts.google_say
+        entity_id: 
+        - media_player.schlafzimmer
+        - media_player.wohnzimmer_mini
+        - media_player.gastezimmer_mini
+        data:
+          message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
       - service: fritzbox_tools.reboot
       - service: automation.turn_on
         data:
@@ -2214,10 +2277,17 @@
             entity_id: device_tracker.fabianphone
             state: home
     action:
-      - service: rest_command.assistant_broadcast
+      #- service: rest_command.assistant_broadcast
+      #  data:
+      #    command: Die Internetverbindung ist wiederhergestellt.
+      #    user: "homeassistant"
+      - service: tts.google_say
+        entity_id: 
+        - media_player.schlafzimmer
+        - media_player.wohnzimmer_mini
+        - media_player.gastezimmer_mini
         data:
-          command: Die Internetverbindung ist wiederhergestellt.
-          user: "homeassistant"
+          message: 'Die Internetverbindung ist wiederhergestellt.'
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_no_internet_access
@@ -3893,6 +3963,83 @@
         data:
           entity_id: climate.wohnzimmer
 
+  - alias: Set climate living room if nessie and fabi at PC
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.nessiepc
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.fabian_dock
+        to: 'home'
+      - platform: state
+        entity_id: device_tracker.nessie_macbook
+        to: 'home'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.guest_mode
+          state: 'off'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.fabianpc
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.fabian_dock
+              state: 'home'
+            - condition: state
+              entity_id: person.fabian
+              state: 'not_home'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.nessiepc
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.nessie_macbook
+              state: 'home'
+            - condition: state
+              entity_id: person.nessie
+              state: 'not_home'
+    action:
+      - service: climate.set_temperature
+        data:
+          entity_id: climate.wohnzimmer
+          temperature: 16
+          hvac_mode: heat
+      - service: automation.turn_on
+        data:
+          entity_id: automation.set_climate_living_room_if_nessie_and_fabi_not_at_pc
+
+  - alias: Set climate living room if nessie and fabi not at PC
+    initial_state: off
+    trigger:
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        to: 'not_home'
+      - platform: state
+        entity_id: device_tracker.nessiepc
+        to: 'not_home'
+      - platform: state
+        entity_id: device_tracker.fabian_dock
+        to: 'not_home'
+      - platform: state
+        entity_id: device_tracker.nessie_macbook
+        to: 'not_home'
+    action:
+      - service: climate.set_hvac_mode
+        data:
+          entity_id: climate.wohnzimmer
+          hvac_mode: auto
+      - service: automation.turn_off
+        data:
+          entity_id: automation.set_climate_living_room_if_nessie_and_fabi_not_at_pc
+
   - alias: remind for guest mode
     initial_state: on
     trigger:
@@ -3908,14 +4055,17 @@
           after: '00:00:00'
           before: '06:00:00'
     action:
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.guest_mode
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Übernachtet heute ein Gast? Gast Modus einschalten?'
+          message: 'Übernachtet heute ein Gast? Gast Modus wurde automatisch eingeschaltet.'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Übernachtet heute ein Gast? Gast Modus einschalten?'
+          message: 'Übernachtet heute ein Gast? Gast Modus wurde automatisch eingeschaltet.'
 
   - alias: Set climate living room if keller left
     initial_state: on
