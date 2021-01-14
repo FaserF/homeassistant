@@ -665,21 +665,34 @@
         from: 'not_home'
         to: 'home'
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: and
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'device_tracker.nessiepc'
+              state: 'home'
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: 'device_tracker.nessie_macbook'
+                  state: 'home'
+                - condition: state
+                  entity_id: 'switch.nessie_pc'
+                  state: 'on'
+        - condition: or
           conditions:
             - condition: sun
               after: sunset
               before: sunrise
-        - condition: and
-          conditions:
-            - condition: sun
-              after: sunset
-              after_offset: "-02:30:00"
-            - condition: state
-              entity_id: weather.dwd_weather_ebersberg_halbing
-              state: 'cloudy'
+            - condition: and
+              conditions:
+                - condition: sun
+                  after: sunset
+                  after_offset: "-02:30:00"
+                - condition: state
+                  entity_id: weather.dwd_weather_ebersberg_halbing
+                  state: 'cloudy'
     action:
       - service: light.turn_on
         data:
@@ -849,7 +862,7 @@
         entity_id: sensor.bad_open_window
         to: 'False'
         for:
-            minutes: 15
+            minutes: 20
     condition:
       condition: and
       conditions:
@@ -872,14 +885,14 @@
         entity_id: sensor.bad_open_window
         to: 'True'
         for:
-            minutes: 5
+          minutes: 5
     condition:
       condition: and
       conditions:
         - condition: numeric_state
           entity_id: 'climate.bad'
           attribute: current_temperature
-          below: 18
+          below: 21
     action:
       - service: tts.google_say
         entity_id: 
@@ -893,21 +906,21 @@
     trigger:
       - platform: state
         entity_id: 
-        - sensor.ipad_battery_state
-        - sensor.fabianphone_battery_state
-        - sensor.nessiephone_battery_state
+          - sensor.ipad_battery_state
+          - sensor.fabianphone_battery_state
+          - sensor.nessiephone_battery_state
         to: 'discharging'
       - platform: state
         entity_id: 
-        - sensor.ipad_battery_state
-        - sensor.fabianphone_battery_state
-        - sensor.nessiephone_battery_state
+          - sensor.ipad_battery_state
+          - sensor.fabianphone_battery_state
+          - sensor.nessiephone_battery_state
         to: 'Not Charging'
       - platform: numeric_state
         entity_id: 
-        - sensor.ipad_battery_level
-        - sensor.fabianphone_battery_level
-        - sensor.nessiephone_battery_level
+          - sensor.ipad_battery_level
+          - sensor.fabianphone_battery_level
+          - sensor.nessiephone_battery_level
         above: 90
     condition:
       condition: and
@@ -1043,6 +1056,20 @@
             - light.leds_tisch
             - light.yeelight_strip1_34ce008b1863
           brightness: 10
+      - service: light.turn_on
+        data_template:
+          entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+          brightness: 100
+          rgb_color: > 
+            {% if state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'snowy' %}
+            [255,255,255] 
+            {% elif state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'rainy' %}
+            [0,0,255] 
+            {% elif state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'sunny' %}
+            [0,255,0]
+            {% else %}
+            [0,0,0]
+            {% endif %}
       - delay: '00:00:20'
       - service: automation.trigger
         entity_id: automation.increase_lights_in_morning
@@ -1194,13 +1221,26 @@
     condition:
       condition: and
       conditions:
-      - condition: numeric_state
-        entity_id: 'weather.dwd_weather_ebersberg_halbing'
-        attribute: temperature
-        below: 17
-      - condition: state
-        entity_id: 'input_boolean.guest_mode'
-        state: 'off'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'device_tracker.nessiepc'
+              state: 'home'
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: 'device_tracker.nessie_macbook'
+                  state: 'home'
+                - condition: state
+                  entity_id: 'switch.nessie_pc'
+                  state: 'on'
+        - condition: numeric_state
+          entity_id: 'weather.dwd_weather_ebersberg_halbing'
+          attribute: temperature
+          below: 17
+        - condition: state
+          entity_id: 'input_boolean.guest_mode'
+          state: 'off'
     action:
       - service: climate.set_temperature
         data:
@@ -1251,6 +1291,11 @@
           entity_id: 
             - light.yeelight_bslamp2_0x0000000013fea10f
             - light.bett_gluhbirne
+          brightness: 255
+      - service: light.turn_off
+        data:
+          entity_id: 
+            - light.leds_tisch
             - light.yeelight_strip1_34ce008b1863
       - delay: '00:04:00'
       - service: light.turn_off
@@ -1410,9 +1455,14 @@
         - condition: state
           entity_id: 'device_tracker.nessiepc'
           state: 'home'
-        - condition: state
-          entity_id: 'device_tracker.nessie_macbook'
-          state: 'home'
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: 'device_tracker.nessie_macbook'
+            state: 'home'
+          - condition: state
+            entity_id: 'switch.nessie_pc'
+            state: 'on'
     action:
       - service: light.turn_on
         data:
@@ -1435,9 +1485,14 @@
             - condition: state
               entity_id: 'device_tracker.nessiepc'
               state: 'home'
-            - condition: state
-              entity_id: 'device_tracker.nessie_macbook'
-              state: 'home'
+            - condition: and
+              conditions:
+              - condition: state
+                entity_id: 'device_tracker.nessie_macbook'
+                state: 'home'
+              - condition: state
+                entity_id: 'switch.nessie_pc'
+                state: 'on'
         - condition: state
           entity_id: weather.dwd_weather_ebersberg_halbing
           state: cloudy
@@ -4001,11 +4056,16 @@
               entity_id: device_tracker.nessiepc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nessie_macbook
-              state: 'home'
-            - condition: state
               entity_id: person.nessie
               state: 'not_home'
+            - condition: and
+              conditions:
+              - condition: state
+                entity_id: 'device_tracker.nessie_macbook'
+                state: 'home'
+              - condition: state
+                entity_id: 'switch.nessie_pc'
+                state: 'on'
     action:
       - service: climate.set_temperature
         data:
