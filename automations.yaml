@@ -1288,10 +1288,13 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: 
-            - light.yeelight_bslamp2_0x0000000013fea10f
-            - light.bett_gluhbirne
+          entity_id: light.bett_gluhbirne
           brightness: 255
+      - service: light.turn_on
+        data:
+          entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+          brightness: 255
+          color_temp: 279
       - service: light.turn_off
         data:
           entity_id: 
@@ -1325,7 +1328,7 @@
     trigger:
       - platform: sun
         event: sunset
-        offset: "-02:30:00"
+        offset: "-02:00:00"
       - platform: state
         entity_id: weather.dwd_weather_ebersberg_halbing
         to: 'cloudy'
@@ -1340,7 +1343,7 @@
           state: cloudy
         - condition: sun
           after: sunset
-          after_offset: "-02:30:00"
+          after_offset: "-02:00:00"
     action:
       - service: light.turn_on
         data:
@@ -1409,7 +1412,7 @@
     trigger:
       - platform: sun
         event: sunset
-        offset: "-02:30:00"
+        offset: "-02:00:00"
       - platform: state
         entity_id: weather.dwd_weather_ebersberg_halbing
         to: 'cloudy'
@@ -1424,7 +1427,7 @@
           state: cloudy
         - condition: sun
           after: sunset
-          after_offset: "-02:30:00"
+          after_offset: "-02:00:00"
         - condition: or
           conditions:
             - condition: state
@@ -1473,7 +1476,7 @@
     trigger:
       - platform: sun
         event: sunset
-        offset: "-02:30:00"
+        offset: "-02:00:00"
       - platform: state
         entity_id: weather.dwd_weather_ebersberg_halbing
         to: 'cloudy'
@@ -1498,7 +1501,7 @@
           state: cloudy
         - condition: sun
           after: sunset
-          after_offset: "-02:30:00"
+          after_offset: "-02:00:00"
     action:
       - service: light.turn_on
         data:
@@ -4060,12 +4063,12 @@
               state: 'not_home'
             - condition: and
               conditions:
-              - condition: state
-                entity_id: 'device_tracker.nessie_macbook'
-                state: 'home'
-              - condition: state
-                entity_id: 'switch.nessie_pc'
-                state: 'on'
+                - condition: state
+                  entity_id: 'device_tracker.nessie_macbook'
+                  state: 'home'
+                - condition: state
+                  entity_id: 'switch.nessie_pc'
+                  state: 'on'
     action:
       - service: climate.set_temperature
         data:
@@ -4089,8 +4092,8 @@
         entity_id: device_tracker.fabian_dock
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.nessie_macbook
-        to: 'not_home'
+        entity_id: switch.nessie_pc
+        to: 'off'
     action:
       - service: climate.set_hvac_mode
         data:
