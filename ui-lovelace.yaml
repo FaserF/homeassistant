@@ -1,51 +1,51 @@
 animated_background:
-  default_url: "https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4"
+  default_url: 'https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4'
   entity: weather.dwd_weather_ebersberg_halbing
   state_url:
     clear-night:
-      - "https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4"
-      - "https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4"
-      - "https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4"
-      - "https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4"
+      - 'https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4'
     cloudy:
-      - "https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4"
-      - "https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4"
-      - "https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4"
-      - "https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4"
-      - "https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4"
-      - "https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4"
+      - 'https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
     fog:
-      - "https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4"
-      - "https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4"
+      - 'https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4'
     mostlycloudy:
-      - "https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4"
-      - "https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4"
-      - "https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4"
+      - 'https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4'
     partlycloudy:
-      - "https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4"
-      - "https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4"
-      - "https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4"
-      - "https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4"
-      - "https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4"
-      - "https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4"
-    rainy: "https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4"
+      - 'https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
+    rainy: 'https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4'
     sunny:
-      - "https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4"
-      - "https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4"
-      - "https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4"
-      - "https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4"
-      - "https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4"
+      - 'https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4'
+      - 'https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4'
 path: default_view
 title: Fabian's Smart Home
 views:
-  - icon: "mdi:home-variant"
+  - icon: 'mdi:home-variant'
     title: Home
     badges:
       - entity: person.fabian
       - entity: person.nessie
       - entity: sensor.fabian_phone_battery_level
       - entity: sensor.nessiephone_battery_level
-      - entity: sensor.ipad_battery_level
+      - entity: sensor.fabian_ipadpro_battery_level
       - entity: sensor.washing_machine_state
       - entity: sensor.nessie_pc_energy_power
       - entity: sensor.fabian_strom_energy_power
@@ -58,40 +58,40 @@ views:
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.yeelight_color1_34ce008bcc9d
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: switch.lichtschalter
           - entity: light.leds_tisch
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.yeelight_strip1_34ce008b1863
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.yeelight_bslamp2_0x0000000013fea10f
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.bett_gluhbirne
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.lampe_gastezimmer
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.leds_gastezimmer
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.keller_gluhbirne
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
@@ -119,45 +119,50 @@ views:
         title: Weiteres
         type: entities
       - entity: climate.wohnzimmer
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.wohnzimmer_humidity
+        step_layout: column
+        step_size: '1'
       - entity: climate.schlafzimmer
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.schlafzimmer_humidity
+        step_size: '1'
       - entity: climate.gastezimmer
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.gastezimmer_humidity
+        step_size: '1'
       - entity: climate.bad
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.bad_humidity
+        step_size: '1'
       - artwork: cover
         entity: media_player.wohnzimmer_tv
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.wohnzimmer_mini
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.schlafzimmer
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.gastezimmer_mini
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.keller_tv
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.keller_tv_cast
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.mini_gruppe
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - type: glance
         entities:
           - entity: sensor.wohnzimmer_humidity
@@ -166,23 +171,26 @@ views:
           - entity: sensor.bad_humidity
         title: Luftfeuchtigkeit
       - entity: weather.dwd_weather_ebersberg_halbing
-        number_of_forecasts: "5"
-        type: "custom:weather-card"
+        number_of_forecasts: '5'
+        type: 'custom:weather-card'
       - type: entities
         entities:
           - sun.sun
-  - badges: []
+  - icon: 'mdi:television'
+    path: wohnzimmer
+    title: Wohnzimmer
+    badges: []
     cards:
       - entities:
           - switch.deckenlampe
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
           - entity: light.yeelight_color1_34ce008bcc9d
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
@@ -194,18 +202,19 @@ views:
         title: Strom
         type: entities
       - entity: climate.wohnzimmer
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.wohnzimmer_humidity
+        step_size: '1'
       - artwork: cover
         entity: media_player.wohnzimmer_tv
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.wohnzimmer_mini
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - buttons:
           back:
             call: androidtv.adb_command
@@ -259,11 +268,8 @@ views:
               entity_id: media_player.wohnzimmer_tv
         name: Wohnzimmer TV
         remote_template: mibox
-        type: "custom:generic-remote-control-card"
-    icon: "mdi:television"
-    path: wohnzimmer
-    title: Wohnzimmer
-  - icon: "mdi:bed-empty"
+        type: 'custom:generic-remote-control-card'
+  - icon: 'mdi:bed-empty'
     path: schlafzimmer
     title: Schlafzimmer
     badges: []
@@ -292,13 +298,17 @@ views:
         title: Fabian PC
         type: entities
       - entity: climate.schlafzimmer
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.schlafzimmer_humidity
+        step_size: '1'
       - artwork: cover
         entity: media_player.schlafzimmer
-        type: "custom:mini-media-player"
-  - badges: []
+        type: 'custom:mini-media-player'
+  - icon: 'mdi:desktop-tower'
+    path: gastezimmer
+    title: Gästezimmer
+    badges: []
     cards:
       - entities:
           - light.lampe_gastezimmer
@@ -309,6 +319,7 @@ views:
       - entities:
           - entity: switch.nessie_pc
           - entity: switch.nessie_pc_shutdown
+          - entity: device_tracker.nessie_macbook
           - entity: device_tracker.nessiepc
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
@@ -316,16 +327,14 @@ views:
         title: Nessie PC
         type: entities
       - entity: climate.gastezimmer
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
         sensors:
           - entity: sensor.gastezimmer_humidity
+        step_size: '1'
       - artwork: cover
         entity: media_player.gastezimmer_mini
-        type: "custom:mini-media-player"
-    icon: "mdi:desktop-tower"
-    path: gastezimmer
-    title: Gästezimmer
-  - icon: "mdi:washing-machine"
+        type: 'custom:mini-media-player'
+  - icon: 'mdi:washing-machine'
     path: keller
     title: Keller
     badges:
@@ -336,7 +345,7 @@ views:
           - entity: light.keller_gluhbirne
             group: true
             toggle: true
-            type: "custom:slider-entity-row"
+            type: 'custom:slider-entity-row'
         show_header_toggle: true
         title: Licht
         type: entities
@@ -360,10 +369,10 @@ views:
         type: entities
       - artwork: cover
         entity: media_player.keller_tv
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.keller_tv_cast
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
       - buttons:
           back:
             call: androidtv.adb_command
@@ -417,10 +426,10 @@ views:
               entity_id: media_player.keller_tv
         name: Keller TV
         remote_template: mibox
-        type: "custom:generic-remote-control-card"
+        type: 'custom:generic-remote-control-card'
   - path: router
     title: Frtizbox
-    icon: "mdi:router-wireless"
+    icon: 'mdi:router-wireless'
     visible:
       - user: b3f36b2d84254a458f3e592a2eb7b130
       - user: 427eee202b4c4ffbad381db4991972dc
@@ -466,11 +475,11 @@ views:
         state_color: false
   - title: RaspberryPi
     path: raspberrypi
-    icon: "mdi:raspberry-pi"
+    icon: 'mdi:raspberry-pi'
     badges: []
     cards:
       - entity: climate.rpi_cooling_fan_controller
-        type: "custom:simple-thermostat"
+        type: 'custom:simple-thermostat'
       - type: entities
         entities:
           - entity: switch.rpi_cooling_fan
@@ -480,19 +489,19 @@ views:
       - type: sensor
         entity: sensor.processor_temperature
         graph: line
-        icon: "mdi:cpu-64-bit"
+        icon: 'mdi:cpu-64-bit'
       - type: sensor
         entity: sensor.memory_use_percent
         graph: line
       - artwork: cover
         entity: media_player.mpd
-        type: "custom:mini-media-player"
+        type: 'custom:mini-media-player'
   - title: media
     path: media
-    icon: "mdi:music"
+    icon: 'mdi:music'
     badges: []
     cards:
-      - type: "custom:spotify-card"
+      - type: 'custom:spotify-card'
         limit: 10
         account: default
         spotify_entity: media_player.schlafzimmer

@@ -893,6 +893,13 @@
           entity_id: 'climate.bad'
           attribute: current_temperature
           below: 21
+        - condition: state
+          entity_id: input_boolean.silent_mode
+          state: 'off'
+        - condition: time
+          before: '23:00:00'
+        - condition: time
+          after: '07:50:00'
     action:
       - service: tts.google_say
         entity_id: 
@@ -901,24 +908,80 @@
         data: 
           message: Das Fenster im Bad kann wieder geschlossen werden.
 
+  - alias: 'Remind for open window after 5 minutes in sleeping room'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.schlafzimmer_open_window
+        to: 'True'
+        for:
+          minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.schlafzimmer'
+          attribute: current_temperature
+          below: 19
+        - condition: state
+          entity_id: input_boolean.silent_mode
+          state: 'off'
+        - condition: time
+          before: '23:00:00'
+        - condition: time
+          after: '07:50:00'
+    action:
+      - service: tts.google_say
+        entity_id: media_player.wohnzimmer_mini
+        data: 
+          message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
+
+  - alias: 'Remind for open window after 5 minutes in guest room'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.gastezimmer_open_window
+        to: 'True'
+        for:
+          minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.gastezimmer'
+          attribute: current_temperature
+          below: 19
+        - condition: state
+          entity_id: input_boolean.silent_mode
+          state: 'off'
+        - condition: time
+          before: '23:00:00'
+        - condition: time
+          after: '07:50:00'
+    action:
+      - service: tts.google_say
+        entity_id: media_player.wohnzimmer_mini
+        data: 
+          message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
+
   - alias: 'Turn off bett if no device is charging'
     initial_state: on
     trigger:
       - platform: state
         entity_id: 
-          - sensor.ipad_battery_state
+          - sensor.fabian_ipadpro_battery_state
           - sensor.fabianphone_battery_state
           - sensor.nessiephone_battery_state
         to: 'discharging'
       - platform: state
         entity_id: 
-          - sensor.ipad_battery_state
+          - sensor.fabian_ipadpro_battery_state
           - sensor.fabianphone_battery_state
           - sensor.nessiephone_battery_state
         to: 'Not Charging'
       - platform: numeric_state
         entity_id: 
-          - sensor.ipad_battery_level
+          - sensor.fabian_ipadpro_battery_level
           - sensor.fabianphone_battery_level
           - sensor.nessiephone_battery_level
         above: 90
@@ -928,10 +991,10 @@
         #- condition: or
         #  conditions:
         #    - condition: state
-        #      entity_id: sensor.ipad_battery_state
+        #      entity_id: sensor.fabian_ipadpro_battery_state
         #      state: 'discharging'
         #    - condition: numeric_state
-        #      entity_id: sensor.ipad_battery_level
+        #      entity_id: sensor.fabian_ipadpro_battery_level
         #      above: 90
         - condition: or
           conditions:
@@ -1209,7 +1272,7 @@
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
-  - alias: 'Turn on climate if Nessie PC started'
+  - alias: 'Turn on climate if npc started'
     initial_state: on
     trigger:
       platform: state
@@ -1587,21 +1650,21 @@
     action:
       - service: shell_command.restartha
           
-  - alias: "Let's Encrypt Renewal"
-    trigger:
-    - platform: time
-      at: '00:02:00'
-    action:
-    - service: hassio.addon_stop
-      data:
-        addon: a0d7b954_nginxproxymanager
-    - service: hassio.addon_restart
-      data:
-        addon: core_letsencrypt
-    - delay: '00:10:00'
-    - service: hassio.addon_start
-      data:
-        addon: a0d7b954_nginxproxymanager
+  #- alias: "Let's Encrypt Renewal"
+  #  trigger:
+  #  - platform: time
+  #    at: '00:02:00'
+  #  action:
+  #  - service: hassio.addon_stop
+  #    data:
+  #      addon: a0d7b954_nginxproxymanager
+  #  - service: hassio.addon_restart
+  #    data:
+  #      addon: core_letsencrypt
+  #  - delay: '00:10:00'
+  #  - service: hassio.addon_start
+  #    data:
+  #      addon: a0d7b954_nginxproxymanager
 
   - alias: Turn on Away Mode
     initial_state: on

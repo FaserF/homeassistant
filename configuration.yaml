@@ -77,10 +77,26 @@ http:
   ssl_certificate: !secret ssl_certificate
   ssl_key: !secret ssl_key
   use_x_forwarded_for: true
+  #server_port: !secret port
   trusted_proxies:
-    - 172.30.33.11
     - 127.0.0.1
-    - 172.30.0.0/24
+    - 192.168.0.0/16
+    - 172.30.0.0/18 #NGINX Proxy Manager
+    - 172.30.33.0/24 #NGINX Proxy Manager
+    - 103.21.244.0/22 #Here and below -> Cloudflare
+    - 103.22.200.0/22
+    - 103.31.4.0/22
+    - 104.16.0.0/12
+    - 108.162.192.0/18
+    - 131.0.72.0/22
+    - 141.101.64.0/18
+    - 162.158.0.0/15
+    - 172.64.0.0/13
+    - 173.245.48.0/20
+    - 188.114.96.0/20
+    - 190.93.240.0/20
+    - 197.234.240.0/22
+    - 198.41.128.0/17
 
 recorder:
   purge_keep_days: 7
@@ -479,7 +495,7 @@ homekit:
       - light.prismatik
 
 no_ip:
-  domain: !secret domain
+  domain: !secret domain_noip
   username: !secret noip_username
   password: !secret noip_pw
 
@@ -523,7 +539,6 @@ google_assistant:
   project_id: !secret google_assistant_id
   service_account: !include Homeassistant SmartLife-f9d43c517637.json
   report_state: true
-  #api_key: !secret google_assistant_api
   exposed_domains:
     - switch
     - light
@@ -539,10 +554,6 @@ google_assistant:
     switch.schreibtisch:
       expose: false
     switch.frei:
-      expose: false
-    switch.stom_keller_defekt:
-      expose: false
-    switch.switch_keller_defekt:
       expose: false
     switch.nessie_pc_shutdown:
       expose: false
@@ -657,7 +668,7 @@ google_assistant:
     switch.fernseher_keller:
       expose: true
       room: Keller
-    switch.switch_keller:
+    switch.strom_keller:
       expose: true
       room: Keller
 
