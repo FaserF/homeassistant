@@ -377,9 +377,9 @@ sensor:
       washing_machine_finish_time:
         value_template: >
           {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }}
+            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
           {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", false) }}
+            {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
           {% else %}
             Läuft nicht
           {% endif %}
@@ -554,6 +554,8 @@ google_assistant:
     switch.schreibtisch:
       expose: false
     switch.frei:
+      expose: false
+    switch.kohleanzunder:
       expose: false
     switch.nessie_pc_shutdown:
       expose: false

@@ -754,6 +754,9 @@
       - condition: state
         entity_id: device_tracker.nessie_macbook
         state: 'not_home'
+      - condition: numeric_state
+        entity_id: sensor.nessie_pc_energy_power
+        below: 40
     action:
       - service: switch.turn_off
         data:
@@ -777,12 +780,15 @@
     condition:
       condition: and
       conditions:
-      - condition: state
-        entity_id: device_tracker.fabianpc
-        state: 'not_home'
-      - condition: state
-        entity_id: device_tracker.fabian_dock
-        state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.fabianpc
+          state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.fabian_dock
+          state: 'not_home'
+        - condition: numeric_state
+          entity_id: sensor.fabian_strom_energy_power
+          below: 60
     action:
       - service: switch.turn_off
         data:
