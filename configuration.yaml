@@ -118,6 +118,13 @@ recorder:
       - sensor.lichtschalter
       - sensor.deckenlampe
       - sensor.strip_keller
+      - sensor.coal_lighter_finish_duration
+      - sensor.washing_machine_finish_duration
+      - sensor.washing_machine_finish_time
+      - sensor.washing_machine_mode
+      - sensor.washing_machine_state
+      - sensor.dwd_weather_warnings_advance_warning_level
+      - sensor.dwd_weather_warnings_current_warning_level
 
 # Checks for available updates
 updater:
@@ -397,6 +404,19 @@ sensor:
           {% endif %}
         friendly_name: "Waschmaschine Dauer ca. fertig"
         unit_of_measurement: "Stunden"
+      coal_lighter_finish_duration:
+        value_template: >
+          {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
+            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+          {% elif (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
+            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+          {% elif (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
+            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+          {% else %}
+            0
+          {% endif %}
+        friendly_name: "Kohleanzünder Dauer ca. fertig"
+        unit_of_measurement: "Minuten"
   - platform: systemmonitor
     resources:
       - type: disk_use_percent
@@ -552,8 +572,6 @@ google_assistant:
     switch.bett:
       expose: false
     switch.schreibtisch:
-      expose: false
-    switch.frei:
       expose: false
     switch.kohleanzunder:
       expose: false

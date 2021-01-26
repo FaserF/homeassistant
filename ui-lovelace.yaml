@@ -107,6 +107,7 @@ views:
           - entity: switch.fernseher_keller
           - entity: switch.strom_keller
           - entity: switch.keller_usb_ports
+          - entity: switch.kohleanzunder
           - entity: switch.schloss
         show_header_toggle: true
         title: Strom
@@ -173,9 +174,6 @@ views:
       - entity: weather.dwd_weather_ebersberg_halbing
         number_of_forecasts: '5'
         type: 'custom:weather-card'
-      - type: entities
-        entities:
-          - sun.sun
   - icon: 'mdi:television'
     path: wohnzimmer
     title: Wohnzimmer
@@ -367,6 +365,12 @@ views:
         show_header_toggle: false
         title: Waschmaschine
         type: entities
+      - entities:
+          - entity: switch.kohleanzunder
+          - entity: sensor.coal_lighter_finish_duration
+        show_header_toggle: false
+        title: Kohleanünder
+        type: entities
       - artwork: cover
         entity: media_player.keller_tv
         type: 'custom:mini-media-player'
@@ -464,10 +468,8 @@ views:
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: switch.fritzbox_7590_portforward_http_server
           - entity: switch.fritzbox_7590_portforward_https_server
           - entity: switch.fritzbox_7590_portforward_ssh
-          - entity: switch.fritzbox_7590_portforward_bitwarden
           - entity: switch.fritzbox_7590_portforward_nginx_proxy
         title: FritzBox Portforwarding
         type: entities

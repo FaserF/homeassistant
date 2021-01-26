@@ -3011,7 +3011,7 @@
           command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
       - service: switch.turn_off
         data:
-          entity_id: switch.waschmaschine
+          entity_id: switch.kohleanzunder
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
@@ -3078,7 +3078,7 @@
           command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
       - service: switch.turn_off
         data:
-          entity_id: switch.waschmaschine
+          entity_id: switch.kohlenanzunder
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
@@ -3147,7 +3147,7 @@
           command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
       - service: switch.turn_off
         data:
-          entity_id: switch.waschmaschine
+          entity_id: switch.kohlenanzunder
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
