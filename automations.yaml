@@ -510,9 +510,14 @@
             - condition: sun
               after: sunset
               before: sunrise
-            - condition: state
-              entity_id: device_tracker.tv
-              state: 'not_home'
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.tv
+                  state: 'not_home'
+                - condition: state
+                  entity_id: switch.fernseher
+                  state: 'off'
         - condition: and
           conditions:
             - condition: sun
@@ -521,9 +526,14 @@
             - condition: state
               entity_id: weather.dwd_weather_ebersberg_halbing
               state: 'cloudy'
-            - condition: state
-              entity_id: device_tracker.tv
-              state: 'not_home'
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.tv
+                  state: 'not_home'
+                - condition: state
+                  entity_id: switch.fernseher
+                  state: 'off'
     action:
       - service: light.turn_on
         data:
@@ -572,13 +582,18 @@
     condition:
       condition: and
       conditions:
-      - condition: state
-        entity_id: device_tracker.tv
-        state: 'not_home'
-      - condition: numeric_state
-        entity_id: 'weather.dwd_weather_ebersberg_halbing'
-        attribute: temperature
-        below: 16
+        - condition: numeric_state
+          entity_id: 'weather.dwd_weather_ebersberg_halbing'
+          attribute: temperature
+          below: 16
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.tv
+              state: 'not_home'
+            - condition: state
+              entity_id: switch.fernseher
+              state: 'off'
     action:
       - service: climate.set_temperature
         data:
@@ -851,8 +866,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.tv
+        entity_id: device_tracker.tv
         from: 'home'
         to: 'not_home'
     action:
@@ -1489,9 +1503,6 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: 'device_tracker.tv'
-          state: 'not_home'
-        - condition: state
           entity_id: weather.dwd_weather_ebersberg_halbing
           state: cloudy
         - condition: sun
@@ -1505,6 +1516,14 @@
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
               state: 'home'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.tv
+              state: 'not_home'
+            - condition: state
+              entity_id: switch.fernseher
+              state: 'off'
     action:
       - service: light.turn_on
         data:
@@ -1579,8 +1598,10 @@
   - alias: 'Turn on fridge for Gruppentreffen'
     initial_state: True
     trigger:
-      - platform: time
-        at: '15:30:00'
+      #- platform: time
+      #  at: '15:30:00'
+      - platform: template
+        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) }}"
     condition:
       condition: and
       conditions:
@@ -1593,6 +1614,8 @@
         - condition: state
           entity_id: 'switch.kuhlschrank'
           state: 'off'
+        - condition: template
+          value_template: '{{ now().month <= 10 or now().month >= 3 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
     action:
       - service: switch.turn_on
         data:
@@ -1604,6 +1627,46 @@
           disable_notification: true
           inline_keyboard:
             - 'Ausschalten:/fridgeoff'
+
+  - alias: 'remind for meetings in keller'
+    initial_state: True
+    trigger:
+      - platform: template
+        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 12800) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: calendar.fabianseitz98_gmail_com
+          attribute: location
+          state: !secret strasse
+        - condition: state
+          entity_id: 'switch.kuhlschrank'
+          state: 'off'
+        #- condition: template
+        #  value_template: '{{ now().month <= 10 or now().month >= 3 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: calendar.fabianseitz98_gmail_com
+              attribute: message
+              state: "Treffen*"
+            - condition: state
+              entity_id: calendar.fabianseitz98_gmail_com
+              attribute: message
+              state: "*Feier*"
+            - condition: state
+              entity_id: calendar.fabianseitz98_gmail_com
+              attribute: message
+              state: "*spieleabend*"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Anscheinend steht heute ein Treffen an, soll der Kühlschrank im Keller eingeschaltet werden?'
+          disable_notification: true
+          inline_keyboard:
+            - 'Anschalten:/fridge'
           
   - alias: 'Turn on Strom Kühlschrank'
     initial_state: on
@@ -1786,7 +1849,7 @@
     action:
       - service: telegram_bot.send_message
         data_template:
-          message: "Home Assistant  {{ state_attr('binary_sensor.updater', 'newest_version') }}  ist nun verfügbar."
+          message: "Home Assistant  {{ state_attr('binary_sensor.updater', 'newest_version') }}  ist nun verfügbar. Changelog: {{ state_attr('binary_sensor.updater', 'release_notes') }}"
           target: !secret telegram_chat_fabian
           inline_keyboard:
           - 'Update starten:/updateha'
@@ -3692,7 +3755,7 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.fabian_pc
+          entity_id: switch.fabian_pc_shutdown
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
@@ -3734,7 +3797,9 @@
       event_data:
         data: '/shutdownnpc'
     action:
-      - service: shell_command.shutdownnpc
+      - service: switch.turn_off
+        data:
+          entity_id: switch.nessie_pc_shutdown
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
@@ -4694,7 +4759,7 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ ((as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - as_timestamp(now())) < 86400) }}"
+        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - 86400) }}"
       - platform: template
         value_template: "{{ is_state_attr('calendar.jugendtreffjek_gmail_com', 'offset_reached', 'true') }}"
     action:
