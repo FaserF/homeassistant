@@ -194,8 +194,8 @@ views:
         type: entities
       - entities:
           - entity: switch.fernseher
-          - entity: automation.restart_bluetooth_on_tv
           - entity: switch.staubsauger
+          - entity: automation.restart_bluetooth_on_tv
         show_header_toggle: true
         title: Strom
         type: entities

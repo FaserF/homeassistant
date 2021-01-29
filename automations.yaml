@@ -1701,6 +1701,8 @@
       - condition: time
         after: '03:10:00'
         before: '03:00:00'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_on_ha_restart.attributes.last_triggered) | int > 1800 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1714,8 +1716,7 @@
       at: '03:00:00'
     condition:
       - condition: time
-        weekday:
-          - sun
+        weekday: sun
     action:
       - service: shell_command.restartha
           
