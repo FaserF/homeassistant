@@ -25,8 +25,10 @@ Schlafzimmer:
     - light.leds_tisch
     - light.bett_gluhbirne
     - light.yeelight_bslamp2_0x0000000013fea10f
+    - light.prismatik
     #- climate.schlafzimmer
     - switch.bett
+    - switch.bett_usb_ports
     - switch.fabian_strom
     - switch.fabian_pc_shutdown
     - switch.schreibtisch
@@ -50,9 +52,12 @@ Keller:
     - media_player.keller_tv
     - media_player.keller_tv_cast
     - switch.waschmaschine
+    - switch.kohleanzunder
     - light.keller_gluhbirne
     - switch.kuhlschrank
-    - switch.usb
+    - switch.fernseher_keller
+    - switch.keller_usb_ports
+    - switch.strom_keller
 #1-OG:
 #  name: 1. OG gesamt ohne Klima und ohne Gastezimmer
 #  entities:

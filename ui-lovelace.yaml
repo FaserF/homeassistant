@@ -44,7 +44,7 @@ views:
       - entity: person.fabian
       - entity: person.nessie
       - entity: sensor.fabian_phone_battery_level
-      - entity: sensor.nessiephone_battery_level
+      - entity: sensor.nessie_phone_battery_level
       - entity: sensor.fabian_ipadpro_battery_level
       - entity: sensor.washing_machine_state
       - entity: sensor.nessie_pc_energy_power
@@ -52,6 +52,7 @@ views:
       - entity: sensor.waschmaschine_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
+      - entity: sensor.dwd_illuminance
     cards:
       - entities:
           - entity: switch.deckenlampe

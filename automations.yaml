@@ -503,37 +503,19 @@
         from: 'not_home'
         to: 'home'
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: and
+        - condition: numeric_state
+          entity_id: sensor.dwd_illuminance
+          below: 2000
+        - condition: or
           conditions:
-            - condition: sun
-              after: sunset
-              before: sunrise
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: device_tracker.tv
-                  state: 'not_home'
-                - condition: state
-                  entity_id: switch.fernseher
-                  state: 'off'
-        - condition: and
-          conditions:
-            - condition: sun
-              after: sunset
-              after_offset: "-02:30:00"
             - condition: state
-              entity_id: weather.dwd_weather_ebersberg_halbing
-              state: 'cloudy'
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: device_tracker.tv
-                  state: 'not_home'
-                - condition: state
-                  entity_id: switch.fernseher
-                  state: 'off'
+              entity_id: device_tracker.tv
+              state: 'not_home'
+            - condition: state
+              entity_id: switch.fernseher
+              state: 'off'
     action:
       - service: light.turn_on
         data:
@@ -682,6 +664,9 @@
     condition:
       condition: and
       conditions:
+        - condition: numeric_state
+          entity_id: sensor.dwd_illuminance
+          below: 2000
         - condition: or
           conditions:
             - condition: state
@@ -695,19 +680,6 @@
                 - condition: state
                   entity_id: 'switch.nessie_pc'
                   state: 'on'
-        - condition: or
-          conditions:
-            - condition: sun
-              after: sunset
-              before: sunrise
-            - condition: and
-              conditions:
-                - condition: sun
-                  after: sunset
-                  after_offset: "-02:30:00"
-                - condition: state
-                  entity_id: weather.dwd_weather_ebersberg_halbing
-                  state: 'cloudy'
     action:
       - service: light.turn_on
         data:
@@ -817,21 +789,11 @@
         from: 'not_home'
         to: 'home'
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: and
-          conditions:
-            - condition: sun
-              after: sunset
-              before: sunrise
-        - condition: and
-          conditions:
-            - condition: sun
-              after: sunset
-              after_offset: "-02:30:00"
-            - condition: state
-              entity_id: weather.dwd_weather_ebersberg_halbing
-              state: 'cloudy'
+        - condition: numeric_state
+          entity_id: sensor.dwd_illuminance
+          below: 2000
     action:
       - service: light.turn_on
         data:
@@ -882,7 +844,7 @@
         entity_id: sensor.bad_open_window
         to: 'False'
         for:
-            minutes: 20
+          minutes: 20
     condition:
       condition: and
       conditions:
@@ -1002,8 +964,8 @@
       - platform: numeric_state
         entity_id: 
           - sensor.fabian_ipadpro_battery_level
-          - sensor.fabianphone_battery_level
-          - sensor.nessiephone_battery_level
+          - sensor.fabian_phone_battery_level
+          - sensor.nessie_phone_battery_level
         above: 90
     condition:
       condition: and
@@ -1022,7 +984,7 @@
               entity_id: sensor.fabianphone_battery_state
               state: 'discharging'
             - condition: numeric_state
-              entity_id: sensor.fabianphone_battery_level
+              entity_id: sensor.fabian_phone_battery_level
               above: 80
         - condition: or
           conditions:
@@ -1030,7 +992,7 @@
               entity_id: sensor.nessiephone_battery_state
               state: 'discharging'
             - condition: numeric_state
-              entity_id: sensor.nessiephone_battery_level
+              entity_id: sensor.nessie_phone_battery_level
               above: 80
     action:
       - service: switch.turn_off
@@ -1094,44 +1056,44 @@
     condition:
       condition: and
       conditions:
-      - condition: time
-        after: '05:00:00'
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: sun
-        before: sunrise
-        before_offset: "1:00:00"
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_morning.attributes.last_triggered) | int > 1800 }}"
-      - condition: or
-        conditions:
-          - condition: and
-            conditions:
-            - condition: state
-              entity_id: device_tracker.fabianphone
-              state: home
-            - condition: state
-              entity_id: device_tracker.nessiephone
-              state: home
-          - condition: and
-            conditions:
-            - condition: state
-              entity_id: device_tracker.nessiephone
-              state: home
-            - condition: template
-              value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
-          - condition: and
-            conditions:
-            - condition: state
-              entity_id: device_tracker.fabianphone
-              state: home
-            - condition: template
-              value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+        - condition: time
+          after: '05:00:00'
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+        - condition: numeric_state
+          entity_id: sensor.dwd_illuminance
+          below: 2000
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_morning.attributes.last_triggered) | int > 1800 }}"
+        - condition: or
+          conditions:
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.fabianphone
+                  state: home
+                - condition: state
+                  entity_id: device_tracker.nessiephone
+                  state: home
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.nessiephone
+                  state: home
+                - condition: template
+                  value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: device_tracker.fabianphone
+                  state: home
+                - condition: template
+                  value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
     action:
       - service: light.turn_on
         data:
@@ -1355,19 +1317,26 @@
           entity_id: climate.gastezimmer
           hvac_mode: 'auto'
 
-  - alias: 'Turn on light in sleeping room if fernseher turned off'
+  - alias: 'Turn on light in sleeping room if tv turned off'
     initial_state: on
     trigger:
-      platform: state
-      entity_id: device_tracker.tv
-      from: 'home'
-      to: 'not_home'
-      for:
-        seconds: 5
+      - platform: state
+        entity_id: device_tracker.tv
+        from: 'home'
+        to: 'not_home'
+        for:
+          seconds: 5
+      - platform: state
+        entity_id: switch.fernseher
+        to: 'off'
+        for:
+          seconds: 5
     condition:
       - condition: time
         after: '21:00:00'
         before: '23:50:00'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_light_in_sleeping_room_if_tv_turned_off.attributes.last_triggered) | int > 1800 }}"
     action:
       - service: light.turn_on
         data:
@@ -1391,42 +1360,16 @@
         data:
           entity_id: switch.deckenlampe
 
-  - alias: 'Turn on lights in livingroom when sun set'
+  - alias: 'Turn on lights in livingroom when dark outside'
     initial_state: on
     trigger:
-      platform: sun
-      event: sunset
-      offset: "-00:25:00"
+      platform: numeric_state
+      entity_id: sensor.dwd_illuminance
+      below: 2000
     condition:
       condition: state
       entity_id: device_tracker.tv
       state: home
-    action:
-      - service: light.turn_on
-        data:
-          entity_id: group.wohnzimmer
-
-  - alias: 'Turn on lights in livingroom when cloudy'
-    initial_state: on
-    trigger:
-      - platform: sun
-        event: sunset
-        offset: "-02:00:00"
-      - platform: state
-        entity_id: weather.dwd_weather_ebersberg_halbing
-        to: 'cloudy'
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: device_tracker.tv
-          state: home
-        - condition: state
-          entity_id: weather.dwd_weather_ebersberg_halbing
-          state: cloudy
-        - condition: sun
-          after: sunset
-          after_offset: "-02:00:00"
     action:
       - service: light.turn_on
         data:
@@ -1444,16 +1387,9 @@
     condition:
       condition: and
       conditions:
-        - condition: sun
-          before: sunset
-          before_offset: "-00:30:00"
-        - condition: sun
-          after: sunrise
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: weather.dwd_weather_ebersberg_halbing
-            state: cloudy
+        - condition: numeric_state
+          entity_id: sensor.dwd_illuminance
+          above: 2000
     action:
       - delay: '00:03:00'
       - service: light.turn_off
@@ -1491,7 +1427,7 @@
           entity_id: light.prismatik
 
   - alias: 'Turn on lights in sleeping room when cloudy'
-    initial_state: on
+    initial_state: off
     trigger:
       - platform: sun
         event: sunset
@@ -1534,12 +1470,12 @@
         data:
           entity_id: light.prismatik
 
-  - alias: 'Turn on lights in guest room room when sun set'
+  - alias: 'Turn on lights in guest room room when dark outside'
     initial_state: on
     trigger:
-      platform: sun
-      event: sunset
-      offset: "-00:15:00"
+      platform: numeric_state
+      entity_id: sensor.dwd_illuminance
+      below: 2000
     condition:
       condition: or
       conditions:
@@ -1559,41 +1495,19 @@
         data:
           entity_id: group.gastezimmer
 
-  - alias: 'Turn on lights in guest room room when cloudy'
+  - alias: 'Turn off lights in rooms when bright outside'
     initial_state: on
     trigger:
-      - platform: sun
-        event: sunset
-        offset: "-02:00:00"
-      - platform: state
-        entity_id: weather.dwd_weather_ebersberg_halbing
-        to: 'cloudy'
-    condition:
-      condition: and
-      conditions:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: 'device_tracker.nessiepc'
-              state: 'home'
-            - condition: and
-              conditions:
-              - condition: state
-                entity_id: 'device_tracker.nessie_macbook'
-                state: 'home'
-              - condition: state
-                entity_id: 'switch.nessie_pc'
-                state: 'on'
-        - condition: state
-          entity_id: weather.dwd_weather_ebersberg_halbing
-          state: cloudy
-        - condition: sun
-          after: sunset
-          after_offset: "-02:00:00"
+      platform: numeric_state
+      entity_id: sensor.dwd_illuminance
+      above: 2510
     action:
-      - service: light.turn_on
+      - service: light.turn_off
         data:
-          entity_id: group.gastezimmer
+          entity_id: 
+            - group.gastezimmer
+            - group.schlafzimmer
+            - group.wohnzimmer
 
   - alias: 'Turn on fridge for Gruppentreffen'
     initial_state: True
@@ -2021,7 +1935,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.nessiephone_battery_level
+      entity_id: sensor.nessie_phone_battery_level
       below: 5
     action:
       - service: telegram_bot.send_message
@@ -2034,7 +1948,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.fabianphone_battery_level
+      entity_id: sensor.fabian_phone_battery_level
       below: 5
     action:
       - service: telegram_bot.send_message
@@ -2786,9 +2700,6 @@
         - condition: state
           entity_id: input_boolean.silent_mode
           state: 'off'
-        - condition: state
-          entity_id: device_tracker.fabian_dock
-          state: 'not_home'
         - condition: template
           value_template: "{{ states.automation.notify_for_high_humidity.attributes.last_triggered != 'null' }}"
         - condition: template
@@ -2797,12 +2708,12 @@
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
         - condition: or
           conditions:
-          - condition: state
-            entity_id: device_tracker.fabianphone
-            state: home
-          - condition: state
-            entity_id: device_tracker.nessiephone
-            state: home
+            - condition: state
+              entity_id: device_tracker.fabianphone
+              state: home
+            - condition: state
+              entity_id: device_tracker.nessiephone
+              state: home
     action:
       - service: media_player.volume_set
         data_template:
@@ -2813,29 +2724,81 @@
       - service: media_player.media_pause
         data: 
           entity_id: media_player.wohnzimmer_tv
-      - service: tts.google_say
-        data_template:
-          entity_id: #>
-            #{% if is_state('media_player.wohnzimmer_mini', 'off') %}- media_player.wohnzimmer_mini{% else %}None{%- endif %}
-            #{% if is_state('media_player.schlafzimmer', 'off') %}- media_player.schlafzimmer{% else %}None{%- endif %}
-            #{% if is_state('input_boolean.guest_mode', 'off') %}- media_player.gastezimmer{% else %}None{%- endif %}
-            - media_player.schlafzimmer
-            - media_player.wohnzimmer_mini
-          message: >
-            Die Luftfeuchtigkeit ist zu hoch im Raum
-            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-            Gästezimmer, 
-            {% endif %}
-            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
-            Wohnzimmer,
-            {% endif %}
-            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
-            Schlafzimmer,
-            {% endif %}
-            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
-            Bad,
-            {% endif %}
-            Bitte lüften.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: media_player.wohnzimmer_mini
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_mini
+                data_template:
+                  message: >
+                    Die Luftfeuchtigkeit ist zu hoch im Raum
+                    {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+                    Gästezimmer, 
+                    {% endif %}
+                    {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+                    Wohnzimmer,
+                    {% endif %}
+                    {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+                    Schlafzimmer,
+                    {% endif %}
+                    {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+                    Bad,
+                    {% endif %}
+                    Bitte lüften.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: media_player.schlafzimmer
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.schlafzimmer
+                data_template:
+                  message: >
+                    Die Luftfeuchtigkeit ist zu hoch im Raum
+                    {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+                    Gästezimmer, 
+                    {% endif %}
+                    {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+                    Wohnzimmer,
+                    {% endif %}
+                    {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+                    Schlafzimmer,
+                    {% endif %}
+                    {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+                    Bad,
+                    {% endif %}
+                    Bitte lüften.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+              - condition: state
+                entity_id: media_player.gastezimmer_mini
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.gastezimmer_mini
+                data_template:
+                  message: >
+                    Die Luftfeuchtigkeit ist zu hoch im Raum
+                    {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+                    Gästezimmer, 
+                    {% endif %}
+                    {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+                    Wohnzimmer,
+                    {% endif %}
+                    {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+                    Schlafzimmer,
+                    {% endif %}
+                    {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+                    Bad,
+                    {% endif %}
+                    Bitte lüften.
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -4185,17 +4148,21 @@
             - condition: state
               entity_id: device_tracker.fabian_dock
               state: 'home'
-            - condition: state
-              entity_id: person.fabian
-              state: 'not_home'
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: 'home'
         - condition: or
           conditions:
             - condition: state
               entity_id: device_tracker.nessiepc
               state: 'home'
-            - condition: state
-              entity_id: person.nessie
-              state: 'not_home'
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: 'home'
             - condition: and
               conditions:
                 - condition: state
