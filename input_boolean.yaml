@@ -7,3 +7,6 @@ guest_mode:
 away_mode:
   name: Abwesend Modus
   icon: mdi:google-maps
+climate_off:
+  name: Thermostate aus
+  icon: mdi:home-thermometer-outline

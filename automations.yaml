@@ -54,54 +54,117 @@
           entity_id: 
             - media_player.schlafzimmer
             - media_player.wohnzimmer_mini
-      - service: climate.set_hvac_mode
-        data:
-          entity_id: 
-            - climate.wohnzimmer
-            - climate.schlafzimmer
-            - climate.bad
-          hvac_mode: auto
-
-  - alias: 'Turn off everything in guest room if nobody is at home'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: person.fabian
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 1
-      - platform: state
-        entity_id: person.nessie
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 1
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: input_boolean.guest_mode
-          state: 'off'
-        - condition: not
-          conditions:
-            - condition: state
-              entity_id: person.fabian
-              state: home
-            - condition: state
-              entity_id: person.nessie
-              state: home
-    action:
-      - service: light.turn_off
-        data:
-          entity_id: group.gastezimmer
-      - service: media_player.turn_off
-        data:
-          entity_id: media_player.gastezimmer_mini
-      - service: climate.set_hvac_mode
-        data:
-          entity_id: climate.gastezimmer
-          hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.fabianpc
+                state: 'home'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Keiner ist mehr zu Hause! Fabian-PC ist allerdings noch an!"
+                  data:
+                    inline_keyboard:
+                    - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.nessiepc
+                state: 'home'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+                  data:
+                    inline_keyboard:
+                    - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
+              - service: notify.telegram_nessie
+                data:
+                  message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+                  data:
+                    inline_keyboard:
+                    - 'Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.fabianpc
+                state: 'not_home'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fabian_strom
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.nessiepc
+                state: 'not_home'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.nessie_pc
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+            sequence:
+              - service: light.turn_off
+                data:
+                  entity_id: group.gastezimmer
+              - service: media_player.turn_off
+                data:
+                  entity_id: media_player.gastezimmer_mini
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: climate.gastezimmer
+                    state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data: 
+                  entity_id: climate.gastezimmer
+                  hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: climate.wohnzimmer
+                    state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data: 
+                  entity_id: climate.wohnzimmer
+                  hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: climate.schlafzimmer
+                    state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data: 
+                  entity_id: climate.schlafzimmer
+                  hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: climate.bad
+                    state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data: 
+                  entity_id: climate.bad
+                  hvac_mode: auto
 
   - alias: 'Turn off 5ghz wifi and turn on ssh if nobody is at home'
     initial_state: on
@@ -179,158 +242,6 @@
       - service: switch.turn_off
         data: 
           entity_id: switch.fritzbox_7590_portforward_ssh
-
-  - alias: 'Turn off fabian pc if nobody is at home'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: person.fabian
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
-        entity_id: person.nessie
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: person.fabian
-          state: home
-        - condition: state
-          entity_id: person.nessie
-          state: home
-        - condition: state
-          entity_id: device_tracker.fabianpc
-          state: not_home
-    action:
-      - service: notify.telegram_fabian
-        data:
-          message: "Keiner ist mehr zu Hause! Fabian-PC ist allerdings noch an!"
-          data:
-            inline_keyboard:
-            - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
-
-  - alias: 'If nobody is at home and nessie pc is on'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: person.fabian
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
-        entity_id: person.nessie
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: person.fabian
-          state: home
-        - condition: state
-          entity_id: person.nessie
-          state: home
-        - condition: state
-          entity_id: device_tracker.nessiepc
-          state: not_home
-    action:
-      - service: notify.telegram_fabian
-        data:
-          message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-          data:
-            inline_keyboard:
-            - 'Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc'
-      - service: notify.telegram_nessie
-        data:
-          message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-          data:
-            inline_keyboard:
-            - 'Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc'
-
-  - alias: 'If nobody is at home and nessie pc strom is on'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.nessiepc
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
-        entity_id: person.fabian
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
-        entity_id: person.nessie
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: person.fabian
-          state: home
-        - condition: state
-          entity_id: person.nessie
-          state: home
-        - condition: state
-          entity_id: device_tracker.nessiepc
-          state: home
-          for:
-            minutes: 2
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.nessie_pc
-
-  - alias: 'If nobody is at home and fabian pc strom is on'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.fabianpc
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
-        entity_id: person.fabian
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: person.fabian
-          state: home
-        - condition: state
-          entity_id: person.nessie
-          state: home
-        - condition: state
-          entity_id: device_tracker.fabianpc
-          state: home
-          for:
-            minutes: 2
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.fabian_strom
 
 #  - alias: 'Turn on ventilator if coming home'
 #    initial_state: on
@@ -415,6 +326,10 @@
     trigger:
       platform: time
       at: '00:50:00'
+    condition:
+      - condition: state
+        entity_id: 'input_boolean.climate_off'
+        state: 'off'
     action:
       - service: climate.set_hvac_mode
         data:
@@ -423,21 +338,16 @@
             - climate.schlafzimmer
             - climate.bad
           hvac_mode: auto
-
-  - alias: 'Set climate to auto at night guest room'
-    initial_state: true
-    trigger:
-      platform: time
-      at: '00:50:00'
-    condition:
-      - condition: state
-        entity_id: input_boolean.guest_mode
-        state: 'off'
-    action:
-      - service: climate.set_hvac_mode
-        data:
-          entity_id: climate.gastezimmer
-          hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: climate.gastezimmer
+                  hvac_mode: auto
 
   - alias: 'Activate guest mode if isi is here'
     initial_state: on
@@ -551,7 +461,7 @@
           entity_id: switch.bett
 
   - alias: 'Turn on climate if fpc starts'
-    initial_state: on
+    initial_state: off
     trigger:
       - platform: state
         entity_id: device_tracker.fabianpc
@@ -918,6 +828,37 @@
         data: 
           message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
 
+  - alias: 'Remind for open window after 5 minutes in living room'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.wohnzimmer_open_window
+        to: 'True'
+        for:
+          minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.wohnzimmer'
+          attribute: current_temperature
+          below: 18
+        - condition: state
+          entity_id: switch.fernseher
+          state: 'off'
+        - condition: state
+          entity_id: input_boolean.silent_mode
+          state: 'off'
+        - condition: time
+          before: '23:00:00'
+        - condition: time
+          after: '07:50:00'
+    action:
+      - service: tts.google_say
+        entity_id: media_player.schlafzimmer
+        data: 
+          message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
+
   - alias: 'Remind for open window after 5 minutes in guest room'
     initial_state: on
     trigger:
@@ -1058,6 +999,8 @@
       conditions:
         - condition: time
           after: '05:00:00'
+        - condition: time
+          before: '09:00:00'
         - condition: time
           weekday:
             - mon
@@ -1286,6 +1229,9 @@
         - condition: state
           entity_id: 'input_boolean.guest_mode'
           state: 'off'
+        - condition: state
+          entity_id: 'input_boolean.climate_off'
+          state: 'off'
     action:
       - service: climate.set_temperature
         data:
@@ -1305,12 +1251,15 @@
     condition:
       condition: and
       conditions:
-      - condition: state
-        entity_id: device_tracker.nessiepc
-        state: not_home
-      - condition: state
-        entity_id: device_tracker.nessie_macbook
-        state: not_home
+        - condition: state
+          entity_id: device_tracker.nessiepc
+          state: not_home
+        - condition: state
+          entity_id: device_tracker.nessie_macbook
+          state: not_home
+        - condition: state
+          entity_id: 'input_boolean.climate_off'
+          state: 'off'
     action:
       - service: climate.set_hvac_mode
         data:
@@ -1581,7 +1530,7 @@
           disable_notification: true
           inline_keyboard:
             - 'Anschalten:/fridge'
-          
+
   - alias: 'Turn on Strom Kühlschrank'
     initial_state: on
     trigger:
@@ -1622,7 +1571,7 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
-          
+
   - alias: 'Restart Homeassistant every sunday'
     initial_state: true
     trigger:
@@ -1633,7 +1582,7 @@
         weekday: sun
     action:
       - service: shell_command.restartha
-          
+
   #- alias: "Let's Encrypt Renewal"
   #  trigger:
   #  - platform: time
@@ -1679,6 +1628,30 @@
         data:
           entity_id: all
           preset_mode: 'home'
+
+  - alias: Turn on Climate Off mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.climate_off
+        to: 'on'
+    action:
+      - service: climate.set_preset_mode
+        data:
+          entity_id: all
+          hvac_mode: 'off'
+
+  - alias: Turn off Climate Off mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.climate_off
+        to: 'off'
+    action:
+      - service: climate.set_preset_mode
+        data:
+          entity_id: all
+          hvac_mode: 'auto'
 
   - alias: 'Remind for away mode'
     initial_state: on
@@ -4138,6 +4111,9 @@
       condition: and
       conditions:
         - condition: state
+          entity_id: 'input_boolean.climate_off'
+          state: 'off'
+        - condition: state
           entity_id: input_boolean.guest_mode
           state: 'off'
         - condition: or
@@ -4196,6 +4172,10 @@
       - platform: state
         entity_id: switch.nessie_pc
         to: 'off'
+    condition:
+      - condition: state
+        entity_id: 'input_boolean.climate_off'
+        state: 'off'
     action:
       - service: climate.set_hvac_mode
         data:
@@ -4246,6 +4226,9 @@
         - condition: time
           after: '17:00:00'
           before: '00:00:00'
+        - condition: state
+          entity_id: 'input_boolean.climate_off'
+          state: 'off'
     action:
       - service: climate.set_hvac_mode
         data:
