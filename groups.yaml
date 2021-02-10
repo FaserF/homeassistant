@@ -58,6 +58,7 @@ Keller:
     - switch.fernseher_keller
     - switch.keller_usb_ports
     - switch.strom_keller
+
 #1-OG:
 #  name: 1. OG gesamt ohne Klima und ohne Gastezimmer
 #  entities:
@@ -72,3 +73,23 @@ Keller:
 #    - switch.fabian_strom
 #    - switch.schreibtisch
 #    - switch.lichtschalter
+
+ignored_entities:
+  name: Entitäten welche von der unavailable Automation ignoriert werden sollen
+  entities:
+    - device_tracker.ipad
+    - device_tracker.nessie_phone
+    - device_tracker.fabian_phone
+    - media_player.beyondtv
+    - media_player.keller_tv
+    - media_player.keller_tv_cast
+    - media_player.wohnzimmer_tv
+    - media_player.wohnzimmer_tv_cast
+    - sensor.nessie_phone_charger_type
+    - sensor.fabian_phone_charger_type
+    - sensor.strip_keller
+    - light.keller_gluhbirne
+    - light.prismatik
+    - sensor.deckenlampe
+    - sensor.lichtschalter
+    - sensor.hacs

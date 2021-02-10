@@ -349,6 +349,23 @@
                   entity_id: climate.gastezimmer
                   hvac_mode: auto
 
+  - alias: 'Remind for unavailable device'
+    initial_state: true
+    trigger:
+      - platform: template
+        value_template: >
+          {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
+            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }}
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: >
+            Es sind {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
+            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }} Geräte nicht verfügbar, bitte prüfen:
+            {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
+                |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|map(attribute='entity_id')|list }}
+
   - alias: 'Activate guest mode if isi is here'
     initial_state: on
     trigger:
@@ -936,6 +953,44 @@
         - condition: time
           after: '07:50:00'
     action:
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: 'home'
+                  - condition: state
+                    entity_id: device_tracker.fabian_dock
+                    state: 'home'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    state: 'off'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Fenster im Bad kann wieder geschlossen werden."
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessiepc
+                    state: 'home'
+                  - condition: state
+                    entity_id: device_tracker.nessie_macbook
+                    state: 'home'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    state: 'off'
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: "Das Fenster im Bad kann wieder geschlossen werden."
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
@@ -1715,6 +1770,16 @@
   #  - service: hassio.addon_start
   #    data:
   #      addon: a0d7b954_nginxproxymanager
+
+  - alias: "Run Bash Script with Addon Bash Script Executer every hour"
+    trigger:
+      - platform: time_pattern
+        minutes: '/59'
+        seconds: 0
+    action:
+      - service: hassio.addon_start
+        data:
+          addon: 605cee21_bashscriptexecuter
 
   - alias: Turn on Away Mode
     initial_state: on
