@@ -38,7 +38,7 @@ Gästezimmer:
   name: Gästezimmer
   icon: mdi:laptop
   entities:
-    - media_player.guest_mini
+    - media_player.gastezimmer_mini
     - light.lampe_gastezimmer
     - light.leds_gastezimmer
     #- climate.gastezimmer

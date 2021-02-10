@@ -491,6 +491,13 @@
               entity_id: switch.fernseher
               state: 'off'
     action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.schlafzimmer_open_window
+                state: 'on'
+            sequence:
+              - delay: '00:25:00'
       - service: climate.set_temperature
         data:
           entity_id: climate.schlafzimmer
@@ -805,31 +812,113 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.bad_open_window
-        to: 'False'
+        entity_id: binary_sensor.bad_open_window
+        to: 'off'
         for:
-          minutes: 20
+          minutes: 15
     condition:
-      condition: and
+      condition: or
       conditions:
         - condition: numeric_state
-          entity_id: 'climate.bad'
+          entity_id: climate.bad
           attribute: current_temperature
           below: 16
+        - condition: numeric_state
+          entity_id: sensor.bad_heating
+          above: 90
+    action:
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.gastezimmer_mini
+          - media_player.schlafzimmer
+        data: 
+          message: Es wurde vergessen das Fenster im Bad zu schließen.
+
+  - alias: 'Remind for open window sleeping room'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.schlafzimmer_open_window
+        to: 'off'
+        for:
+          minutes: 15
+    condition:
+      condition: or
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.schlafzimmer'
+          attribute: current_temperature
+          below: 16
+        - condition: numeric_state
+          entity_id: sensor.schlafzimmer_heating
+          above: 90
+    action:
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.gastezimmer_mini
+        data: 
+          message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
+
+  - alias: 'Remind for open window living room'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.wohnzimmer_open_window
+        to: 'off'
+        for:
+          minutes: 15
+    condition:
+      condition: or
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.wohnzimmer'
+          attribute: current_temperature
+          below: 16
+        - condition: numeric_state
+          entity_id: sensor.wohnzimmer_heating
+          above: 90
+    action:
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.gastezimmer_mini
+        data: 
+          message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+
+  - alias: 'Remind for open window guest room'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.gastezimmer_open_window
+        to: 'off'
+        for:
+          minutes: 15
+    condition:
+      condition: or
+      conditions:
+        - condition: numeric_state
+          entity_id: 'climate.gastezimmer'
+          attribute: current_temperature
+          below: 16
+        - condition: numeric_state
+          entity_id: sensor.gastezimmer_heating
+          above: 90
     action:
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
         data: 
-          message: Es wurde vergessen das Fenster im Bad zu schließen.
+          message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
 
   - alias: 'Remind for open window after 5 minutes in bathroom'
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.bad_open_window
-        to: 'True'
+        entity_id: binary_sensor.bad_open_window
+        to: 'on'
         for:
           minutes: 5
     condition:
@@ -858,8 +947,8 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.schlafzimmer_open_window
-        to: 'True'
+        entity_id: binary_sensor.schlafzimmer_open_window
+        to: 'on'
         for:
           minutes: 5
     condition:
@@ -886,8 +975,8 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.wohnzimmer_open_window
-        to: 'True'
+        entity_id: binary_sensor.wohnzimmer_open_window
+        to: 'on'
         for:
           minutes: 5
     condition:
@@ -917,8 +1006,8 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.gastezimmer_open_window
-        to: 'True'
+        entity_id: binary_sensor.gastezimmer_open_window
+        to: 'on'
         for:
           minutes: 5
     condition:
@@ -1079,15 +1168,21 @@
                 - condition: state
                   entity_id: device_tracker.nessiephone
                   state: home
-                - condition: template
-                  value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: device_tracker.google_maps_112174659110860535869
+                      state: home
             - condition: and
               conditions:
                 - condition: state
                   entity_id: device_tracker.fabianphone
                   state: home
-                - condition: template
-                  value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: device_tracker.google_maps_112056758146194246561
+                      state: home
     action:
       - choose:
           - conditions:
@@ -1485,7 +1580,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: calendar.fabianseitz98_gmail_com
+          entity_id: !secret calendar_fs
           attribute: message
           state: "Gruppentreffen"  
         - condition: template
@@ -1516,10 +1611,6 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: calendar.fabianseitz98_gmail_com
-          attribute: location
-          state: !secret strasse
-        - condition: state
           entity_id: 'switch.kuhlschrank'
           state: 'off'
         #- condition: template
@@ -1527,15 +1618,25 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
+              entity_id: !secret calendar_fs
+              attribute: location
+              state: !secret strasse
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: location
+              state: none
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: !secret calendar_fs
               attribute: message
               state: "Treffen*"
             - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
+              entity_id: !secret calendar_fs
               attribute: message
               state: "*Feier*"
             - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
+              entity_id: !secret calendar_fs
               attribute: message
               state: "*spieleabend*"
     action:
@@ -1757,80 +1858,112 @@
           inline_keyboard:
           - 'Update starten:/updateha'
 
-  - alias: 'Incoming Call Fabian'
-    initial_state: off
+  - alias: 'HACS Update available'
+    initial_state: on
     trigger:
-      - platform: state
-        entity_id: automation.incoming_call_fabian
-        to: 'on'
+      - platform: numeric_state
+        entity_id: sensor.hacs
+        above: 0
     condition:
-      - condition: state
-        entity_id: 'input_boolean.silent_mode'
-        state: 'off'
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.hacs_update_available.attributes.last_triggered) | int > 3200 }}"
     action:
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.4
-          entity_id: media_player.wohnzimmer_mini
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
-        data_template: 
-          message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
-      - service: media_player.media_pause
-        data:
-          entity_id: media_player.wohnzimmer_tv
-      - delay: '00:00:09'
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: media_player.wohnzimmer_mini
-      - service: automation.turn_off
-        data:
-          entity_id: automation.incoming_call_fabian
-      - service: media_player.turn_off
-        data:
-          entity_id: media_player.wohnzimmer_mini
-      - service: media_player.turn_off
-        data:
-          entity_id: media_player.schlafzimmer
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            {% if is_state("states.sensor.hacs.state", "1")%} 
+            Es gibt ein verfügbares HACS Update.
+            {% else %}
+            Es gibt {{ states.sensor.hacs.state }} verfügbare HACS Updates.
+            {% endif %}
+            Darunter folgende Integrationen:
 
-  - alias: 'Incoming Call Nessie'
-    initial_state: off
-    trigger:
-      - platform: state
-        entity_id: automation.incoming_call_nessie
-        to: 'on'
-    condition:
-      - condition: state
-        entity_id: 'input_boolean.silent_mode'
-        state: 'off'
-    action:
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.7
-          entity_id: media_player.wohnzimmer_mini
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
-        data:
-          message: 'Nessie wird soeben angerufen!'
-      - delay: '00:00:10'
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: media_player.wohnzimmer_mini
-      - service: automation.turn_off
-        data:
-          entity_id: automation.incoming_call_nessie
-      - service: media_player.turn_off
-        data:
-          entity_id: media_player.wohnzimmer_mini
-      - service: media_player.turn_off
-        data:
-          entity_id: media_player.schlafzimmer
+            - {{state_attr('sensor.hacs', 'repositories')[0]['display_name']}} von Version {{state_attr('sensor.hacs', 'repositories')[0]['installed_version']}} zu Version {{state_attr('sensor.hacs', 'repositories')[0]['available_version']}}
+            {% if states.sensor.hacs.state >= '2' %}
+            - {{state_attr('sensor.hacs', 'repositories')[1]['display_name']}} von Version {{state_attr('sensor.hacs', 'repositories')[1]['installed_version']}} zu Version {{state_attr('sensor.hacs', 'repositories')[1]['available_version']}}
+            {% endif %}
+            {% if states.sensor.hacs.state >= '3' %}
+            - {{state_attr('sensor.hacs', 'repositories')[2]['display_name']}} von Version {{state_attr('sensor.hacs', 'repositories')[2]['installed_version']}} zu Version {{state_attr('sensor.hacs', 'repositories')[2]['available_version']}}
+            {% endif %}
+
+  # - alias: 'Incoming Call Fabian'
+  #   initial_state: on
+  #   trigger:
+  #     - platform: state
+  #       entity_id: automation.incoming_call_fabian
+  #       to: 'on'
+  #   condition:
+  #     - condition: state
+  #       entity_id: 'input_boolean.silent_mode'
+  #       state: 'off'
+  #   action:
+  #     - service: media_player.volume_set
+  #       data:
+  #         volume_level: 0.4
+  #         entity_id: media_player.wohnzimmer_mini
+  #     - service: tts.google_say
+  #       entity_id: 
+  #       - media_player.wohnzimmer_mini
+  #       - media_player.schlafzimmer
+  #       data_template: 
+  #         message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
+  #     - service: media_player.media_pause
+  #       data:
+  #         entity_id: media_player.wohnzimmer_tv
+  #     - delay: '00:00:09'
+  #     - service: media_player.volume_set
+  #       data:
+  #         volume_level: 0.3
+  #         entity_id: media_player.wohnzimmer_mini
+  #     - service: automation.turn_off
+  #       data:
+  #         entity_id: automation.incoming_call_fabian
+  #     - service: media_player.turn_off
+  #       data:
+  #         entity_id: media_player.wohnzimmer_mini
+  #     - service: media_player.turn_off
+  #       data:
+  #         entity_id: media_player.schlafzimmer
+
+  # - alias: 'Incoming Call Nessie'
+  #   initial_state: on
+  #   trigger:
+  #     - platform: state
+  #       entity_id: automation.incoming_call_nessie
+  #       to: 'on'
+  #   condition:
+  #     - condition: state
+  #       entity_id: 'input_boolean.silent_mode'
+  #       state: 'off'
+  #   action:
+  #     - service: media_player.volume_set
+  #       data:
+  #         volume_level: 0.7
+  #         entity_id: media_player.wohnzimmer_mini
+  #     - service: tts.google_say
+  #       entity_id: 
+  #       - media_player.wohnzimmer_mini
+  #       - media_player.schlafzimmer
+  #       data:
+  #         message: 'Nessie wird soeben angerufen!'
+  #     - delay: '00:00:10'
+  #     - service: media_player.volume_set
+  #       data:
+  #         volume_level: 0.3
+  #         entity_id: media_player.wohnzimmer_mini
+  #     - service: automation.turn_off
+  #       data:
+  #         entity_id: automation.incoming_call_nessie
+  #     - service: media_player.turn_off
+  #       data:
+  #         entity_id: media_player.wohnzimmer_mini
+  #     - service: media_player.turn_off
+  #       data:
+  #         entity_id: media_player.schlafzimmer
 
 #not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
 #  - alias: 'Coinbase balance high'
@@ -2250,10 +2383,8 @@
     trigger:
       - platform: state
         entity_id: 
-        - binary_sensor.thermostat_bad_low_battery
-        - binary_sensor.thermostat_wohnzimmer_low_battery
-        - binary_sensor.thermostat_gastezimmer_low_battery
-        - binary_sensor.thermostat_schlafzimmer_low_battery
+        - binary_sensor.bad_battery_state
+        - binary_sensor.schlafzimmer_battery_state
         from: 'off'
         to: 'on'
     action:
@@ -2261,16 +2392,33 @@
         data_template:
           message: > 
             Die Batterie im Thermostat
-            {% if is_state('binary_sensor.thermostat_gastezimmer_low_battery', 'on') %}
+            {% if is_state('binary_sensor.gastezimmer_battery_state', 'on') %}
             Gästezimmer 
             {% endif %}
-            {% if is_state('binary_sensor.thermostat_wohnzimmer_low_battery', 'on') %}
+            {% if is_state('binary_sensor.wohnzimmer_battery_state', 'on') %}
             Wohnzimmer
             {% endif %}
-            {% if is_state('binary_sensor.thermostat_schlafzimmer_low_battery', 'on') %}
+            {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
             Schlafzimmer
             {% endif %}
-            {% if is_state('binary_sensor.thermostat_bad_low_battery', 'on') %}
+            {% if is_state('binary_sensor.bad_battery_state', 'on') %}
+            Bad
+            {% endif %}
+            ist bald leer. Bitte auswechseln!
+      - service: notify.telegram_nessie
+        data_template:
+          message: > 
+            Die Batterie im Thermostat
+            {% if is_state('binary_sensor.gastezimmer_battery_state', 'on') %}
+            Gästezimmer 
+            {% endif %}
+            {% if is_state('binary_sensor.wohnzimmer_battery_state', 'on') %}
+            Wohnzimmer
+            {% endif %}
+            {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
+            Schlafzimmer
+            {% endif %}
+            {% if is_state('binary_sensor.bad_battery_state', 'on') %}
             Bad
             {% endif %}
             ist bald leer. Bitte auswechseln!
@@ -2676,9 +2824,11 @@
     trigger:
       - platform: numeric_state
         entity_id: 
-          - sensor.gastezimmer_humidity
-          - sensor.wohnzimmer_humidity
-          - sensor.schlafzimmer_humidity
+          - climate.gastezimmer
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.bad
+        attribute: current_humidity
         above: 60
     condition:
       condition: and
@@ -2690,8 +2840,12 @@
         - condition: state
           entity_id: input_boolean.silent_mode
           state: 'off'
-        - condition: template
-          value_template: "{{ states.automation.notify_for_high_humidity.attributes.last_triggered != 'null' }}"
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: automation.notify_for_high_humidity
+              attribute: last_triggered
+              state: none
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
         - condition: template
@@ -2799,10 +2953,12 @@
   - alias: Notify for extreme high humidity
     trigger:
       - platform: numeric_state
-        entity_id: sensor.gastezimmer_humidity
-        above: 67
-      - platform: numeric_state
-        entity_id: sensor.wohnzimmer_humidity
+        entity_id: 
+          - climate.gastezimmer
+          - climate.wohnzimmer
+          - climate.schlafzimmer
+          - climate.bad
+        attribute: current_humidity
         above: 67
     condition:
       - condition: state
@@ -2835,17 +2991,14 @@
         from: 'not_home'
         to: 'home'
     condition:
-      - condition: or
-        conditions:
-        - condition: numeric_state
-          entity_id: sensor.gastezimmer_humidity
-          above: 60
-        - condition: numeric_state
-          entity_id: sensor.wohnzimmer_humidity
-          above: 60
-        - condition: numeric_state
-          entity_id: sensor.schlafzimmer_humidity
-          above: 60
+      - condition: numeric_state
+        entity_id: 
+          - climate.gastezimmer
+          - climate.wohnzimmer
+          - climate.schlafzimme
+          - climate.bad
+        attribute: current_humidity
+        above: 54
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
@@ -2860,12 +3013,16 @@
         before: '22:00:00'
       - condition: time
         after: '08:00:00'
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: automation.notify_for_high_humidity_when_coming_home
+            attribute: last_triggered
+            state: none
       - condition: template
-        value_template: "{{ states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered != 'null' }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 4200 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home.attributes.last_triggered) | int > 7200 }}"
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 7200 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 4200 }}"
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
@@ -2915,10 +3072,12 @@
         to: 'home'
     condition:
       - condition: numeric_state
-        entity_id: sensor.gastezimmer_humidity
-        above: 54
-      - condition: numeric_state
-        entity_id: sensor.wohnzimmer_humidity
+        entity_id: 
+          - climate.gastezimmer
+          - climate.wohnzimmer
+          - climate.schlafzimme
+          - climate.bad
+        attribute: current_humidity
         above: 54
       - condition: state
         entity_id: 'input_boolean.silent_mode'
@@ -2932,7 +3091,7 @@
       - condition: time
         after: '11:00:00'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 7200 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 4200 }}"
     action:
       - delay: 00:03:00
       - service: media_player.volume_set
@@ -3607,8 +3766,12 @@
     condition:
       condition: and
       conditions:
-        - condition: template
-          value_template: "{{ states.automation.telegram_pill_marked_done.attributes.last_triggered != 'null' }}"
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: automation.telegram_pill_marked_done
+              attribute: last_triggered
+              state: none
         - condition: state
           entity_id: person.nessie
           state: home
@@ -4045,6 +4208,15 @@
       to: 'unavailable'
       for:
         minutes: 10
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: switch.fernseher_keller
+          state: 'off'
+        - condition: state
+          entity_id: switch.strom_keller
+          state: 'off'
     action:
     - service: switch.turn_off
       data:
@@ -4306,8 +4478,11 @@
   #   condition:
   #     condition: and
   #     conditions:
-  #       - condition: template
-  #         value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state != 'home' }}"
+  #        - condition: not
+  #          conditions:
+  #            - condition: state
+  #              entity_id: device_tracker.google_maps_112056758146194246561
+  #              state: home
   #       - condition: time
   #         after: '06:30:00'
   #         before: '07:10:00'
@@ -4335,7 +4510,7 @@
           entity_id: device_tracker.fabianphone
           state: home
         - condition: template
-          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.last_seen)) < 3600 }}"
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.attributes.last_seen)) < 3600 }}"
         - condition: time
           after: '06:30:00'
           before: '07:10:00'
@@ -4373,8 +4548,11 @@
             - tue
             - wed
             - thu
-        - condition: template
-          value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state != 'home' }}"
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: device_tracker.google_maps_112174659110860535869
+              state: home
     action:
       - service: notify.telegram_fabian
         data:
