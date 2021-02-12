@@ -404,10 +404,6 @@ sensor:
         value_template: >
           {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
             {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
-          {% elif (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
-            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_5_freunde.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
-          {% elif (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
-            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active_afk.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
           {% else %}
             0
           {% endif %}
