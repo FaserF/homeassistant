@@ -355,11 +355,22 @@
       - platform: template
         value_template: >
           {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
-            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }}
+            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
+        for:
+          minutes: 1
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: 'input_boolean.guest_mode'
+          state: 'off'
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_unavailable_device.attributes.last_triggered) | int > 5600 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
+          disable_notification: true
           message: >
             Es sind {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
             |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }} Geräte nicht verfügbar, bitte prüfen:
@@ -510,9 +521,11 @@
     action:
       - choose:
           - conditions:
-              - condition: state
-                entity_id: binary_sensor.schlafzimmer_open_window
-                state: 'on'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: binary_sensor.schlafzimmer_open_window
+                    state: 'on'
             sequence:
               - delay: '00:25:00'
       - service: climate.set_temperature
@@ -594,11 +607,10 @@
     initial_state: on
     trigger:
       platform: state
-      entity_id: 
-        - device_tracker.nessiepc
-        - device_tracker.nessie_macbook
-      from: 'not_home'
-      to: 'home'
+      entity_id: switch.nessie_pc
+      to: 'on'
+      for:
+        minutes: 1
     action:
       - choose:
           - conditions:
@@ -625,6 +637,11 @@
               - condition: state
                 entity_id: 'input_boolean.climate_off'
                 state: 'off'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: 'climate.gastezimmer'
+                    state: 'off'
             sequence:
               - service: climate.set_temperature
                 data:
@@ -945,14 +962,42 @@
           entity_id: 'climate.bad'
           attribute: current_temperature
           below: 21
-        - condition: state
-          entity_id: input_boolean.silent_mode
-          state: 'off'
         - condition: time
           before: '23:00:00'
         - condition: time
           after: '07:50:00'
     action:
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: input_boolean.silent_mode
+                    state: 'on'
+                  - condition: and
+                    conditions:
+                      - condition: state
+                        entity_id: device_tracker.fabianpc
+                        state: 'not_home'
+                      - condition: state
+                        entity_id: device_tracker.fabian_dock
+                        state: 'not_home'
+                      - condition: state
+                        entity_id: device_tracker.nessiepc
+                        state: 'not_home'
+                      - condition: state
+                        entity_id: device_tracker.nessie_macbook
+                        state: 'not_home'
+                      - condition: state
+                        entity_id: device_tracker.tv
+                        state: 'not_home'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Fenster im Bad kann wieder geschlossen werden."
+              - service: notify.telegram_nessie
+                data:
+                  message: "Das Fenster im Bad kann wieder geschlossen werden."
       - choose:
           - conditions:
               - condition: or
@@ -991,12 +1036,31 @@
               - service: notify.telegram_nessie
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
-        data: 
-          message: Das Fenster im Bad kann wieder geschlossen werden.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.gastezimmer_mini
+                data: 
+                  message: Das Fenster im Bad kann wieder geschlossen werden.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.schlafzimmer
+                data: 
+                  message: Das Fenster im Bad kann wieder geschlossen werden.
 
   - alias: 'Remind for open window after 5 minutes in sleeping room'
     initial_state: on
@@ -1013,18 +1077,33 @@
           entity_id: 'climate.schlafzimmer'
           attribute: current_temperature
           below: 19
-        - condition: state
-          entity_id: input_boolean.silent_mode
-          state: 'off'
         - condition: time
           before: '23:00:00'
         - condition: time
           after: '07:50:00'
     action:
-      - service: tts.google_say
-        entity_id: media_player.wohnzimmer_mini
-        data: 
-          message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'on'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
+              - service: notify.telegram_nessie
+                data:
+                  message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_mini
+                data: 
+                  message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
 
   - alias: 'Remind for open window after 5 minutes in living room'
     initial_state: on
@@ -1044,18 +1123,46 @@
         - condition: state
           entity_id: switch.fernseher
           state: 'off'
-        - condition: state
-          entity_id: input_boolean.silent_mode
-          state: 'off'
         - condition: time
           before: '23:00:00'
         - condition: time
           after: '07:50:00'
     action:
-      - service: tts.google_say
-        entity_id: media_player.schlafzimmer
-        data: 
-          message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'on'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
+              - service: notify.telegram_nessie
+                data:
+                  message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.schlafzimmer
+                data: 
+                  message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.gastezimmer_mini
+                data: 
+                  message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
 
   - alias: 'Remind for open window after 5 minutes in guest room'
     initial_state: on
@@ -1072,18 +1179,35 @@
           entity_id: 'climate.gastezimmer'
           attribute: current_temperature
           below: 19
-        - condition: state
-          entity_id: input_boolean.silent_mode
-          state: 'off'
         - condition: time
           before: '23:00:00'
         - condition: time
           after: '07:50:00'
     action:
-      - service: tts.google_say
-        entity_id: media_player.wohnzimmer_mini
-        data: 
-          message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'on'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Fenster im Gästezimmer kann wieder geschlossen werden."
+              - service: notify.telegram_nessie
+                data:
+                  message: "Das Fenster im Gästezimmer kann wieder geschlossen werden."
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.schlafzimmer
+                data: 
+                  message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
 
   - alias: 'Turn off bett if no device is charging'
     initial_state: on
