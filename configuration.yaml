@@ -200,6 +200,42 @@ notify:
 
 media_player:
   - platform: androidtv
+    name: Chromecast
+    device_class: androidtv
+    host: 192.168.178.14
+    adb_server_ip: 127.0.0.1
+    exclude_unnamed_apps: true
+    apps:
+      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
+      exp.animo.fireanime: "FireAnime"
+      com.crunchyroll.crunchyroid: "Crunchyroll"
+      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
+      com.netflix.ninja: "Netflix"
+      com.valvesoftware.steamlink: "Steam Link"
+      com.zdf.android.mediathek: "ZDF Mediathek"
+      tv.emby.embyatv: "Emby"
+      com.google.android.apps.mediashell: "Chromecast"
+      de.prosiebensat1digital.prosieben: "Pro7"
+      com.android.tv.settings: "Einstellungen"
+    state_detection_rules:
+      "com.google.android.apps.tv.launcherx":
+        - "standby"
+      "com.netflix.ninja":
+        - "playing":
+            "media_session_state": 3
+        - "paused":
+            "media_session_state": 2
+      "com.spotify.tv.android":
+        - "playing":
+            "media_session_state": 3
+        - "paused":
+            "media_session_state": 2
+      "com.google.android.apps.mediashell":
+        - "audio_state"
+      "com.liskovsoft.videomanager":
+        - "playing":
+            "media_session_state": 3
+  - platform: androidtv
     name: Wohnzimmer TV
     device_class: androidtv
     host: 192.168.178.11
@@ -404,10 +440,14 @@ sensor:
         value_template: >
           {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
             {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+          {% elif (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) + 780 - as_timestamp(now()) > 0 ) %}
+            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (780) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+          {% elif (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) + 300 - as_timestamp(now()) > 0 ) %}
+            {{ (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int + (300) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
           {% else %}
             0
           {% endif %}
-        friendly_name: "Kohleanzünder Dauer ca. fertig"
+        friendly_name: "Gerät Waschraum Dauer ca. fertig"
         unit_of_measurement: "Minuten"
   - platform: systemmonitor
     resources:

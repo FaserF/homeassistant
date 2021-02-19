@@ -80,11 +80,12 @@ ignored_entities:
     - device_tracker.ipad
     - device_tracker.nessie_phone
     - device_tracker.fabian_phone
-    - media_player.beyondtv
     - media_player.keller_tv
     - media_player.keller_tv_cast
     - media_player.wohnzimmer_tv
     - media_player.wohnzimmer_tv_cast
+    - media_player.chromecast
+    - media_player.chromecast_cast
     - sensor.nessie_phone_charger_type
     - sensor.fabian_phone_charger_type
     - sensor.strip_keller
@@ -93,3 +94,5 @@ ignored_entities:
     - sensor.deckenlampe
     - sensor.lichtschalter
     - sensor.hacs
+    - sensor.dwd_weather_warnings_advance_warning_level
+    - sensor.dwd_weather_warnings_current_warning_level

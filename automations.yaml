@@ -357,7 +357,7 @@
           {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
             |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
         for:
-          minutes: 1
+          minutes: 5
     condition:
       condition: and
       conditions:
@@ -366,6 +366,10 @@
           state: 'off'
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_unavailable_device.attributes.last_triggered) | int > 5600 }}"
+        - condition: template
+          value_template: >
+            {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
+              |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -413,6 +417,11 @@
         to: 'not_home'
         for:
           days: 1
+      - platform: state
+        entity_id: input_boolean.guest_mode
+        to: 'on'
+        for:
+          days: 1
     condition:
       condition: and
       conditions:
@@ -423,11 +432,11 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Gast Modus sollte deaktiviert werden, da Isi nicht mehr zu Besuch ist.'
+          message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Gast Modus sollte deaktiviert werden, da Isi nicht mehr zu Besuch ist.'
+          message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
 
   - alias: 'Turn on light if fpc starts'
     initial_state: on
@@ -533,12 +542,9 @@
           entity_id: climate.schlafzimmer
           temperature: 20
           hvac_mode: heat
-      - service: automation.turn_on
-        data:
-          entity_id: automation.turn_off_climate_if_fpc_stops
 
   - alias: 'Turn off climate if fpc stops'
-    initial_state: off
+    initial_state: on
     trigger:
       - platform: state
         entity_id: device_tracker.fabianpc
@@ -562,9 +568,6 @@
         data:
           entity_id: climate.schlafzimmer
           hvac_mode: 'auto'
-      - service: automation.turn_off
-        data:
-          entity_id: automation.turn_off_climate_if_fpc_stops
 
   - alias: 'Turn off tleds if fpc stops'
     initial_state: on
@@ -675,12 +678,14 @@
   - alias: 'Turn off lights and climate if npc stopped'
     initial_state: on
     trigger:
-      platform: state
-      entity_id: 
-        - device_tracker.nessiepc
-        - device_tracker.nessie_macbook
-      from: 'home'
-      to: 'not_home'
+      - platform: state
+        entity_id: device_tracker.nessiepc
+        from: 'home'
+        to: 'not_home'
+      - platform: state
+        entity_id: device_tracker.nessie_macbook
+        from: 'home'
+        to: 'not_home'
     action:
       - choose:
           - conditions:
@@ -747,7 +752,7 @@
         state: 'not_home'
       - condition: numeric_state
         entity_id: sensor.nessie_pc_energy_power
-        below: 40
+        below: 30
     action:
       - service: switch.turn_off
         data:
@@ -1055,12 +1060,24 @@
                 entity_id: input_boolean.silent_mode
                 state: 'off'
             sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id:
+                    - media_player.schlafzimmer
+                    - media_player.wohnzimmer_mini
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.schlafzimmer
                 data: 
                   message: Das Fenster im Bad kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id:
+                    - media_player.schlafzimmer
+                    - media_player.wohnzimmer_mini
 
   - alias: 'Remind for open window after 5 minutes in sleeping room'
     initial_state: on
@@ -1100,10 +1117,18 @@
                 entity_id: input_boolean.silent_mode
                 state: 'off'
             sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id: media_player.wohnzimmer_mini
               - service: tts.google_say
                 entity_id: media_player.wohnzimmer_mini
                 data: 
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_mini
 
   - alias: 'Remind for open window after 5 minutes in living room'
     initial_state: on
@@ -1146,10 +1171,18 @@
                 entity_id: input_boolean.silent_mode
                 state: 'off'
             sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id: media_player.schlafzimmer
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer
                 data: 
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id: media_player.schlafzimmer
       - choose:
           - conditions:
               - condition: state
@@ -1202,12 +1235,24 @@
                 entity_id: input_boolean.silent_mode
                 state: 'off'
             sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id:
+                    - media_player.schlafzimmer
+                    - media_player.wohnzimmer_mini
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.schlafzimmer
                 data: 
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id:
+                    - media_player.schlafzimmer
+                    - media_player.wohnzimmer_mini
 
   - alias: 'Turn off bett if no device is charging'
     initial_state: on
@@ -1781,6 +1826,70 @@
           inline_keyboard:
             - 'Ausschalten:/fridgeoff'
 
+  - alias: 'Test Calendar Event'
+    initial_state: True
+    trigger:
+      - platform: template
+        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: !secret calendar_fs
+          attribute: message
+          state: "Testtermin"  
+        - condition: template
+          value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Testtermin Trigger ausgeführt.'
+
+  - alias: 'Test Calendar Event 2'
+    initial_state: True
+    trigger:
+      - platform: template
+        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 12800) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: message
+              state: "Gruppentreffen"
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: location
+              state: !secret strasse
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: location
+              state: none
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: message
+              state: "*Treffen*"
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: message
+              state: "*Feier*"
+            - condition: state
+              entity_id: !secret calendar_fs
+              attribute: message
+              state: "*spieleabend*"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Testtermin Trigger #2'
+
   - alias: 'remind for meetings in keller'
     initial_state: True
     trigger:
@@ -1868,16 +1977,16 @@
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
 
-  - alias: 'Restart Homeassistant every sunday'
-    initial_state: true
-    trigger:
-      platform: time
-      at: '03:00:00'
-    condition:
-      - condition: time
-        weekday: sun
-    action:
-      - service: shell_command.restartha
+#  - alias: 'Restart Homeassistant every sunday'
+#    initial_state: on
+#    trigger:
+#      platform: time
+#      at: '03:00:00'
+#    condition:
+#      - condition: time
+#        weekday: sun
+#    action:
+#      - service: shell_command.restartha
 
   #- alias: "Let's Encrypt Renewal"
   #  trigger:
@@ -2181,7 +2290,7 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.dwd_weather_warnings_current_warning_level
-        above: 0
+        above: 1
     condition:
       condition: and
       conditions:
@@ -2189,28 +2298,92 @@
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.dwd_weather_warnings.attributes.last_triggered) | int > 43200 }}"
     action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: >
-            Aktuell {{ states.sensor.dwd_weather_warnings_current_warning_level.state }} Wetter Warnung in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '2'
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  disable_notification: true
+                  message: >
+                    Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
 
-            *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
 
-            {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
-            Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_nessie
-          message: >
-            Aktuell {{ states.sensor.dwd_weather_warnings_current_warning_level.state }} Wetter Warnung in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_nessie
+                  disable_notification: true
+                  message: >
+                    Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
 
-            *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
 
-            {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
-            Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+                    Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '3'
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: >
+                    Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
+                    Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_nessie
+                  message: >
+                    Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
+                    Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '4'
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: >
+                    ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
+                    Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_nessie
+                  message: >
+                    ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+                    
+                    Voraussichtlich bis {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
 
   - alias: 'RaspberryPi Temp Warning'
     initial_state: on
@@ -3335,6 +3508,12 @@
       - service: automation.turn_off
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_oven_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_pizzamaker_is_currently_active
       - choose:
           - conditions:
               - condition: or
@@ -3361,6 +3540,14 @@
                     state: home
                   - condition: state
                     entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -3410,6 +3597,14 @@
                   message: 'Bitte Kohle wenden.'
       - choose:
           - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
               - condition: or
                 conditions:
                   - condition: state
@@ -3444,14 +3639,22 @@
                 data_template:
                   target: !secret telegram_chat_fabian
                   message: 'Bitte Kohle wenden.'
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.keller_tv
-          command: "pm clear com.tcl.videoplayer"
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: unavailable
+            sequence:
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "pm clear com.tcl.videoplayer"
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
       - delay: '00:11:00'
       - choose:
           - conditions:
@@ -3504,6 +3707,18 @@
                 data_template:
                   target: !secret telegram_chat_fabian
                   message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.kohleanzunder
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_oven_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_pizzamaker_is_currently_active
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
@@ -3512,12 +3727,334 @@
         data:
           entity_id: media_player.keller_tv
           command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+
+  - alias: Detect if oven is currently active
+    initial_state: on
+    mode: single
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 1400
+        below: 1500
+        for:
+          seconds: 35
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+    action:
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_pizzamaker_is_currently_active
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Der Ofen wurde eingeschaltet.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_afk
+                  message: 'Der Ofen wurde eingeschaltet.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Der Ofen wurde eingeschaltet.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+      - delay: '00:13:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_afk
+                  message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "pm clear com.tcl.videoplayer"
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+      - delay: '00:05:00'
       - service: switch.turn_off
         data:
           entity_id: switch.kohleanzunder
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_pizzamaker_is_currently_active
+
+  - alias: Detect if pizzamaker is currently active
+    initial_state: on
+    mode: single
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.waschmaschine_energy_power
+        above: 1100
+        below: 1250
+        for:
+          seconds: 35
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+    action:
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_oven_is_currently_active
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Der Pizzamaker wurde eingeschaltet.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_afk
+                  message: 'Der Pizzamaker wurde eingeschaltet.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Der Pizzamaker wurde eingeschaltet.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+      - delay: '00:05:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_afk
+                  message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_104418453164779945782
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "pm clear com.tcl.videoplayer"
+      - service: androidtv.adb_command
+        data:
+          entity_id: media_player.keller_tv
+          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+      - delay: '00:05:00'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.kohleanzunder
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_oven_is_currently_active
 
   - alias: Detect if Washing machine is currently active
     initial_state: on
@@ -3538,6 +4075,9 @@
       - service: automation.turn_off
         data:
           entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_oven_is_currently_active
       - service: automation.turn_on
         data:
           entity_id: automation.set_washing_machine_active_when_power_detected
@@ -3559,6 +4099,9 @@
       - service: automation.turn_off
         data:
           entity_id: automation.detect_if_washing_machine_is_currently_active
+      - service: automation.turn_off
+        data:
+          entity_id: automation.detect_if_pizzamaker_is_currently_active
  
   - alias: Set washing machine active when power detected
     initial_state: off
@@ -3655,6 +4198,12 @@
       - service: automation.turn_on
         data:
           entity_id: automation.detect_if_coal_lighter_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_oven_is_currently_active
+      - service: automation.turn_on
+        data:
+          entity_id: automation.detect_if_pizzamaker_is_currently_active
 
   - alias: 'Remind for going off Nessie'
     initial_state: on
@@ -4496,21 +5045,13 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.nessiepc
-              state: 'home'
+              entity_id: 'switch.nessie_pc'
+              state: 'on'
             - condition: not
               conditions:
                 - condition: state
                   entity_id: person.nessie
                   state: 'home'
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: 'device_tracker.nessie_macbook'
-                  state: 'home'
-                - condition: state
-                  entity_id: 'switch.nessie_pc'
-                  state: 'on'
     action:
       - service: climate.set_temperature
         data:
@@ -4561,7 +5102,7 @@
       condition: and
       conditions:
         - condition: time
-          after: '00:00:00'
+          after: '23:00:00'
           before: '06:00:00'
     action:
       - service: input_boolean.turn_on
@@ -4611,11 +5152,34 @@
         event_data:
           command: '/remaining_time'
     action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: "{{ trigger.event.data.user_id }}"
-          message: 'Die Kohle ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
-          disable_notification: true
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int < 1200 }}"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: "{{ trigger.event.data.user_id }}"
+                  message: 'Die Kohle ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
+                  disable_notification: true
+          - conditions:
+              - condition: template
+                value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int < 1200 }}"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: "{{ trigger.event.data.user_id }}"
+                  message: 'Der Backofen ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
+                  disable_notification: true
+          - conditions:
+              - condition: template
+                value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int < 1200 }}"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: "{{ trigger.event.data.user_id }}"
+                  message: 'Der Pizzamaker ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
+                  disable_notification: true
 
   - alias: Turn off fridge
     initial_state: on
