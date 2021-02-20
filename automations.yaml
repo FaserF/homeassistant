@@ -3742,7 +3742,7 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1020 }}"
     action:
       - service: automation.turn_off
         data:
@@ -3877,7 +3877,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/raab_mib.mp4 -t video/mp4"
       - delay: '00:05:00'
       - service: switch.turn_off
         data:
@@ -3906,7 +3906,7 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int > 600 }}"
     action:
       - service: automation.turn_off
         data:
@@ -4041,7 +4041,7 @@
       - service: androidtv.adb_command
         data:
           entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+          command: "am start -a android.intent.action.VIEW -d /sdcard/raab_pizza.mp4 -t video/mp4"
       - delay: '00:05:00'
       - service: switch.turn_off
         data:
@@ -5152,34 +5152,11 @@
         event_data:
           command: '/remaining_time'
     action:
-      - choose:
-          - conditions:
-              - condition: template
-                value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int < 1200 }}"
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: "{{ trigger.event.data.user_id }}"
-                  message: 'Die Kohle ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
-                  disable_notification: true
-          - conditions:
-              - condition: template
-                value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int < 1200 }}"
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: "{{ trigger.event.data.user_id }}"
-                  message: 'Der Backofen ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
-                  disable_notification: true
-          - conditions:
-              - condition: template
-                value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int < 1200 }}"
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: "{{ trigger.event.data.user_id }}"
-                  message: 'Der Pizzamaker ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
-                  disable_notification: true
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: '{{ states.sensor.coal_lighter_finish_duration.attributes.friendly_name }} ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
+          disable_notification: true
 
   - alias: Turn off fridge
     initial_state: on

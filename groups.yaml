@@ -86,13 +86,14 @@ ignored_entities:
     - media_player.wohnzimmer_tv_cast
     - media_player.chromecast
     - media_player.chromecast_cast
+    - light.keller_gluhbirne
+    - light.prismatik
     - sensor.nessie_phone_charger_type
     - sensor.fabian_phone_charger_type
     - sensor.strip_keller
-    - light.keller_gluhbirne
-    - light.prismatik
     - sensor.deckenlampe
     - sensor.lichtschalter
     - sensor.hacs
     - sensor.dwd_weather_warnings_advance_warning_level
     - sensor.dwd_weather_warnings_current_warning_level
+    - weather.dwd_weather_ebersberg_halbing
