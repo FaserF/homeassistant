@@ -415,15 +415,19 @@ sensor:
         friendly_name: "Waschmaschinen Modus"
       washing_machine_finish_time:
         value_template: >
-          {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
-            {% else %}
-              Läuft nicht
-            {% endif %}
-          {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
+          {% if (is_state("switch.waschmaschine", "on")) -%}
+            {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
+              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
+              {% else %}
+                Läuft nicht
+              {% endif %}
+            {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
+              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
+              {% else %}
+                Läuft nicht
+              {% endif %}
             {% else %}
               Läuft nicht
             {% endif %}
@@ -434,15 +438,19 @@ sensor:
         unit_of_measurement: "Uhr"
       washing_machine_finish_duration:
         value_template: >
-          {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
-            {% else %}
-              0
-            {% endif %}
-          {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+          {% if (is_state("switch.waschmaschine", "on")) -%}
+            {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
+              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+              {% else %}
+                0
+              {% endif %}
+            {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
+              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+              {% else %}
+                0
+              {% endif %}
             {% else %}
               0
             {% endif %}
@@ -453,31 +461,39 @@ sensor:
         unit_of_measurement: "Stunden"
       coal_lighter_finish_duration:
         value_template: >
-          {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
-            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
-          {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Ofen' %}
-            {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (780) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
-          {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
-            {{ (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int + (300) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+          {% if (is_state("switch.kohleanzunder", "on")) -%}
+            {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
+              {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Ofen' %}
+              {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (780) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
+              {{ (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int + (300) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
+            {% else %}
+              0
+            {% endif %}
           {% else %}
             0
           {% endif %}
         friendly_name_template: >-
-          {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered))) %}
-            {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
-              Kohle
-            {% else %}
-              Inaktiv
-            {% endif %}
-          {% elif (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered))) %}
-            {% if (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) + 780 - as_timestamp(now()) > 0 ) %}
-              Ofen
-            {% else %}
-              Inaktiv
-            {% endif %}
-          {% elif (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered))) %}
-            {% if (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) + 300 - as_timestamp(now()) > 0 ) %}
-              Pizzamaker
+          {% if (is_state("switch.kohleanzunder", "on")) -%}
+            {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered))) %}
+              {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
+                Kohle
+              {% else %}
+                Inaktiv
+              {% endif %}
+            {% elif (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered))) %}
+              {% if (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) + 780 - as_timestamp(now()) > 0 ) %}
+                Ofen
+              {% else %}
+                Inaktiv
+              {% endif %}
+            {% elif (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered))) %}
+              {% if (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) + 300 - as_timestamp(now()) > 0 ) %}
+                Pizzamaker
+              {% else %}
+                Inaktiv
+              {% endif %}
             {% else %}
               Inaktiv
             {% endif %}

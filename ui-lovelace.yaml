@@ -17,6 +17,11 @@ animated_background:
     fog:
       - 'https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4'
       - 'https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4'
+      - 'https://home.eidolf.de/local/weather/vwqzlk4turo2449be9uf.hd.mp4'
+      - 'https://home.eidolf.de/local/weather/5363uhabodwwrzgnq6vx.hd.mp4'
+      - 'https://home.eidolf.de/local/weather/Fog-190408_01_Alaska_Landscapes1_09.mp4'
+      - 'https://home.eidolf.de/local/weather/Fog-190915_A_01_Timelapse_02.mp4'
+      - 'https://home.eidolf.de/local/weather/Fog-Dron_footage_over_a_winter_foggy_mountain.mp4'
     mostlycloudy:
       - 'https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4'
       - 'https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4'
@@ -28,13 +33,22 @@ animated_background:
       - 'https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4'
       - 'https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4'
       - 'https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4'
-    rainy: 'https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4'
+    rainy: 
+      - 'https://cdn.flixel.com/flixel/f0w23bd0enxur5ff0bxz.hd.mp4'
+      - 'https://home.eidolf.de/local/weather/f0w23bd0enxur5ff0bxz.hd.mp4'
+      - 'https://home.eidolf.de/local/weather/Rain-Raindrops_Videvo.mp4'
     sunny:
       - 'https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4'
       - 'https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4'
       - 'https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4'
       - 'https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4'
       - 'https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4'
+    snowy:
+      - 'https://home.eidolf.de/local/weather/Snow-2016WinterPrecip_LoopableBackground_1080.mp4'
+      - 'https://home.eidolf.de/local/weather/Snow-Day_SnowCoveredTrees.mp4'
+      - 'https://home.eidolf.de/local/weather/Snow-Reaviling_Sjusjoen_Ski_Senter.mp4'
+      - 'https://home.eidolf.de/local/weather/Snow-Tree-1080p.mp4'
+      - 'https://home.eidolf.de/local/weather/Snow-2016FewerColdNights_LoopableBackground_1080.mp4'
 path: default_view
 title: Fabian's Smart Home
 views:
@@ -159,11 +173,11 @@ views:
             name: Heizleistung
         step_size: '1'
       - artwork: cover
-        entity: media_player.wohnzimmer_tv
         type: 'custom:mini-media-player'
+        entity: media_player.chromecast
       - artwork: cover
-        entity: media_player.wohnzimmer_tv_cast
         type: 'custom:mini-media-player'
+        entity: media_player.chromecast_cast
       - artwork: cover
         entity: media_player.wohnzimmer_mini
         type: 'custom:mini-media-player'
@@ -178,9 +192,6 @@ views:
         type: 'custom:mini-media-player'
       - artwork: cover
         entity: media_player.keller_tv_cast
-        type: 'custom:mini-media-player'
-      - artwork: cover
-        entity: media_player.mini_gruppe
         type: 'custom:mini-media-player'
       - entity: weather.dwd_weather_ebersberg_halbing
         number_of_forecasts: '5'
@@ -532,3 +543,61 @@ views:
           - sensor.germany_coronavirus_recovered
         show_header_toggle: false
         title: Coronavirus Deutschland
+      - type: media-control
+        entity: media_player.wohnzimmer_gruppe
+      - type: media-control
+        entity: media_player.mini_gruppe
+      - buttons:
+          back:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 4
+              entity_id: media_player.wohnzimmer_tv
+          bottom:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 20
+              entity_id: media_player.wohnzimmer_tv
+          clickleft:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 21
+              entity_id: media_player.wohnzimmer_tv
+          clickright:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 22
+              entity_id: media_player.wohnzimmer_tv
+          home:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 3
+              entity_id: media_player.wohnzimmer_tv
+          ok:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 66
+              entity_id: media_player.wohnzimmer_tv
+          power:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 26
+              entity_id: media_player.wohnzimmer_tv
+          top:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 19
+              entity_id: media_player.wohnzimmer_tv
+          volumedown:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 25
+              entity_id: media_player.wohnzimmer_tv
+          volumeup:
+            call: androidtv.adb_command
+            data:
+              command: input keyevent 24
+              entity_id: media_player.wohnzimmer_tv
+        name: Wohnzimmer TV
+        remote_template: ccwgtv
+        type: 'custom:generic-remote-control-card'
