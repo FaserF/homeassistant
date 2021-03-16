@@ -291,6 +291,11 @@
                   - condition: state
                     entity_id: media_player.keller_tv
                     state: 'unavailable'
+              - condition: template
+                value_template: >
+                  {% set domain = 'light' %}
+                  {% set state = 'on' %}
+                  {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
             sequence:
               - service: telegram_bot.send_message
                 data_template:
@@ -342,6 +347,11 @@
     action:
       - choose:
           - conditions:
+              - condition: template
+                value_template: >
+                  {% set domain = 'light' %}
+                  {% set state = 'on' %}
+                  {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
               - condition: not
                 conditions:
                   - condition: state
@@ -434,7 +444,7 @@
           disable_notification: true
           message: >
             Es sind {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
-            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }} Geräte nicht verfügbar, bitte prüfen:
+            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }} Gerät(e) nicht verfügbar, bitte prüfen:
             {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
                 |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|map(attribute='entity_id')|list }}
 
@@ -494,42 +504,6 @@
         data_template:
           target: !secret telegram_chat_nessie
           message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
-
-  - alias: 'Turn on light if fpc starts'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: device_tracker.fabianpc
-        from: 'not_home'
-        to: 'home'
-      - platform: state
-        entity_id: device_tracker.fabian_dock
-        from: 'not_home'
-        to: 'home'
-    condition:
-      condition: and
-      conditions:
-        - condition: numeric_state
-          entity_id: sensor.dwd_illuminance
-          below: 2000
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: device_tracker.tv
-              state: 'not_home'
-            - condition: state
-              entity_id: switch.fernseher
-              state: 'off'
-    action:
-      - service: light.turn_on
-        data:
-          entity_id: light.leds_tisch
-          brightness: 255
-          transition: 2
-      - delay: '00:03:00'
-      - service: light.turn_on
-        data:
-          entity_id: light.prismatik
           
   - alias: 'Turn on bett if bett usb ports turned on'
     initial_state: on
@@ -555,8 +529,8 @@
         data:
           entity_id: switch.bett
 
-  - alias: 'Turn on climate if fpc starts'
-    initial_state: off
+  - alias: 'Turn on light and climate if fpc starts'
+    initial_state: on
     trigger:
       - platform: state
         entity_id: device_tracker.fabianpc
@@ -570,12 +544,8 @@
       condition: and
       conditions:
         - condition: numeric_state
-          entity_id: 'weather.dwd_weather_ebersberg_halbing'
-          attribute: temperature
-          below: 16
-        - condition: state
-          entity_id: 'input_boolean.climate_off'
-          state: 'off'
+          entity_id: sensor.dwd_illuminance
+          below: 2000
         - condition: or
           conditions:
             - condition: state
@@ -587,46 +557,59 @@
     action:
       - choose:
           - conditions:
+              - condition: numeric_state
+                entity_id: sensor.dwd_illuminance
+                below: 2000
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: binary_sensor.schlafzimmer_open_window
-                    state: 'on'
+                    entity_id: device_tracker.tv
+                    state: 'not_home'
+                  - condition: state
+                    entity_id: switch.fernseher
+                    state: 'off'
             sequence:
-              - delay: '00:25:00'
-      - service: climate.set_temperature
-        data:
-          entity_id: climate.schlafzimmer
-          temperature: 20
-          hvac_mode: heat
+              - service: light.turn_on
+                data:
+                  entity_id: light.leds_tisch
+                  brightness: 255
+                  transition: 2
+              - delay: '00:03:00'
+              - service: light.turn_on
+                data:
+                  entity_id: light.prismatik
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: 'weather.dwd_weather_ebersberg_halbing'
+                attribute: temperature
+                below: 16
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'off'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.tv
+                    state: 'not_home'
+                  - condition: state
+                    entity_id: switch.fernseher
+                    state: 'off'
+            sequence:
+              - choose:
+                  - conditions:
+                      - condition: state
+                        entity_id: binary_sensor.schlafzimmer_open_window
+                        state: 'on'
+                    sequence:
+                      - delay: '00:25:00'
+              - service: climate.set_temperature
+                data:
+                  entity_id: climate.schlafzimmer
+                  temperature: 19
+                  hvac_mode: heat
 
-  - alias: 'Turn off climate if fpc stops'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: device_tracker.fabianpc
-        from: 'home'
-        to: 'not_home'
-      - platform: state
-        entity_id: device_tracker.fabian_dock
-        from: 'home'
-        to: 'not_home'
-    condition:
-      condition: and
-      conditions:
-      - condition: state
-        entity_id: device_tracker.fabianpc
-        state: 'not_home'
-      - condition: state
-        entity_id: device_tracker.fabian_dock
-        state: 'not_home'
-    action:
-      - service: climate.set_hvac_mode
-        data:
-          entity_id: climate.schlafzimmer
-          hvac_mode: 'auto'
-
-  - alias: 'Turn off tleds if fpc stops'
+  - alias: 'Turn off tleds and climate if fpc stops'
     initial_state: on
     trigger:
       - platform: state
@@ -641,15 +624,25 @@
         to: 'not_home'
         for:
             minutes: 1
+      - platform: numeric_state
+        entity_id: sensor.fabian_strom_energy_power
+        below: 20
     condition:
       condition: and
       conditions:
       - condition: state
         entity_id: device_tracker.fabianpc
         state: 'not_home'
+        for: 
+          minutes: 1
       - condition: state
         entity_id: device_tracker.fabian_dock
         state: 'not_home'
+        for: 
+          seconds: 20
+      - condition: numeric_state
+        entity_id: sensor.fabian_strom_energy_power
+        below: 20
     action:
       - service: light.turn_off
         data:
@@ -658,10 +651,18 @@
         data:
           volume_level: 0.4
           entity_id: media_player.schlafzimmer
-      - service: climate.set_hvac_mode
-        data:
-          entity_id: climate.schlafzimmer
-          hvac_mode: 'auto'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: input_boolean.climate_off
+                    state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: climate.schlafzimmer
+                  hvac_mode: 'auto'
 
   - alias: 'Turn on light and climate if npc started'
     initial_state: on
@@ -739,19 +740,38 @@
         entity_id: device_tracker.nessiepc
         from: 'home'
         to: 'not_home'
+        for:
+          seconds: 30
       - platform: state
         entity_id: device_tracker.nessie_macbook
         from: 'home'
         to: 'not_home'
+        for:
+          seconds: 20
+      - platform: numeric_state
+        entity_id: sensor.nessie_pc_energy_power
+        below: 20
     action:
       - choose:
           - conditions:
               - condition: state
                 entity_id: device_tracker.nessiepc
                 state: not_home
-              - condition: state
-                entity_id: device_tracker.nessie_macbook
-                state: not_home
+                for:
+                  seconds: 30
+              - condition: numeric_state
+                entity_id: sensor.nessie_pc_energy_power
+                below: 20
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessie_macbook
+                    state: not_home
+                    for:
+                      seconds: 20
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    below: 15
               - condition: state
                 entity_id: 'input_boolean.climate_off'
                 state: 'off'
@@ -771,9 +791,14 @@
               - condition: state
                 entity_id: device_tracker.nessiepc
                 state: 'not_home'
-              - condition: state
-                entity_id: device_tracker.nessie_macbook
-                state: 'not_home'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessie_macbook
+                    state: not_home
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    below: 15
             sequence:
               - service: light.turn_off
                 data:
@@ -803,9 +828,6 @@
       conditions:
       - condition: state
         entity_id: device_tracker.nessiepc
-        state: 'not_home'
-      - condition: state
-        entity_id: device_tracker.nessie_macbook
         state: 'not_home'
       - condition: numeric_state
         entity_id: sensor.nessie_pc_energy_power
@@ -898,10 +920,14 @@
         entity_id: device_tracker.tv
         from: 'home'
         to: 'not_home'
+    condition:
+      - condition: state
+        entity_id: 'input_boolean.climate_off'
+        state: 'off'
     action:
       - service: climate.set_hvac_mode
         data:
-          entity_id: climate.schlafzimmer
+          entity_id: climate.wohnzimmer
           hvac_mode: 'auto'
 
   - alias: 'Remind for open window bathroom'
@@ -2171,6 +2197,9 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_on_ha_restart.attributes.last_triggered) | int > 1800 }}"
     action:
+      - service: frontend.set_theme
+        data:
+          name: transparentgray-LAB
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -2372,7 +2401,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            {% if is_state("states.sensor.hacs.state", "1")%} 
+            {% if is_state("sensor.hacs", "1")%} 
             Es gibt ein verfügbares HACS Update.
             {% else %}
             Es gibt {{ states.sensor.hacs.state }} verfügbare HACS Updates.
@@ -2984,6 +3013,24 @@
             {% endif %}
             ist bald leer. Bitte auswechseln!
 
+  - alias: Cast HA to TV if idleing
+    trigger: 
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        to: 'idle'
+        for:
+          minutes: 2
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        to: 'standby'
+        for:
+          minutes: 2
+    action:
+      service: cast.show_lovelace_view
+      data: 
+        entity_id: media_player.wohnzimmer_tv_cast
+        view_path: cast
+
   - alias: Fritzbox Public IP Change
     initial_state: on
     trigger:
@@ -3515,12 +3562,12 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Achtung, sehr hohe Luftfeuchtigkeit. Luftfeuchtigkeit Wohnzimmer: {{ states.climate.wohnzimmer.attributes.current_humidity }} %. Luftfeuchtigkeit Gästezimmer: {{ states.climate.gastezimmer.attributes.current_humidity }} %.'
+          message: 'Achtung, sehr hohe Luftfeuchtigkeit. {% if (states.climate.gastezimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Gästezimmer {{ states.climate.gastezimmer.attributes.current_humidity }} %. {% endif %} {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer {{ states.climate.wohnzimmer.attributes.current_humidity }} %. {% endif %} {% if (states.climate.schlafzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Schlafzimmer {{ states.climate.schlafzimmer.attributes.current_humidity }} %. {% endif %} {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad {{ states.climate.bad.attributes.current_humidity }} %. {% endif %}'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Achtung, sehr hohe Luftfeuchtigkeit. Luftfeuchtigkeit Wohnzimmer: {{ states.climate.wohnzimmer.attributes.current_humidity }} %. Luftfeuchtigkeit Gästezimmer: {{ states.climate.gastezimmer.attributes.current_humidity }} %.'
-          
+          message: 'Achtung, sehr hohe Luftfeuchtigkeit. {% if (states.climate.gastezimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Gästezimmer {{ states.climate.gastezimmer.attributes.current_humidity }} %. {% endif %} {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer {{ states.climate.wohnzimmer.attributes.current_humidity }} %. {% endif %} {% if (states.climate.schlafzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Schlafzimmer {{ states.climate.schlafzimmer.attributes.current_humidity }} %. {% endif %} {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad {{ states.climate.bad.attributes.current_humidity }} %. {% endif %}'
+
   - alias: Notify for high humidity when coming home
     initial_state: true
     trigger:
@@ -3832,7 +3879,11 @@
                 data:
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-      - delay: '00:11:00'
+      - delay: '00:10:00'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.kohleanzunder
+      - delay: '00:01:00'
       - choose:
           - conditions:
               - condition: or
@@ -3884,9 +3935,6 @@
                 data_template:
                   target: !secret telegram_chat_fabian
                   message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - service: switch.turn_off
-        data:
-          entity_id: switch.kohleanzunder
       - service: automation.turn_on
         data:
           entity_id: 
@@ -4240,6 +4288,7 @@
             - automation.detect_if_coal_lighter_is_currently_active
             - automation.detect_if_oven_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
+            - automation.detect_if_washing_machine_is_currently_active
       - service: automation.turn_on
         data:
           entity_id: 
@@ -4253,7 +4302,7 @@
             - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'
       - service: notify.telegram_fabian
         data:
-          message: 'Die Waschmaschine wurde gestartet.'
+          message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
           data:
             inline_keyboard:
             - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'
@@ -4483,19 +4532,6 @@
           data:
             tag: 'notification-about-sensor'
 
-  - alias: 'Remind Nessie for pill'
-    initial_state: on
-    trigger:
-      platform: time
-      at: '19:50:00'
-    action:
-      - service: notify.telegram_nessie
-        data:
-          message: "Pille nehmen nicht vergessen!"
-          data:
-            inline_keyboard:
-            - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'
-
   - alias: 'Telegram urgent message'
     initial_state: on
     trigger:
@@ -4650,6 +4686,79 @@
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
 
+  - alias: 'Telegram reset pill counter'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/pillreset'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay. Du nimmst die Pille durch.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: counter.configure
+        data:
+          entity_id: counter.pill
+          value: 28
+
+  - alias: 'Remind Nessie for pill'
+    initial_state: on
+    trigger:
+      platform: time
+      at: '19:50:00'
+    action:
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: counter.pill
+                below: '28'
+            sequence:
+              - service: counter.increment
+                target:
+                  entity_id: counter.pill
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: counter.pill
+                below: 29
+                above: 27
+            sequence:
+              - service: counter.reset
+                target:
+                  entity_id: counter.pill
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: counter.pill
+                below: '21'
+            sequence:
+              - service: notify.telegram_nessie
+                data_template:
+                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pill.state }} von 28."
+                  data:
+                    inline_keyboard:
+                    - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: counter.pill
+                below: 22
+                above: 20
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: "Pille nehmen nicht vergessen! Heute ist der letze Tag, an dem du die Pille nehmen musst. Ab morgen kommen für 7 Tage keine Erinnerungen."
+                  data:
+                    inline_keyboard:
+                    - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h, Durchnehmen:/pillreset'
+
   - alias: 'Nessie forgot pill'
     initial_state: on
     trigger:
@@ -4664,6 +4773,9 @@
               entity_id: automation.telegram_pill_marked_done
               attribute: last_triggered
               state: none
+        - condition: numeric_state
+          entity_id: counter.pill
+          below: '22'
         - condition: state
           entity_id: person.nessie
           state: home
@@ -5472,50 +5584,103 @@
     action:
       - service: notify.telegram_nessie
         data:
-          message: "Sbahn in leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
+          message: "Sbahn in Leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
 
-  - alias: 'Notify Nessie Fabian on way home ghome'
+  - alias: 'Notify Kai Adri come to visit'
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
-        from: 'Arbeit Fabi'
-        to: 'not_home'
+        entity_id: proximity.home_ka
+        attribute: dir_of_travel
+        to: 'towards'
     condition:
-      - condition: time
-        after: '14:15:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: numeric_state
+        entity_id: proximity.home_ka
+        below: 7
       - condition: state
-        entity_id: device_tracker.nessiephone
+        entity_id: person.fabian
         state: home
-      - condition: state
-        entity_id: 
-          - input_boolean.silent_mode
-          - input_boolean.guest_mode
-        state: 'off'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_ghome.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_kai_adri_come_to_visit.attributes.last_triggered) | int > 1800 }}"
+      - condition: or
+        conditions:
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: device_tracker.google_maps_104418453164779945782
+                state: 'Kai-Adri'
+              - condition: state
+                entity_id: device_tracker.google_maps_103127589611220223167
+                state: 'Kai-Adri'
     action:
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
-        - media_player.gastezimmer_mini
+      - service: notify.telegram_fabian
         data_template:
-          message: 'Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
+          message: >
+            {% if (not is_state("device_tracker.google_maps_104418453164779945782", "Kai-Adri")) -%}Kai{% endif %}{% if (not is_state("device_tracker.google_maps_103127589611220223167", "Kai-Adri")) -%} Adri{% endif %} sind auf dem Weg nach Zorneding und noch {{ states.proximity.home_ka.state }} km entfernt von zu Hause.
 
   - alias: 'Notify Nessie Fabian on way home'
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: proximity.home_fabian
+        attribute: dir_of_travel
+        to: 'towards'
+        for:
+          minutes: 1
+    condition:
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        above: 3
+      - condition: state
+        entity_id: person.nessie
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 1800 }}"
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+      - service: notify.telegram_fabian
+        data:
+          message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+
+  - alias: 'Notify Fabian Nessie on way home'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: proximity.home_nessie
+        attribute: dir_of_travel
+        to: 'towards'
+        for:
+          minutes: 1
+    condition:
+      - condition: numeric_state
+        entity_id: proximity.home_nessie
+        above: 3
+      - condition: state
+        entity_id: person.fabian
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.nessie
+            state: zone.arbeit_nessie
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Nessie ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_nessie.state }} km entfernt von zu Hause."
+
+  - alias: 'Notify Nessie Fabian on way home from STA'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: person.fabian
         from: 'Arbeit Fabi'
         to: 'not_home'
     condition:
@@ -5527,7 +5692,26 @@
           - wed
           - thu
           - fri
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3600 }}"
     action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.nessiephone
+                state: home
+              - condition: state
+                entity_id: 
+                  - input_boolean.silent_mode
+                  - input_boolean.guest_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.gastezimmer_mini
+                data_template:
+                  message: 'Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
       - service: notify.telegram_nessie
         data:
           message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
@@ -5536,8 +5720,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'Arbeit Fabi GIL'
         to: 'not_home'
     condition:
@@ -5560,8 +5743,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'Arbeit Fabi MUC'
         to: 'not_home'
     condition:
@@ -5582,8 +5764,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112174659110860535869
+        entity_id: person.fabian
         from: 'Arbeit Fabi WHM'
         to: 'not_home'
     condition:
@@ -5600,12 +5781,11 @@
         data:
           message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich. Voraussichtlich daheim in ca. 1,5 Stunden."
 
-  - alias: 'Notify Fabian Nessie on way home'
+  - alias: 'Notify Fabian Nessie on way home from work'
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'Arbeit Nessie'
         to: 'not_home'
     condition:
@@ -5618,53 +5798,34 @@
           - thu
           - fri
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
     action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.fabianphone
+                state: home
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.schlafzimmer
+                data_template:
+                  message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
       - service: notify.telegram_fabian
         data:
           message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-
-  - alias: 'Notify Fabian Nessie on way home ghome'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
-        from: 'Arbeit Nessie'
-        to: 'not_home'
-    condition:
-      - condition: time
-        after: '13:15:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: state
-        entity_id: device_tracker.fabianphone
-        state: home
-      - condition: state
-        entity_id: 'input_boolean.silent_mode'
-        state: 'off'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_ghome.attributes.last_triggered) | int > 3600 }}"
-    action:
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
-        data_template:
-          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
   - alias: 'Notify Fabian Nessie on way home from Berufsschule'
     initial_state: on
     trigger:
       - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
+        entity_id: person.nessie
         from: 'Berufsschule'
         to: 'not_home'
     condition:
@@ -5679,42 +5840,24 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
     action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.fabianphone
+                state: home
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.schlafzimmer
+                data_template:
+                  message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
       - service: notify.telegram_fabian
         data:
           message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-
-  - alias: 'Notify Fabian Nessie on way home ghome Berufsschule'
-    initial_state: true
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.google_maps_112056758146194246561
-        from: 'Berufsschule'
-        to: 'not_home'
-    condition:
-      - condition: time
-        after: '13:15:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: state
-        entity_id: device_tracker.fabianphone
-        state: home
-      - condition: state
-        entity_id: 'input_boolean.silent_mode'
-        state: 'off'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_ghome_berufsschule.attributes.last_triggered) | int > 3600 }}"
-    action:
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
-        data_template:
-          message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
 
   - alias: 'Telegram send weather forecast'
     initial_state: true

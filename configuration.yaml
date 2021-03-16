@@ -125,6 +125,7 @@ recorder:
       - sensor.washing_machine_state
       - sensor.dwd_weather_warnings_advance_warning_level
       - sensor.dwd_weather_warnings_current_warning_level
+      - counter.pill
 
 # Checks for available updates
 updater:
@@ -167,6 +168,25 @@ device_tracker:
     new_device_defaults:
       track_new_devices: False
 
+proximity:
+  home_nessie:
+    zone: home
+    ignored_zones: zone.arbeit_nessie
+    devices: person.nessie
+    tolerance: 50
+  home_fabian:
+    zone: home
+    ignored_zones: zone.arbeit_fabi
+    devices: person.fabian
+    tolerance: 50
+  home_ka:
+    zone: home
+    ignored_zones: kai_adri
+    devices:
+      - !secret kai_maps
+      - !secret adri_maps
+    tolerance: 50
+
 telegram_bot:
   - platform: polling
     api_key: !secret telegram_bot_api
@@ -200,45 +220,9 @@ notify:
 
 media_player:
   - platform: androidtv
-    name: Chromecast
-    device_class: androidtv
-    host: 192.168.178.14
-    adb_server_ip: 127.0.0.1
-    exclude_unnamed_apps: true
-    apps:
-      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
-      exp.animo.fireanime: "FireAnime"
-      com.crunchyroll.crunchyroid: "Crunchyroll"
-      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
-      com.netflix.ninja: "Netflix"
-      com.valvesoftware.steamlink: "Steam Link"
-      com.zdf.android.mediathek: "ZDF Mediathek"
-      tv.emby.embyatv: "Emby"
-      com.google.android.apps.mediashell: "Chromecast"
-      de.prosiebensat1digital.prosieben: "Pro7"
-      com.android.tv.settings: "Einstellungen"
-    state_detection_rules:
-      "com.google.android.apps.tv.launcherx":
-        - "standby"
-      "com.netflix.ninja":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.spotify.tv.android":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.google.android.apps.mediashell":
-        - "audio_state"
-      "com.liskovsoft.videomanager":
-        - "playing":
-            "media_session_state": 3
-  - platform: androidtv
     name: Wohnzimmer TV
     device_class: androidtv
-    host: 192.168.178.11
+    host: 192.168.178.10
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
@@ -260,6 +244,42 @@ media_player:
       "com.google.android.tvlauncher":
         - "standby"
       "com.tcl.tv":
+        - "standby"
+      "com.netflix.ninja":
+        - "playing":
+            "media_session_state": 3
+        - "paused":
+            "media_session_state": 2
+      "com.spotify.tv.android":
+        - "playing":
+            "media_session_state": 3
+        - "paused":
+            "media_session_state": 2
+      "com.google.android.apps.mediashell":
+        - "audio_state"
+      "com.liskovsoft.videomanager":
+        - "playing":
+            "media_session_state": 3
+  - platform: androidtv
+    name: Chromecast
+    device_class: androidtv
+    host: 192.168.178.11
+    adb_server_ip: 127.0.0.1
+    exclude_unnamed_apps: true
+    apps:
+      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
+      exp.animo.fireanime: "FireAnime"
+      com.crunchyroll.crunchyroid: "Crunchyroll"
+      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
+      com.netflix.ninja: "Netflix"
+      com.valvesoftware.steamlink: "Steam Link"
+      com.zdf.android.mediathek: "ZDF Mediathek"
+      tv.emby.embyatv: "Emby"
+      com.google.android.apps.mediashell: "Chromecast"
+      de.prosiebensat1digital.prosieben: "Pro7"
+      com.android.tv.settings: "Einstellungen"
+    state_detection_rules:
+      "com.google.android.apps.tv.launcherx":
         - "standby"
       "com.netflix.ninja":
         - "playing":
@@ -352,8 +372,8 @@ shell_command:
   foodyes: !secret foodyes
   jek_telegram: !secret telegram_jek_open_command
   restartha: "ha host reboot"
-  hibernatefpc: "curl http://192.168.178.59:5001/hibernate"
-  hibernatenpc: "curl http://192.168.178.49:5001/hibernate"
+  hibernatefpc: "curl http://192.168.178.33:5001/hibernate"
+  hibernatenpc: "curl http://192.168.178.22:5001/hibernate"
   #overtime_input: !secret overtime_input
 
 #rest_command:
@@ -383,9 +403,18 @@ shell_command:
 #  exchange_rate_currencies:
 #    - BTC
 
+counter:
+  pill:
+    name: Pille Tageszähler
+    initial: 1
+    step: 1
+    minimum: 0
+    maximum: 28
+    restore: true
+    icon: mdi:pill
+
 sensor:
-  - platform: illuminance
-    name: DWD Illuminance
+  - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_halbing
   - platform: mqtt
     state_topic: "lichtschalter/stat/BUTTON1T"
@@ -546,7 +575,7 @@ light:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik
-    host: 192.168.178.59
+    host: 192.168.178.33
     name: "Prismatik"
     profile_name: homeassistant
 
@@ -616,12 +645,12 @@ switch:
   - platform: command_line
     switches:
       fabian_pc_shutdown:
-        command_off: "curl http://192.168.178.59:5001/shutdown"
+        command_off: "curl http://192.168.178.33:5001/shutdown"
         friendly_name: Fabian PC herunterfahren
   - platform: command_line
     switches:
       nessie_pc_shutdown:
-        command_off: "curl http://192.168.178.49:5001/shutdown"
+        command_off: "curl http://192.168.178.22:5001/shutdown"
         friendly_name: Nessie PC herunterfahren
   #- platform: sonoff_lan_mode_r3
   #name: Bett
