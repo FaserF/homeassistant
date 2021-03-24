@@ -529,6 +529,90 @@
         data:
           entity_id: switch.bett
 
+  - alias: 'Remind Nessie to ventilate'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.nessiepc
+        to: 'home'
+        for:
+          hours: 4
+      - platform: state
+        entity_id: switch.nessie_pc
+        to: 'on'
+        for:
+          hours: 4
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: climate.gastezimmer
+          attribute: current_humidity
+          above: 50
+        - condition: state
+          entity_id: 
+            - input_boolean.silent_mode
+            - input_boolean.guest_mode
+          state: 'off'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.nessiepc
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.nessie_macbook
+              state: 'home'
+    action:
+      - service: tts.google_say
+        entity_id: media_player.wohnzimmer_mini
+        data_template:
+          message: >
+            Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
+      - service: notify.telegram_nessie
+        data:
+          message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
+
+  - alias: 'Remind Fabi to ventilate'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        to: 'home'
+        for:
+          hours: 4
+      - platform: state
+        entity_id: device_tracker.fabian_dock
+        to: 'home'
+        for:
+          hours: 4
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: climate.schlafzimmer
+          attribute: current_humidity
+          above: 50
+        - condition: state
+          entity_id: input_boolean.silent_mode
+          state: 'off'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.fabianpc
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.fabian_dock
+              state: 'home'
+    action:
+      - service: tts.google_say
+        entity_id: media_player.wohnzimmer_mini
+        data_template:
+          message: >
+            Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
+      - service: notify.telegram_fabian
+        data:
+          message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
+
   - alias: 'Turn on light and climate if fpc starts'
     initial_state: on
     trigger:
@@ -1928,9 +2012,7 @@
         - condition: or
           conditions:
             - condition: template
-              value_template: '{{ now().month <= 10 or now().month >= 3 }}'
-            - condition: template
-              value_template: '{{ now().month <= 11 or now().month >= 10 }}'
+              value_template: '{{ now().month <= 10 and now().month >= 2 }}'
     action:
       - service: input_boolean.turn_on
         data:
@@ -1981,9 +2063,7 @@
         - condition: or
           conditions:
             - condition: template
-              value_template: '{{ now().month <= 10 or now().month >= 3 }}'
-            - condition: template
-              value_template: '{{ now().month <= 11 or now().month >= 10 }}'
+              value_template: '{{ now().month <= 10 and now().month >= 2 }}'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -2006,12 +2086,12 @@
       #- platform: time
       #  at: '15:30:00'
       - platform: template
-        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) | round(-1) }}"
     condition:
       condition: and
       conditions:
         - condition: state
-          entity_id: !secret calendar_fs
+          entity_id: calendar.fabianseitz98_gmail_com
           attribute: message
           state: "Gruppentreffen"  
         - condition: template
@@ -2020,7 +2100,7 @@
           entity_id: 'switch.kuhlschrank'
           state: 'off'
         - condition: template
-          value_template: '{{ now().month <= 10 or now().month >= 3 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+          value_template: '{{ now().month <= 10 and now().month >= 4 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
     action:
       - service: switch.turn_on
         data:
@@ -2037,12 +2117,12 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 7200) | round(-1) }}"
     condition:
       condition: and
       conditions:
         - condition: state
-          entity_id: !secret calendar_fs
+          entity_id: calendar.fabianseitz98_gmail_com
           attribute: message
           state: "Testtermin"  
         - condition: template
@@ -2057,38 +2137,22 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 12800) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 3600) | round(-1) }}"
     condition:
       condition: and
       conditions:
-        - condition: not
-          conditions:
-            - condition: state
-              entity_id: !secret calendar_fs
-              attribute: message
-              state: "Gruppentreffen"
         - condition: or
           conditions:
             - condition: state
-              entity_id: !secret calendar_fs
-              attribute: location
-              state: !secret strasse
-            - condition: state
-              entity_id: !secret calendar_fs
-              attribute: location
-              state: none
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
               state: "*Treffen*"
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
               state: "*Feier*"
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
               state: "*spieleabend*"
     action:
@@ -2101,37 +2165,43 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 12800) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 34000) | round(-1) }}"
     condition:
       condition: and
       conditions:
         - condition: state
           entity_id: 'switch.kuhlschrank'
           state: 'off'
-        #- condition: template
-        #  value_template: '{{ now().month <= 10 or now().month >= 3 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: calendar.fabianseitz98_gmail_com
+              attribute: message
+              state: "Gruppentreffen"
+        - condition: template
+          value_template: '{{ now().month <= 10 and now().month >= 3 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
         - condition: or
           conditions:
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: location
               state: !secret strasse
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: location
               state: none
         - condition: or
           conditions:
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
               state: "Treffen*"
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
               state: "*Feier*"
             - condition: state
-              entity_id: !secret calendar_fs
+              entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
               state: "*spieleabend*"
     action:
@@ -3584,7 +3654,7 @@
         entity_id: 
           - climate.gastezimmer
           - climate.wohnzimmer
-          - climate.schlafzimme
+          - climate.schlafzimmer
           - climate.bad
         attribute: current_humidity
         above: 54
@@ -3715,6 +3785,200 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
+
+  - alias: 'Notify for above 100 corona stats'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        above: 100
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch gelten folgende Regeln:
+
+            Notbremse
+
+            - Ausgangssperre von 22 bis 5 Uhr
+
+            - Treffen mit max. einer weiteren Person
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch gelten folgende Regeln:
+
+            Notbremse
+
+            - Ausgangssperre von 22 bis 5 Uhr
+
+            - Treffen mit max. einer weiteren Person
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
+
+  - alias: 'Notify for below 100 corona stats'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        below: 100
+      - platform: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        above: 50
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        above: 50
+      - condition: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        below: 100
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch gelten folgende Regeln:
+
+            - Öffnung von Einzelhandel als Click and meet mit Terminbuchung
+
+            - Kontaktfreier Sport mit zwei Haushalten in Gruppen bis 20 Personen
+
+            - Weiterhin ein Haushalt bei max 5 Personen
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch gelten folgende Regeln:
+
+            - Öffnung von Einzelhandel als Click and meet mit Terminbuchung
+
+            - Kontaktfreier Sport mit zwei Haushalten in Gruppen bis 20 Personen
+
+            - Weiterhin ein Haushalt bei max 5 Personen
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
+
+  - alias: 'Notify for below 51 corona stats'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        below: 51
+      - platform: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        above: 35
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        above: 35
+      - condition: numeric_state
+        entity_id: sensor.corona_stats_lk_ebersberg
+        below: 51
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch gelten folgende Regeln:
+
+            - Öffnung von Einzelhandel, Museen, Galerien, Zoo, botanische Gärten
+
+            - Kontaktfreier Sport in Gruppen bis 10 Personen
+
+            - Weiterhin ein Haushalt bei max 5 Personen
+
+
+            Bei 14 Tage 50 und niedriger:
+
+            - Öffnung von Außengastronomie, Theatern, Konzerten, Kinos
+
+            - Kontaktfreier Sport im Innen und Außenbereich bei unbegrenzten
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch gelten folgende Regeln:
+
+            - Öffnung von Einzelhandel, Museen, Galerien, Zoo, botanische Gärten
+
+            - Kontaktfreier Sport in Gruppen bis 10 Personen
+
+            - Weiterhin ein Haushalt bei max 5 Personen
+
+
+            Bei 14 Tage 50 und niedriger:
+
+            - Öffnung von Außengastronomie, Theatern, Konzerten, Kinos
+
+            - Kontaktfreier Sport im Innen und Außenbereich bei unbegrenzten
+            
+
+            Link: www.stmgp.bayern.de/coronavirus/
+
+  - alias: 'Notify for below 36 corona stats'
+    initial_state: on
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.corona_stats_lk_ebersberg
+      below: 36
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch treten neue Regeln in Kraft:
+
+            - Zwei Hausälte bei 10 Personen maximal
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: true
+          message: >
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
+            Dadurch treten neue Regeln in Kraft:
+
+            - Zwei Hausälte bei 10 Personen maximal
+
+
+            Link: www.stmgp.bayern.de/coronavirus/
 
   - alias: Detect if coal lighter is currently active
     initial_state: on
@@ -4282,6 +4546,23 @@
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 5400 }}"
     action:
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
+          data:
+            inline_keyboard:
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb'
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
+          data:
+            inline_keyboard:
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb'
+      - service: automation.turn_on
+        data:
+          entity_id: 
+            - automation.set_washing_machine_active_when_power_detected
+            - automation.set_washing_machine_clean_when_power_drops
       - service: automation.turn_off
         data:
           entity_id: 
@@ -4289,23 +4570,6 @@
             - automation.detect_if_oven_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
             - automation.detect_if_washing_machine_is_currently_active
-      - service: automation.turn_on
-        data:
-          entity_id: 
-            - automation.set_washing_machine_active_when_power_detected
-            - automation.set_washing_machine_clean_when_power_drops
-      - service: notify.telegram_nessie
-        data:
-          message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
-          data:
-            inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'
-      - service: notify.telegram_fabian
-        data:
-          message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
-          data:
-            inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart30'
  
   - alias: Set washing machine active when power detected
     initial_state: off
@@ -4389,6 +4653,13 @@
                 entity_id: media_player.schlafzimmer
                 data:
                   message: 'Die Waschmaschine ist fertig.'
+      - service: automation.turn_on
+        data:
+          entity_id: 
+            - automation.detect_if_washing_machine_is_currently_active
+            - automation.detect_if_coal_lighter_is_currently_active
+            - automation.detect_if_oven_is_currently_active
+            - automation.detect_if_pizzamaker_is_currently_active
       #- service: tts.google_say
       #  entity_id: 
       #  - media_player.wohnzimmer_mini
@@ -4401,13 +4672,6 @@
       - service: automation.turn_off
         data:
           entity_id: automation.set_washing_machine_finished_when_power_drops
-      - service: automation.turn_on
-        data:
-          entity_id: 
-            - automation.detect_if_washing_machine_is_currently_active
-            - automation.detect_if_coal_lighter_is_currently_active
-            - automation.detect_if_oven_is_currently_active
-            - automation.detect_if_pizzamaker_is_currently_active
 
   - alias: Set washing machine idle after timeout
     initial_state: on
@@ -4865,6 +5129,30 @@
       - service: notify.telegram_fabian
         data:
           message: '40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr.'
+
+  - alias: 'Telegram Washing mashine set program 40 degrees Koch Bunt'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/washerstart40kb'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay, Programm gesetzt.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: notify.telegram_nessie
+        data:
+          message: '40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr.'
+      - service: notify.telegram_fabian
+        data:
+          message: '40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr.'
 
   - alias: 'Telegram shutdown fpc'
     initial_state: on
@@ -5881,6 +6169,8 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+
   - alias: 'Telegram send daily weather forecast fabian'
     initial_state: true
     trigger:
@@ -5910,6 +6200,8 @@
             {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
+
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
 
   - alias: 'Telegram send daily weather forecast nessie'
     initial_state: true

@@ -26,8 +26,9 @@ homeassistant:
   #unit_system: metricbinary_sensor.snapshots_stale
   # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   #time_zone: Europe/Berlin
-  #allowlist_external_dirs:
-  #  - "/share/scripts"
+  allowlist_external_dirs:
+    - "/share/scripts"
+    - "/media/netboot"
 
 zone:
   # This will override the default home zone
@@ -261,42 +262,6 @@ media_player:
         - "playing":
             "media_session_state": 3
   - platform: androidtv
-    name: Chromecast
-    device_class: androidtv
-    host: 192.168.178.11
-    adb_server_ip: 127.0.0.1
-    exclude_unnamed_apps: true
-    apps:
-      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
-      exp.animo.fireanime: "FireAnime"
-      com.crunchyroll.crunchyroid: "Crunchyroll"
-      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
-      com.netflix.ninja: "Netflix"
-      com.valvesoftware.steamlink: "Steam Link"
-      com.zdf.android.mediathek: "ZDF Mediathek"
-      tv.emby.embyatv: "Emby"
-      com.google.android.apps.mediashell: "Chromecast"
-      de.prosiebensat1digital.prosieben: "Pro7"
-      com.android.tv.settings: "Einstellungen"
-    state_detection_rules:
-      "com.google.android.apps.tv.launcherx":
-        - "standby"
-      "com.netflix.ninja":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.spotify.tv.android":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.google.android.apps.mediashell":
-        - "audio_state"
-      "com.liskovsoft.videomanager":
-        - "playing":
-            "media_session_state": 3
-  - platform: androidtv
     name: Keller TV
     device_class: androidtv
     host: 192.168.178.12
@@ -434,10 +399,14 @@ sensor:
         friendly_name: "Waschmaschine Status"
       washing_machine_mode:
         value_template: >
-          {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
+          {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
             30° Pflegeleicht
-          {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
+          {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
             40° Pflegeleicht
+          {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
+            40° Koch/Bunt
+          {% elif (9780) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) %}
+            Unbekannt
           {% else %}
             Läuft nicht
           {% endif %}
@@ -445,18 +414,14 @@ sensor:
       washing_machine_finish_time:
         value_template: >
           {% if (is_state("switch.waschmaschine", "on")) -%}
-            {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
-              {% else %}
-                Läuft nicht
-              {% endif %}
-            {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
-              {% else %}
-                Läuft nicht
-              {% endif %}
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) ) | timestamp_custom("%H:%M", true) }}
+            {% elif (9780) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
             {% else %}
               Läuft nicht
             {% endif %}
@@ -468,18 +433,14 @@ sensor:
       washing_machine_finish_duration:
         value_template: >
           {% if (is_state("switch.waschmaschine", "on")) -%}
-            {% if (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
-              {% else %}
-                0
-              {% endif %}
-            {% elif (as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) < as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) %}
-              {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-                {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
-              {% else %}
-                0
-              {% endif %}
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+            {% elif (9780) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
             {% else %}
               0
             {% endif %}
@@ -564,6 +525,30 @@ sensor:
   #- platform: email
   #  email: !secret vapid_email
   #  password: !secret email_pw
+  - platform: feedparser
+    name: Corona News
+    feed_url: "https://www.rki.de/SiteGlobals/Functions/RSSFeed/RSSGenerator_nCoV.xml"
+    date_format: "%a, %d %b %H:%M:%S %Z"
+    inclusions:
+      - title
+      - description
+      - link
+      - pubDate
+    exclusions:
+      - language
+      - image
+  - platform: feedparser
+    name: Mydealz
+    feed_url: !secret mydealz_rss
+    date_format: "%a, %d %b %H:%M:%S %Z"
+    inclusions:
+      - title
+      - link
+      - pubDate
+    exclusions:
+      - language
+      - description
+      - image
 
 light:
   #MagicHue LEDs
@@ -809,10 +794,6 @@ google:
   client_id: !secret google_calendar_client_id
   client_secret: !secret google_calendar_client_secret
   track_new_calendar: false
-
-feedreader:
-  urls:
-    - !secret mydealz_rss
 
 dialogflow:
 intent_script:

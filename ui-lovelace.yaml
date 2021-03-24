@@ -54,7 +54,7 @@ animated_background:
       - >-
         https://home.eidolf.de/local/weather/Snow-2016FewerColdNights_LoopableBackground_1080.mp4
 path: default_view
-title: Fabian's Smart Home
+title: Smart Life Home
 views:
   - icon: "mdi:home-variant"
     title: Home
@@ -73,6 +73,7 @@ views:
       - entity: sensor.zorneding_to_leuchtenbergring
       - entity: sensor.dwd_illuminance
       - entity: counter.pill
+      - entity: sensor.corona_stats_lk_ebersberg
     cards:
       - entities:
           - entity: switch.deckenlampe
@@ -231,11 +232,13 @@ views:
       - entity: climate.wohnzimmer
         type: "custom:simple-thermostat"
         sensors:
-          - entity: sensor.wohnzimmer_humidity
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: "%"
+          - entity: sensor.wohnzimmer_heating
+            name: Heizleistung
+        step_layout: column
         step_size: "1"
-      - artwork: cover
-        entity: media_player.wohnzimmer_tv
-        type: "custom:mini-media-player"
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
         type: "custom:mini-media-player"
@@ -243,58 +246,84 @@ views:
         entity: media_player.wohnzimmer_mini
         type: "custom:mini-media-player"
       - buttons:
-          back:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 4
-              entity_id: media_player.wohnzimmer_tv
-          bottom:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 20
-              entity_id: media_player.wohnzimmer_tv
-          clickleft:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 21
-              entity_id: media_player.wohnzimmer_tv
-          clickright:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 22
-              entity_id: media_player.wohnzimmer_tv
-          home:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 3
-              entity_id: media_player.wohnzimmer_tv
-          ok:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 66
-              entity_id: media_player.wohnzimmer_tv
-          power:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 26
-              entity_id: media_player.wohnzimmer_tv
           top:
             call: androidtv.adb_command
             data:
-              command: input keyevent 19
               entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 19
+          bottom:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 20
+          ok:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 66
+          lefttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 21
+          rightttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 22
           volumedown:
             call: androidtv.adb_command
             data:
-              command: input keyevent 25
               entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 25
           volumeup:
             call: androidtv.adb_command
             data:
-              command: input keyevent 24
               entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 24
+          back:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 4
+          assistant:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.apps.tv.launcherx/.home.HomeActivity
+          mute:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 164
+          youtube:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.youtube.tvunplugged/com.google.android.apps.youtube.tvunplugged.activity.MainActivity
+          netflix:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                *com.netflix.ninja/.MainActivity
+          home:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 3
+          power:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 26
         name: Wohnzimmer TV
-        remote_template: mibox
+        remote_template: ccwgtv
         type: "custom:generic-remote-control-card"
       - artwork: cover
         entity: media_player.wohnzimmer_tv
@@ -330,7 +359,11 @@ views:
       - entity: climate.schlafzimmer
         type: "custom:simple-thermostat"
         sensors:
-          - entity: sensor.schlafzimmer_humidity
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: "%"
+          - entity: sensor.schlafzimmer_heating
+            name: Heizleistung
         step_size: "1"
       - artwork: cover
         entity: media_player.schlafzimmer
@@ -359,7 +392,11 @@ views:
       - entity: climate.gastezimmer
         type: "custom:simple-thermostat"
         sensors:
-          - entity: sensor.gastezimmer_humidity
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: "%"
+          - entity: sensor.gastezimmer_heating
+            name: Heizleistung
         step_size: "1"
       - artwork: cover
         entity: media_player.gastezimmer_mini
@@ -410,59 +447,125 @@ views:
         entity: media_player.keller_tv_cast
         type: "custom:mini-media-player"
       - buttons:
-          back:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 4
-              entity_id: media_player.keller_tv
-          bottom:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 20
-              entity_id: media_player.keller_tv
-          clickleft:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 21
-              entity_id: media_player.keller_tv
-          clickright:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 22
-              entity_id: media_player.keller_tv
-          home:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 3
-              entity_id: media_player.keller_tv
-          ok:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 66
-              entity_id: media_player.keller_tv
-          power:
-            call: androidtv.adb_command
-            data:
-              command: input keyevent 26
-              entity_id: media_player.keller_tv
           top:
             call: androidtv.adb_command
             data:
-              command: input keyevent 19
               entity_id: media_player.keller_tv
+              command: input keyevent 19
+          bottom:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 20
+          ok:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 66
+          lefttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 21
+          rightttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 22
           volumedown:
             call: androidtv.adb_command
             data:
-              command: input keyevent 25
               entity_id: media_player.keller_tv
+              command: input keyevent 25
           volumeup:
             call: androidtv.adb_command
             data:
-              command: input keyevent 24
               entity_id: media_player.keller_tv
+              command: input keyevent 24
+          back:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 4
+          assistant:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.apps.tv.launcherx/.home.HomeActivity
+          mute:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 164
+          youtube:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.youtube.tvunplugged/com.google.android.apps.youtube.tvunplugged.activity.MainActivity
+          netflix:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                *com.netflix.ninja/.MainActivity
+          home:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 3
+          power:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 26
         name: Keller TV
-        remote_template: mibox
+        remote_template: ccwgtv
         type: "custom:generic-remote-control-card"
+  - title: other
+    path: other
+    icon: "mdi:perspective-more"
+    visible:
+      - user: b3f36b2d84254a458f3e592a2eb7b130
+      - user: 223709d150e743c993e7a9215f63d8a8
+    badges: []
+    cards:
+      - type: "custom:spotify-card"
+        limit: 10
+        account: default
+        spotify_entity: media_player.schlafzimmer
+        playlist_type: default
+        always_play_random_song: true
+        default_device: media_player.schlafzimmer
+        grid_covers_per_row: 5
+        display_style: list
+      - artwork: cover
+        entity: media_player.wohnzimmer_gruppe
+        type: "custom:mini-media-player"
+      - artwork: cover
+        entity: media_player.mini_gruppe
+        type: "custom:mini-media-player"
+      - entity: climate.bad
+        type: "custom:simple-thermostat"
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: "%"
+          - entity: sensor.bad_heating
+            name: Heizleistung
+        step_size: "1"
+      - type: "custom:list-card"
+        entity: sensor.mydealz
+        title: MyDealz
+        feed_attribute: entries
+        columns:
+          - title: Deal
+            field: title
+            add_link: link
   - path: router
     title: Frtizbox
     icon: "mdi:router-wireless"
@@ -530,116 +633,6 @@ views:
       - artwork: cover
         entity: media_player.mpd
         type: "custom:mini-media-player"
-  - title: media
-    path: media
-    icon: "mdi:music"
-    visible:
-      - user: b3f36b2d84254a458f3e592a2eb7b130
-    badges: []
-    cards:
-      - type: "custom:spotify-card"
-        limit: 10
-        account: default
-        spotify_entity: media_player.schlafzimmer
-        playlist_type: default
-        always_play_random_song: true
-        default_device: media_player.schlafzimmer
-        grid_covers_per_row: 5
-        display_style: list
-      - type: entities
-        entities:
-          - sensor.germany_coronavirus_deaths
-          - sensor.germany_coronavirus_current
-          - sensor.germany_coronavirus_confirmed
-          - sensor.germany_coronavirus_recovered
-        show_header_toggle: false
-        title: Coronavirus Deutschland
-      - artwork: cover
-        entity: media_player.wohnzimmer_gruppe
-        type: "custom:mini-media-player"
-      - artwork: cover
-        entity: media_player.mini_gruppe
-        type: "custom:mini-media-player"
-      - buttons:
-          top:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 19
-          bottom:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 20
-          ok:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 66
-          lefttt:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 21
-          rightttt:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 22
-          volumedown:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 25
-          volumeup:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 24
-          back:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 4
-          assistant:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: >-
-                am start -a android.intent.action.VIEW -d -n
-                com.google.android.apps.tv.launcherx/.home.HomeActivity
-          mute:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 164
-          youtube:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: >-
-                am start -a android.intent.action.VIEW -d -n
-                com.google.android.youtube.tvunplugged/com.google.android.apps.youtube.tvunplugged.activity.MainActivity
-          netflix:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: >-
-                am start -a android.intent.action.VIEW -d -n
-                *com.netflix.ninja/.MainActivity
-          home:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 3
-          power:
-            call: androidtv.adb_command
-            data:
-              entity_id: media_player.chromecast
-              command: input keyevent 26
-        name: Chromecast
-        remote_template: ccwgtv
-        type: "custom:generic-remote-control-card"
   - title: Cast
     path: cast
     icon: "mdi:cast"
