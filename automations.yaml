@@ -2113,54 +2113,6 @@
           inline_keyboard:
             - 'Ausschalten:/fridgeoff'
 
-  - alias: 'Test Calendar Event'
-    initial_state: True
-    trigger:
-      - platform: template
-        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 7200) | round(-1) }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: calendar.fabianseitz98_gmail_com
-          attribute: message
-          state: "Testtermin"  
-        - condition: template
-          value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: 'Testtermin Trigger ausgeführt.'
-
-  - alias: 'Test Calendar Event 2'
-    initial_state: True
-    trigger:
-      - platform: template
-        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 3600) | round(-1) }}"
-    condition:
-      condition: and
-      conditions:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "*Treffen*"
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "*Feier*"
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "*spieleabend*"
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: 'Testtermin Trigger #2'
-
   - alias: 'remind for meetings in keller'
     initial_state: True
     trigger:
@@ -2195,15 +2147,15 @@
             - condition: state
               entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
-              state: "Treffen*"
+              state: "Treffen"
             - condition: state
               entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
-              state: "*Feier*"
+              state: "Geburtstagsfeier"
             - condition: state
               entity_id: calendar.fabianseitz98_gmail_com
               attribute: message
-              state: "*spieleabend*"
+              state: "Spieleabend"
     action:
       - service: telegram_bot.send_message
         data_template:
