@@ -227,8 +227,7 @@ media_player:
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
-      com.liskovsoft.videomanager: "Smart YoutTube TV"
-      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
+      com.liskovsoft.smarttubetv.beta: "YouTube TV - SmartTubeNext"
       exp.animo.fireanime: "FireAnime"
       com.crunchyroll.crunchyroid: "Crunchyroll"
       com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
@@ -245,7 +244,7 @@ media_player:
       "com.google.android.tvlauncher":
         - "standby"
       "com.tcl.tv":
-        - "standby"
+        - "playing"
       "com.netflix.ninja":
         - "playing":
             "media_session_state": 3
@@ -268,8 +267,7 @@ media_player:
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
-      com.liskovsoft.videomanager: "Smart YoutTube TV"
-      com.liskovsoft.smarttubetv.beta: "Next YouTube TV"
+      com.liskovsoft.smarttubetv.beta: "YouTube TV - SmartTubeNext"
       exp.animo.fireanime: "FireAnime"
       com.crunchyroll.crunchyroid: "Crunchyroll"
       com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
@@ -286,7 +284,7 @@ media_player:
       "com.google.android.tvlauncher":
         - "standby"
       "com.tcl.tv":
-        - "standby"
+        - "playing"
       "com.netflix.ninja":
         - "playing":
             "media_session_state": 3

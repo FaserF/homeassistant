@@ -421,8 +421,7 @@
     trigger:
       - platform: template
         value_template: >
-          {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
-            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
+          {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group') |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
         for:
           minutes: 5
     condition:
@@ -627,9 +626,6 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: sensor.dwd_illuminance
-          below: 2000
         - condition: or
           conditions:
             - condition: state
@@ -3039,14 +3035,11 @@
     trigger: 
       - platform: state
         entity_id: media_player.wohnzimmer_tv
-        to: 'idle'
+        to: 
+          - 'idle'
+          - 'standby'
         for:
-          minutes: 2
-      - platform: state
-        entity_id: media_player.wohnzimmer_tv
-        to: 'standby'
-        for:
-          minutes: 2
+          minutes: 3
     action:
       service: cast.show_lovelace_view
       data: 
@@ -3914,7 +3907,7 @@
 
             Dadurch treten neue Regeln in Kraft:
 
-            - Zwei Hausälte bei 10 Personen maximal
+            - Zwei Haushälte bei 10 Personen maximal
 
 
             Link: www.stmgp.bayern.de/coronavirus/
@@ -3927,7 +3920,7 @@
 
             Dadurch treten neue Regeln in Kraft:
 
-            - Zwei Hausälte bei 10 Personen maximal
+            - Zwei Haushälte bei 10 Personen maximal
 
 
             Link: www.stmgp.bayern.de/coronavirus/
@@ -4019,7 +4012,7 @@
                   message: 'Kohleanzünder wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - delay: '00:11:00'
+      - delay: '00:09:00'
       - choose:
           - conditions:
               - condition: or
@@ -4095,7 +4088,7 @@
                 data:
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-      - delay: '00:10:00'
+      - delay: '00:08:00'
       - service: switch.turn_off
         data:
           entity_id: switch.kohleanzunder
@@ -4124,6 +4117,14 @@
                     state: home
                   - condition: state
                     entity_id: device_tracker.google_maps_103127589611220223167
+                    state: home
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.maxiphone
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4974,6 +4975,9 @@
                   data:
                     inline_keyboard:
                     - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h, Durchnehmen:/pillreset'
+              - service: notify.telegram_fabian
+                data:
+                  message: "Heute ist der letze Tag, an dem Nessie die Pille nimmt für 7 Tage."
 
   - alias: 'Nessie forgot pill'
     initial_state: on
