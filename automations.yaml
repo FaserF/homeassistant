@@ -2046,7 +2046,7 @@
           below: 10
         - condition: sun
           after: sunset
-          after_offset: "-02:00:00"
+          after_offset: "-04:00:00"
         - condition: time
           before: '20:30:00'
         - condition: template
@@ -2055,7 +2055,7 @@
           entity_id: 'input_boolean.climate_off'
           state: 'on'
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_climates_on_cold_days.attributes.last_triggered) | int > 86400 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_climates_on_cold_days.attributes.last_triggered) | int > 6400 }}"
         - condition: or
           conditions:
             - condition: template
@@ -2202,6 +2202,37 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
+
+  - alias: 'Remind for DST change - Winter/Sommerzeit'
+    initial_state: True
+    trigger:
+      #- platform: time
+      #  at: '15:30:00'
+      - platform: template
+        value_template: "{{ now().timetuple().tm_isdst }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            Die Zeitumstellung hat stattgefunden!
+            {%- if now().timetuple().tm_isdst | int > 0 -%}
+              Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
+            {%- else -%}
+              Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
+            {%- endif -%}
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          disable_notification: true
+          message: >
+            Die Zeitumstellung hat stattgefunden!
+            {%- if now().timetuple().tm_isdst | int > 0 -%}
+              Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
+            {%- else -%}
+              Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
+            {%- endif -%}
 
   - alias: 'Notify on HA restart'
     initial_state: True
