@@ -388,23 +388,12 @@
                   target: !secret telegram_chat_nessie
                   message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
 
-  - alias: 'Set climate to auto at night'
+  - alias: 'Set climate at night'
     initial_state: true
     trigger:
       platform: time
       at: '00:50:00'
-    condition:
-      - condition: state
-        entity_id: 'input_boolean.climate_off'
-        state: 'off'
     action:
-      - service: climate.set_hvac_mode
-        data:
-          entity_id: 
-            - climate.wohnzimmer
-            - climate.schlafzimmer
-            - climate.bad
-          hvac_mode: auto
       - choose:
           - conditions:
               - condition: state
@@ -413,8 +402,49 @@
             sequence:
               - service: climate.set_hvac_mode
                 data:
+                  entity_id: 
+                    - climate.wohnzimmer
+                    - climate.schlafzimmer
+                    - climate.bad
+                  hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'on'
+            sequence:
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: 
+                    - climate.wohnzimmer
+                    - climate.schlafzimmer
+                    - climate.bad
+                  hvac_mode: off
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data:
                   entity_id: climate.gastezimmer
                   hvac_mode: auto
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'on'
+            sequence:
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: climate.gastezimmer
+                  hvac_mode: off
 
   - alias: 'Remind for unavailable device'
     initial_state: true
@@ -4671,7 +4701,7 @@
           entity_id: input_select.washing_machine_status
           option: Idle
 
-  - alias: 'Remind for going off Nessie'
+  - alias: 'Remind for going off'
     initial_state: on
     trigger:
       platform: time
@@ -4690,95 +4720,87 @@
           entity_id: device_tracker.nessiepc
           state: home
     action:
-      #- service: notify.browser
-      #  data_template:
-      #    message: "Es ist 22 Uhr - Zeit off zu gehen."
-      #    target: Nessie-PC
-      #  data:
-      #    data:
-      #      tag: 'notification-about-sensor'
-      - service: notify.mobile_app_nessie_phone
-        data_template:
-          title: "Zeit off zu gehen"
-          message: "Es ist 22 Uhr."
-        data:
-          data:
-            tag: 'notification-about-sensor'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.nessiepc
+                state: home
+            sequence:
+              #- service: notify.browser
+              #  data_template:
+              #    message: "Es ist 22 Uhr - Zeit off zu gehen."
+              #    target: Nessie-PC
+              #  data:
+              #    data:
+              #      tag: 'notification-about-sensor'
+              - service: notify.mobile_app_nessie_phone
+                data_template:
+                  title: "Zeit off zu gehen"
+                  message: "Es ist 22 Uhr."
+                data:
+                  data:
+                    tag: 'notification-about-sensor'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.fabian_dock
+                    state: home
+            sequence:
+              #- service: notify.browser
+              #  data_template:
+              #    message: "Es ist 22 Uhr - Zeit off zu gehen."
+              #    target: 
+              #      - Fabian-PC
+              #      - Fabian-Hackbook
+              #  data:
+              #    data:
+              #      tag: 'notification-about-sensor'
+              - service: notify.mobile_app_fabian_phone
+                data_template:
+                  title: "Zeit off zu gehen"
+                  message: "Es ist 22 Uhr."
+                data:
+                  data:
+                    tag: 'notification-about-sensor'
 
-  - alias: 'Remind for going off Fabi'
-    initial_state: on
-    trigger:
-      platform: time
-      at: '22:05:00'
-    condition:
-      condition: and
-      conditions:
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - sun
-        - condition: or
-          conditions:
-          - condition: state
-            entity_id: device_tracker.fabianpc
-            state: home
-          - condition: state
-            entity_id: device_tracker.fabian_dock
-            state: home
-    action:
-      #- service: notify.browser
-      #  data_template:
-      #    message: "Es ist 22 Uhr - Zeit off zu gehen."
-      #    target: 
-      #      - Fabian-PC
-      #      - Fabian-Hackbook
-      #  data:
-      #    data:
-      #      tag: 'notification-about-sensor'
-      - service: notify.mobile_app_fabian_phone
-        data_template:
-          title: "Zeit off zu gehen"
-          message: "Es ist 22 Uhr."
-        data:
-          data:
-            tag: 'notification-about-sensor'
-
-  - alias: 'Turn on Airplane Mode Fabi'
-    initial_state: on
-    trigger:
-      - platform: time
-        at: '23:30:00'
-      - platform: time
-        at: '03:30:00'
-    condition:
-      condition: and
-      conditions:
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - sun
-        - condition: state
-          entity_id: device_tracker.fabianphone
-          state: home
-        - condition: template
-          value_template: >
-            {% set domain = 'light' %}
-            {% set state = 'off' %}
-            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
-    action:
-      - service: notify.mobile_app_fabian_phone
-        data_template:
-          title: "Flugmodus"
-          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
-        data:
-          data:
-            tag: 'notification-about-sensor'
+#  - alias: 'Turn on Airplane Mode Fabi'
+#    initial_state: on
+#    trigger:
+#      - platform: time
+#        at: '23:30:00'
+#      - platform: time
+#        at: '03:30:00'
+#    condition:
+#      condition: and
+#      conditions:
+#        - condition: time
+#          weekday:
+#            - mon
+#            - tue
+#            - wed
+#            - thu
+#            - sun
+#        - condition: state
+#          entity_id: device_tracker.fabianphone
+#          state: home
+#        - condition: template
+#          value_template: >
+#            {% set domain = 'light' %}
+#            {% set state = 'off' %}
+#            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
+#    action:
+#      - service: notify.mobile_app_fabian_phone
+#        data_template:
+#          title: "Flugmodus"
+#          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
+#        data:
+#          data:
+#            tag: 'notification-about-sensor'
 
   - alias: 'Telegram urgent message'
     initial_state: on
