@@ -397,7 +397,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: input_boolean.guest_mode
+                entity_id: input_boolean.climate_off
                 state: 'off'
             sequence:
               - service: climate.set_hvac_mode
@@ -410,7 +410,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: input_boolean.guest_mode
+                entity_id: input_boolean.climate_off
                 state: 'on'
             sequence:
               - service: climate.set_hvac_mode
@@ -4988,15 +4988,6 @@
           - conditions:
               - condition: numeric_state
                 entity_id: counter.pill
-                below: '28'
-            sequence:
-              - service: counter.increment
-                target:
-                  entity_id: counter.pill
-      - choose:
-          - conditions:
-              - condition: numeric_state
-                entity_id: counter.pill
                 below: 29
                 above: 27
             sequence:
@@ -5007,11 +4998,20 @@
           - conditions:
               - condition: numeric_state
                 entity_id: counter.pill
+                below: '28'
+            sequence:
+              - service: counter.increment
+                target:
+                  entity_id: counter.pill
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: counter.pill
                 below: '21'
             sequence:
               - service: notify.telegram_nessie
                 data_template:
-                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pill.state }} von 28."
+                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pill.state }} von {{ states.counter.pill.attributes.maximum }}."
                   data:
                     inline_keyboard:
                     - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'

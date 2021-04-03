@@ -369,7 +369,7 @@ shell_command:
 counter:
   pill:
     name: Pille Tageszähler
-    initial: 1
+    initial: 0
     step: 1
     minimum: 0
     maximum: 28
