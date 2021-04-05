@@ -54,6 +54,7 @@
           entity_id: 
             - media_player.schlafzimmer
             - media_player.wohnzimmer_mini
+            - media_player.kueche_mini
       - choose:
           - conditions:
               - condition: state
@@ -593,7 +594,7 @@
               state: 'home'
     action:
       - service: tts.google_say
-        entity_id: media_player.wohnzimmer_mini
+        entity_id: media_player.gastezimmer_mini
         data_template:
           message: >
             Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
@@ -634,7 +635,7 @@
               state: 'home'
     action:
       - service: tts.google_say
-        entity_id: media_player.wohnzimmer_mini
+        entity_id: media_player.schlafzimmer
         data_template:
           message: >
             Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
@@ -1062,6 +1063,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           - media_player.gastezimmer_mini
           - media_player.schlafzimmer
         data: 
@@ -1089,6 +1091,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           - media_player.gastezimmer_mini
         data: 
           message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
@@ -1115,6 +1118,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           - media_player.gastezimmer_mini
         data: 
           message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
@@ -1141,6 +1145,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           - media_player.schlafzimmer
         data: 
           message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
@@ -1263,6 +1268,7 @@
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.schlafzimmer
+                  - media_player.kueche_mini
                 data: 
                   message: Das Fenster im Bad kann wieder geschlossen werden.
               - service: media_player.volume_set
@@ -1315,7 +1321,9 @@
                   volume_level: 0.6
                   entity_id: media_player.wohnzimmer_mini
               - service: tts.google_say
-                entity_id: media_player.wohnzimmer_mini
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
                 data: 
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
@@ -1438,6 +1446,7 @@
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.schlafzimmer
+                  - media_player.kueche_mini
                 data: 
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
@@ -1748,6 +1757,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           #- media_player.mpd
         data_template: 
           message: >
@@ -2443,6 +2453,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           - media_player.gastezimmer_mini
           - media_player.schlafzimmer
         data: 
@@ -2747,65 +2758,105 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  - alias: Mute Spotify ads wohnzimmer mini
+  - alias: Mute Cast Spotify ads
     initial_state: on
     mode: single
     trigger:
       - platform: state
         entity_id: media_player.wohnzimmer_mini
         attribute: media_title
-        to: "Advertisement"
       - platform: state
-        entity_id: media_player.wohnzimmer_mini
+        entity_id: media_player.kueche_mini
         attribute: media_title
-        to: "Spotify"
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: media_player.wohnzimmer_mini
-          attribute: is_volume_muted
-          state: "false"
     action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.wohnzimmer_mini
-          is_volume_muted: true
-
-  - alias: Unmute after Spotify ads wohnzimmer mini
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.wohnzimmer_mini
-        attribute: media_title
-        from: "Advertisement"
-      - platform: state
-        entity_id: media_player.wohnzimmer_mini
-        attribute: media_title
-        from: "Spotify"
-    condition:
-      condition: and
-      conditions:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: media_player.wohnzimmer_mini
-            attribute: media_title
-            state: "Advertisement"
-          - condition: state
-            entity_id: media_player.wohnzimmer_mini
-            attribute: media_title
-            state: "Spotify"
-          - condition: state
-            entity_id: media_player.wohnzimmer_mini
-            attribute: is_volume_muted
-            state: "true"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.wohnzimmer_mini
-          is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.wohnzimmer_mini
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.kueche_mini
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.kueche_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.kueche_mini
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.kueche_mini
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.wohnzimmer_mini
+                  is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.kueche_mini
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.kueche_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.kueche_mini
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.kueche_mini
+                  is_volume_muted: false
 
   - alias: Mute Spotify ads schlafzimmer
     initial_state: on
@@ -3163,6 +3214,7 @@
         entity_id: 
         - media_player.schlafzimmer
         - media_player.wohnzimmer_mini
+        - media_player.kueche_mini
         - media_player.gastezimmer_mini
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
@@ -3210,6 +3262,7 @@
                 entity_id: 
                   - media_player.schlafzimmer
                   - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
                   - media_player.gastezimmer_mini
                 data:
                   message: 'Die Internetverbindung ist wiederhergestellt.'
@@ -3560,6 +3613,30 @@
       - choose:
           - conditions:
               - condition: state
+                entity_id: media_player.kueche_mini
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.kueche_mini
+                data_template:
+                  message: >
+                    Die Luftfeuchtigkeit ist zu hoch im Raum
+                    {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+                    Gästezimmer, 
+                    {% endif %}
+                    {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+                    Wohnzimmer,
+                    {% endif %}
+                    {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+                    Schlafzimmer,
+                    {% endif %}
+                    {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+                    Bad,
+                    {% endif %}
+                    Bitte lüften.
+      - choose:
+          - conditions:
+              - condition: state
                 entity_id: media_player.schlafzimmer
                 state: 'off'
             sequence:
@@ -3699,6 +3776,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
           - media_player.schlafzimmer
           #- media_player.mpd
         data_template: 
@@ -3768,6 +3846,7 @@
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
+        - media_player.kueche_mini
         - media_player.schlafzimmer
         data_template:
           message: >
@@ -4660,6 +4739,21 @@
               - condition: not
                 conditions:
                   - condition: state
+                    entity_id: media_player.kueche_mini
+                    state: 'playing'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.kueche_mini
+                data:
+                  message: 'Die Waschmaschine ist fertig.'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+              - condition: not
+                conditions:
+                  - condition: state
                     entity_id: media_player.schlafzimmer
                     state: 'playing'
             sequence:
@@ -4821,6 +4915,7 @@
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
+        - media_player.kueche_mini
         - media_player.schlafzimmer
         #- media_player.gastezimmer_mini
         data_template:
@@ -4909,7 +5004,9 @@
           volume_level: 0.7
           entity_id: media_player.wohnzimmer_mini
       - service: tts.google_say
-        entity_id: media_player.wohnzimmer_mini
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
         data_template:
           message: >
             Ding Dong, es klingelt.
@@ -5756,6 +5853,20 @@
           message: 'Kühlschrank wurde wieder ausgeschaltet.'
           disable_notification: true
 
+  - alias: "Remind for checking google maps ha cookie"
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: 'device_tracker.google_maps_112174659110860535869'
+        attribute: source_type
+        to: null
+        for:
+          minutes: 10
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Der Google Maps Homeassistant Coockie scheint abgelaufen zu sein. Bitte erneuern. In der Zwischenzeit funktionieren keine Google Maps Automationen."
+
   - alias: Telegram HA Update
     initial_state: on
     trigger:
@@ -6006,6 +6117,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
                   - media_player.gastezimmer_mini
                 data_template:
                   message: 'Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
@@ -6111,6 +6223,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
                   - media_player.schlafzimmer
                 data_template:
                   message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
@@ -6149,6 +6262,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
                   - media_player.schlafzimmer
                 data_template:
                   message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
@@ -6241,6 +6355,8 @@
             {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
+
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
 
   - alias: 'remind for jek'
     initial_state: True
