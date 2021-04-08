@@ -534,7 +534,31 @@
         data_template:
           target: !secret telegram_chat_nessie
           message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
-          
+
+  - alias: 'Deactivate silent mode after 12 hours'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: input_boolean.silent_mode
+        to: 'on'
+        for:
+          hours: 12
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.silent_mode
+          state: 'on'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist.'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_nessie
+          message: 'Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist.'
+
   - alias: 'Turn on bett if bett usb ports turned on'
     initial_state: on
     trigger:
@@ -1264,6 +1288,7 @@
                   entity_id:
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
+                    - media_player.kueche_mini
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
@@ -1277,6 +1302,7 @@
                   entity_id:
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
+                    - media_player.kueche_mini
 
   - alias: 'Remind for open window after 5 minutes in sleeping room'
     initial_state: on
@@ -2116,7 +2142,7 @@
           inline_keyboard:
             - 'Einschalten:/climateson'
 
-  - alias: 'Turn on fridge for Gruppentreffen'
+  - alias: 'Turn on fridge for meetings'
     initial_state: True
     trigger:
       #- platform: time
@@ -2125,81 +2151,196 @@
         value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) | round(-1) }}"
     condition:
       condition: and
-      conditions:
-        - condition: state
-          entity_id: calendar.fabianseitz98_gmail_com
-          attribute: message
-          state: "Gruppentreffen"  
+      conditions:  
         - condition: template
           value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
-        - condition: state
-          entity_id: 'switch.kuhlschrank'
-          state: 'off'
-        - condition: template
-          value_template: '{{ now().month <= 10 and now().month >= 4 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
     action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.kuhlschrank
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_5friends
-          message: 'Kühlschrank für Gruppentreffen heute angeschaltet zum kühlen.'
-          disable_notification: true
-          inline_keyboard:
-            - 'Ausschalten:/fridgeoff'
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Gruppentreffen"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: 'switch.kuhlschrank'
+                    state: 'on'
+                  - condition: template
+                    value_template: '{{ now().month < 4 and now().month > 10 }}'
+                  - condition: and
+                    conditions:
+                      - condition: template
+                        value_template: '{{ now().month <= 10 and now().month >= 4 }}'
+                      - condition: numeric_state
+                        entity_id: weather.dwd_weather_ebersberg_halbing
+                        attribute: temperature
+                        below: 6
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Erinnerung: Heute steht {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an.'
+                  disable_notification: true
+                  inline_keyboard:
+                    - 'Kühlschrank anschalten:/fridge'
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Gruppentreffen"
+                  - condition: state
+                    entity_id: input_boolean.away_mode
+                    state: "off"
+                  - condition: state
+                    entity_id: 'switch.kuhlschrank'
+                    state: 'off'
+                  - condition: template
+                    value_template: '{{ now().month <= 10 and now().month >= 4 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+                  - condition: numeric_state
+                    entity_id: weather.dwd_weather_ebersberg_halbing
+                    attribute: temperature
+                    above: 5
+            sequence:
+              - service: switch.turn_on
+                data:
+                  entity_id: switch.kuhlschrank
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Der Kühlschrank für das Gruppentreffen heute wurde angeschaltet.'
+                  disable_notification: true
+                  inline_keyboard:
+                    - 'Ausschalten:/fridgeoff'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: 'switch.kuhlschrank'
+                state: 'off'
+              - condition: template
+                value_template: '{{ now().month <= 10 and now().month >= 4 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+              - condition: state
+                entity_id: input_boolean.away_mode
+                state: "off"
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Gruppentreffen"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: location
+                    state: !secret strasse
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: location
+                    state: none
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Treffen"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Treffen in Zorneding"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Geburtstagsfeier"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Spieleabend"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Karten- / Brettspieleabend"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Kartenspieleabend"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Anscheinend steht heute {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an, soll der Kühlschrank im Keller eingeschaltet werden?'
+                  disable_notification: true
+                  inline_keyboard:
+                    - 'Anschalten:/fridge'
 
-  - alias: 'remind for meetings in keller'
+  - alias: 'Remind for door for meetings'
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 34000) | round(-1) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 43200) | round(-1) }}"
     condition:
       condition: and
-      conditions:
-        - condition: state
-          entity_id: 'switch.kuhlschrank'
-          state: 'off'
-        - condition: not
-          conditions:
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "Gruppentreffen"
+      conditions:  
         - condition: template
-          value_template: '{{ now().month <= 10 and now().month >= 3 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: location
-              state: !secret strasse
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: location
-              state: none
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "Treffen"
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "Geburtstagsfeier"
-            - condition: state
-              entity_id: calendar.fabianseitz98_gmail_com
-              attribute: message
-              state: "Spieleabend"
+          value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 58000) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
+        - condition: template
+          value_template: '{{ now().month <= 4 or now().month >= 10 }}' #Im Sommer ist der Keller warm genug, da muss nicht die Wärme vom Flur genutzt werden.
     action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          message: 'Anscheinend steht heute ein Treffen an, soll der Kühlschrank im Keller eingeschaltet werden?'
-          disable_notification: true
-          inline_keyboard:
-            - 'Anschalten:/fridge'
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Gruppentreffen"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Demnächst steht Gruppentreffen an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?'
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Gruppentreffen"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: location
+                    state: !secret strasse
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: location
+                    state: none
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Treffen"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Geburtstagsfeier"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Spieleabend"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_fabian
+                  message: 'Demnächst steht ein Treffen an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?'
 
   - alias: 'Turn on Strom Kühlschrank'
     initial_state: on
@@ -2763,10 +2904,14 @@
     mode: single
     trigger:
       - platform: state
-        entity_id: media_player.wohnzimmer_mini
-        attribute: media_title
-      - platform: state
-        entity_id: media_player.kueche_mini
+        entity_id: 
+          - media_player.wohnzimmer_mini
+          - media_player.kueche_mini
+          - media_player.schlafzimmer
+          - media_player.gastezimmer_mini
+          - media_player.wohnzimmer_tv_cast
+          - media_player.mini_gruppe
+          - media_player.keller_tv_cast
         attribute: media_title
     action:
       - choose:
@@ -2797,6 +2942,27 @@
               - condition: not
                 conditions:
                   - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.wohnzimmer_mini
+                  is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
                     entity_id: media_player.kueche_mini
                     attribute: is_volume_muted
                     state: "false"
@@ -2820,27 +2986,6 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
-                    attribute: media_title
-                    state: "Advertisement"
-                  - condition: state
-                    entity_id: media_player.wohnzimmer_mini
-                    attribute: media_title
-                    state: "Spotify"
-                  - condition: state
-                    entity_id: media_player.wohnzimmer_mini
-                    attribute: is_volume_muted
-                    state: "true"
-            sequence:
-              - service: media_player.volume_mute
-                data:
-                  entity_id: media_player.wohnzimmer_mini
-                  is_volume_muted: false
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
                     entity_id: media_player.kueche_mini
                     attribute: media_title
                     state: "Advertisement"
@@ -2857,246 +3002,226 @@
                 data:
                   entity_id: media_player.kueche_mini
                   is_volume_muted: false
-
-  - alias: Mute Spotify ads schlafzimmer
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.schlafzimmer
-        attribute: media_title
-        to: "Advertisement"
-      - platform: state
-        entity_id: media_player.schlafzimmer
-        attribute: media_title
-        to: "Spotify"
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: media_player.schlafzimmer
-          attribute: is_volume_muted
-          state: "false"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.schlafzimmer
-          is_volume_muted: true
-
-  - alias: Unmute after Spotify ads schlafzimmer
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.schlafzimmer
-        attribute: media_title
-        from: "Advertisement"
-      - platform: state
-        entity_id: media_player.schlafzimmer
-        attribute: media_title
-        from: "Spotify"
-    condition:
-      condition: and
-      conditions:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: media_player.schlafzimmer
-            attribute: media_title
-            state: "Advertisement"
-          - condition: state
-            entity_id: media_player.schlafzimmer
-            attribute: media_title
-            state: "Spotify"
-          - condition: state
-            entity_id: media_player.schlafzimmer
-            attribute: is_volume_muted
-            state: "true"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.schlafzimmer
-          is_volume_muted: false
-
-  - alias: Mute Spotify ads wohnzimmer tv
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.wohnzimmer_tv
-        attribute: media_title
-        to: "Advertisement"
-      - platform: state
-        entity_id: media_player.wohnzimmer_tv
-        attribute: media_title
-        to: "Spotify"
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: media_player.wohnzimmer_tv
-          attribute: is_volume_muted
-          state: "false"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.wohnzimmer_tv
-          is_volume_muted: true
-
-  - alias: Unmute after Spotify ads wohnzimmer tv
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.wohnzimmer_tv
-        attribute: media_title
-        from: "Advertisement"
-      - platform: state
-        entity_id: media_player.wohnzimmer_tv
-        attribute: media_title
-        from: "Spotify"
-    condition:
-      condition: and
-      conditions:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: media_player.wohnzimmer_tv
-            attribute: media_title
-            state: "Advertisement"
-          - condition: state
-            entity_id: media_player.wohnzimmer_tv
-            attribute: media_title
-            state: "Spotify"
-          - condition: state
-            entity_id: media_player.wohnzimmer_tv
-            attribute: is_volume_muted
-            state: "true"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.wohnzimmer_tv
-          is_volume_muted: false
-
-  - alias: Mute Spotify ads mini Gruppe
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.mini_gruppe
-        attribute: media_title
-        to: "Advertisement"
-      - platform: state
-        entity_id: media_player.mini_gruppe
-        attribute: media_title
-        to: "Spotify"
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: media_player.mini_gruppe
-          attribute: is_volume_muted
-          state: "false"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.mini_gruppe
-          is_volume_muted: true
-
-  - alias: Unmute after Spotify ads mini Gruppe
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.mini_gruppe
-        attribute: media_title
-        from: "Advertisement"
-      - platform: state
-        entity_id: media_player.mini_gruppe
-        attribute: media_title
-        from: "Spotify"
-    condition:
-      condition: and
-      conditions:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: media_player.mini_gruppe
-            attribute: media_title
-            state: "Advertisement"
-          - condition: state
-            entity_id: media_player.mini_gruppe
-            attribute: media_title
-            state: "Spotify"
-          - condition: state
-            entity_id: media_player.mini_gruppe
-            attribute: is_volume_muted
-            state: "true"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.mini_gruppe
-          is_volume_muted: false
-
-  - alias: Mute Spotify ads guest mini
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.gastezimmer_mini
-        attribute: media_title
-        to: "Advertisement"
-      - platform: state
-        entity_id: media_player.gastezimmer_mini
-        attribute: media_title
-        to: "Spotify"
-    condition:
-      condition: not
-      conditions:
-        - condition: state
-          entity_id: media_player.gastezimmer_mini
-          attribute: is_volume_muted
-          state: "false"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.gastezimmer_mini
-          is_volume_muted: true
-
-  - alias: Unmute after Spotify ads guest mini
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: media_player.gastezimmer_mini
-        attribute: media_title
-        from: "Advertisement"
-      - platform: state
-        entity_id: media_player.gastezimmer_mini
-        attribute: media_title
-        from: "Spotify"
-    condition:
-      condition: and
-      conditions:
-        - condition: not
-          conditions:
-          - condition: state
-            entity_id: media_player.gastezimmer_mini
-            attribute: media_title
-            state: "Advertisement"
-          - condition: state
-            entity_id: media_player.gastezimmer_mini
-            attribute: media_title
-            state: "Spotify"
-          - condition: state
-            entity_id: media_player.gastezimmer_mini
-            attribute: is_volume_muted
-            state: "true"
-    action:
-      - service: media_player.volume_mute
-        data:
-          entity_id: media_player.gastezimmer_mini
-          is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.schlafzimmer
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.schlafzimmer
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.schlafzimmer
+                  is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.gastezimmer_mini
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.gastezimmer_mini
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.gastezimmer_mini
+                  is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv_cast
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv_cast
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv_cast
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.wohnzimmer_tv_cast
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv_cast
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv_cast
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv_cast
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.wohnzimmer_tv_cast
+                  is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.mini_gruppe
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.mini_gruppe
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.mini_gruppe
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.mini_gruppe
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.mini_gruppe
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.mini_gruppe
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.mini_gruppe
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.mini_gruppe
+                  is_volume_muted: false
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv_cast
+                    attribute: is_volume_muted
+                    state: "false"
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv_cast
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.keller_tv_cast
+                    attribute: media_title
+                    state: "Advertisement"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.keller_tv_cast
+                  is_volume_muted: true
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv_cast
+                    attribute: media_title
+                    state: "Advertisement"
+                  - condition: state
+                    entity_id: media_player.keller_tv_cast
+                    attribute: media_title
+                    state: "Spotify"
+                  - condition: state
+                    entity_id: media_player.keller_tv_cast
+                    attribute: is_volume_muted
+                    state: "true"
+            sequence:
+              - service: media_player.volume_mute
+                data:
+                  entity_id: media_player.keller_tv_cast
+                  is_volume_muted: false
 
   - alias: Low battery thermostats
     initial_state: on
@@ -6044,6 +6169,11 @@
         state: home
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 1800 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: "Arbeit Fabi"
     action:
       - service: notify.telegram_nessie
         data:

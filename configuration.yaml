@@ -130,8 +130,6 @@ recorder:
 
 # Checks for available updates
 updater:
-  # Optional, allows Home Assistant developers to focus on popular components.
-  include_used_components: true
 
 # Discover some devices automatically
 discovery:
@@ -141,6 +139,19 @@ history:
 
 # View all events in a logbook
 logbook:
+
+logger:
+  filters:
+    custom_components.prismatik.light:
+      - "Could not connect to Prismatik at 192.168.178.33:3636"
+    homeassistant.components.light:
+      - "Setup of light platform prismatik is taking over 10 seconds."
+    homeassistant.loader:
+      - "^You are using a custom integration$"
+    androidtv.adb_manager.adb_manager_async:
+      - "Couldn't connect to$"
+    homeassistant.components.androidtv.media_player:
+      - "Could not connect to $"
 
 # Enables a map showing the location of tracked devices
 map:
@@ -203,8 +214,11 @@ telegram_bot:
       - !secret telegram_chat_lars
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
-      - !secret telegram_chat_jek_group
       - !secret telegram_chat_triemagisch
+  #- platform: broadcast
+  #  api_key: !secret telegram_bot_api_jek
+  #  allowed_chat_ids:
+  #    - !secret telegram_chat_jek_group
 
 notify:
   - name: telegram_fabian
