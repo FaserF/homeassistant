@@ -147,7 +147,7 @@ logger:
     homeassistant.components.light:
       - "Setup of light platform prismatik is taking over 10 seconds."
     homeassistant.loader:
-      - "^You are using a custom integration$"
+      - "You are using a custom integration$"
     androidtv.adb_manager.adb_manager_async:
       - "Couldn't connect to$"
     homeassistant.components.androidtv.media_player:
@@ -167,7 +167,10 @@ device_tracker:
     consider_home: 30
     new_device_defaults:
       track_new_devices: False
-    #OpenWRT Router
+  #- platform: xiaomi
+  #  host: 192.168.31.1
+  #  password: !secret fritzbox
+  #OpenWRT Router
   #- platform: luci
   #  host: 192.168.178.8
   #  username: root
@@ -277,7 +280,7 @@ media_player:
   - platform: androidtv
     name: Keller TV
     device_class: androidtv
-    host: 192.168.178.12
+    host: 192.168.31.12
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
@@ -566,9 +569,11 @@ light:
   #MagicHue LEDs
   - platform: flux_led
     devices:
-      192.168.178.251:
+      #192.168.178.251:
+      192.168.31.251:
         name: LEDs Gästezimmer
-      192.168.178.252:
+      #192.168.178.252:
+      192.168.31.252:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik

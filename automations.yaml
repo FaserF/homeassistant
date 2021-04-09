@@ -234,9 +234,9 @@
         from: 'not_home'
         to: 'home'
     action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.fritzbox_7590_wifi_5ghz
+      #- service: switch.turn_on
+      #  data:
+      #    entity_id: switch.fritzbox_7590_wifi_5ghz
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.away_mode
@@ -1646,7 +1646,7 @@
                 data:
                   entity_id: 
                     - light.leds_tisch
-                    - light.yeelight_strip1_34ce008b1863
+                    - light.yeelight_stripe_0x00000000036d0c16
                   brightness: 10
               - delay: '00:00:20'
               - service: automation.trigger
@@ -1682,7 +1682,7 @@
       - condition: not
         conditions:
         - condition: state
-          entity_id: light.yeelight_strip1_34ce008b1863
+          entity_id: light.yeelight_stripe_0x00000000036d0c16
           state: 'off'
         - condition: state
           entity_id: light.leds_tisch
@@ -1701,12 +1701,12 @@
       - condition: or
         conditions:
         - condition: state
-          entity_id: light.yeelight_strip1_34ce008b1863
+          entity_id: light.yeelight_stripe_0x00000000036d0c16
           state: 'unavailable'
         - condition: not
           conditions:
             - condition: state
-              entity_id: light.yeelight_strip1_34ce008b1863
+              entity_id: light.yeelight_stripe_0x00000000036d0c16
               attribute: brightness
               state: '255'
     action:
@@ -1715,24 +1715,24 @@
       #  data:
       #    entity_id: 
       #      - light.leds_tisch
-      #      - light.yeelight_strip1_34ce008b1863 
+      #      - light.yeelight_stripe_0x00000000036d0c16 
       #    brightness_step: 30
       - choose:
           - conditions:
               - condition: state
-                entity_id: light.yeelight_strip1_34ce008b1863
+                entity_id: light.yeelight_stripe_0x00000000036d0c16
                 state: 'on'
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: light.yeelight_strip1_34ce008b1863
+                    entity_id: light.yeelight_stripe_0x00000000036d0c16
                     attribute: brightness
                     state: '255'
             sequence:
               - service: light.turn_on
-                entity_id: light.yeelight_strip1_34ce008b1863
+                entity_id: light.yeelight_stripe_0x00000000036d0c16
                 data_template:
-                  brightness: '{{states.light.yeelight_strip1_34ce008b1863.attributes.brightness + 5}}'
+                  brightness: '{{states.light.yeelight_stripe_0x00000000036d0c16.attributes.brightness + 5}}'
       - choose:
           - conditions:
               - condition: state
@@ -1876,7 +1876,7 @@
         data:
           entity_id: 
             - light.leds_tisch
-            - light.yeelight_strip1_34ce008b1863
+            - light.yeelight_stripe_0x00000000036d0c16
       - choose:
           - conditions:
               - condition: or
@@ -1890,7 +1890,7 @@
             sequence:
               - service: light.turn_on
                 data:
-                  entity_id: light.yeelight_strip1_34ce008b1863
+                  entity_id: light.yeelight_stripe_0x00000000036d0c16
                   brightness: 255
       - delay: '00:04:00'
       - service: light.turn_off
@@ -3457,7 +3457,7 @@
           entity_id: light.leds_wohnzimmer
           state: 'on'
         - condition: state
-          entity_id: light.yeelight_color1_34ce008bcc9d
+          entity_id: light.yeelight_color_0x00000000036dc050
           state: 'on'
     action:
       - service: switch.turn_off
@@ -3487,10 +3487,10 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: light.yeelight_color1_34ce008bcc9d
+              entity_id: light.yeelight_color_0x00000000036dc050
               state: 'off'
             - condition: state
-              entity_id: light.yeelight_color1_34ce008bcc9d
+              entity_id: light.yeelight_color_0x00000000036dc050
               state: 'unavailable'
     action:
       - service: light.turn_on
@@ -3538,7 +3538,7 @@
       condition: or
       conditions:
         - condition: state
-          entity_id: light.yeelight_strip1_34ce008b1863
+          entity_id: light.yeelight_stripe_0x00000000036d0c16
           state: 'on'
         - condition: state
           entity_id: light.leds_tisch
@@ -3593,17 +3593,17 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: light.yeelight_strip1_34ce008b1863
+              entity_id: light.yeelight_stripe_0x00000000036d0c16
               state: 'off'
             - condition: state
-              entity_id: light.yeelight_strip1_34ce008b1863
+              entity_id: light.yeelight_stripe_0x00000000036d0c16
               state: 'unavailable'
     action:
       - service: light.turn_on
         data:
           entity_id: 
             - light.leds_tisch
-            - light.yeelight_strip1_34ce008b1863
+            - light.yeelight_stripe_0x00000000036d0c16
           brightness: 255
           transition: 2
           
