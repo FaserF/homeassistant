@@ -569,11 +569,9 @@ light:
   #MagicHue LEDs
   - platform: flux_led
     devices:
-      #192.168.178.251:
-      192.168.31.251:
+      192.168.178.251:
         name: LEDs Gästezimmer
-      #192.168.178.252:
-      192.168.31.252:
+      192.168.178.252:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik
