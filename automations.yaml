@@ -216,7 +216,8 @@
         data: 
           entity_id: switch.fritzbox_7590_portforward_ssh
 
-  - alias: 'Turn on 5ghz wifi and ssh off if coming home'
+  - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
+    alias: 'Turn on 5ghz wifi and ssh off if coming home'
     initial_state: true
     trigger:
       - platform: state
@@ -246,6 +247,7 @@
         data: 
           entity_id: switch.fritzbox_7590_portforward_ssh
 
+#  - id: turn_on_ventilator_if_coming_home
 #  - alias: 'Turn on ventilator if coming home'
 #    initial_state: on
 #    trigger:
@@ -272,7 +274,8 @@
 #        data:
 #          entity_id: switch.ventilator
 
-  - alias: 'Turn off light at night - notify'
+  - id: turn_off_light_at_night_notify
+    alias: 'Turn off light at night - notify'
     initial_state: true
     trigger:
       platform: time
@@ -330,8 +333,10 @@
                   message: 'Alle Lichter werden in 20 Minuten ausgeschaltet.'
                   inline_keyboard:
                     - 'Abbruch:/cancellight, Okay:/telegramno'
-            
-  - alias: 'Turn off light at night'
+
+
+  - id: turn_off_light_at_night
+    alias: 'Turn off light at night'
     initial_state: true
     trigger:
       platform: time
@@ -391,7 +396,8 @@
                   target: !secret telegram_chat_nessie
                   message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
 
-  - alias: 'Set climate at night'
+  - id: set_climate_at_night
+    alias: 'Set climate at night'
     initial_state: true
     trigger:
       platform: time
@@ -449,7 +455,8 @@
                   entity_id: climate.gastezimmer
                   hvac_mode: off
 
-  - alias: 'Remind for unavailable device'
+  - id: remind_for_unavailable_device
+    alias: 'Remind for unavailable device'
     initial_state: true
     trigger:
       - platform: template
@@ -480,7 +487,8 @@
             {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
                 |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|map(attribute='entity_id')|list }}
 
-  - alias: 'Activate guest mode if isi is here'
+  - id: activate_guest_mode_if_isi_is_here
+    alias: 'Activate guest mode if isi is here'
     initial_state: on
     trigger:
       - platform: state
@@ -508,7 +516,8 @@
           target: !secret telegram_chat_nessie
           message: 'Gast Modus wurde aktiviert, da Isi zu Besuch ist. Automationen im Gästezimmer sind dadurch eingeschränkt.'
 
-  - alias: 'Deactivate guest mode if no guest is here'
+  - id: deactivate_guest_mode_if_no_guest_is_here
+    alias: 'Deactivate guest mode if no guest is here'
     initial_state: on
     trigger:
       - platform: state
@@ -537,7 +546,8 @@
           target: !secret telegram_chat_nessie
           message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
 
-  - alias: 'Deactivate silent mode after 12 hours'
+  - id: deactivate_silent_mode_after_12_hours
+    alias: 'Deactivate silent mode after 12 hours'
     initial_state: on
     trigger:
       - platform: state
@@ -561,7 +571,8 @@
           target: !secret telegram_chat_nessie
           message: 'Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist.'
 
-  - alias: 'Turn on bett if bett usb ports turned on'
+  - id: turn_on_bett_if_bett_usb_ports_turned on
+    alias: 'Turn on bett if bett usb ports turned on'
     initial_state: on
     trigger:
       - platform: state
@@ -573,7 +584,8 @@
         data:
           entity_id: switch.bett
 
-  - alias: 'Turn off bett if bett usb ports turned off'
+  - id: turn_off_bett_if_bett_usb_ports_turned_off
+    alias: 'Turn off bett if bett usb ports turned off'
     initial_state: on
     trigger:
       - platform: state
@@ -585,7 +597,8 @@
         data:
           entity_id: switch.bett
 
-  - alias: 'Remind Nessie to ventilate'
+  - id: remind_Nessie_to_ventilate
+    alias: 'Remind Nessie to ventilate'
     initial_state: on
     trigger:
       - platform: state
@@ -628,7 +641,8 @@
         data:
           message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
 
-  - alias: 'Remind Fabi to ventilate'
+  - id: remind_fabi_to_ventilate
+    alias: 'Remind Fabi to ventilate'
     initial_state: on
     trigger:
       - platform: state
@@ -669,7 +683,8 @@
         data:
           message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
 
-  - alias: 'Turn on light and climate if fpc starts'
+  - id: turn_on_light_and_climate_if_fpc_starts
+    alias: 'Turn on light and climate if fpc starts'
     initial_state: on
     trigger:
       - platform: state
@@ -746,7 +761,8 @@
                   temperature: 19
                   hvac_mode: heat
 
-  - alias: 'Turn off tleds and climate if fpc stops'
+  - id: turn_off_tleds_and_climate_if_fpc_stops
+    alias: 'Turn off tleds and climate if fpc stops'
     initial_state: on
     trigger:
       - platform: state
@@ -801,7 +817,8 @@
                   entity_id: climate.schlafzimmer
                   hvac_mode: 'auto'
 
-  - alias: 'Turn on light and climate if npc started'
+  - id: turn_on_light_and_climate_if_npc_started
+    alias: 'Turn on light and climate if npc started'
     initial_state: on
     trigger:
       platform: state
@@ -870,7 +887,8 @@
                   entity_id: group.gastezimmer
                   transition: 2
 
-  - alias: 'Turn off lights and climate if npc stopped'
+  - id: turn_off_lights_and_climate_if_npc_stopped
+    alias: 'Turn off lights and climate if npc stopped'
     initial_state: on
     trigger:
       - platform: state
@@ -945,7 +963,8 @@
                   volume_level: 0.4
                   entity_id: media_player.gastezimmer_mini
 
-  - alias: 'Turn off strom if npc stops'
+  - id: turn_off_strom_if_npc_stops
+    alias: 'Turn off strom if npc stops'
     initial_state: on
     trigger:
       - platform: state
@@ -974,7 +993,8 @@
         data:
           entity_id: switch.nessie_pc
 
-  - alias: 'Turn off strom if fpc stops'
+  - id: turn_off_strom_if_fpc_stops
+    alias: 'Turn off strom if fpc stops'
     initial_state: on
     trigger:
       - platform: state
@@ -1006,7 +1026,8 @@
         data:
           entity_id: switch.fabian_strom
 
-  - alias: 'Turn on light if tv starts'
+  - id: turn_on_light_if_tv_starts
+    alias: 'Turn on light if tv starts'
     initial_state: on
     trigger:
       - platform: state
@@ -1025,7 +1046,8 @@
           entity_id: group.wohnzimmer
           transition: 2
 
-  - alias: 'Turn on climate if tv starts'
+  - id: turn_on_climate_if_tv_starts
+    alias: 'Turn on climate if tv starts'
     initial_state: on
     trigger:
       - platform: state
@@ -1050,7 +1072,8 @@
           temperature: 21
           hvac_mode: heat
 
-  - alias: 'Turn off climate if tv stops'
+  - id: turn_off_climate_if_tv_stops
+    alias: 'Turn off climate if tv stops'
     initial_state: on
     trigger:
       - platform: state
@@ -1067,7 +1090,8 @@
           entity_id: climate.wohnzimmer
           hvac_mode: 'auto'
 
-  - alias: 'Remind for open window bathroom'
+  - id: remind_for_open_window_bathroom
+    alias: 'Remind for open window bathroom'
     initial_state: on
     trigger:
       - platform: state
@@ -1095,7 +1119,8 @@
         data: 
           message: Es wurde vergessen das Fenster im Bad zu schließen.
 
-  - alias: 'Remind for open window sleeping room'
+  - id: remind_for_open_window_sleeping_room
+    alias: 'Remind for open window sleeping room'
     initial_state: on
     trigger:
       - platform: state
@@ -1122,7 +1147,8 @@
         data: 
           message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
 
-  - alias: 'Remind for open window living room'
+  - id: remind_for_open_window_living_room
+    alias: 'Remind for open window living room'
     initial_state: on
     trigger:
       - platform: state
@@ -1149,7 +1175,8 @@
         data: 
           message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
 
-  - alias: 'Remind for open window guest room'
+  - id: remind_for_open_window_guest_room
+    alias: 'Remind for open window guest room'
     initial_state: on
     trigger:
       - platform: state
@@ -1176,7 +1203,8 @@
         data: 
           message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
 
-  - alias: 'Remind for open window after 5 minutes in bathroom'
+  - id: remind_for_open_window_after_5_minutes_in_bathroom
+    alias: 'Remind for open window after 5 minutes in bathroom'
     initial_state: on
     trigger:
       - platform: state
@@ -1306,7 +1334,8 @@
                     - media_player.wohnzimmer_mini
                     - media_player.kueche_mini
 
-  - alias: 'Remind for open window after 5 minutes in sleeping room'
+  - id: remind_for_open_window_after_5_minutes_in_sleeping_room
+    alias: 'Remind for open window after 5 minutes in sleeping room'
     initial_state: on
     trigger:
       - platform: state
@@ -1359,7 +1388,8 @@
                   volume_level: 0.3
                   entity_id: media_player.wohnzimmer_mini
 
-  - alias: 'Remind for open window after 5 minutes in living room'
+  - id: remind_for_open_window_after_5_minutes_in_living room
+    alias: 'Remind for open window after 5 minutes in living room'
     initial_state: on
     trigger:
       - platform: state
@@ -1426,7 +1456,8 @@
                 data: 
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
 
-  - alias: 'Remind for open window after 5 minutes in guest room'
+  - id: remind_for_open_window_after_5_minutes_in_guest_room
+    alias: 'Remind for open window after 5 minutes in guest room'
     initial_state: on
     trigger:
       - platform: state
@@ -1484,7 +1515,8 @@
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
 
-  - alias: 'Turn off bett if no device is charging'
+  - id: turn_off_bett_if_no_device_is_charging
+    alias: 'Turn off bett if no device is charging'
     initial_state: on
     trigger:
       - platform: state
@@ -1537,7 +1569,8 @@
         data:
           entity_id: switch.bett_usb_ports
 
-  - alias: 'Turn off bett after 2,5 hours'
+  - id: turn_off_bett_after_2,5_hours
+    alias: 'Turn off bett after 2,5 hours'
     initial_state: on
     trigger:
       - platform: state
@@ -1551,7 +1584,8 @@
         data:
           entity_id: switch.bett_usb_ports
 
-  - alias: 'Turn off staubsauger after 3 hours'
+  - id: turn_off_staubsauger_after_3_hours
+    alias: 'Turn off staubsauger after 3 hours'
     initial_state: on
     trigger:
       - platform: state
@@ -1565,7 +1599,8 @@
         data:
           entity_id: switch.staubsauger
 
-  - alias: 'Turn on staubsauger weekly'
+  - id: turn_on_staubsauger_weekly
+    alias: 'Turn on staubsauger weekly'
     initial_state: on
     trigger:
       platform: time
@@ -1580,7 +1615,8 @@
         data:
           entity_id: switch.staubsauger
 
-  - alias: 'Turn on lights in morning'
+  - id: turn_on_lights_in_morning
+    alias: 'Turn on lights in morning'
     initial_state: on
     trigger:
       - platform: state
@@ -1671,7 +1707,8 @@
       - service: automation.trigger
         entity_id: automation.notify_for_high_humidity
 
-  - alias: 'Increase lights in morning'
+  - id: increase_lights_in_morning
+    alias: 'Increase lights in morning'
     initial_state: off
     mode: restart
     trigger:
@@ -1755,7 +1792,8 @@
         data:
           entity_id: automation.increase_lights_in_morning
 
-  - alias: 'Remind for leaving wohnzimmer'
+  - id: Remind for leaving wohnzimmer
+    alias: 'Remind for leaving wohnzimmer'
     initial_state: True
     trigger:
       - platform: time
@@ -1794,7 +1832,8 @@
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
-  - alias: 'Remind for leaving schlafzimmer'
+  - id: remind_for_leaving_schlafzimmer
+    alias: 'Remind for leaving schlafzimmer'
     initial_state: True
     trigger:
       - platform: time
@@ -1828,7 +1867,8 @@
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
-  - alias: 'Turn on light in sleeping room if tv turned off'
+  - id: turn_on_light_in_sleeping_room_if_tv_turned_off
+    alias: 'Turn on light in sleeping room if tv turned off'
     initial_state: on
     trigger:
       - platform: state
@@ -1902,7 +1942,8 @@
         data:
           entity_id: switch.deckenlampe
 
-  - alias: 'Turn on lights in livingroom when dark outside'
+  - id: turn_on_lights_in_livingroom_when_dark_outside
+    alias: 'Turn on lights in livingroom when dark outside'
     initial_state: on
     trigger:
       platform: numeric_state
@@ -1939,7 +1980,8 @@
         data:
           entity_id: light.prismatik
 
-  - alias: 'Turn on lights in sleeping room when sun set'
+  - id: turn_on_lights_in_sleeping_room_when_sun_set
+    alias: 'Turn on lights in sleeping room when sun set'
     initial_state: on
     trigger:
       platform: sun
@@ -1970,7 +2012,8 @@
         data:
           entity_id: light.prismatik
 
-  - alias: 'Turn on lights in sleeping room when cloudy'
+  - id: Turn_on_lights_in_sleeping_room_when_cloudy
+    alias: 'Turn on lights in sleeping room when cloudy'
     initial_state: off
     trigger:
       - platform: sun
@@ -2015,7 +2058,8 @@
         data:
           entity_id: light.prismatik
 
-  - alias: 'Turn on lights in guest room room when dark outside'
+  - id: turn_on_lights_in_guest_room_room_when_dark_outside
+    alias: 'Turn on lights in guest room room when dark outside'
     initial_state: on
     trigger:
       platform: numeric_state
@@ -2041,7 +2085,8 @@
           entity_id: group.gastezimmer
           transition: 2
 
-  - alias: 'Turn off lights in rooms when bright outside'
+  - id: turn_off_lights_in_rooms_when_bright_outside
+    alias: 'Turn off lights in rooms when bright outside'
     initial_state: on
     trigger:
       platform: numeric_state
@@ -2055,7 +2100,8 @@
             - group.schlafzimmer
             - group.wohnzimmer
 
-  - alias: 'Turn off Climates on warm days'
+  - id: turn_off_climates_on_warm_days
+    alias: 'Turn off Climates on warm days'
     initial_state: True
     trigger:
       platform: numeric_state
@@ -2096,7 +2142,8 @@
           inline_keyboard:
             - 'Einschalten:/climateson'
 
-  - alias: 'Turn on Climates on cold days'
+  - id: turn_on_climates_on_cold_days
+    alias: 'Turn on Climates on cold days'
     initial_state: True
     trigger:
       - platform: numeric_state
@@ -2144,7 +2191,8 @@
           inline_keyboard:
             - 'Einschalten:/climateson'
 
-  - alias: 'Turn on fridge for meetings'
+  - id: turn_on_fridge_for_meetings
+    alias: 'Turn on fridge for meetings'
     initial_state: True
     trigger:
       #- platform: time
@@ -2280,7 +2328,8 @@
                   inline_keyboard:
                     - 'Anschalten:/fridge'
 
-  - alias: 'Remind for door for meetings'
+  - id: remind_for_door_for_meetings
+    alias: 'Remind for door for meetings'
     initial_state: True
     trigger:
       - platform: template
@@ -2344,7 +2393,8 @@
                   target: !secret telegram_chat_fabian
                   message: 'Demnächst steht ein Treffen an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?'
 
-  - alias: 'Turn on Strom Kühlschrank'
+  - id: turn_on_strom_kühlschrank
+    alias: 'Turn on Strom Kühlschrank'
     initial_state: on
     trigger:
       - platform: event
@@ -2368,7 +2418,8 @@
           target: "{{ trigger.event.data.user_id }}"
           message: 'Kühlschrank im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
-  - alias: 'Turn on Climates'
+  - id: turn_on_climates
+    alias: 'Turn on Climates'
     initial_state: on
     trigger:
       - platform: event
@@ -2386,7 +2437,8 @@
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
 
-  - alias: 'Remind for DST change - Winter/Sommerzeit'
+  - id: remind_for_DST_change_Winter_Sommerzeit
+    alias: 'Remind for DST change - Winter/Sommerzeit'
     initial_state: True
     trigger:
       #- platform: time
@@ -2417,7 +2469,8 @@
               Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
             {%- endif -%}
 
-  - alias: 'Notify on HA restart'
+  - id: notify_on_HA_restart
+    alias: 'Notify on HA restart'
     initial_state: True
     trigger:
       platform: homeassistant
@@ -2437,7 +2490,8 @@
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
 
-#  - alias: 'Restart Homeassistant every sunday'
+#  - id: restart_homeassistant_every_sunday
+#    alias: 'Restart Homeassistant every sunday'
 #    initial_state: on
 #    trigger:
 #      platform: time
@@ -2448,9 +2502,10 @@
 #    action:
 #      - service: shell_command.restartha
 
-  #- alias: "Let's Encrypt Renewal"
+  #- id: lets_encrypt_Renewal
+  #  alias: "Let's Encrypt Renewal"
   #  trigger:
-  #  - platform: time
+  #    platform: time
   #    at: '00:02:00'
   #  action:
   #  - service: hassio.addon_stop
@@ -2464,7 +2519,8 @@
   #    data:
   #      addon: a0d7b954_nginxproxymanager
 
-  - alias: "Run Bash Script with Addon Bash Script Executer every hour"
+  - id: run_bash_script_with_addon_bash_script_executer_every_hour
+    alias: "Run Bash Script with Addon Bash Script Executer every hour"
     trigger:
       - platform: time_pattern
         minutes: '/59'
@@ -2474,7 +2530,8 @@
         data:
           addon: 605cee21_bashscriptexecuter
 
-  - alias: Turn on Away Mode
+  - id: turn_on_away_mode
+    alias: Turn on Away Mode
     initial_state: on
     trigger: 
       - platform: state
@@ -2489,7 +2546,8 @@
           entity_id: all
           preset_mode: 'away'
 
-  - alias: Turn off Away Mode
+  - id: turn_off_away_mode
+    alias: Turn off Away Mode
     initial_state: on
     trigger: 
       - platform: state
@@ -2504,7 +2562,8 @@
           entity_id: all
           preset_mode: 'home'
 
-  - alias: Turn on Climate Off mode
+  - id: turn_on_climate_off_mode
+    alias: Turn on Climate Off mode
     initial_state: on
     trigger: 
       - platform: state
@@ -2515,7 +2574,8 @@
         data:
           entity_id: all
 
-  - alias: Turn off Climate Off mode
+  - id: turn_off_climate_off_mode
+    alias: Turn off Climate Off mode
     initial_state: on
     trigger: 
       - platform: state
@@ -2527,7 +2587,8 @@
           entity_id: all
           hvac_mode: auto
 
-  - alias: 'Remind for away mode'
+  - id: remind_for_away_mode
+    alias: 'Remind for away mode'
     initial_state: on
     trigger:
       - platform: state
@@ -2566,7 +2627,8 @@
         data:
           entity_id: input_boolean.away_mode
 
-  - alias: Warn for state change if in away mode
+  - id: warn_for_state_change_if_in_away_mode
+    alias: Warn for state change if in away mode
     initial_state: on
     trigger: 
       - platform: state
@@ -2602,7 +2664,8 @@
         data: 
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
 
-  - alias: 'HA Update Available'
+  - id: ha_update_available
+    alias: 'HA Update Available'
     initial_state: on
     trigger:
       - platform: state
@@ -2901,7 +2964,8 @@
           target: !secret telegram_chat_nessie
           message: ''
 
-  - alias: Mute Cast Spotify ads
+  - id: mute_cast_spotify_ads
+    alias: Mute Cast Spotify ads
     initial_state: on
     mode: single
     trigger:
