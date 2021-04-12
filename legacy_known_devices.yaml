@@ -1,0 +1,854 @@
+google_maps_112174659110860535869:
+  hide_if_away: false
+  icon:
+  mac:
+  name: Fabian
+  picture: https://lh3.googleusercontent.com/a-/AAuE7mBVkZrxVGfeDnITW1Q-bFt2ZmtKy-0OVktqtiRA2Qc
+  track: true
+
+google_maps_112056758146194246561:
+  hide_if_away: false
+  icon:
+  mac:
+  name: Nessie
+  picture: https://lh5.googleusercontent.com/-iPdMZsPOggM/AAAAAAAAAAI/AAAAAAAAAAA/ACevoQOMkNByfpmvHMwm6RGpiOJaJbKn6Q/mo/photo.jpg
+  track: true
+
+fabianphone:
+  hide_if_away: true
+  icon:
+  mac: A0:FB:C5:10:D2:75
+  name: Fabian-Phone
+  picture:
+  track: true
+  vendor: Apple
+
+nessiephone:
+  hide_if_away: true
+  icon:
+  mac: 50:3D:C6:5B:4F:BD #RedmiNote10Pro
+  #mac: 10:41:7F:97:7C:D8 #iPhone6-weiß
+  name: Nessie-Phone
+  picture:
+  track: true
+  vendor: Xiaomi
+
+isiphone:
+  hide_if_away: true
+  icon:
+  mac: A4:50:46:67:3D:11
+  name: Isi-Phone
+  picture:
+  track: true
+  vendor: Xiaomi
+
+fabianhackbook:
+  hide_if_away: true
+  icon:
+  mac: 16:88:11:C3:6E:50
+  name: Fabian-Hackbook
+  picture: https://www.notebookcheck.com/fileadmin/Notebooks/Dell/Latitude_E7450/4zu3_E7450.png
+  track: false
+  vendor: Dell
+
+fabiannotebook_work:
+  name: Fabian NB Work
+  mac: 4C:1D:96:CA:C3:D0
+  icon:
+  picture:
+  track: false
+  vendor: Lenovo
+
+fabian_dock:
+  hide_if_away: true
+  icon:
+  #mac: D4:81:D7:C3:AC:2A #TYP C
+  mac: D8:D0:90:5B:92:40 #Dell Thunderbolt
+  name: USB C Dockingstation
+  picture: https://cdn.sandberg.world/products/images/lg/136-32_lg.jpg.webp
+  track: true
+  vendor: Dell
+
+fabianpc:
+  hide_if_away: true
+  icon:
+  mac: A8:5E:45:60:26:AB
+  name: Fabian-PC
+  picture: https://www.agando-shop.de/db/aganeu/listimages/113276.png
+  track: true
+  vendor: Dell
+
+nessiepc:
+  hide_if_away: true
+  icon:
+  mac: F8:B1:56:C8:ED:73 #OptiPlex XE2
+  name: Nessie-PC
+  picture:
+  track: true
+
+nessie_macbook:
+  name: Nessie-Macbook
+  mac: 14:7D:DA:1C:72:34
+  icon:
+  picture:
+  track: true
+
+tv:
+  hide_if_away: true
+  icon:
+  mac: 34:51:80:D0:44:29 #LAN Wohnzimmer TV 55P815
+  #mac: CC:A1:2B:E2:E5:DD #LAN Keller TV 50EP660
+  #mac: F8:4F:AD:4F:82:72 #WLAN Keller TV 50EP660
+  #mac: D8:8C:79:79:29:0F #Chromecast WLAN
+  #mac: 14:AE:85:70:78:98 #Chromecast LAN
+  name: TV
+  picture:
+  track: true
+  vendor: TCL
+
+flophone:
+  hide_if_away: true
+  icon:
+  mac: 30:AB:6A:C1:FE:15
+  name: Flo-S20
+  picture:
+  track: true
+
+maxiphone:
+  hide_if_away: true
+  icon:
+  mac: 6C:C7:EC:CE:73:75
+  name: Maxi-S9
+  picture:
+  track: true
+
+tv_keller_50ep660:
+  name: TV-Keller-50EP660
+  mac: CC:A1:2B:E2:E5:DD
+  icon:
+  picture:
+  track: false
+
+google_maps_votgaming_gmail_com:
+  hide_if_away: false
+  icon:
+  mac:
+  name: google maps votgaming gmail com
+  picture:
+  track: false
+
+google_maps_104418453164779945782:
+  hide_if_away: true
+  icon:
+  mac:
+  name: Kai
+  picture: https://lh3.googleusercontent.com/a-/AAuE7mDMjN95u83CBwpNPzmMMfM8994yL6dgZC6VNKTR1IE
+  track: true
+
+google_maps_103127589611220223167:
+  hide_if_away: true
+  icon:
+  mac:
+  name: Adri
+  picture: https://lh3.googleusercontent.com/a-/AAuE7mBtppkiELUmBcZkp_qYaOfRC9P9114QjncDCdX6bfY
+  track: true
+
+google_maps_111850814497454376374:
+  icon:
+  mac:
+  name: Fabio
+  picture: https://lh3.googleusercontent.com/a-/AOh14GjzHAPPJE4Y7tyUcoiZb8Svo-1FddSKo-WLf-TmhAI
+  track: false
+
+google_maps_116224521755813274584:
+  icon:
+  mac:
+  name: Michelle
+  picture: https://lh5.googleusercontent.com/-ryPGqaYIZz4/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucmXBCVW-2tLMOr66Ch39glBEOXxGA/photo.jpg
+  track: false
+
+google_maps_114935414809961191566:
+  icon:
+  mac:
+  name: Flo
+  picture: https://lh3.googleusercontent.com/a-/AOh14GhsqdKEQefC-LtHcCjnPEb8tX5_sBlwqgePe1OrdQ
+  track: false
+
+bett:
+  icon:
+  mac: 60:01:94:4C:C8:57
+  name: Bett
+  picture:
+  track: false
+
+deckenlampe:
+  icon:
+  mac: 68:C6:3A:87:B4:BF
+  name: Deckenlampe
+  picture:
+  track: false
+
+esp_910f24:
+  icon:
+  mac: 60:01:94:91:0F:24
+  name: ESP-910F24
+  picture:
+  track: false
+
+google_home:
+  icon:
+  mac: 54:60:09:EF:F8:2A
+  name: Google-Home
+  picture:
+  track: false
+
+google_home_mini:
+  icon:
+  mac: E4:F0:42:57:D2:BA
+  name: Google-Home-Mini
+  picture:
+  track: false
+
+google_home_mini_2:
+  icon:
+  mac: 20:DF:B9:4F:85:41
+  name: Google-Home-Mini
+  picture:
+  track: false
+
+leds_gastezimmer:
+  icon:
+  mac: DC:4F:22:C1:62:20
+  name: LEDs-Gastezimmer
+  picture:
+  track: false
+
+leds_tisch:
+  icon:
+  mac: 60:01:94:96:C8:1F
+  name: LEDs-Tisch
+  picture:
+  track: false
+
+nachtlampe:
+  icon:
+  mac: DC:4F:22:12:6D:FD
+  name: Nachtlampe
+  picture:
+  track: false
+
+waschmaschine:
+  icon:
+  mac: B4:E6:2D:54:4E:87
+  name: Waschmaschine
+  picture:
+  track: false
+
+fritz_box:
+  icon:
+  mac: 98:9B:CB:A5:20:6D
+  name: fritz.box
+  picture:
+  track: false
+
+hassio:
+  icon:
+  mac: 2C:4D:54:42:F1:0F
+  name: hassio
+  picture:
+  track: false
+
+leds_wohnzimmer:
+  icon:
+  mac: EC:FA:BC:83:F1:9D
+  name: leds-wohnzimmer
+  picture:
+  track: false
+
+lichtschalter:
+  icon:
+  mac: 68:C6:3A:A7:28:08
+  name: lichtschalter
+  picture:
+  track: false
+
+nessie_pc:
+  icon:
+  mac: DC:4F:22:38:B6:48
+  name: nessie-pc
+  picture:
+  track: false
+
+schloss:
+  icon:
+  mac: 84:0D:8E:B0:85:A3
+  name: schloss
+  picture:
+  track: false
+
+switch_lr_5626:
+  icon:
+  mac: 80:7D:3A:7C:95:FA
+  name: switch-lr-5626
+  picture:
+  track: false
+
+switch_sr:
+  icon:
+  mac: 84:F3:EB:24:7B:CB
+  name: switch-sr
+  picture:
+  track: false
+
+switch_staubsauger:
+  icon:
+  mac: 2C:F4:32:BE:29:0D
+  name: switch-staubsauger
+  picture:
+  track: false
+
+tado:
+  icon:
+  mac: EC:E5:12:11:34:F9
+  name: tado
+  picture:
+  track: false
+
+yeelink_light_color1_miio57524304:
+  icon:
+  mac: 34:CE:00:8B:CC:9D
+  name: yeelink-light-color1-miio57524304
+  picture:
+  track: false
+
+yeelink_light_strip1_miio57478166:
+  icon:
+  mac: 34:CE:00:8B:18:63
+  name: yeelink-light-strip1-miio57478166
+  picture:
+  track: false
+
+raspberrypi4:
+  name: raspberrypi4
+  mac: DC:A6:32:86:E5:55
+  icon:
+  picture:
+  track: false
+
+oneplus6:
+  name: OnePlus6
+  mac: C0:EE:FB:62:09:97
+  icon:
+  picture:
+  track: false
+
+mi9t_ksmi9t:
+  name: Mi9T-KSmi9t
+  mac: A8:9C:ED:3E:12:9B
+  icon:
+  picture:
+  track: false
+
+keller_bulb:
+  name: Keller-Bulb
+  mac: B4:E6:2D:49:C6:13
+  icon:
+  picture:
+  track: false
+
+openwrt:
+  name: OpenWrt
+  mac: 10:FE:ED:E7:BE:5C
+  icon:
+  picture:
+  track: false
+
+galaxy_s10_lite:
+  name: Galaxy-S10-Lite
+  mac: E6:9C:33:B9:E1:42
+  icon:
+  picture:
+  track: false
+
+galaxy_s7_edge:
+  name: Galaxy-S7-edge
+  mac: 2C:0E:3D:60:E8:D0
+  icon:
+  picture:
+  track: false
+
+galaxy_j5:
+  name: Galaxy-J5
+  mac: 50:C8:E5:D2:7C:81
+  icon:
+  picture:
+  track: false
+
+esp_efc26d:
+  name: ESP-EFC26D
+  mac: 8C:AA:B5:EF:C2:6D
+  icon:
+  picture:
+  track: false
+
+fritz_powerline_1220e_gang:
+  name: FRITZ-Powerline-1220E-Gang
+  mac: E8:DF:70:10:9D:8F
+  icon:
+  picture:
+  track: false
+
+fritz_powerline_keller:
+  name: FRITZ-Powerline-Keller
+  mac: EE:DF:70:10:5E:9D
+  icon:
+  picture:
+  track: false
+
+esp_efc698:
+  name: ESP-EFC698
+  mac: 8C:AA:B5:EF:C6:98
+  icon:
+  picture:
+  track: false
+
+fabian_ipadpro:
+  name: Fabian-iPadPro
+  mac: 78:D1:62:8E:4B:EE
+  icon:
+  picture:
+  track: false
+
+pc_192_168_178_21:
+  name: PC-192-168-178-21
+  mac: DC:68:EB:06:27:4E
+  icon:
+  picture:
+  track: false
+
+android:
+  name: Android
+  mac: F8:4F:AD:4F:82:72
+  icon:
+  picture:
+  track: false
+
+fabian_iphone6:
+  name: Fabian-iPhone6
+  mac: 04:4B:ED:85:D2:97
+  icon:
+  picture:
+  track: false
+
+iphone:
+  name: iPhone
+  mac: EE:51:4F:DE:2A:72
+  icon:
+  picture:
+  track: false
+
+fernseher_keller:
+  name: Fernseher-Keller
+  mac: F8:4F:AD:7E:92:06
+  icon:
+  picture:
+  track: false
+
+iphone_2:
+  name: iPhone
+  mac: 8E:D0:6B:43:83:89
+  icon:
+  picture:
+  track: false
+
+iphone_3:
+  name: iPhone
+  mac: 58:7F:57:62:1E:E7
+  icon:
+  picture:
+  track: false
+
+fritz_powerline_keller_2:
+  name: FRITZ-Powerline-Keller
+  mac: E8:DF:70:10:5E:A0
+  icon:
+  picture:
+  track: false
+
+fritz_box_2:
+  name: fritz.box
+  mac: 74:42:7F:04:64:88
+  icon:
+  picture:
+  track: false
+
+pc_e2_35_6e_ed_a5_f7:
+  name: PC-E2-35-6E-ED-A5-F7
+  mac: E2:35:6E:ED:A5:F7
+  icon:
+  picture:
+  track: false
+
+fabian_ipadpro_2:
+  name: Fabian-iPadPro
+  mac: 48:65:EE:15:4A:90
+  icon:
+  picture:
+  track: false
+
+oneplus6t:
+  name: OnePlus6T
+  mac: C0:EE:FB:FF:BD:23
+  icon:
+  picture:
+  track: false
+
+redminote9pro_redmin:
+  name: RedmiNote9Pro-RedmiN
+  mac: DA:36:F8:EC:C9:98
+  icon:
+  picture:
+  track: false
+
+yeelink_light_bslamp2_miio15:
+  name: yeelink-light-bslamp2-miio15
+  mac: 64:90:C1:A1:22:E2
+  icon:
+  picture:
+  track: false
+
+isi_notebook:
+  name: Isi-Notebook
+  mac: A4:34:D9:FC:E6:A8
+  icon:
+  picture:
+  track: false
+
+redminote4_redminedo:
+  name: RedmiNote4-Redminedo
+  mac: 04:B1:67:9D:5C:86
+  icon:
+  picture:
+  track: false
+
+google_nest_mini:
+  name: Google-Nest-Mini
+  mac: F8:0F:F9:A6:09:70
+  icon:
+  picture:
+  track: false
+
+esp_1af749:
+  name: ESP-1AF749
+  mac: CC:50:E3:1A:F7:49
+  icon:
+  picture:
+  track: false
+
+fabian_ipadpro_3:
+  name: Fabian-iPadPro
+  mac: 96:3D:FB:D5:F9:01
+  icon:
+  picture:
+  track: false
+
+nest_audio:
+  name: Nest-Audio
+  mac: 14:C1:4E:41:95:F8
+  icon:
+  picture:
+  track: false
+
+google_nest_mini_2:
+  name: Google-Nest-Mini
+  mac: 90:0C:C8:EE:1D:F0
+  icon:
+  picture:
+  track: false
+
+keller_fridge:
+  name: Keller-fridge
+  mac: 60:01:94:93:2C:20
+  icon:
+  picture:
+  track: false
+
+win_66ppjo0vnoh:
+  name: WIN-66PPJO0VNOH
+  mac: 00:28:F8:2D:28:A0
+  icon:
+  picture:
+  track: false
+
+pc_00_b0_0c_00_80_87:
+  name: PC-00-B0-0C-00-80-87
+  mac: 00:B0:0C:00:80:87
+  icon:
+  picture:
+  track: false
+
+ipad2:
+  name: iPad2
+  mac: 04:54:53:33:F2:A8
+  icon:
+  picture:
+  track: false
+
+aknorrs_mbp_2:
+  name: aknorrs-MBP-2
+  mac: F0:18:98:48:F8:97
+  icon:
+  picture:
+  track: false
+
+024munm51tsgtdy:
+  name: 024MUNM51TSGTDY
+  mac: F4:0F:24:16:43:A7
+  icon:
+  picture:
+  track: false
+
+pc_169_254_71_73:
+  name: PC-169-254-71-73
+  mac: F8:75:A4:5B:28:51
+  icon:
+  picture:
+  track: false
+
+fritz_box_3:
+  name: fritz.box
+  mac: 98:9B:CB:A5:20:6A
+  icon:
+  picture:
+  track: false
+
+esp_07d751:
+  name: ESP-07D751
+  mac: 24:A1:60:07:D7:51
+  icon:
+  picture:
+  track: false
+
+huawei_p30_pro_367996c2e9:
+  name: HUAWEI-P30-Pro-367996c2e9
+  mac: AC:BD:70:BA:F7:7C
+  icon:
+  picture:
+  track: false
+
+florian_s_s20:
+  name: Florian-s-S20
+  mac: D6:45:F3:C6:8D:A8
+  icon:
+  picture:
+  track: false
+
+fernseher_keller_lan:
+  name: Fernseher-Keller-LAN
+  mac: 34:51:80:03:CE:1B
+  icon:
+  picture:
+  track: false
+
+pc_192_168_178_55:
+  name: PC-192-168-178-55
+  mac: 2A:3D:87:E6:BC:8F
+  icon:
+  picture:
+  track: false
+
+win_hqn5aqmrg0n:
+  name: WIN-HQN5AQMRG0N
+  mac: 34:17:EB:DD:EA:51
+  icon:
+  picture:
+  track: false
+
+android_2:
+  name: Android
+  mac: 9E:5E:84:DB:12:67
+  icon:
+  picture:
+  track: false
+
+win_0chncttq5di:
+  name: WIN-0CHNCTTQ5DI
+  mac: 34:17:EB:C7:B8:E3
+  icon:
+  picture:
+  track: false
+
+iphone_4:
+  name: iPhone
+  mac: 10:41:7F:93:5E:32
+  icon:
+  picture:
+  track: false
+
+redminote9s_redminot:
+  name: RedmiNote9S-RedmiNot
+  mac: 26:F0:AF:76:65:85
+  icon:
+  picture:
+  track: false
+
+redminote9s_jutta_no:
+  name: RedmiNote9S-Jutta-No
+  mac: CA:89:3A:71:BD:D6
+  icon:
+  picture:
+  track: false
+
+iphone6:
+  name: iPhone6
+  mac: 9C:FC:01:45:8D:FA
+  icon:
+  picture:
+  track: false
+
+iphone_5:
+  name: iPhone
+  mac: 10:41:7F:97:78:EA
+  icon:
+  picture:
+  track: false
+
+dell_e7450:
+  name: Dell-E7450
+  mac: 4C:34:88:C5:DA:0A
+  icon:
+  picture:
+  track: false
+
+pc_192_168_178_103:
+  name: PC-192-168-178-103
+  mac: 60:6B:BD:05:3E:8D
+  icon:
+  picture:
+  track: false
+
+nessie_iphone6:
+  name: Nessie-iPhone6
+  mac: 10:41:7F:97:7C:D8
+  icon:
+  picture:
+  track: false
+
+redminote8t_redminot:
+  name: RedmiNote8T-RedmiNot
+  mac: A4:45:19:6B:3A:88
+  icon:
+  picture:
+  track: false
+
+redminote8t_redmi:
+  name: RedmiNote8T-Redmi
+  mac: A4:45:19:61:BD:BA
+  icon:
+  picture:
+  track: false
+
+mikas_iphone:
+  name: Mikas-iPhone
+  mac: A6:64:FC:BD:D8:BA
+  icon:
+  picture:
+  track: false
+
+win_bbs4dkaqjks:
+  name: WIN-BBS4DKAQJKS
+  mac: F8:94:C2:A9:6C:BC
+  icon:
+  picture:
+  track: false
+
+nsta0377_intune_test_fs:
+  name: NSTA0377-Intune-Test-FS
+  mac: A4:4C:C8:4C:C1:24
+  icon:
+  picture:
+  track: false
+
+win_8j8t0kq7tmq:
+  name: WIN-8J8T0KQ7TMQ
+  mac: D4:81:D7:9D:6E:7C
+  icon:
+  picture:
+  track: false
+
+win_6kopbk14q4e:
+  name: WIN-6KOPBK14Q4E
+  mac: B8:08:CF:5D:F4:74
+  icon:
+  picture:
+  track: false
+
+iphonevnnatalie:
+  name: iPhonevnNatalie
+  mac: 9A:27:B0:8D:70:93
+  icon:
+  picture:
+  track: false
+
+ipadpro11:
+  name: iPadPro11
+  mac: 6A:61:FD:8A:4E:EC
+  icon:
+  picture:
+  track: false
+
+audiocast:
+  name: audiocast
+  mac: 10:2C:6B:45:31:28
+  icon:
+  picture:
+  track: false
+
+miwifi_r3600:
+  name: MiWiFi-R3600
+  mac: 28:D1:27:FC:AB:D8
+  icon:
+  picture:
+  track: false
+
+pc_192_168_31_1:
+  name: PC-192-168-31-1
+  mac: 9C:9D:7E:76:8D:06
+  icon:
+  picture:
+  track: false
+
+pc_192_168_178_1:
+  name: PC-192-168-178-1
+  mac: BC:05:43:49:9A:59
+  icon:
+  picture:
+  track: false
+
+datapipe:
+  name: datapipe
+  mac: BC:05:43:49:9A:5B
+  icon:
+  picture:
+  track: false
+
+be_7e_3d_7a_3f_db:
+  name: be_7e_3d_7a_3f_db
+  mac: BE:7E:3D:7A:3F:DB
+  icon:
+  picture:
+  track: false
+
+galaxy_s10_lite_2:
+  name: Galaxy-S10-Lite
+  mac: 1A:94:85:28:FF:02
+  icon:
+  picture:
+  track: false
+
+fritz_box_4:
+  name: fritz.box
+  mac: 5C:49:79:79:AC:4B
+  icon:
+  picture:
+  track: false

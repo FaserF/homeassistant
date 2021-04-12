@@ -280,7 +280,7 @@ media_player:
   - platform: androidtv
     name: Keller TV
     device_class: androidtv
-    host: 192.168.178.12
+    host: 192.168.178.11
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
@@ -684,6 +684,14 @@ google_assistant:
       expose: false
     switch.xiaomi_abd8_reboot:
       expose: false
+    switch.schlafzimmer_speaker_do_not_disturb:
+      expose: false
+    switch.gastezimmer_mini_do_not_disturb:
+      expose: false
+    switch.kuche_mini_do_not_disturb:
+      expose: false
+    switch.wohnzimmer_uhr_do_not_disturb:
+      expose: false
     switch.schloss:
       expose: false
     switch.bett:
@@ -698,29 +706,15 @@ google_assistant:
       expose: false
     light.keller_gluhbirne:
       expose: false
-    switch.fritzbox_7590_guest_wifi:
+    switch.fritzbox_7430_guest_wifi:
       expose: false
-    switch.fritzbox_7590_portforward_bitwarden:
+    switch.fritzbox_7430_portforward_https_server:
       expose: false
-    switch.fritzbox_7590_portforward_nextcloud:
+    switch.fritzbox_7430_portforward_ssh:
       expose: false
-    switch.fritzbox_7590_portforward_bookstracks:
+    switch.fritzbox_7430_wifi:
       expose: false
-    switch.fritzbox_7590_portforward_homeassistant:
-      expose: false
-    switch.fritzbox_7590_portforward_http_server:
-      expose: false
-    switch.fritzbox_7590_portforward_https_server:
-      expose: false
-    switch.fritzbox_7590_portforward_ssh:
-      expose: false
-    switch.fritzbox_7590_portforward_tasmoadmin:
-      expose: false
-    switch.fritzbox_7590_portforward_nginx_proxy:
-      expose: false
-    switch.fritzbox_7590_wifi:
-      expose: false
-    switch.fritzbox_7590_wifi_5ghz:
+    switch.fritzbox_7430_wifi_5ghz:
       expose: false
     switch.rpi_cooling_fan:
       expose: false
