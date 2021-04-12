@@ -209,12 +209,12 @@
           entity_id: device_tracker.nessiephone
           state: not_home
     action:
-      - service: switch.turn_off
-        data: 
-          entity_id: switch.fritzbox_7590_wifi_5ghz
+      #- service: switch.turn_off
+      #  data: 
+      #    entity_id: switch.fritzbox_7430_wifi_5ghz
       - service: switch.turn_on
         data: 
-          entity_id: switch.fritzbox_7590_portforward_ssh
+          entity_id: switch.fritzbox_7430_portforward_ssh
 
   - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
     alias: 'Turn on 5ghz wifi and ssh off if coming home'
@@ -239,13 +239,13 @@
     action:
       #- service: switch.turn_on
       #  data:
-      #    entity_id: switch.fritzbox_7590_wifi_5ghz
+      #    entity_id: switch.fritzbox_7430_wifi_5ghz
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.away_mode
       - service: switch.turn_off
         data: 
-          entity_id: switch.fritzbox_7590_portforward_ssh
+          entity_id: switch.fritzbox_7430_portforward_ssh
 
 #  - id: turn_on_ventilator_if_coming_home
 #  - alias: 'Turn on ventilator if coming home'
@@ -3410,6 +3410,8 @@
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
       - service: fritzbox_tools.reboot
+        data:
+          host: 192.168.178.1
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_internet_access_returned
