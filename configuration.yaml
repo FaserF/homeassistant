@@ -143,7 +143,7 @@ logbook:
 logger:
   filters:
     custom_components.prismatik.light:
-      - "Could not connect to Prismatik at 192.168.178.33:3636"
+      - "Could not connect to Prismatik at $"
     homeassistant.components.light:
       - "Setup of light platform prismatik is taking over 10 seconds."
     homeassistant.loader:
@@ -240,7 +240,7 @@ media_player:
   - platform: androidtv
     name: Wohnzimmer TV
     device_class: androidtv
-    host: 192.168.178.10
+    host: 192.168.31.10
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
@@ -280,7 +280,7 @@ media_player:
   - platform: androidtv
     name: Keller TV
     device_class: androidtv
-    host: 192.168.178.11
+    host: 192.168.31.11
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:
@@ -569,13 +569,13 @@ light:
   #MagicHue LEDs
   - platform: flux_led
     devices:
-      192.168.178.251:
+      192.168.31.251:
         name: LEDs Gästezimmer
-      192.168.178.252:
+      192.168.31.252:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik
-    host: 192.168.178.33
+    host: 192.168.31.33
     name: "Prismatik"
     profile_name: homeassistant
 
@@ -645,12 +645,12 @@ switch:
   - platform: command_line
     switches:
       fabian_pc_shutdown:
-        command_off: "curl http://192.168.178.33:5001/shutdown"
+        command_off: "curl http://192.168.31.33:5001/shutdown"
         friendly_name: Fabian PC herunterfahren
   - platform: command_line
     switches:
       nessie_pc_shutdown:
-        command_off: "curl http://192.168.178.22:5001/shutdown"
+        command_off: "curl http://192.168.31.22:5001/shutdown"
         friendly_name: Nessie PC herunterfahren
   #- platform: sonoff_lan_mode_r3
   #name: Bett
