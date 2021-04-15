@@ -160,13 +160,13 @@ map:
 sun:
 
 device_tracker:
-  - platform: fritz
-    host: 192.168.178.1
-    password: !secret fritzbox
-    interval_seconds: 8
-    consider_home: 30
-    new_device_defaults:
-      track_new_devices: False
+  #- platform: fritz
+  #  host: 192.168.178.1
+  #  password: !secret fritzbox
+  #  interval_seconds: 8
+  #  consider_home: 30
+  #  new_device_defaults:
+  #    track_new_devices: False
   #- platform: xiaomi
   #  host: 192.168.31.1
   #  password: !secret fritzbox
@@ -280,7 +280,7 @@ media_player:
   - platform: androidtv
     name: Keller TV
     device_class: androidtv
-    host: 192.168.31.11
+    host: 192.168.31.12
     adb_server_ip: 127.0.0.1
     exclude_unnamed_apps: true
     apps:

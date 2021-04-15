@@ -5971,6 +5971,12 @@
         - condition: time
           after: '23:00:00'
           before: '06:00:00'
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: calendar.fabianseitz98_gmail_com
+              attribute: message
+              state: "Gruppentreffen"
     action:
       - service: input_boolean.turn_on
         data:
@@ -6236,7 +6242,9 @@
         entity_id: person.nessie
         state: home
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 1800 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3700 }}"
       - condition: not
         conditions:
           - condition: state
