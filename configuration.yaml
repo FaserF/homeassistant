@@ -151,7 +151,11 @@ logger:
     androidtv.adb_manager.adb_manager_async:
       - "Couldn't connect to$"
     homeassistant.components.androidtv.media_player:
-      - "Could not connect to $"
+      - "Could not connect to$"
+    homeassistant.components.media_player:
+      - "Platform androidtv not ready yet. Retrying in$"
+    homeassistant.helpers.service:
+      - "Unable to find referenced entities$"
 
 # Enables a map showing the location of tracked devices
 map:

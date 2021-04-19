@@ -59,7 +59,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabianpc
+                entity_id: device_tracker.fabian_pc
                 state: 'home'
             sequence:
               - service: notify.telegram_fabian
@@ -89,7 +89,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabianpc
+                entity_id: device_tracker.fabian_pc
                 state: 'not_home'
             sequence:
               - service: switch.turn_off
@@ -168,53 +168,53 @@
                   entity_id: climate.bad
                   hvac_mode: auto
 
-  - id: turn_off_5ghz_wifi_and_turn_on_ssh_if_nobody_is_at_home
-    alias: 'Turn off 5ghz wifi and turn on ssh if nobody is at home'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: device_tracker.fabianphone
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 10
-      - platform: state
-        entity_id: device_tracker.nessiephone
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 10
-      - platform: state
-        entity_id: person.fabian
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-      - platform: state
-        entity_id: person.nessie
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 2
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: input_boolean.guest_mode
-          state: 'off'
-        - condition: state
-          entity_id: device_tracker.fabianphone
-          state: not_home
-        - condition: state
-          entity_id: device_tracker.nessiephone
-          state: not_home
-    action:
+#  - id: turn_off_5ghz_wifi_and_turn_on_ssh_if_nobody_is_at_home
+#    alias: 'Turn off 5ghz wifi and turn on ssh if nobody is at home'
+#    initial_state: on
+#    trigger:
+#      - platform: state
+#        entity_id: device_tracker.fabianphone
+#        from: 'home'
+#        to: 'not_home'
+#        for:
+#          minutes: 10
+#      - platform: state
+#        entity_id: device_tracker.nessiephone
+#        from: 'home'
+#        to: 'not_home'
+#        for:
+#          minutes: 10
+#      - platform: state
+#        entity_id: person.fabian
+#        from: 'home'
+#        to: 'not_home'
+#        for:
+#          minutes: 2
+#      - platform: state
+#        entity_id: person.nessie
+#        from: 'home'
+#        to: 'not_home'
+#        for:
+#          minutes: 2
+#    condition:
+#      condition: and
+#      conditions:
+#        - condition: state
+#          entity_id: input_boolean.guest_mode
+#          state: 'off'
+#        - condition: state
+#          entity_id: device_tracker.fabianphone
+#          state: not_home
+#        - condition: state
+#          entity_id: device_tracker.nessiephone
+#          state: not_home
+#    action:
       #- service: switch.turn_off
       #  data: 
       #    entity_id: switch.fritzbox_7430_wifi_5ghz
-      - service: switch.turn_on
-        data: 
-          entity_id: switch.fritzbox_7430_portforward_ssh
+#      - service: switch.turn_on
+#        data: 
+#          entity_id: switch.fritzbox_7430_portforward_ssh
 
   - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
     alias: 'Turn on 5ghz wifi and ssh off if coming home'
@@ -571,31 +571,31 @@
           target: !secret telegram_chat_nessie
           message: 'Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist.'
 
-  - id: turn_on_bett_if_bett_usb_ports_turned on
-    alias: 'Turn on bett if bett usb ports turned on'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: switch.bett_usb_ports
-        from: 'off'
-        to: 'on'
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.bett
+#  - id: turn_on_bett_if_bett_usb_ports_turned on
+#    alias: 'Turn on bett if bett usb ports turned on'
+#    initial_state: on
+#    trigger:
+#      - platform: state
+#        entity_id: switch.bett_usb_ports
+#        from: 'off'
+#        to: 'on'
+#    action:
+#      - service: switch.turn_on
+#        data:
+#          entity_id: switch.bett
 
-  - id: turn_off_bett_if_bett_usb_ports_turned_off
-    alias: 'Turn off bett if bett usb ports turned off'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: switch.bett_usb_ports
-        from: 'on'
-        to: 'off'
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.bett
+#  - id: turn_off_bett_if_bett_usb_ports_turned_off
+#    alias: 'Turn off bett if bett usb ports turned off'
+#    initial_state: on
+#    trigger:
+#      - platform: state
+#        entity_id: switch.bett_usb_ports
+#        from: 'on'
+#        to: 'off'
+#    action:
+#      - service: switch.turn_off
+#        data:
+#          entity_id: switch.bett
 
   - id: remind_Nessie_to_ventilate
     alias: 'Remind Nessie to ventilate'
@@ -646,7 +646,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         to: 'home'
         for:
           hours: 4
@@ -668,7 +668,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabianpc
+              entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
               entity_id: device_tracker.fabian_dock
@@ -688,7 +688,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'not_home'
         to: 'home'
       - platform: state
@@ -766,7 +766,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'home'
         to: 'not_home'
         for:
@@ -784,7 +784,7 @@
       condition: and
       conditions:
       - condition: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         state: 'not_home'
         for: 
           minutes: 1
@@ -998,7 +998,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'home'
         to: 'not_home'
         for:
@@ -1013,7 +1013,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.fabianpc
+          entity_id: device_tracker.fabian_pc
           state: 'not_home'
         - condition: state
           entity_id: device_tracker.fabian_dock
@@ -1234,7 +1234,7 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: device_tracker.fabianpc
+                        entity_id: device_tracker.fabian_pc
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.fabian_dock
@@ -1260,7 +1260,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.fabian_dock
@@ -1569,8 +1569,8 @@
         data:
           entity_id: switch.bett_usb_ports
 
-  - id: turn_off_bett_after_2,5_hours
-    alias: 'Turn off bett after 2,5 hours'
+  - id: turn_off_bett_after_x_hours
+    alias: 'Turn off bett after x hours'
     initial_state: on
     trigger:
       - platform: state
@@ -1578,14 +1578,14 @@
         from: 'off'
         to: 'on'
         for:
-            minutes: 150
+            minutes: 180
     action:
       - service: switch.turn_off
         data:
           entity_id: switch.bett_usb_ports
 
-  - id: turn_off_staubsauger_after_3_hours
-    alias: 'Turn off staubsauger after 3 hours'
+  - id: turn_off_staubsauger_after_x_hours
+    alias: 'Turn off staubsauger after x hours'
     initial_state: on
     trigger:
       - platform: state
@@ -1593,7 +1593,7 @@
         from: 'off'
         to: 'on'
         for:
-            minutes: 180
+            minutes: 150
     action:
       - service: switch.turn_off
         data:
@@ -1963,7 +1963,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'not_home'
         to: 'home'
         for:
@@ -1996,7 +1996,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: 'device_tracker.fabianpc'
+              entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
@@ -2034,7 +2034,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: 'device_tracker.fabianpc'
+              entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
@@ -5032,7 +5032,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: home
                   - condition: state
                     entity_id: device_tracker.fabian_dock
@@ -5876,7 +5876,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         to: 'home'
       - platform: state
         entity_id: device_tracker.nessiepc
@@ -5899,7 +5899,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabianpc
+              entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
               entity_id: device_tracker.fabian_dock
@@ -5933,7 +5933,7 @@
     initial_state: off
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         to: 'not_home'
       - platform: state
         entity_id: device_tracker.nessiepc
