@@ -164,13 +164,13 @@ map:
 sun:
 
 device_tracker:
-  #- platform: fritz
-  #  host: 192.168.178.1
-  #  password: !secret fritzbox
-  #  interval_seconds: 8
-  #  consider_home: 30
-  #  new_device_defaults:
-  #    track_new_devices: False
+  - platform: fritz
+    host: 192.168.178.1
+    password: !secret fritzbox
+    interval_seconds: 8
+    consider_home: 30
+    new_device_defaults:
+      track_new_devices: False
   #- platform: xiaomi
   #  host: 192.168.31.1
   #  password: !secret fritzbox
@@ -356,7 +356,7 @@ shell_command:
   foodyes: !secret foodyes
   jek_telegram: !secret telegram_jek_open_command
   restartha: "ha host reboot"
-  hibernatefpc: "curl http://192.168.178.33:5001/hibernate"
+  hibernatefpc: "curl http://192.168.178.23:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.22:5001/hibernate"
   #overtime_input: !secret overtime_input
 
@@ -579,7 +579,7 @@ light:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik
-    host: 192.168.31.33
+    host: 192.168.178.23
     name: "Prismatik"
     profile_name: homeassistant
 
@@ -649,12 +649,12 @@ switch:
   - platform: command_line
     switches:
       fabian_pc_shutdown:
-        command_off: "curl http://192.168.31.33:5001/shutdown"
+        command_off: "curl http://192.168.178.23:5001/shutdown"
         friendly_name: Fabian PC herunterfahren
   - platform: command_line
     switches:
       nessie_pc_shutdown:
-        command_off: "curl http://192.168.31.22:5001/shutdown"
+        command_off: "curl http://192.168.178.22:5001/shutdown"
         friendly_name: Nessie PC herunterfahren
   #- platform: sonoff_lan_mode_r3
   #name: Bett

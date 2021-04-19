@@ -59,7 +59,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabian_pc
+                entity_id: device_tracker.fabianpc
                 state: 'home'
             sequence:
               - service: notify.telegram_fabian
@@ -89,7 +89,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabian_pc
+                entity_id: device_tracker.fabianpc
                 state: 'not_home'
             sequence:
               - service: switch.turn_off
@@ -646,7 +646,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         to: 'home'
         for:
           hours: 4
@@ -668,7 +668,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabian_pc
+              entity_id: device_tracker.fabianpc
               state: 'home'
             - condition: state
               entity_id: device_tracker.fabian_dock
@@ -688,7 +688,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         from: 'not_home'
         to: 'home'
       - platform: state
@@ -766,7 +766,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         from: 'home'
         to: 'not_home'
         for:
@@ -784,7 +784,7 @@
       condition: and
       conditions:
       - condition: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         state: 'not_home'
         for: 
           minutes: 1
@@ -825,7 +825,7 @@
       entity_id: switch.nessie_pc
       to: 'on'
       for:
-        minutes: 1
+        seconds: 40
     action:
       - choose:
           - conditions:
@@ -905,7 +905,7 @@
           seconds: 20
       - platform: numeric_state
         entity_id: sensor.nessie_pc_energy_power
-        below: 20
+        below: 25
     action:
       - choose:
           - conditions:
@@ -916,7 +916,7 @@
                   seconds: 30
               - condition: numeric_state
                 entity_id: sensor.nessie_pc_energy_power
-                below: 20
+                below: 25
               - condition: or
                 conditions:
                   - condition: state
@@ -968,17 +968,16 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.nessiepc
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 60
-      - platform: state
         entity_id: device_tracker.nessie_macbook
         from: 'home'
         to: 'not_home'
         for:
           minutes: 5
+      - platform: numeric_state
+        entity_id: sensor.nessie_pc_energy_power
+        below: 25
+        for:
+          minutes: 10
     condition:
       condition: and
       conditions:
@@ -987,7 +986,7 @@
         state: 'not_home'
       - condition: numeric_state
         entity_id: sensor.nessie_pc_energy_power
-        below: 30
+        below: 25
     action:
       - service: switch.turn_off
         data:
@@ -997,30 +996,35 @@
     alias: 'Turn off strom if fpc stops'
     initial_state: on
     trigger:
-      - platform: state
-        entity_id: device_tracker.fabian_pc
-        from: 'home'
-        to: 'not_home'
+      - platform: numeric_state
+        entity_id: sensor.fabian_strom_energy_power
+        below: 25
         for:
-          minutes: 60
+          minutes: 10
       - platform: state
         entity_id: device_tracker.fabian_dock
         from: 'home'
         to: 'not_home'
         for:
           minutes: 5
+      - platform: state
+        entity_id: device_tracker.fabianpc
+        from: 'home'
+        to: 'not_home'
+        for:
+          minutes: 60
     condition:
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.fabian_pc
+          entity_id: device_tracker.fabianpc
           state: 'not_home'
         - condition: state
           entity_id: device_tracker.fabian_dock
           state: 'not_home'
         - condition: numeric_state
           entity_id: sensor.fabian_strom_energy_power
-          below: 60
+          below: 25
     action:
       - service: switch.turn_off
         data:
@@ -1234,7 +1238,7 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: device_tracker.fabian_pc
+                        entity_id: device_tracker.fabianpc
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.fabian_dock
@@ -1260,7 +1264,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabian_pc
+                    entity_id: device_tracker.fabianpc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.fabian_dock
@@ -1963,7 +1967,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         from: 'not_home'
         to: 'home'
         for:
@@ -1996,7 +2000,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: 'device_tracker.fabian_pc'
+              entity_id: 'device_tracker.fabianpc'
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
@@ -2034,7 +2038,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: 'device_tracker.fabian_pc'
+              entity_id: 'device_tracker.fabianpc'
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
@@ -5032,7 +5036,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabian_pc
+                    entity_id: device_tracker.fabianpc
                     state: home
                   - condition: state
                     entity_id: device_tracker.fabian_dock
@@ -5876,7 +5880,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         to: 'home'
       - platform: state
         entity_id: device_tracker.nessiepc
@@ -5899,7 +5903,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabian_pc
+              entity_id: device_tracker.fabianpc
               state: 'home'
             - condition: state
               entity_id: device_tracker.fabian_dock
@@ -5933,7 +5937,7 @@
     initial_state: off
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
+        entity_id: device_tracker.fabianpc
         to: 'not_home'
       - platform: state
         entity_id: device_tracker.nessiepc
