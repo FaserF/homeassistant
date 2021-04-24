@@ -211,10 +211,10 @@
 #    action:
       #- service: switch.turn_off
       #  data: 
-      #    entity_id: switch.fritzbox_7430_wifi_5ghz
+      #    entity_id: switch.fritzbox_3490_wifi_5ghz
 #      - service: switch.turn_on
 #        data: 
-#          entity_id: switch.fritzbox_7430_portforward_ssh
+#          entity_id: switch.fritzbox_3490_portforward_ssh
 
   - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
     alias: 'Turn on 5ghz wifi and ssh off if coming home'
@@ -239,13 +239,13 @@
     action:
       #- service: switch.turn_on
       #  data:
-      #    entity_id: switch.fritzbox_7430_wifi_5ghz
+      #    entity_id: switch.fritzbox_3490_wifi_5ghz
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.away_mode
       - service: switch.turn_off
         data: 
-          entity_id: switch.fritzbox_7430_portforward_ssh
+          entity_id: switch.fritzbox_3490_portforward_ssh
 
 #  - id: turn_on_ventilator_if_coming_home
 #  - alias: 'Turn on ventilator if coming home'
@@ -637,9 +637,6 @@
         data_template:
           message: >
             Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
-      - service: notify.telegram_nessie
-        data:
-          message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
 
   - id: remind_fabi_to_ventilate
     alias: 'Remind Fabi to ventilate'
@@ -1030,51 +1027,40 @@
         data:
           entity_id: switch.fabian_strom
 
-  - id: turn_on_light_if_tv_starts
-    alias: 'Turn on light if tv starts'
+  - id: turn_on_light_climate_if_tv_starts
+    alias: 'Turn on light and climate if tv starts'
     initial_state: on
     trigger:
       - platform: state
         entity_id: device_tracker.tv
         from: 'not_home'
         to: 'home'
-    condition:
-      condition: and
-      conditions:
-        - condition: numeric_state
-          entity_id: sensor.dwd_illuminance
-          below: 2000
     action:
-      - service: light.turn_on
-        data:
-          entity_id: group.wohnzimmer
-          transition: 2
-
-  - id: turn_on_climate_if_tv_starts
-    alias: 'Turn on climate if tv starts'
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id:
-          - device_tracker.tv
-        from: 'not_home'
-        to: 'home'
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: 'input_boolean.climate_off'
-          state: 'off'
-        - condition: numeric_state
-          entity_id: 'weather.dwd_weather_ebersberg_halbing'
-          attribute: temperature
-          below: 17
-    action:
-      - service: climate.set_temperature
-        data:
-          entity_id: climate.wohnzimmer
-          temperature: 21
-          hvac_mode: heat
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.dwd_illuminance
+                below: 2000
+            sequence:
+              - service: light.turn_on
+                data:
+                  entity_id: group.wohnzimmer
+                  transition: 2
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'off'
+              - condition: numeric_state
+                entity_id: 'weather.dwd_weather_ebersberg_halbing'
+                attribute: temperature
+                below: 17
+            sequence:
+              - service: climate.set_temperature
+                data:
+                  entity_id: climate.wohnzimmer
+                  temperature: 21
+                  hvac_mode: heat
 
   - id: turn_off_climate_if_tv_stops
     alias: 'Turn off climate if tv stops'
@@ -1950,9 +1936,12 @@
     alias: 'Turn on lights in livingroom when dark outside'
     initial_state: on
     trigger:
-      platform: numeric_state
-      entity_id: sensor.dwd_illuminance
-      below: 2000
+      - platform: numeric_state
+        entity_id: sensor.dwd_illuminance
+        below: 2000
+      - platform: sun
+        event: sunset
+        offset: "-00:30:00"
     condition:
       condition: state
       entity_id: device_tracker.tv
@@ -1971,7 +1960,7 @@
         from: 'not_home'
         to: 'home'
         for:
-          minutes: 6
+          minutes: 2
     condition:
       condition: and
       conditions:
@@ -2062,8 +2051,8 @@
         data:
           entity_id: light.prismatik
 
-  - id: turn_on_lights_in_guest_room_room_when_dark_outside
-    alias: 'Turn on lights in guest room room when dark outside'
+  - id: turn_on_lights_in_guest_room_when_dark_outside
+    alias: 'Turn on lights in guest room when dark outside'
     initial_state: on
     trigger:
       platform: numeric_state
@@ -3380,7 +3369,7 @@
         from: 'online'
         to: 'offline'
         for:
-          seconds: 25
+          seconds: 15
     condition:
       condition: and
       conditions:
@@ -3412,10 +3401,10 @@
         - media_player.kueche_mini
         - media_player.gastezimmer_mini
         data:
-          message: 'Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.'
-      - service: fritzbox_tools.reboot
-        data:
-          host: 192.168.178.1
+          message: 'Die Fritzbox hat keine Internet Verbindung' #und wird nun neugestartet.'
+      #- service: fritzbox_tools.reboot
+      #  data:
+      #    host: 192.168.178.1
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_internet_access_returned
@@ -3513,201 +3502,203 @@
   #       state: home
   #   action:
   #     - service: notify.telegram_nessie
-  #       data:
+  #       data: 
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-  - alias: Deckenlampe Button Hold Off
+  - alias: Deckenlampe Button Hold
     initial_state: on
     trigger: 
       - entity_id: sensor.deckenlampe
         platform: state
         to: '{"TRIG":"HOLD"}'
-    condition:
-      condition: or
-      conditions:
-        - condition: state
-          entity_id: light.leds_wohnzimmer
-          state: 'on'
-        - condition: state
-          entity_id: light.yeelight_color_0x00000000036dc050
-          state: 'on'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.deckenlampe
-      - service: light.turn_off
-        data:
-          entity_id: group.wohnzimmer
-          
-  - alias: Deckenlampe Button Hold On
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.deckenlampe
-        platform: state
-        to: '{"TRIG":"HOLD"}'
-    condition:
-      condition: and
-      conditions:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: light.leds_wohnzimmer
-              state: 'off'
-            - condition: state
-              entity_id: light.leds_wohnzimmer
-              state: 'unavailable'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: light.yeelight_color_0x00000000036dc050
-              state: 'off'
-            - condition: state
-              entity_id: light.yeelight_color_0x00000000036dc050
-              state: 'unavailable'
-    action:
-      - service: light.turn_on
-        data:
-          entity_id: group.wohnzimmer
-          transition: 2
-          
-  - alias: Deckenlampe Button double press Off
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.deckenlampe
-        platform: state
-        to: '{"TRIG":"DOUBLE"}'
-    condition:
-      - condition: state
-        entity_id: switch.fernseher
-        state: 'on'
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.fernseher
-          
-  - alias: Deckenlampe Button double press On
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.deckenlampe
-        platform: state
-        to: '{"TRIG":"DOUBLE"}'
-    condition:
-      - condition: state
-        entity_id: switch.fernseher
-        state: 'off'
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.fernseher
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: light.leds_wohnzimmer
+                    state: 'off'
+                  - condition: state
+                    entity_id: light.leds_wohnzimmer
+                    state: 'unavailable'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: light.yeelight_color_0x00000000036dc050
+                    state: 'off'
+                  - condition: state
+                    entity_id: light.yeelight_color_0x00000000036dc050
+                    state: 'unavailable'
+            sequence:
+              - service: light.turn_on
+                data:
+                  entity_id: group.wohnzimmer
+                  transition: 2
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: light.leds_wohnzimmer
+                    state: 'on'
+                    for:
+                      seconds: 1
+                  - condition: state
+                    entity_id: light.yeelight_color_0x00000000036dc050
+                    state: 'on'
+                    for:
+                      seconds: 1
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.deckenlampe
+              - service: light.turn_off
+                data:
+                  entity_id: group.wohnzimmer
 
-  - alias: Lichtschalter Button Hold Off
+  - alias: Deckenlampe Button double press
+    initial_state: on
+    trigger: 
+      - entity_id: sensor.deckenlampe
+        platform: state
+        to: '{"TRIG":"DOUBLE"}'
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.fernseher
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fernseher
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.fernseher
+                state: 'off'
+            sequence:
+              - service: switch.turn_on
+                data:
+                  entity_id: switch.fernseher
+
+  - alias: Lichtschalter Button Hold
     initial_state: on
     trigger: 
       - entity_id: sensor.lichtschalter
         platform: state
         to: '{"TRIG":"HOLD"}'
-    condition:
-      condition: or
-      conditions:
-        - condition: state
-          entity_id: light.yeelight_stripe_0x00000000036d0c16
-          state: 'on'
-        - condition: state
-          entity_id: light.leds_tisch
-          state: 'on'
-        - condition: state
-          entity_id: light.bett_gluhbirne
-          state: 'on'
-        - condition: state
-          entity_id: light.yeelight_bslamp2_0x0000000013fea10f
-          state: 'on'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.lichtschalter
-      - service: light.turn_off
-        data:
-          entity_id: group.schlafzimmer
-          
-  - alias: Lichtschalter Button Hold On
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.lichtschalter
-        platform: state
-        to: '{"TRIG":"HOLD"}'
-    condition:
-      condition: and
-      conditions:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: light.bett_gluhbirne
-              state: 'off'
-            - condition: state
-              entity_id: light.bett_gluhbirne
-              state: 'unavailable'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: light.yeelight_bslamp2_0x0000000013fea10f
-              state: 'off'
-            - condition: state
-              entity_id: light.yeelight_bslamp2_0x0000000013fea10f
-              state: 'unavailable'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: light.leds_tisch
-              state: 'off'
-            - condition: state
-              entity_id: light.leds_tisch
-              state: 'unavailable'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: light.yeelight_stripe_0x00000000036d0c16
-              state: 'off'
-            - condition: state
-              entity_id: light.yeelight_stripe_0x00000000036d0c16
-              state: 'unavailable'
-    action:
-      - service: light.turn_on
-        data:
-          entity_id: 
-            - light.leds_tisch
-            - light.yeelight_stripe_0x00000000036d0c16
-          brightness: 255
-          transition: 2
-          
-  - alias: Lichtschalter Button double press Off
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: light.leds_wohnzimmer
+                        state: 'off'
+                      - condition: state
+                        entity_id: light.leds_wohnzimmer
+                        state: 'unavailable'
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: light.bett_gluhbirne
+                        state: 'off'
+                      - condition: state
+                        entity_id: light.bett_gluhbirne
+                        state: 'unavailable'
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                        state: 'off'
+                      - condition: state
+                        entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                        state: 'unavailable'
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: light.leds_tisch
+                        state: 'off'
+                      - condition: state
+                        entity_id: light.leds_tisch
+                        state: 'unavailable'
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: light.yeelight_stripe_0x00000000036d0c16
+                        state: 'off'
+                      - condition: state
+                        entity_id: light.yeelight_stripe_0x00000000036d0c16
+                        state: 'unavailable'
+            sequence:
+              - service: light.turn_on
+                data:
+                  entity_id: 
+                    - light.leds_tisch
+                    - light.yeelight_stripe_0x00000000036d0c16
+                  brightness: 255
+                  transition: 2
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: light.yeelight_stripe_0x00000000036d0c16
+                    state: 'on'
+                    for:
+                      seconds: 1
+                  - condition: state
+                    entity_id: light.leds_tisch
+                    state: 'on'
+                    for:
+                      seconds: 1
+                  - condition: state
+                    entity_id: light.bett_gluhbirne
+                    state: 'on'
+                    for:
+                      seconds: 1
+                  - condition: state
+                    entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                    state: 'on'
+                    for:
+                      seconds: 1
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.lichtschalter
+              - service: light.turn_off
+                data:
+                  entity_id: group.schlafzimmer
+
+  - alias: Lichtschalter Button double press
     initial_state: on
     trigger: 
       - entity_id: sensor.lichtschalter
         platform: state
         to: '{"TRIG":"DOUBLE"}'
-    condition:
-      - condition: state
-        entity_id: switch.fabian_strom
-        state: 'on'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.fabian_strom
-          
-  - alias: Lichtschalter Button double press On
-    initial_state: on
-    trigger: 
-      - entity_id: sensor.lichtschalter
-        platform: state
-        to: '{"TRIG":"DOUBLE"}'
-    condition:
-      - condition: state
-        entity_id: switch.fabian_strom
-        state: 'off'
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.fabian_strom
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fabian_strom
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'off'
+            sequence:
+              - service: switch.turn_on
+                data:
+                  entity_id: switch.fabian_strom
 
   - alias: Restart Bluetooth on TV
     initial_state: off
@@ -5272,7 +5263,7 @@
           entity_id: counter.pill
           value: 28
 
-  - alias: 'Remind Nessie for pill'
+  - alias: 'Remind Nessie for pill and for turning on thermostats'
     initial_state: on
     trigger:
       platform: time
@@ -5313,8 +5304,8 @@
           - conditions:
               - condition: numeric_state
                 entity_id: counter.pill
-                below: 22
-                above: 20
+                below: 29
+                above: 27
             sequence:
               - service: notify.telegram_nessie
                 data:
@@ -5325,6 +5316,27 @@
               - service: notify.telegram_fabian
                 data:
                   message: "Heute ist der letze Tag, an dem Nessie die Pille nimmt für 7 Tage."
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'off'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: climate.schlafzimmer
+                    state: 'auto'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Thermostat im Schlafzimmer war noch auf aus/niedriger Temp eingestellt und wurde nun automatisch eingeschaltet."
+              - service: notify.telegram_nessie
+                data:
+                  message: "Das Thermostat im Schlafzimmer war noch auf aus/niedriger Temp eingestellt und wurde nun automatisch eingeschaltet."
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: climate.schlafzimmer
+                  hvac_mode: auto
 
   - alias: 'Nessie forgot pill'
     initial_state: on

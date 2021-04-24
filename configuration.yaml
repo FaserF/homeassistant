@@ -710,15 +710,15 @@ google_assistant:
       expose: false
     light.keller_gluhbirne:
       expose: false
-    switch.fritzbox_7430_guest_wifi:
+    switch.fritzbox_3490_guest_wifi:
       expose: false
-    switch.fritzbox_7430_portforward_https_server:
+    switch.fritzbox_3490_portforward_https_server:
       expose: false
-    switch.fritzbox_7430_portforward_ssh:
+    switch.fritzbox_3490_portforward_ssh:
       expose: false
-    switch.fritzbox_7430_wifi:
+    switch.fritzbox_3490_wifi:
       expose: false
-    switch.fritzbox_7430_wifi_5ghz:
+    switch.fritzbox_3490_wifi_5ghz:
       expose: false
     switch.rpi_cooling_fan:
       expose: false
