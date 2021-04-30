@@ -14,12 +14,6 @@
         to: 'not_home'
         for:
           minutes: 1
-      - platform: state
-        entity_id: person.samuel
-        from: 'home'
-        to: 'not_home'
-        for:
-          minutes: 1
     condition:
       condition: not
       conditions:
@@ -28,9 +22,6 @@
           state: home
         - condition: state
           entity_id: person.nessie
-          state: home
-        - condition: state
-          entity_id: person.samuel
           state: home
     action:
       - service: light.turn_off
@@ -61,6 +52,9 @@
               - condition: state
                 entity_id: device_tracker.fabianpc
                 state: 'home'
+              - condition: numeric_state
+                entity_id: sensor.fabian_strom_energy_power
+                above: 20
             sequence:
               - service: notify.telegram_fabian
                 data:
@@ -1680,6 +1674,8 @@
               - service: automation.trigger
                 entity_id: automation.increase_lights_in_morning
               - delay: '00:00:30'
+      - service: automation.trigger
+        entity_id: automation.notify_for_high_humidity
       - service: light.turn_on
         data_template:
           entity_id: light.yeelight_bslamp2_0x0000000013fea10f
@@ -1694,8 +1690,11 @@
             {% else %}
             [0,0,0]
             {% endif %}
-      - service: automation.trigger
-        entity_id: automation.notify_for_high_humidity
+      - delay: '00:05:00'
+      - service: light.turn_off
+        data:
+          entity_id: 
+            - light.yeelight_bslamp2_0x0000000013fea10f
 
   - id: increase_lights_in_morning
     alias: 'Increase lights in morning'
@@ -2579,6 +2578,257 @@
         data:
           entity_id: all
           hvac_mode: auto
+
+  - id: turn_on_fs_strom
+    alias: Turn on FS Strom
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.fs_strom
+        to: 'on'
+      - platform: state
+        entity_id: switch.fabian_strom
+        to: 'on'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.fabian_strom
+      - service: input_boolean.turn_on
+        data:
+          entity_id: switch.fs_strom
+
+  - id: turn_off_fs_strom
+    alias: Turn off FS Strom
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.fs_strom
+        to: 'off'
+      - platform: state
+        entity_id: switch.fabian_strom
+        to: 'off'
+    action:
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.fabian_strom_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fabian_pc_shutdown
+              - delay: '00:30:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.fabian_strom_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fabian_pc_shutdown
+              - delay: '00:30:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.fabian_strom_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fabian_pc_shutdown
+              - delay: '00:01:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.fabian_strom_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Der PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.fabianpc
+                    state: 'not_home'
+                  - condition: numeric_state
+                    entity_id: sensor.fabian_strom_energy_power
+                    below: 21
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.fabian_strom
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'off'
+            sequence:
+              - service: input_boolean.turn_off
+                data:
+                  entity_id: switch.fs_strom
+
+  - id: turn_on_vk_strom
+    alias: Turn on VK Strom
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.vk_strom
+        to: 'on'
+      - platform: state
+        entity_id: switch.nessie_pc
+        to: 'on'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.nessie_pc
+      - service: input_boolean.turn_on
+        data:
+          entity_id: switch.vk_strom
+
+  - id: turn_off_vk_strom
+    alias: Turn off VK Strom
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.vk_strom
+        to: 'off'
+      - platform: state
+        entity_id: switch.nessie_pc
+        to: 'off'
+    action:
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessiepc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.nessie_pc
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.nessie_pc_shutdown
+              - delay: '00:30:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessiepc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.nessie_pc
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.nessie_pc_shutdown
+              - delay: '00:30:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessiepc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.nessie_pc
+                state: 'on'
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.nessie_pc_shutdown
+              - delay: '00:01:00'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessiepc
+                    state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    above: 20
+              - condition: state
+                entity_id: switch.nessie_pc
+                state: 'on'
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: "Der PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
+              - service: notify.telegram_fabian
+                data:
+                  message: "Nessie PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.nessiepc
+                    state: 'not_home'
+                  - condition: numeric_state
+                    entity_id: sensor.nessie_pc_energy_power
+                    below: 21
+            sequence:
+              - service: switch.turn_off
+                data:
+                  entity_id: switch.nessie_pc
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.nessie_pc
+                state: 'off'
+            sequence:
+              - service: input_boolean.turn_off
+                data:
+                  entity_id: switch.vk_strom
 
   - id: remind_for_away_mode
     alias: 'Remind for away mode'
@@ -4063,7 +4313,7 @@
     initial_state: on
     trigger:
       - platform: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         above: 100
     action:
       - service: telegram_bot.send_message
@@ -4071,7 +4321,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch gelten folgende Regeln:
 
@@ -4088,7 +4338,7 @@
           target: !secret telegram_chat_nessie
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch gelten folgende Regeln:
 
@@ -4105,17 +4355,17 @@
     initial_state: on
     trigger:
       - platform: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         below: 100
       - platform: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         above: 50
     condition:
       - condition: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         above: 50
       - condition: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         below: 100
     action:
       - service: telegram_bot.send_message
@@ -4123,7 +4373,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch gelten folgende Regeln:
 
@@ -4140,7 +4390,7 @@
           target: !secret telegram_chat_nessie
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch gelten folgende Regeln:
 
@@ -4157,17 +4407,17 @@
     initial_state: on
     trigger:
       - platform: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         below: 51
       - platform: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         above: 35
     condition:
       - condition: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         above: 35
       - condition: numeric_state
-        entity_id: sensor.corona_stats_lk_ebersberg
+        entity_id: sensor.coronavirus_lk_ebersberg
         below: 51
     action:
       - service: telegram_bot.send_message
@@ -4175,7 +4425,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch gelten folgende Regeln:
 
@@ -4199,7 +4449,7 @@
           target: !secret telegram_chat_nessie
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch gelten folgende Regeln:
 
@@ -4223,7 +4473,7 @@
     initial_state: on
     trigger:
       platform: numeric_state
-      entity_id: sensor.corona_stats_lk_ebersberg
+      entity_id: sensor.coronavirus_lk_ebersberg
       below: 36
     action:
       - service: telegram_bot.send_message
@@ -4231,7 +4481,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch treten neue Regeln in Kraft:
 
@@ -4244,7 +4494,7 @@
           target: !secret telegram_chat_nessie
           disable_notification: true
           message: >
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
             Dadurch treten neue Regeln in Kraft:
 
@@ -4297,10 +4547,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
               - condition: not
                 conditions:
@@ -4328,10 +4578,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4369,10 +4619,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4390,10 +4640,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4441,10 +4691,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
               - condition: not
                 conditions:
@@ -4470,10 +4720,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4539,10 +4789,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
               - condition: not
                 conditions:
@@ -4570,10 +4820,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4603,10 +4853,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4624,10 +4874,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4697,10 +4947,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
               - condition: not
                 conditions:
@@ -4728,10 +4978,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4761,10 +5011,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4782,10 +5032,10 @@
                     entity_id: device_tracker.maxiphone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_104418453164779945782
+                    entity_id: person.kai
                     state: home
                   - condition: state
-                    entity_id: device_tracker.google_maps_103127589611220223167
+                    entity_id: person.adri
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5273,19 +5523,19 @@
           - conditions:
               - condition: numeric_state
                 entity_id: counter.pill
-                below: 29
-                above: 27
+                below: '29'
             sequence:
-              - service: counter.reset
+              - service: counter.increment
                 target:
                   entity_id: counter.pill
       - choose:
           - conditions:
               - condition: numeric_state
                 entity_id: counter.pill
-                below: '28'
+                below: 30
+                above: 28
             sequence:
-              - service: counter.increment
+              - service: counter.reset
                 target:
                   entity_id: counter.pill
       - choose:
@@ -5304,8 +5554,8 @@
           - conditions:
               - condition: numeric_state
                 entity_id: counter.pill
-                below: 29
-                above: 27
+                below: 22
+                above: 20
             sequence:
               - service: notify.telegram_nessie
                 data:
@@ -6514,7 +6764,7 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
   - alias: 'Telegram send daily weather forecast fabian'
     initial_state: true
@@ -6546,7 +6796,7 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
   - alias: 'Telegram send daily weather forecast nessie'
     initial_state: true
@@ -6578,7 +6828,7 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
 
-            Corona 7 Tage Inzidenzwert: {{ states.sensor.corona_stats_lk_ebersberg.attributes.incidence|round(0) }}
+            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
   - alias: 'remind for jek'
     initial_state: True

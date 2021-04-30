@@ -10,3 +10,9 @@ away_mode:
 climate_off:
   name: Thermostate aus
   icon: mdi:home-thermometer-outline
+fs_strom:
+  name: Fabian Strom
+  icon: mdi:desktop-tower-monitor
+vk_strom:
+  name: Nessie Strom
+  icon: mdi:desktop-tower-monitor

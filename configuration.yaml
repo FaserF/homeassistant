@@ -156,6 +156,8 @@ logger:
       - "Platform androidtv not ready yet. Retrying in$"
     homeassistant.helpers.service:
       - "Unable to find referenced entities$"
+    homeassistant.config_entries:
+      - "Config entry '192.168.31.159' for miwifi integration not ready yet; Retrying in background"
 
 # Enables a map showing the location of tracked devices
 map:
@@ -258,6 +260,7 @@ media_player:
       tv.emby.embyatv: "Emby"
       com.google.android.apps.mediashell: "Chromecast"
       de.prosiebensat1digital.prosieben: "Pro7"
+      de.prosiebensat1digital.seventv: "Joyn"
       com.tcl.tv: "HDMI"
       com.tcl.settings: "Einstellungen TCL"
       com.android.tv.settings: "Einstellungen"
@@ -298,6 +301,7 @@ media_player:
       tv.emby.embyatv: "Emby"
       com.google.android.apps.mediashell: "Chromecast"
       de.prosiebensat1digital.prosieben: "Pro7"
+      de.prosiebensat1digital.seventv: "Joyn"
       com.tcl.tv: "HDMI"
       com.tcl.settings: "Einstellungen TCL"
       com.android.tv.settings: "Einstellungen"
@@ -356,8 +360,8 @@ shell_command:
   foodyes: !secret foodyes
   jek_telegram: !secret telegram_jek_open_command
   restartha: "ha host reboot"
-  hibernatefpc: "curl http://192.168.178.23:5001/hibernate"
-  hibernatenpc: "curl http://192.168.178.22:5001/hibernate"
+  hibernatefpc: "curl http://192.168.178.15:5001/hibernate"
+  hibernatenpc: "curl http://192.168.178.16:5001/hibernate"
   #overtime_input: !secret overtime_input
 
 #rest_command:
@@ -390,10 +394,10 @@ shell_command:
 counter:
   pill:
     name: Pille Tageszähler
-    initial: 0
+    initial: 1
     step: 1
-    minimum: 0
-    maximum: 28
+    minimum: 1
+    maximum: 29
     restore: true
     icon: mdi:pill
 
@@ -579,7 +583,7 @@ light:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik
-    host: 192.168.178.23
+    host: 192.168.178.15
     name: "Prismatik"
     profile_name: homeassistant
 
@@ -593,43 +597,38 @@ homekit:
       - binary_sensor
       - media_player
       - person
-      - input_boolean
+      - device_tracker
     exclude_entity_globs:
       - device_tracker.google_maps*
       - device_tracker.*phone*
       - device_tracker.*ipad*
       - media_player.*_cast
-      - switch.*_shutdown
+      - switch.*shutdown*
+      - switch.*hibernate*
+      - switch.*reboot*
       - sensor.*_open_window
       - switch.fritzbox_*
+      - switch.xiaomi_*
+      - light.xiaomi_*
+      - switch.adguard_*
     exclude_entities:
       - binary_sensor.updater
-      - device_tracker.fabianhackbook
       - device_tracker.fabiannotebook_work
       - input_boolean.silent_mode
       - input_boolean.guest_mode
       - input_boolean.away_mode
+      - input_boolean.climate_off
       - media_player.mini_gruppe
       - climate.rpi_cooling_fan_controller
       - switch.rpi_cooling_fan
-      - switch.adguard_protection
-      - switch.adguard_filtering
-      - switch.fritzbox_guest_wifi
-      - switch.fritzbox_portforward_bitwarden
-      - switch.fritzbox_portforward_bookstracks
-      - switch.fritzbox_portforward_homeassistant
-      - switch.fritzbox_portforward_http_server
-      - switch.fritzbox_portforward_https_server
-      - switch.fritzbox_portforward_ssh
-      - switch.fritzbox_portforward_tasmoadmin
-      - switch.fritzbox_wifi
-      - switch.fritzbox_wifi_5ghz
       - media_player.mpd
       - switch.schreibtisch
       - switch.frei
       - switch.bett
       - light.yeelight_bslamp2_0x0000000013fea10f #Bedside Lamp has a direct Homekit integration
       - light.prismatik
+      - switch.nessie_pc
+      - switch.fabian_strom
 
 #no_ip:
 #  domain: !secret domain_noip
@@ -649,12 +648,12 @@ switch:
   - platform: command_line
     switches:
       fabian_pc_shutdown:
-        command_off: "curl http://192.168.178.23:5001/shutdown"
+        command_off: "curl http://192.168.178.15:5001/shutdown"
         friendly_name: Fabian PC herunterfahren
   - platform: command_line
     switches:
       nessie_pc_shutdown:
-        command_off: "curl http://192.168.178.22:5001/shutdown"
+        command_off: "curl http://192.168.178.16:5001/shutdown"
         friendly_name: Nessie PC herunterfahren
   #- platform: sonoff_lan_mode_r3
   #name: Bett
@@ -679,14 +678,31 @@ google_assistant:
   exposed_domains:
     - switch
     - light
-  expose_by_default: true
+    - input_boolean
+  expose_by_default: false
   entity_config:
     #Disabled Entitys
+    input_boolean.silent_mode:
+      expose: false
+    input_boolean.guest_mode:
+      expose: false
+    input_boolean.away_mode:
+      expose: false
+    input_boolean.climate_off:
+      expose: false
+    switch.hibernate_fabian_pc:
+      expose: false
+    switch.shutdown_fabian_pc:
+      expose: false
     light.prismatik:
       expose: false
     light.xiaomi_abd8_led:
       expose: false
     switch.xiaomi_abd8_reboot:
+      expose: false
+    light.xiaomi_89fb_7604_led:
+      expose: false
+    switch.xiaomi_89fb_7604_reboot:
       expose: false
     switch.schlafzimmer_speaker_do_not_disturb:
       expose: false
@@ -733,6 +749,10 @@ google_assistant:
     ##Schlafzimmer
     switch.fabian_strom:
       name: Strom Schlafzimmer
+      expose: false
+      room: Schlafzimmer
+    input_boolean.fs_strom:
+      name: Strom Schlafzimmer
       expose: true
       room: Schlafzimmer
     switch.bett_usb_ports:
@@ -769,7 +789,11 @@ google_assistant:
       expose: true
       room: Gästezimmer
     switch.nessie_pc:
-      expose: True
+      expose: false
+      room: Gästezimmer
+    input_boolean.vk_strom:
+      name: Nessie PC
+      expose: true
       room: Gästezimmer
     ##Wohnzimmer
     switch.deckenlampe:
