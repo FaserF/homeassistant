@@ -50,7 +50,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabianpc
+                entity_id: device_tracker.fabian_pc
                 state: 'home'
               - condition: numeric_state
                 entity_id: sensor.fabian_strom_energy_power
@@ -65,7 +65,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.nessiepc
+                entity_id: device_tracker.schnuppes_pc
                 state: 'home'
             sequence:
               - service: notify.telegram_fabian
@@ -83,7 +83,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabianpc
+                entity_id: device_tracker.fabian_pc
                 state: 'not_home'
             sequence:
               - service: switch.turn_off
@@ -92,7 +92,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.nessiepc
+                entity_id: device_tracker.schnuppes_pc
                 state: 'not_home'
             sequence:
               - service: switch.turn_off
@@ -486,7 +486,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.isiphone
+        entity_id: device_tracker.isi_phone
         from: 'not_home'
         to: 'home'
     condition:
@@ -515,7 +515,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.isiphone
+        entity_id: device_tracker.isi_phone
         to: 'not_home'
         for:
           days: 1
@@ -530,6 +530,9 @@
         - condition: state
           entity_id: input_boolean.guest_mode
           state: 'on'
+        - condition: state
+          entity_id: device_tracker.isi_phone
+          state: 'not_home'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -596,7 +599,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.nessiepc
+        entity_id: device_tracker.schnuppes_pc
         to: 'home'
         for:
           hours: 4
@@ -620,7 +623,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.nessiepc
+              entity_id: device_tracker.schnuppes_pc
               state: 'home'
             - condition: state
               entity_id: device_tracker.nessie_macbook
@@ -637,7 +640,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         to: 'home'
         for:
           hours: 4
@@ -659,7 +662,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabianpc
+              entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
               entity_id: device_tracker.fabian_dock
@@ -679,7 +682,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'not_home'
         to: 'home'
       - platform: state
@@ -757,7 +760,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'home'
         to: 'not_home'
         for:
@@ -775,7 +778,7 @@
       condition: and
       conditions:
       - condition: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         state: 'not_home'
         for: 
           minutes: 1
@@ -823,7 +826,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: 'device_tracker.nessiepc'
+                    entity_id: 'device_tracker.schnuppes_pc'
                     state: 'home'
                   - condition: and
                     conditions:
@@ -862,7 +865,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: 'device_tracker.nessiepc'
+                    entity_id: 'device_tracker.schnuppes_pc'
                     state: 'home'
                   - condition: and
                     conditions:
@@ -883,7 +886,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.nessiepc
+        entity_id: device_tracker.schnuppes_pc
         from: 'home'
         to: 'not_home'
         for:
@@ -901,7 +904,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.nessiepc
+                entity_id: device_tracker.schnuppes_pc
                 state: not_home
                 for:
                   seconds: 30
@@ -935,7 +938,7 @@
                 entity_id: input_boolean.guest_mode
                 state: 'off'
               - condition: state
-                entity_id: device_tracker.nessiepc
+                entity_id: device_tracker.schnuppes_pc
                 state: 'not_home'
               - condition: or
                 conditions:
@@ -973,7 +976,7 @@
       condition: and
       conditions:
       - condition: state
-        entity_id: device_tracker.nessiepc
+        entity_id: device_tracker.schnuppes_pc
         state: 'not_home'
       - condition: numeric_state
         entity_id: sensor.nessie_pc_energy_power
@@ -999,7 +1002,7 @@
         for:
           minutes: 5
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'home'
         to: 'not_home'
         for:
@@ -1008,7 +1011,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.fabianpc
+          entity_id: device_tracker.fabian_pc
           state: 'not_home'
         - condition: state
           entity_id: device_tracker.fabian_dock
@@ -1218,13 +1221,13 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: device_tracker.fabianpc
+                        entity_id: device_tracker.fabian_pc
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.fabian_dock
                         state: 'not_home'
                       - condition: state
-                        entity_id: device_tracker.nessiepc
+                        entity_id: device_tracker.schnuppes_pc
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.nessie_macbook
@@ -1244,7 +1247,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.fabian_dock
@@ -1263,7 +1266,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiepc
+                    entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.nessie_macbook
@@ -1955,7 +1958,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         from: 'not_home'
         to: 'home'
         for:
@@ -1988,7 +1991,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: 'device_tracker.fabianpc'
+              entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
@@ -2026,7 +2029,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: 'device_tracker.fabianpc'
+              entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.fabian_dock'
@@ -2061,7 +2064,7 @@
       condition: or
       conditions:
         - condition: state
-          entity_id: 'device_tracker.nessiepc'
+          entity_id: 'device_tracker.schnuppes_pc'
           state: 'home'
         - condition: and
           conditions:
@@ -2122,14 +2125,14 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Thermostate wurden ausgeschaltet, da es über 15° hat und sonnig ist.'
+          message: 'Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} ° hat und sonnig ist.'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Thermostate wurden ausgeschaltet, da es über 15° hat und sonnig ist.'
+          message: 'Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} ° hat und sonnig ist.'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
@@ -2147,26 +2150,34 @@
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: weather.dwd_weather_ebersberg_halbing
-          attribute: temperature
-          below: 10
-        - condition: sun
-          after: sunset
-          after_offset: "-04:00:00"
-        - condition: time
-          before: '20:30:00'
-        - condition: template
-          value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['condition'] != 'sunny' }}"
         - condition: state
           entity_id: 'input_boolean.climate_off'
           state: 'on'
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_climates_on_cold_days.attributes.last_triggered) | int > 6400 }}"
         - condition: or
           conditions:
+            - condition: and
+              conditions:
+                - condition: numeric_state
+                  entity_id: weather.dwd_weather_ebersberg_halbing
+                  attribute: temperature
+                  below: 10
+                - condition: sun
+                  after: sunset
+                  after_offset: "-04:00:00"
+                - condition: time
+                  before: '20:30:00'
+                - condition: template
+                  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_climates_on_cold_days.attributes.last_triggered) | int > 12000 }}"
+                - condition: template
+                  value_template: '{{ now().month <= 10 and now().month >= 2 }}'
             - condition: template
-              value_template: '{{ now().month <= 10 and now().month >= 2 }}'
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['temperature'] <= '12' }}"
+            - condition: and
+              conditions:
+                - condition: template
+                  value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['condition'] != 'sunny' }}"
+                - condition: template
+                  value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['temperature'] <= '14' }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -2205,11 +2216,11 @@
                     entity_id: calendar.fabianseitz98_gmail_com
                     attribute: message
                     state: "Gruppentreffen"
-              - condition: or
-                conditions:
                   - condition: state
                     entity_id: 'switch.kuhlschrank'
-                    state: 'on'
+                    state: 'off'
+              - condition: or
+                conditions:
                   - condition: template
                     value_template: '{{ now().month < 4 and now().month > 10 }}'
                   - condition: and
@@ -2294,6 +2305,10 @@
                   - condition: state
                     entity_id: calendar.fabianseitz98_gmail_com
                     attribute: message
+                    state: "Monthly Meet"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
                     state: "Treffen in Zorneding"
                   - condition: state
                     entity_id: calendar.fabianseitz98_gmail_com
@@ -2336,25 +2351,6 @@
     action:
       - choose:
           - conditions:
-              - condition: and
-                conditions:
-                  - condition: state
-                    entity_id: calendar.fabianseitz98_gmail_com
-                    attribute: message
-                    state: "Gruppentreffen"
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Demnächst steht Gruppentreffen an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: calendar.fabianseitz98_gmail_com
-                    attribute: message
-                    state: "Gruppentreffen"
               - condition: or
                 conditions:
                   - condition: state
@@ -2370,7 +2366,19 @@
                   - condition: state
                     entity_id: calendar.fabianseitz98_gmail_com
                     attribute: message
+                    state: "Gruppentreffen"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
                     state: "Treffen"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Monthly Meet"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Treffen in Zorneding"
                   - condition: state
                     entity_id: calendar.fabianseitz98_gmail_com
                     attribute: message
@@ -2379,11 +2387,19 @@
                     entity_id: calendar.fabianseitz98_gmail_com
                     attribute: message
                     state: "Spieleabend"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Karten- / Brettspieleabend"
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: message
+                    state: "Kartenspieleabend"
             sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_fabian
-                  message: 'Demnächst steht ein Treffen an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?'
+                  message: 'Demnächst steht {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?'
 
   - id: turn_on_strom_kühlschrank
     alias: 'Turn on Strom Kühlschrank'
@@ -2428,6 +2444,9 @@
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
+      - service: input_boolean.turn_off
+        data:
+          entity_id: switch.climate_off
 
   - id: remind_for_DST_change_Winter_Sommerzeit
     alias: 'Remind for DST change - Winter/Sommerzeit'
@@ -2595,7 +2614,7 @@
           entity_id: switch.fabian_strom
       - service: input_boolean.turn_on
         data:
-          entity_id: switch.fs_strom
+          entity_id: input_boolean.fs_strom
 
   - id: turn_off_fs_strom
     alias: Turn off FS Strom
@@ -2613,14 +2632,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.fabian_strom_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.fabian_strom
-                state: 'on'
             sequence:
               - service: switch.turn_off
                 data:
@@ -2631,14 +2647,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.fabian_strom_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.fabian_strom
-                state: 'on'
             sequence:
               - service: switch.turn_off
                 data:
@@ -2649,14 +2662,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.fabian_strom_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.fabian_strom
-                state: 'on'
             sequence:
               - service: switch.turn_off
                 data:
@@ -2667,14 +2677,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.fabian_strom_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.fabian_strom
-                state: 'on'
             sequence:
               - service: notify.telegram_fabian
                 data:
@@ -2684,7 +2691,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: 'not_home'
                   - condition: numeric_state
                     entity_id: sensor.fabian_strom_energy_power
@@ -2701,7 +2708,7 @@
             sequence:
               - service: input_boolean.turn_off
                 data:
-                  entity_id: switch.fs_strom
+                  entity_id: input_boolean.fs_strom
 
   - id: turn_on_vk_strom
     alias: Turn on VK Strom
@@ -2719,7 +2726,7 @@
           entity_id: switch.nessie_pc
       - service: input_boolean.turn_on
         data:
-          entity_id: switch.vk_strom
+          entity_id: input_boolean.vk_strom
 
   - id: turn_off_vk_strom
     alias: Turn off VK Strom
@@ -2737,14 +2744,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiepc
+                    entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.nessie_pc
-                state: 'on'
             sequence:
               - service: switch.turn_off
                 data:
@@ -2755,14 +2759,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiepc
+                    entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.nessie_pc
-                state: 'on'
             sequence:
               - service: switch.turn_off
                 data:
@@ -2773,14 +2774,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiepc
+                    entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.nessie_pc
-                state: 'on'
             sequence:
               - service: switch.turn_off
                 data:
@@ -2791,14 +2789,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiepc
+                    entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
-              - condition: state
-                entity_id: switch.nessie_pc
-                state: 'on'
             sequence:
               - service: notify.telegram_nessie
                 data:
@@ -2811,7 +2806,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiepc
+                    entity_id: device_tracker.schnuppes_pc
                     state: 'not_home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -2828,7 +2823,7 @@
             sequence:
               - service: input_boolean.turn_off
                 data:
-                  entity_id: switch.vk_strom
+                  entity_id: input_boolean.vk_strom
 
   - id: remind_for_away_mode
     alias: 'Remind for away mode'
@@ -3748,7 +3743,7 @@
   #     - condition: template
   #       value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
   #     - condition: state
-  #       entity_id: device_tracker.nessiepc
+  #       entity_id: device_tracker.schnuppes_pc
   #       state: home
   #   action:
   #     - service: notify.telegram_nessie
@@ -4178,7 +4173,7 @@
           - climate.schlafzimmer
           - climate.bad
         attribute: current_humidity
-        above: 54
+        above: 55
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
@@ -4220,16 +4215,16 @@
         data_template: 
           message: >
             Die Luftfeuchtigkeit ist zu hoch im Raum
-            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+            {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
             Gästezimmer, 
             {% endif %}
-            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
             Wohnzimmer,
             {% endif %}
-            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
             Schlafzimmer,
             {% endif %}
-            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+            {% if (states.climate.bad.attributes.current_humidity) > 55 %}
             Bad,
             {% endif %}
             Bitte lüften.
@@ -4259,7 +4254,7 @@
           - climate.schlafzimme
           - climate.bad
         attribute: current_humidity
-        above: 54
+        above: 55
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
@@ -4289,16 +4284,16 @@
         data_template:
           message: >
             Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im
-            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+            {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
             Gästezimmer, 
             {% endif %}
-            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
             Wohnzimmer,
             {% endif %}
-            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
             Schlafzimmer,
             {% endif %}
-            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+            {% if (states.climate.bad.attributes.current_humidity) > 55 %}
             Bad
             {% endif %}
             Bitte lüften.
@@ -4517,7 +4512,10 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1200 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 900 }}"
+        - condition: state
+          entity_id: switch.kohleanzunder
+          state: 'on'
     action:
       - service: automation.turn_off
         data:
@@ -4760,6 +4758,9 @@
       conditions:
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1020 }}"
+        - condition: state
+          entity_id: switch.kohleanzunder
+          state: 'on'
     action:
       - service: automation.turn_off
         data:
@@ -4918,6 +4919,9 @@
       conditions:
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int > 600 }}"
+        - condition: state
+          entity_id: switch.kohleanzunder
+          state: 'on'
     action:
       - service: automation.turn_off
         data:
@@ -5076,19 +5080,22 @@
       conditions:
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 5400 }}"
+        - condition: state
+          entity_id: switch.waschmaschine
+          state: 'on'
     action:
       - service: notify.telegram_nessie
         data:
           message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
           data:
             inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb'
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Feinschwäsche:/washerstart20fw'
       - service: notify.telegram_fabian
         data:
           message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
           data:
             inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb'
+            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Feinschwäsche:/washerstart20fw'
       - service: automation.turn_on
         data:
           entity_id: 
@@ -5249,13 +5256,13 @@
             - thu
             - sun
         - condition: state
-          entity_id: device_tracker.nessiepc
+          entity_id: device_tracker.schnuppes_pc
           state: home
     action:
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.nessiepc
+                entity_id: device_tracker.schnuppes_pc
                 state: home
             sequence:
               #- service: notify.browser
@@ -5277,7 +5284,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.fabianpc
+                    entity_id: device_tracker.fabian_pc
                     state: home
                   - condition: state
                     entity_id: device_tracker.fabian_dock
@@ -5579,10 +5586,10 @@
             sequence:
               - service: notify.telegram_fabian
                 data:
-                  message: "Das Thermostat im Schlafzimmer war noch auf aus/niedriger Temp eingestellt und wurde nun automatisch eingeschaltet."
+                  message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
               - service: notify.telegram_nessie
                 data:
-                  message: "Das Thermostat im Schlafzimmer war noch auf aus/niedriger Temp eingestellt und wurde nun automatisch eingeschaltet."
+                  message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
               - service: climate.set_hvac_mode
                 data:
                   entity_id: climate.schlafzimmer
@@ -5670,6 +5677,30 @@
       - service: notify.telegram_fabian
         data:
           message: '30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr.'
+
+  - alias: 'Telegram Washing mashine set program 20 degrees feinwasche'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/washerstart20fw'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Okay, Programm gesetzt.'
+      - service: telegram_bot.edit_replymarkup
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.user_id }}'
+          inline_keyboard: []
+      - service: notify.telegram_nessie
+        data:
+          message: '20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr.'
+      - service: notify.telegram_fabian
+        data:
+          message: '20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr.'
 
   - alias: 'Telegram Washing mashine set program 40 degrees pflegeleicht'
     initial_state: on
@@ -6142,10 +6173,10 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessiepc
+        entity_id: device_tracker.schnuppes_pc
         to: 'home'
       - platform: state
         entity_id: device_tracker.fabian_dock
@@ -6165,7 +6196,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabianpc
+              entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
               entity_id: device_tracker.fabian_dock
@@ -6199,10 +6230,10 @@
     initial_state: off
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianpc
+        entity_id: device_tracker.fabian_pc
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.nessiepc
+        entity_id: device_tracker.schnuppes_pc
         to: 'not_home'
       - platform: state
         entity_id: device_tracker.fabian_dock
@@ -6499,7 +6530,7 @@
         attribute: dir_of_travel
         to: 'towards'
         for:
-          minutes: 1
+          minutes: 4
     condition:
       - condition: numeric_state
         entity_id: proximity.home_fabian
@@ -6532,7 +6563,7 @@
         attribute: dir_of_travel
         to: 'towards'
         for:
-          minutes: 1
+          minutes: 4
     condition:
       - condition: numeric_state
         entity_id: proximity.home_nessie

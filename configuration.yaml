@@ -166,13 +166,6 @@ map:
 sun:
 
 device_tracker:
-  - platform: fritz
-    host: 192.168.178.1
-    password: !secret fritzbox
-    interval_seconds: 8
-    consider_home: 30
-    new_device_defaults:
-      track_new_devices: False
   #- platform: xiaomi
   #  host: 192.168.31.1
   #  password: !secret fritzbox
@@ -426,6 +419,8 @@ sensor:
             30° Pflegeleicht
           {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
             40° Pflegeleicht
+          {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinschwasche.attributes.last_triggered) ) < 3200 %}
+            20° Feinschwäsche
           {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
             40° Koch/Bunt
           {% elif (9780) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) %}
@@ -441,6 +436,8 @@ sensor:
               {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
               {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinschwasche.attributes.last_triggered) ) < 3200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (2400) ) | timestamp_custom("%H:%M", true) }}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
               {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) ) | timestamp_custom("%H:%M", true) }}
             {% elif (9780) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) %}
@@ -460,6 +457,8 @@ sensor:
               {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
               {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinschwasche.attributes.last_triggered) ) < 3200 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (2400) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
               {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
             {% elif (9780) > as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) %}
@@ -545,6 +544,8 @@ sensor:
   - platform: dwd_weather_warnings
     region_name: !secret dwd_cell_id
   - platform: spotcast
+    sp_dc: !secret sp_dc
+    sp_key: !secret sp_key
   #- platform: email
   #  email: !secret vapid_email
   #  password: !secret email_pw
@@ -679,7 +680,7 @@ google_assistant:
     - switch
     - light
     - input_boolean
-  expose_by_default: false
+  expose_by_default: true
   entity_config:
     #Disabled Entitys
     input_boolean.silent_mode:
@@ -773,7 +774,7 @@ google_assistant:
     light.leds_tisch:
       expose: true
       room: Schlafzimmer
-    light.yeelight_strip1_34ce008b1863:
+    light.yeelight_stripe_0x00000000036d0c16:
       expose: true
       room: Schlafzimmer
     light.yeelight_bslamp2_0x0000000013fea10f:
@@ -803,7 +804,7 @@ google_assistant:
     light.leds_wohnzimmer:
       expose: true
       room: Wohnzimmer
-    light.yeelight_color1_34ce008bcc9d:
+    light.yeelight_color_0x00000000036dc050:
       expose: True
       room: Wohnzimmer
     switch.fernseher:
