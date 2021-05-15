@@ -53,7 +53,7 @@
                 entity_id: device_tracker.fabian_pc
                 state: 'home'
               - condition: numeric_state
-                entity_id: sensor.fabian_strom_energy_power
+                entity_id: sensor.steckdose_schlafzimmer_energy_power
                 above: 20
             sequence:
               - service: notify.telegram_fabian
@@ -772,7 +772,7 @@
         for:
             minutes: 1
       - platform: numeric_state
-        entity_id: sensor.fabian_strom_energy_power
+        entity_id: sensor.steckdose_schlafzimmer_energy_power
         below: 20
     condition:
       condition: and
@@ -788,7 +788,7 @@
         for: 
           seconds: 20
       - condition: numeric_state
-        entity_id: sensor.fabian_strom_energy_power
+        entity_id: sensor.steckdose_schlafzimmer_energy_power
         below: 20
     action:
       - service: light.turn_off
@@ -991,7 +991,7 @@
     initial_state: on
     trigger:
       - platform: numeric_state
-        entity_id: sensor.fabian_strom_energy_power
+        entity_id: sensor.steckdose_schlafzimmer_energy_power
         below: 25
         for:
           minutes: 10
@@ -1017,7 +1017,7 @@
           entity_id: device_tracker.fabian_dock
           state: 'not_home'
         - condition: numeric_state
-          entity_id: sensor.fabian_strom_energy_power
+          entity_id: sensor.steckdose_schlafzimmer_energy_power
           below: 25
     action:
       - service: switch.turn_off
@@ -2635,7 +2635,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
-                    entity_id: sensor.fabian_strom_energy_power
+                    entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
               - service: switch.turn_off
@@ -2650,7 +2650,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
-                    entity_id: sensor.fabian_strom_energy_power
+                    entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
               - service: switch.turn_off
@@ -2665,7 +2665,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
-                    entity_id: sensor.fabian_strom_energy_power
+                    entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
               - service: switch.turn_off
@@ -2680,7 +2680,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: numeric_state
-                    entity_id: sensor.fabian_strom_energy_power
+                    entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
               - service: notify.telegram_fabian
@@ -2694,7 +2694,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'not_home'
                   - condition: numeric_state
-                    entity_id: sensor.fabian_strom_energy_power
+                    entity_id: sensor.steckdose_schlafzimmer_energy_power
                     below: 21
             sequence:
               - service: switch.turn_off
@@ -4503,7 +4503,7 @@
     mode: single
     trigger:
       - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
+        entity_id: sensor.keller_steckdose_energy_power
         above: 470
         below: 540
         for:
@@ -4748,7 +4748,7 @@
     mode: single
     trigger:
       - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
+        entity_id: sensor.keller_steckdose_energy_power
         above: 1400
         below: 1500
         for:
@@ -4909,7 +4909,7 @@
     mode: single
     trigger:
       - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
+        entity_id: sensor.keller_steckdose_energy_power
         above: 1100
         below: 1250
         for:
@@ -5070,7 +5070,7 @@
     mode: single
     trigger:
       - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
+        entity_id: sensor.keller_steckdose_energy_power
         above: 22
         below: 469
         for:
@@ -5113,7 +5113,7 @@
     initial_state: off
     trigger:
       - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
+        entity_id: sensor.keller_steckdose_energy_power
         above: 22
     condition:
       condition: or
@@ -5140,7 +5140,7 @@
     initial_state: off
     trigger:
       - platform: numeric_state
-        entity_id: sensor.waschmaschine_energy_power
+        entity_id: sensor.keller_steckdose_energy_power
         below: 5
         for:
           minutes: 3
@@ -6268,6 +6268,9 @@
         - condition: time
           after: '23:00:00'
           before: '06:00:00'
+        - condition: state
+          entity_id: 'input_boolean.guest_mode'
+          state: 'off'
         - condition: not
           conditions:
             - condition: state

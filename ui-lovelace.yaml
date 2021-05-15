@@ -67,8 +67,8 @@ views:
       - entity: sensor.fabian_ipadpro_battery_level
       - entity: sensor.washing_machine_state
       - entity: sensor.nessie_pc_energy_power
-      - entity: sensor.fabian_strom_energy_power
-      - entity: sensor.waschmaschine_energy_power
+      - entity: sensor.steckdose_schlafzimmer_energy_power
+      - entity: sensor.keller_steckdose_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
       - entity: sensor.dwd_illuminance
@@ -140,7 +140,7 @@ views:
           - entity: input_boolean.guest_mode
           - entity: input_boolean.away_mode
           - entity: input_boolean.climate_off
-        show_header_toggle: true
+        show_header_toggle: false
         title: Weiteres
         type: entities
       - entity: climate.wohnzimmer
@@ -352,11 +352,11 @@ views:
           - entity: switch.schreibtisch
           - entity: input_boolean.fs_strom
           - entity: light.prismatik
-          - entity: device_tracker.fabianpc
+          - entity: device_tracker.fabian_pc
           - entity: device_tracker.fabian_dock
           - entity: switch.fabian_pc_shutdown
-          - entity: sensor.fabian_strom_energy_today
-          - entity: sensor.fabian_strom_energy_power
+          - entity: sensor.steckdose_schlafzimmer_energy_today
+          - entity: sensor.steckdose_schlafzimmer_energy_power
         show_header_toggle: true
         title: Fabian PC
         type: entities
@@ -387,7 +387,7 @@ views:
           - entity: input_boolean.vk_strom
           - entity: switch.nessie_pc_shutdown
           - entity: device_tracker.nessie_macbook
-          - entity: device_tracker.nessiepc
+          - entity: device_tracker.schnuppes_pc
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
         show_header_toggle: false
@@ -430,7 +430,7 @@ views:
         type: entities
       - entities:
           - entity: switch.waschmaschine
-          - entity: sensor.waschmaschine_energy_power
+          - entity: sensor.keller_steckdose_energy_power
           - entity: sensor.washing_machine_state
           - entity: sensor.washing_machine_mode
           - entity: sensor.washing_machine_finish_time
@@ -622,8 +622,6 @@ views:
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: switch.fritzbox_3490_portforward_https_server
-          - entity: switch.fritzbox_3490_portforward_ssh
           - entity: switch.fritzbox_3490_wifi
           - entity: switch.fritzbox_3490_wifi_5ghz
         title: FritzBox
@@ -638,7 +636,7 @@ views:
           - device_tracker.galaxy_s10_lite
           - device_tracker.maxiphone
           - device_tracker.redminote8t_redminot
-          - device_tracker.isiphone
+          - device_tracker.isi_phone
         title: Freunde & Bekannte
   - title: RaspberryPi
     path: raspberrypi
