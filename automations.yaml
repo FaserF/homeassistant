@@ -86,18 +86,18 @@
                 entity_id: device_tracker.fabian_pc
                 state: 'not_home'
             sequence:
-              - service: switch.turn_off
+              - service: input_boolean.turn_off
                 data:
-                  entity_id: switch.fabian_strom
+                  entity_id: input_boolean.fs_strom
       - choose:
           - conditions:
               - condition: state
                 entity_id: device_tracker.schnuppes_pc
                 state: 'not_home'
             sequence:
-              - service: switch.turn_off
+              - service: input_boolean.turn_off
                 data:
-                  entity_id: switch.nessie_pc
+                  entity_id: input_boolean.vk_strom
       - choose:
           - conditions:
               - condition: state
@@ -436,6 +436,7 @@
                 data:
                   entity_id: climate.gastezimmer
                   hvac_mode: auto
+      - choose:
           - conditions:
               - condition: state
                 entity_id: input_boolean.guest_mode
@@ -2182,14 +2183,14 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Thermostate sollten wieder eingeschaltet werden, da es nur noch {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C hat. Dies wurde nicht automatisch gemacht!'
+          message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg_halbing", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Thermostate sollten wieder eingeschaltet werden, da es unter {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C hat. Dies wurde nicht automatisch gemacht!'
+          message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg_halbing", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
@@ -5758,22 +5759,18 @@
       event_data:
         data: '/shutdownfpc'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.fabian_pc_shutdown
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
-          message: 'PC wird heruntergefahren, Strom wird nach 4 Minuten ausgeschaltet.'
+          message: 'PC wird heruntergefahren, Strom wird ausgeschaltet.'
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - delay: '00:04:00'
-      - service: switch.turn_off
+      - service: input_boolean.turn_off
         data:
-          entity_id: switch.fabian_strom
+          entity_id: input_boolean.fs_strom
 
   - alias: 'Telegram hibernate fpc'
     initial_state: on
@@ -5802,22 +5799,18 @@
       event_data:
         data: '/shutdownnpc'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.nessie_pc_shutdown
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
-          message: 'PC wird heruntergefahren, Strom wird nach 4 Minuten ausgeschaltet.'
+          message: 'PC wird heruntergefahren, Strom wird ausgeschaltet.'
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
           chat_id: '{{ trigger.event.data.user_id }}'
           inline_keyboard: []
-      - delay: '00:04:00'
-      - service: switch.turn_off
+      - service: input_boolean.turn_off
         data:
-          entity_id: switch.nessie_pc
+          entity_id: input_boolean.vk_strom
 
   - alias: 'Telegram hibernate npc'
     initial_state: on
