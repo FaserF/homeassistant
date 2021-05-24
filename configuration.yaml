@@ -395,6 +395,10 @@ counter:
     icon: mdi:pill
 
 sensor:
+  - platform: rest
+    resource: https://lp.smartlife.tk/info
+    method: GET
+    unit_of_measurement: people
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_halbing
   - platform: mqtt

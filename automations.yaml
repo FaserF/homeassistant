@@ -629,12 +629,12 @@
             - condition: state
               entity_id: device_tracker.nessie_macbook
               state: 'home'
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_Nessie_to_ventilate.attributes.last_triggered) | int > 1800 }}"
     action:
-      - service: tts.google_say
-        entity_id: media_player.gastezimmer_mini
-        data_template:
-          message: >
-            Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
+      - service: notify.telegram_nessie
+        data:
+          message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
 
   - id: remind_fabi_to_ventilate
     alias: 'Remind Fabi to ventilate'
@@ -646,7 +646,7 @@
         for:
           hours: 4
       - platform: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         to: 'home'
         for:
           hours: 4
@@ -666,7 +666,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.fabian_dock
+              entity_id: device_tracker.nsta0516_lan
               state: 'home'
     action:
       - service: tts.google_say
@@ -687,7 +687,7 @@
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         from: 'not_home'
         to: 'home'
     condition:
@@ -767,7 +767,7 @@
         for:
             minutes: 1
       - platform: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         from: 'home'
         to: 'not_home'
         for:
@@ -784,7 +784,7 @@
         for: 
           minutes: 1
       - condition: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         state: 'not_home'
         for: 
           seconds: 20
@@ -997,7 +997,7 @@
         for:
           minutes: 10
       - platform: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         from: 'home'
         to: 'not_home'
         for:
@@ -1015,7 +1015,7 @@
           entity_id: device_tracker.fabian_pc
           state: 'not_home'
         - condition: state
-          entity_id: device_tracker.fabian_dock
+          entity_id: device_tracker.nsta0516_lan
           state: 'not_home'
         - condition: numeric_state
           entity_id: sensor.steckdose_schlafzimmer_energy_power
@@ -1225,7 +1225,7 @@
                         entity_id: device_tracker.fabian_pc
                         state: 'not_home'
                       - condition: state
-                        entity_id: device_tracker.fabian_dock
+                        entity_id: device_tracker.nsta0516_lan
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.schnuppes_pc
@@ -1251,7 +1251,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.fabian_dock
+                    entity_id: device_tracker.nsta0516_lan
                     state: 'home'
               - condition: not
                 conditions:
@@ -1995,7 +1995,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.fabian_dock'
+              entity_id: 'device_tracker.nsta0516_lan'
               state: 'home'
     action:
       - service: light.turn_on
@@ -2033,7 +2033,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.fabian_dock'
+              entity_id: 'device_tracker.nsta0516_lan'
               state: 'home'
         - condition: or
           conditions:
@@ -5288,7 +5288,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: home
                   - condition: state
-                    entity_id: device_tracker.fabian_dock
+                    entity_id: device_tracker.nsta0516_lan
                     state: home
             sequence:
               #- service: notify.browser
@@ -6172,7 +6172,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         to: 'home'
       - platform: state
         entity_id: device_tracker.nessie_macbook
@@ -6192,7 +6192,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.fabian_dock
+              entity_id: device_tracker.nsta0516_lan
               state: 'home'
             - condition: not
               conditions:
@@ -6229,7 +6229,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.fabian_dock
+        entity_id: device_tracker.nsta0516_lan
         to: 'not_home'
       - platform: state
         entity_id: switch.nessie_pc
