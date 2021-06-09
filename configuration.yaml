@@ -126,7 +126,7 @@ recorder:
       - sensor.washing_machine_state
       - sensor.dwd_weather_warnings_advance_warning_level
       - sensor.dwd_weather_warnings_current_warning_level
-      - counter.pill
+      - counter.pille
 
 # Checks for available updates
 updater:
@@ -385,7 +385,7 @@ shell_command:
 #    - BTC
 
 counter:
-  pill:
+  pille:
     name: Pille Tageszähler
     initial: 1
     step: 1
@@ -395,12 +395,12 @@ counter:
     icon: mdi:pill
 
 sensor:
-  - platform: rest
-    resource: https://lp.smartlife.tk/info
-    method: GET
-    unit_of_measurement: people
+  #- platform: rest
+  #  resource: https://lp.smartlife.tk/info
+  #  method: GET
+  #  unit_of_measurement: people
   - platform: dwd_illuminance
-    entity_id: weather.dwd_weather_ebersberg_halbing
+    entity_id: weather.dwd_weather_ebersberg_1h
   - platform: mqtt
     state_topic: "lichtschalter/stat/BUTTON1T"
     name: lichtschalter
@@ -616,6 +616,7 @@ homekit:
       - switch.xiaomi_*
       - light.xiaomi_*
       - switch.adguard_*
+      - switch.*do_not_disturb
     exclude_entities:
       - binary_sensor.updater
       - device_tracker.fabiannotebook_work
@@ -684,7 +685,7 @@ google_assistant:
     - switch
     - light
     - input_boolean
-  expose_by_default: true
+  expose_by_default: false
   entity_config:
     #Disabled Entitys
     input_boolean.silent_mode:
@@ -819,6 +820,10 @@ google_assistant:
     ##Wohnzimmer
     switch.deckenlampe:
       name: Deckenlampe Licht
+      expose: true
+      room: Wohnzimmer
+    switch.leds_wohnzimmer_tv:
+      name: LEDs Wohnzimmer TV
       expose: true
       room: Wohnzimmer
     light.leds_wohnzimmer:

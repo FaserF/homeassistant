@@ -167,13 +167,13 @@
 #    initial_state: on
 #    trigger:
 #      - platform: state
-#        entity_id: device_tracker.fabianphone
+#        entity_id: device_tracker.fabian_iphone
 #        from: 'home'
 #        to: 'not_home'
 #        for:
 #          minutes: 10
 #      - platform: state
-#        entity_id: device_tracker.nessiephone
+#        entity_id: device_tracker.50_3d_c6_5b_4f_bd
 #        from: 'home'
 #        to: 'not_home'
 #        for:
@@ -197,10 +197,10 @@
 #          entity_id: input_boolean.guest_mode
 #          state: 'off'
 #        - condition: state
-#          entity_id: device_tracker.fabianphone
+#          entity_id: device_tracker.fabian_iphone
 #          state: not_home
 #        - condition: state
-#          entity_id: device_tracker.nessiephone
+#          entity_id: device_tracker.50_3d_c6_5b_4f_bd
 #          state: not_home
 #    action:
       #- service: switch.turn_off
@@ -215,11 +215,11 @@
     initial_state: true
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianphone
+        entity_id: device_tracker.fabian_iphone
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessiephone
+        entity_id: device_tracker.50_3d_c6_5b_4f_bd
         from: 'not_home'
         to: 'home'
       - platform: state
@@ -257,7 +257,7 @@
 #      condition: and
 #      conditions:
 #        - condition: numeric_state
-#          entity_id: 'weather.dwd_weather_ebersberg_halbing'
+#          entity_id: 'weather.dwd_weather_ebersberg_1h'
 #          attribute: temperature
 #          above: 22
 #        - condition: time
@@ -627,7 +627,7 @@
               entity_id: device_tracker.schnuppes_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nessie_macbook
+              entity_id: device_tracker.nessie_macbook_lan
               state: 'home'
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_Nessie_to_ventilate.attributes.last_triggered) | int > 1800 }}"
@@ -728,7 +728,7 @@
       - choose:
           - conditions:
               - condition: numeric_state
-                entity_id: 'weather.dwd_weather_ebersberg_halbing'
+                entity_id: 'weather.dwd_weather_ebersberg_1h'
                 attribute: temperature
                 below: 16
               - condition: state
@@ -832,13 +832,13 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: 'device_tracker.nessie_macbook'
+                        entity_id: 'device_tracker.nessie_macbook_lan'
                         state: 'home'
                       - condition: state
                         entity_id: 'switch.nessie_pc'
                         state: 'on'
               - condition: numeric_state
-                entity_id: 'weather.dwd_weather_ebersberg_halbing'
+                entity_id: 'weather.dwd_weather_ebersberg_1h'
                 attribute: temperature
                 below: 17
               - condition: state
@@ -871,7 +871,7 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: 'device_tracker.nessie_macbook'
+                        entity_id: 'device_tracker.nessie_macbook_lan'
                         state: 'home'
                       - condition: state
                         entity_id: 'switch.nessie_pc'
@@ -893,7 +893,7 @@
         for:
           seconds: 30
       - platform: state
-        entity_id: device_tracker.nessie_macbook
+        entity_id: device_tracker.nessie_macbook_lan
         from: 'home'
         to: 'not_home'
         for:
@@ -915,7 +915,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook
+                    entity_id: device_tracker.nessie_macbook_lan
                     state: not_home
                     for:
                       seconds: 20
@@ -944,7 +944,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook
+                    entity_id: device_tracker.nessie_macbook_lan
                     state: not_home
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -963,7 +963,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.nessie_macbook
+        entity_id: device_tracker.nessie_macbook_lan
         from: 'home'
         to: 'not_home'
         for:
@@ -1050,7 +1050,7 @@
                 entity_id: 'input_boolean.climate_off'
                 state: 'off'
               - condition: numeric_state
-                entity_id: 'weather.dwd_weather_ebersberg_halbing'
+                entity_id: 'weather.dwd_weather_ebersberg_1h'
                 attribute: temperature
                 below: 17
             sequence:
@@ -1231,7 +1231,7 @@
                         entity_id: device_tracker.schnuppes_pc
                         state: 'not_home'
                       - condition: state
-                        entity_id: device_tracker.nessie_macbook
+                        entity_id: device_tracker.nessie_macbook_lan
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.tv
@@ -1270,7 +1270,7 @@
                     entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook
+                    entity_id: device_tracker.nessie_macbook_lan
                     state: 'home'
               - condition: not
                 conditions:
@@ -1608,11 +1608,11 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabianphone
+        entity_id: device_tracker.fabian_iphone
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessiephone
+        entity_id: device_tracker.50_3d_c6_5b_4f_bd
         from: 'not_home'
         to: 'home'
     condition:
@@ -1636,15 +1636,15 @@
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.fabianphone
+                  entity_id: device_tracker.fabian_iphone
                   state: home
                 - condition: state
-                  entity_id: device_tracker.nessiephone
+                  entity_id: device_tracker.50_3d_c6_5b_4f_bd
                   state: home
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.nessiephone
+                  entity_id: device_tracker.50_3d_c6_5b_4f_bd
                   state: home
                 - condition: not
                   conditions:
@@ -1654,7 +1654,7 @@
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.fabianphone
+                  entity_id: device_tracker.fabian_iphone
                   state: home
                 - condition: not
                   conditions:
@@ -1685,11 +1685,11 @@
           entity_id: light.yeelight_bslamp2_0x0000000013fea10f
           brightness: 100
           rgb_color: > 
-            {% if state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'snowy' %}
+            {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
             [255,255,255] 
-            {% elif state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'rainy' %}
+            {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
             [0,0,255] 
-            {% elif state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'sunny' %}
+            {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
             [0,255,0]
             {% else %}
             [0,0,0]
@@ -1699,6 +1699,18 @@
         data:
           entity_id: 
             - light.yeelight_bslamp2_0x0000000013fea10f
+      - delay: '00:20:00'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: device_tracker.fabian_pc
+                state: 'not_home'
+            sequence:
+              - service: light.turn_off
+                data:
+                  entity_id: 
+                    - light.leds_tisch
+                    - light.yeelight_stripe_0x00000000036d0c16
 
   - id: increase_lights_in_morning
     alias: 'Increase lights in morning'
@@ -1807,10 +1819,10 @@
         - condition: or
           conditions:
           - condition: state
-            entity_id: device_tracker.nessiephone
+            entity_id: device_tracker.50_3d_c6_5b_4f_bd
             state: home
           - condition: state
-            entity_id: device_tracker.fabianphone
+            entity_id: device_tracker.fabian_iphone
             state: home
     action:
       - service: tts.google_say
@@ -1842,10 +1854,10 @@
           - thu
           - fri
       - condition: state
-        entity_id: device_tracker.fabianphone
+        entity_id: device_tracker.fabian_iphone
         state: home
       - condition: state
-        entity_id: device_tracker.nessiephone
+        entity_id: device_tracker.50_3d_c6_5b_4f_bd
         state: home
       - condition: state
         entity_id: 'input_boolean.silent_mode'
@@ -1933,7 +1945,9 @@
           entity_id: group.wohnzimmer
       - service: switch.turn_off
         data:
-          entity_id: switch.deckenlampe
+          entity_id: 
+            - switch.deckenlampe
+            - switch.leds_wohnzimmer_tv
 
   - id: turn_on_lights_in_livingroom_when_dark_outside
     alias: 'Turn on lights in livingroom when dark outside'
@@ -1954,6 +1968,9 @@
         data:
           entity_id: group.wohnzimmer
           transition: 2
+      - service: switch.turn_on
+        data:
+          entity_id: switch.leds_wohnzimmer_tv
 
   - alias: 'Turn off Prismatik during the day'
     initial_state: on
@@ -2016,13 +2033,13 @@
         event: sunset
         offset: "-02:00:00"
       - platform: state
-        entity_id: weather.dwd_weather_ebersberg_halbing
+        entity_id: weather.dwd_weather_ebersberg_1h
         to: 'cloudy'
     condition:
       condition: and
       conditions:
         - condition: state
-          entity_id: weather.dwd_weather_ebersberg_halbing
+          entity_id: weather.dwd_weather_ebersberg_1h
           state: cloudy
         - condition: sun
           after: sunset
@@ -2070,7 +2087,7 @@
         - condition: and
           conditions:
           - condition: state
-            entity_id: 'device_tracker.nessie_macbook'
+            entity_id: 'device_tracker.nessie_macbook_lan'
             state: 'home'
           - condition: state
             entity_id: 'switch.nessie_pc'
@@ -2101,16 +2118,16 @@
     initial_state: True
     trigger:
       platform: numeric_state
-      entity_id: weather.dwd_weather_ebersberg_halbing
+      entity_id: weather.dwd_weather_ebersberg_1h
       attribute: temperature
       above: 12
     condition:
       condition: and
       conditions:
         - condition: template
-          value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition'] == 'sunny' }}"
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
         #- condition: state
-        #  entity_id: 'weather.dwd_weather_ebersberg_halbing'
+        #  entity_id: 'weather.dwd_weather_ebersberg_1h'
         #  state: 'sunny'
         - condition: state
           entity_id: 'input_boolean.climate_off'
@@ -2126,14 +2143,14 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} ° hat und sonnig ist.'
+          message: 'Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} ° hat und sonnig ist.'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} ° hat und sonnig ist.'
+          message: 'Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} ° hat und sonnig ist.'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
@@ -2143,7 +2160,7 @@
     initial_state: True
     trigger:
       - platform: numeric_state
-        entity_id: weather.dwd_weather_ebersberg_halbing
+        entity_id: weather.dwd_weather_ebersberg_1h
         attribute: temperature
         below: 10
       - platform: sun
@@ -2159,7 +2176,7 @@
             - condition: and
               conditions:
                 - condition: numeric_state
-                  entity_id: weather.dwd_weather_ebersberg_halbing
+                  entity_id: weather.dwd_weather_ebersberg_1h
                   attribute: temperature
                   below: 10
                 - condition: sun
@@ -2172,25 +2189,25 @@
                 - condition: template
                   value_template: '{{ now().month <= 10 and now().month >= 2 }}'
             - condition: template
-              value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['temperature'] <= '12' }}"
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= '12' }}"
             - condition: and
               conditions:
                 - condition: template
-                  value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['condition'] != 'sunny' }}"
+                  value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] != 'sunny' }}"
                 - condition: template
-                  value_template: "{{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[1]['temperature'] <= '14' }}"
+                  value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= '14' }}"
     action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg_halbing", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
+          message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg_halbing", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
+          message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
           disable_notification: true
           inline_keyboard:
             - 'Einschalten:/climateson'
@@ -2229,7 +2246,7 @@
                       - condition: template
                         value_template: '{{ now().month <= 10 and now().month >= 4 }}'
                       - condition: numeric_state
-                        entity_id: weather.dwd_weather_ebersberg_halbing
+                        entity_id: weather.dwd_weather_ebersberg_1h
                         attribute: temperature
                         below: 6
             sequence:
@@ -2257,7 +2274,7 @@
                   - condition: template
                     value_template: '{{ now().month <= 10 and now().month >= 4 }}' #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
                   - condition: numeric_state
-                    entity_id: weather.dwd_weather_ebersberg_halbing
+                    entity_id: weather.dwd_weather_ebersberg_1h
                     attribute: temperature
                     above: 5
             sequence:
@@ -3628,10 +3645,10 @@
         - condition: or
           conditions:
           - condition: state
-            entity_id: device_tracker.nessiephone
+            entity_id: device_tracker.50_3d_c6_5b_4f_bd
             state: home
           - condition: state
-            entity_id: device_tracker.fabianphone
+            entity_id: device_tracker.fabian_iphone
             state: home
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
@@ -3680,10 +3697,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiephone
+                    entity_id: device_tracker.50_3d_c6_5b_4f_bd
                     state: home
                   - condition: state
-                    entity_id: device_tracker.fabianphone
+                    entity_id: device_tracker.fabian_iphone
                     state: home
             sequence:
               #- service: rest_command.assistant_broadcast
@@ -3703,10 +3720,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessiephone
+                    entity_id: device_tracker.50_3d_c6_5b_4f_bd
                     state: home
                   - condition: state
-                    entity_id: device_tracker.fabianphone
+                    entity_id: device_tracker.fabian_iphone
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -3776,6 +3793,14 @@
                   - condition: state
                     entity_id: light.yeelight_color_0x00000000036dc050
                     state: 'unavailable'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: switch.leds_wohnzimmer_tv
+                    state: 'off'
+                  - condition: state
+                    entity_id: switch.leds_wohnzimmer_tv
+                    state: 'unavailable'
             sequence:
               - service: light.turn_on
                 data:
@@ -3798,7 +3823,9 @@
             sequence:
               - service: switch.turn_off
                 data:
-                  entity_id: switch.deckenlampe
+                  entity_id: 
+                    - switch.deckenlampe
+                    - switch.leds_wohnzimmer_tv
               - service: light.turn_off
                 data:
                   entity_id: group.wohnzimmer
@@ -4005,10 +4032,10 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabianphone
+              entity_id: device_tracker.fabian_iphone
               state: home
             - condition: state
-              entity_id: device_tracker.nessiephone
+              entity_id: device_tracker.50_3d_c6_5b_4f_bd
               state: home
     action:
       - service: media_player.volume_set
@@ -4138,10 +4165,10 @@
         above: 67
     condition:
       - condition: state
-        entity_id: device_tracker.fabianphone
+        entity_id: device_tracker.fabian_iphone
         state: not_home
       - condition: state
-        entity_id: device_tracker.nessiephone
+        entity_id: device_tracker.50_3d_c6_5b_4f_bd
         state: not_home
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
@@ -4159,11 +4186,11 @@
     initial_state: true
     trigger:
       - platform: state
-        entity_id: device_tracker.nessiephone
+        entity_id: device_tracker.50_3d_c6_5b_4f_bd
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabianphone
+        entity_id: device_tracker.fabian_iphone
         from: 'not_home'
         to: 'home'
     condition:
@@ -4240,11 +4267,11 @@
     initial_state: true
     trigger:
       - platform: state
-        entity_id: device_tracker.nessiephone
+        entity_id: device_tracker.50_3d_c6_5b_4f_bd
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabianphone
+        entity_id: device_tracker.fabian_iphone
         from: 'not_home'
         to: 'home'
     condition:
@@ -5326,7 +5353,7 @@
 #            - thu
 #            - sun
 #        - condition: state
-#          entity_id: device_tracker.fabianphone
+#          entity_id: device_tracker.fabian_iphone
 #          state: home
 #        - condition: template
 #          value_template: >
@@ -5518,7 +5545,7 @@
           inline_keyboard: []
       - service: counter.configure
         data:
-          entity_id: counter.pill
+          entity_id: counter.pille
           value: 28
 
   - alias: 'Remind Nessie for pill and for turning on thermostats'
@@ -5530,38 +5557,38 @@
       - choose:
           - conditions:
               - condition: numeric_state
-                entity_id: counter.pill
+                entity_id: counter.pille
                 below: '29'
             sequence:
               - service: counter.increment
                 target:
-                  entity_id: counter.pill
+                  entity_id: counter.pille
       - choose:
           - conditions:
               - condition: numeric_state
-                entity_id: counter.pill
+                entity_id: counter.pille
                 below: 30
                 above: 28
             sequence:
               - service: counter.reset
                 target:
-                  entity_id: counter.pill
+                  entity_id: counter.pille
       - choose:
           - conditions:
               - condition: numeric_state
-                entity_id: counter.pill
+                entity_id: counter.pille
                 below: '21'
             sequence:
               - service: notify.telegram_nessie
                 data_template:
-                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pill.state }} von {{ states.counter.pill.attributes.maximum }}."
+                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
                   data:
                     inline_keyboard:
                     - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'
       - choose:
           - conditions:
               - condition: numeric_state
-                entity_id: counter.pill
+                entity_id: counter.pille
                 below: 22
                 above: 20
             sequence:
@@ -5611,7 +5638,7 @@
               attribute: last_triggered
               state: none
         - condition: numeric_state
-          entity_id: counter.pill
+          entity_id: counter.pille
           below: '22'
         - condition: state
           entity_id: person.nessie
@@ -6175,7 +6202,7 @@
         entity_id: device_tracker.nsta0516_lan
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessie_macbook
+        entity_id: device_tracker.nessie_macbook_lan
         to: 'home'
     condition:
       condition: and
@@ -6416,7 +6443,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.fabianphone
+          entity_id: device_tracker.fabian_iphone
           state: home
         - condition: template
           value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.attributes.last_seen)) < 3600 }}"
@@ -6605,7 +6632,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.nessiephone
+                entity_id: device_tracker.50_3d_c6_5b_4f_bd
                 state: home
               - condition: state
                 entity_id: 
@@ -6713,7 +6740,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabianphone
+                entity_id: device_tracker.fabian_iphone
                 state: home
               - condition: state
                 entity_id: input_boolean.silent_mode
@@ -6752,7 +6779,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabianphone
+                entity_id: device_tracker.fabian_iphone
                 state: home
               - condition: state
                 entity_id: input_boolean.silent_mode
@@ -6783,13 +6810,13 @@
           disable_notification: true
           message: >
             Wettervorhersage für heute
-            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition']}}
+            {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
 
-            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C*
+            *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
 
-            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
+            {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
             
-            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
+            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
             Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
@@ -6798,7 +6825,7 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.fabianphone
+          - device_tracker.fabian_iphone
         from: 'not_home'
         to: 'home'
     condition:
@@ -6815,13 +6842,13 @@
           disable_notification: true
           message: >
             Wettervorhersage für heute
-            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition']}}
+            {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
 
-            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C*
+            *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
 
-            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
+            {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
             
-            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
+            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
             Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
@@ -6830,7 +6857,7 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.nessiephone
+          - device_tracker.50_3d_c6_5b_4f_bd
         from: 'not_home'
         to: 'home'
     condition:
@@ -6847,13 +6874,13 @@
           disable_notification: true
           message: >
             Wettervorhersage für heute
-            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['condition']}}
+            {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
 
-            *Momentan {{ states.weather.dwd_weather_ebersberg_halbing.attributes.temperature }} °C*
+            *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
 
-            {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['temperature']}} °C
+            {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
             
-            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg_halbing', 'forecast')[0]['precipitation_probability']}} %.
+            Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
             Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
 
