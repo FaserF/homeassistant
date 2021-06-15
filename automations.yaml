@@ -4037,6 +4037,24 @@
             - condition: state
               entity_id: device_tracker.50_3d_c6_5b_4f_bd
               state: home
+        - condition: or
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.gastezimmer
+              attribute: current_humidity
+              above: 60
+            - condition: numeric_state
+              entity_id: climate.wohnzimmer
+              attribute: current_humidity
+              above: 60
+            - condition: numeric_state
+              entity_id: climate.schlafzimmer
+              attribute: current_humidity
+              above: 60
+            - condition: numeric_state
+              entity_id: climate.bad
+              attribute: current_humidity
+              above: 60
     action:
       - service: media_player.volume_set
         data_template:
@@ -4194,14 +4212,24 @@
         from: 'not_home'
         to: 'home'
     condition:
-      - condition: numeric_state
-        entity_id: 
-          - climate.gastezimmer
-          - climate.wohnzimmer
-          - climate.schlafzimmer
-          - climate.bad
-        attribute: current_humidity
-        above: 55
+      - condition: or
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.gastezimmer
+              attribute: current_humidity
+              above: 57
+            - condition: numeric_state
+              entity_id: climate.wohnzimmer
+              attribute: current_humidity
+              above: 57
+            - condition: numeric_state
+              entity_id: climate.schlafzimmer
+              attribute: current_humidity
+              above: 57
+            - condition: numeric_state
+              entity_id: climate.bad
+              attribute: current_humidity
+              above: 57
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
