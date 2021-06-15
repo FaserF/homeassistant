@@ -4213,23 +4213,23 @@
         to: 'home'
     condition:
       - condition: or
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.gastezimmer
-              attribute: current_humidity
-              above: 57
-            - condition: numeric_state
-              entity_id: climate.wohnzimmer
-              attribute: current_humidity
-              above: 57
-            - condition: numeric_state
-              entity_id: climate.schlafzimmer
-              attribute: current_humidity
-              above: 57
-            - condition: numeric_state
-              entity_id: climate.bad
-              attribute: current_humidity
-              above: 57
+        conditions:
+          - condition: numeric_state
+            entity_id: climate.gastezimmer
+            attribute: current_humidity
+            above: 57
+          - condition: numeric_state
+            entity_id: climate.wohnzimmer
+            attribute: current_humidity
+            above: 57
+          - condition: numeric_state
+            entity_id: climate.schlafzimmer
+            attribute: current_humidity
+            above: 57
+          - condition: numeric_state
+            entity_id: climate.bad
+            attribute: current_humidity
+            above: 57
       - condition: state
         entity_id: 'input_boolean.silent_mode'
         state: 'off'
@@ -6581,7 +6581,7 @@
         attribute: dir_of_travel
         to: 'towards'
         for:
-          minutes: 4
+          minutes: 5
     condition:
       - condition: numeric_state
         entity_id: proximity.home_fabian
@@ -6600,9 +6600,6 @@
             state: "Arbeit Fabi"
     action:
       - service: notify.telegram_nessie
-        data:
-          message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
-      - service: notify.telegram_fabian
         data:
           message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
 

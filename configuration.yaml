@@ -86,6 +86,7 @@ http:
     - 192.168.0.0/16
     - 172.30.0.0/18 #NGINX Proxy Manager
     - 172.30.33.0/24 #NGINX Proxy Manager
+    - 172.30.33.7
     - 103.21.244.0/22 #Here and below -> Cloudflare
     - 103.22.200.0/22
     - 103.31.4.0/22
