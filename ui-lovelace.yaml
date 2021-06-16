@@ -2,21 +2,36 @@ animated_background:
   default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
   entity: weather.dwd_weather_ebersberg_1h
   state_url:
-    clear-night:
-      - https://cdn.flixel.com/flixel/x9dr8caygivq5secll7i.hd.mp4
-      - https://cdn.flixel.com/flixel/v26zyfd6yf0r33s46vpe.hd.mp4
-      - https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
-      - https://cdn.flixel.com/flixel/rosz2gi676xhkiw1ut6i.hd.mp4
+    sunny:
+      - https://home.eidolf.de/local/weather/hlhff0h8md4ev0kju5be.hd.mp4
+      - https://home.eidolf.de/local/weather/zjqsoc6ecqhntpl5vacs.hd.mp4
+      - https://home.eidolf.de/local/weather/jvw1avupguhfbo11betq.hd.mp4
+      - https://home.eidolf.de/local/weather/8cmeusxf3pkanai43djs.hd.mp4
+      - https://home.eidolf.de/local/weather/guwb10mfddctfvwioaex.hd.mp4
+    partlycloudy:
+      - https://home.eidolf.de/local/weather/13e0s6coh6ayapvdyqnv.hd.mp4
+      - https://home.eidolf.de/local/weather/aorl3skmssy7udwopk22.hd.mp4
+      - https://home.eidolf.de/local/weather/qed6wvf2igukiioykg3r.hd.mp4
+      - https://home.eidolf.de/local/weather/3rd72eezaj6d23ahlo7y.hd.mp4
+      - https://home.eidolf.de/local/weather/9m11gd43m6qn3y93ntzp.hd.mp4
+      - https://home.eidolf.de/local/weather/hrkw2m8eofib9sk7t1v2.hd.mp4
     cloudy:
-      - https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4
-      - https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4
-      - https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4
-      - https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4
-      - https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4
-      - https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4
+      - https://home.eidolf.de/local/weather/13e0s6coh6ayapvdyqnv.hd.mp4
+      - https://home.eidolf.de/local/weather/aorl3skmssy7udwopk22.hd.mp4
+      - https://home.eidolf.de/local/weather/qed6wvf2igukiioykg3r.hd.mp4
+      - https://home.eidolf.de/local/weather/3rd72eezaj6d23ahlo7y.hd.mp4
+      - https://home.eidolf.de/local/weather/9m11gd43m6qn3y93ntzp.hd.mp4
+      - https://home.eidolf.de/local/weather/hrkw2m8eofib9sk7t1v2.hd.mp4
+    mostlycloudy:
+      - https://home.eidolf.de/local/weather/e95h5cqyvhnrk4ytqt4q.hd.mp4
+      - https://home.eidolf.de/local/weather/l2bjw34wnusyf5q2qq3p.hd.mp4
+      - https://home.eidolf.de/local/weather/rrgta099ulami3zb9fd2.hd.mp4
+    clear-night:
+      - https://home.eidolf.de/local/weather/x9dr8caygivq5secll7i.hd.mp4
+      - https://home.eidolf.de/local/weather/v26zyfd6yf0r33s46vpe.hd.mp4
+      - https://home.eidolf.de/local/weather/ypy8bw9fgw1zv2b4htp2.hd.mp4
+      - https://home.eidolf.de/local/weather/rosz2gi676xhkiw1ut6i.hd.mp4
     fog:
-      - https://cdn.flixel.com/flixel/vwqzlk4turo2449be9uf.hd.mp4
-      - https://cdn.flixel.com/flixel/5363uhabodwwrzgnq6vx.hd.mp4
       - https://home.eidolf.de/local/weather/vwqzlk4turo2449be9uf.hd.mp4
       - https://home.eidolf.de/local/weather/5363uhabodwwrzgnq6vx.hd.mp4
       - >-
@@ -24,26 +39,12 @@ animated_background:
       - https://home.eidolf.de/local/weather/Fog-190915_A_01_Timelapse_02.mp4
       - >-
         https://home.eidolf.de/local/weather/Fog-Dron_footage_over_a_winter_foggy_mountain.mp4
-    mostlycloudy:
-      - https://cdn.flixel.com/flixel/e95h5cqyvhnrk4ytqt4q.hd.mp4
-      - https://cdn.flixel.com/flixel/l2bjw34wnusyf5q2qq3p.hd.mp4
-      - https://cdn.flixel.com/flixel/rrgta099ulami3zb9fd2.hd.mp4
-    partlycloudy:
-      - https://cdn.flixel.com/flixel/13e0s6coh6ayapvdyqnv.hd.mp4
-      - https://cdn.flixel.com/flixel/aorl3skmssy7udwopk22.hd.mp4
-      - https://cdn.flixel.com/flixel/qed6wvf2igukiioykg3r.hd.mp4
-      - https://cdn.flixel.com/flixel/3rd72eezaj6d23ahlo7y.hd.mp4
-      - https://cdn.flixel.com/flixel/9m11gd43m6qn3y93ntzp.hd.mp4
-      - https://cdn.flixel.com/flixel/hrkw2m8eofib9sk7t1v2.hd.mp4
     rainy:
       - https://home.eidolf.de/local/weather/f0w23bd0enxur5ff0bxz.hd.mp4
       - https://home.eidolf.de/local/weather/Rain-Raindrops_Videvo.mp4
-    sunny:
-      - https://cdn.flixel.com/flixel/hlhff0h8md4ev0kju5be.hd.mp4
-      - https://cdn.flixel.com/flixel/zjqsoc6ecqhntpl5vacs.hd.mp4
-      - https://cdn.flixel.com/flixel/jvw1avupguhfbo11betq.hd.mp4
-      - https://cdn.flixel.com/flixel/8cmeusxf3pkanai43djs.hd.mp4
-      - https://cdn.flixel.com/flixel/guwb10mfddctfvwioaex.hd.mp4
+      - https://home.eidolf.de/local/weather/Regen-1.mp4
+    pouring:
+      - https://home.eidolf.de/local/weather/heavy_rain_in_the_forest.mp4
     snowy:
       - >-
         https://home.eidolf.de/local/weather/Snow-2016WinterPrecip_LoopableBackground_1080.mp4
@@ -53,6 +54,15 @@ animated_background:
       - https://home.eidolf.de/local/weather/Snow-Tree-1080p.mp4
       - >-
         https://home.eidolf.de/local/weather/Snow-2016FewerColdNights_LoopableBackground_1080.mp4
+    snowy-rainy:
+      - https://home.eidolf.de/local/weather/Schneeregen_01.mp4
+      - https://home.eidolf.de/local/weather/Schneeregen_02.mp4
+    lightning-rainy:
+      - https://home.eidolf.de/local/weather/Blitz-1.mp4
+      - https://home.eidolf.de/local/weather/Blitz-2.mp4
+      - https://home.eidolf.de/local/weather/Blitz-3.mp4
+      - https://home.eidolf.de/local/weather/Blitz-4.mp4
+      - https://home.eidolf.de/local/weather/Blitz-5.mp4
 path: default_view
 title: Smart Life Home
 views:
@@ -149,54 +159,54 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - type: vertical-stack
         cards:
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: '6'
-            number_of_forecasts: '8'
+            forecastMaxColumn: "6"
+            number_of_forecasts: "8"
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: '6'
+            number_of_forecasts: "6"
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: '5'
+            forecastMaxColumn: "5"
       - artwork: cover
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
@@ -253,11 +263,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
         type: custom:mini-media-player
@@ -380,10 +390,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
@@ -413,10 +423,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
@@ -573,10 +583,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - type: entities
         entities:
           - entity: sensor.kuche_mini_timers
@@ -759,7 +769,7 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
