@@ -452,25 +452,19 @@
 
   - id: remind_for_unavailable_device
     alias: 'Remind for unavailable device'
-    initial_state: true
+    variables:
+      watched: >
+        {{states|selectattr('state','in',['unavailable','unknown','none'])
+                |rejectattr('domain','eq','group')
+                |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))
+                |map(attribute='entity_id')
+                |list}}
     trigger:
-      - platform: template
-        value_template: >
-          {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group') |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
-        for:
-          minutes: 5
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: 'input_boolean.guest_mode'
-          state: 'off'
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_unavailable_device.attributes.last_triggered) | int > 5600 }}"
-        - condition: template
-          value_template: >
-            {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
-              |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count | int > 0 }}
+      platform: template
+      value_template: >
+        {{watched|count|int > 0}}
+      for:
+        minutes: 5
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -3820,6 +3814,11 @@
                     state: 'on'
                     for:
                       seconds: 1
+                  - condition: state
+                    entity_id: switch.leds_wohnzimmer_tv
+                    state: 'on'
+                    for:
+                      seconds: 1
             sequence:
               - service: switch.turn_off
                 data:
@@ -3870,14 +3869,6 @@
                   - condition: or
                     conditions:
                       - condition: state
-                        entity_id: light.leds_wohnzimmer
-                        state: 'off'
-                      - condition: state
-                        entity_id: light.leds_wohnzimmer
-                        state: 'unavailable'
-                  - condition: or
-                    conditions:
-                      - condition: state
                         entity_id: light.bett_gluhbirne
                         state: 'off'
                       - condition: state
@@ -3915,6 +3906,24 @@
                     - light.yeelight_stripe_0x00000000036d0c16
                   brightness: 255
                   transition: 2
+              - choose:
+                  - conditions:
+                      - condition: or
+                        conditions:
+                          - condition: state
+                            entity_id: light.yeelight_stripe_0x00000000036d0c16
+                            state: 'unavailable'
+                          - condition: state
+                            entity_id: light.yeelight_stripe_0x00000000036d0c16
+                            state: 'unavailable'
+                    sequence:
+                      - service: light.turn_on
+                        data:
+                          entity_id: 
+                            - light.bett_gluhbirne
+                            - light.yeelight_bslamp2_0x0000000013fea10f
+                          brightness: 255
+                          transition: 2
       - choose:
           - conditions:
               - condition: or

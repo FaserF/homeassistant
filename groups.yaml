@@ -11,6 +11,7 @@ Wohnzimmer:
     - media_player.wohnzimmer_mini
     - light.yeelight_color_0x00000000036dc050 #Stehlampe
     - light.leds_wohnzimmer
+    - switch.leds_wohnzimmer_tv
     #- climate.wohnzimmer
     - switch.fernseher
     - switch.staubsauger
@@ -51,28 +52,13 @@ Keller:
   entities:
     - media_player.keller_tv
     - media_player.keller_tv_cast
+    - light.keller_gluhbirne
     - switch.waschmaschine
     - switch.kohleanzunder
-    - light.keller_gluhbirne
     - switch.kuhlschrank
     - switch.fernseher_keller
     - switch.keller_usb_ports
     - switch.strom_keller
-
-#1-OG:
-#  name: 1. OG gesamt ohne Klima und ohne Gastezimmer
-#  entities:
-#    - light.yeelight_color1_34ce008bcc9d #Stehlampe
-#    - light.leds_wohnzimmer
-#    - switch.fernseher
-#    - switch.staubsauger
-#    - switch.deckenlampe
-#    - light.yeelight_strip1_34ce008b1863 #Bett LEDs
-#    - light.leds_tisch
-#    - light.bett_gluhbirne
-#    - switch.fabian_strom
-#    - switch.schreibtisch
-#    - switch.lichtschalter
 
 ignored_entities:
   name: Entitäten welche von der unavailable Automation ignoriert werden sollen
@@ -97,3 +83,26 @@ ignored_entities:
     - sensor.dwd_weather_warnings_advance_warning_level
     - sensor.dwd_weather_warnings_current_warning_level
     - weather.dwd_weather_ebersberg_halbing
+    - sensor.kuche_mini_alarms
+    - sensor.kuche_mini_timers
+    - sensor.schlafzimmer_speaker_alarms
+    - sensor.schlafzimmer_speaker_timers
+    - switch.shutdown_fabian_pc
+    - switch.hibernate_fabian_pc
+    - sensor.cpu_load_fabian_pc
+    - sensor.washing_machine_mode
+    - automation.turn_off_5ghz_wifi_and_turn_on_ssh_if_nobody_is_at_home
+    - automation.turn_on_bett_if_bett_usb_ports_turned_on
+    - automation.turn_off_bett_if_bett_usb_ports_turned_off
+    - automation.turn_on_light_if_tv_starts
+    - automation.turn_on_climate_if_tv_starts
+    - automation.turn_off_bett_after_25_hours
+    - automation.turn_off_staubsauger_after_3_hours
+    - automation.turn_on_lights_in_guest_room_room_when_dark_outside
+    - device_tracker.maxi_phone_2
+    - device_tracker.maxiphone
+    - device_tracker.galaxy_s10_lite
+    - device_tracker.mi9t_ksmi9t
+    - device_tracker.9a_27_b0_8d_70_93
+    - device_tracker.iphone_2
+    - device_tracker.iphone
