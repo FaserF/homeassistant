@@ -546,7 +546,7 @@ sensor:
     to: !secret nessie_work
     only_direct: true
   - platform: deutsche_bahn
-    from: Westkreuz
+    from: Donnersbergerbruecke
     to: !secret sbahn_home
     only_direct: true
   - platform: template
