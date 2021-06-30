@@ -509,11 +509,11 @@
     alias: 'Deactivate guest mode if no guest is here'
     initial_state: on
     trigger:
-      - platform: state
-        entity_id: device_tracker.isi_phone
-        to: 'not_home'
-        for:
-          days: 1
+      #- platform: state
+      #  entity_id: device_tracker.isi_phone
+      #  to: 'not_home'
+      #  for:
+      #    days: 1
       - platform: state
         entity_id: input_boolean.guest_mode
         to: 'on'
@@ -525,9 +525,9 @@
         - condition: state
           entity_id: input_boolean.guest_mode
           state: 'on'
-        - condition: state
-          entity_id: device_tracker.isi_phone
-          state: 'not_home'
+        #- condition: state
+        #  entity_id: device_tracker.isi_phone
+        #  state: 'not_home'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1552,6 +1552,12 @@
         to: 'on'
         for:
             minutes: 180
+      - platform: state
+        entity_id: switch.bett_usb_ports
+        from: 'off'
+        to: 'on'
+        for:
+            minutes: 360
     action:
       - service: switch.turn_off
         data:
@@ -1567,6 +1573,12 @@
         to: 'on'
         for:
             minutes: 150
+      - platform: state
+        entity_id: switch.staubsauger
+        from: 'off'
+        to: 'on'
+        for:
+            minutes: 360
     action:
       - service: switch.turn_off
         data:
@@ -6656,10 +6668,10 @@
         conditions:
           - condition: state
             entity_id: person.nessie
-            state: zone.arbeit_nessie
+            state: 'arbeit_nessie'
           - condition: state
             entity_id: person.nessie
-            state: zone.berufsschule
+            state: 'Berufsschule'
     action:
       - service: notify.telegram_fabian
         data:
@@ -6846,10 +6858,10 @@
                   - media_player.kueche_mini
                   - media_player.schlafzimmer
                 data_template:
-                  message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
+                  message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
       - service: notify.telegram_fabian
         data:
-          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.westkreuz_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.westkreuz_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+          message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
 
   - alias: 'Telegram send weather forecast'
     initial_state: true
