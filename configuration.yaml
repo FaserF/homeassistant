@@ -805,7 +805,7 @@ google_assistant:
       expose: true
       room: Schlafzimmer
     light.yeelight_stripe_0x00000000036d0c16:
-      expose: true
+      expose: false
       room: Schlafzimmer
     light.yeelight_bslamp2_0x0000000013fea10f:
       name: Bett Licht

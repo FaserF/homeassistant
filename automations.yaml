@@ -591,7 +591,7 @@
 
   - id: remind_Nessie_to_ventilate
     alias: 'Remind Nessie to ventilate'
-    initial_state: on
+    initial_state: off
     trigger:
       - platform: state
         entity_id: device_tracker.schnuppes_pc
@@ -2083,12 +2083,12 @@
           state: 'home'
         - condition: and
           conditions:
-          - condition: state
-            entity_id: 'device_tracker.nessie_macbook_lan'
-            state: 'home'
-          - condition: state
-            entity_id: 'switch.nessie_pc'
-            state: 'on'
+            - condition: state
+              entity_id: 'device_tracker.nessie_macbook_lan'
+              state: 'home'
+            - condition: state
+              entity_id: 'switch.nessie_pc'
+              state: 'on'
     action:
       - service: light.turn_on
         data:
@@ -2756,7 +2756,7 @@
     action:
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.schnuppes_pc
@@ -2771,7 +2771,7 @@
               - delay: '00:30:00'
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.schnuppes_pc
@@ -2786,7 +2786,7 @@
               - delay: '00:30:00'
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.schnuppes_pc
@@ -2801,11 +2801,14 @@
               - delay: '00:01:00'
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.schnuppes_pc
                     state: 'home'
+                  - condition: state
+                    entity_id: device_tracker.nessie_macbook_lan
+                    state: 'not_home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
@@ -2818,11 +2821,8 @@
                   message: "Nessie PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
-                  - condition: state
-                    entity_id: device_tracker.schnuppes_pc
-                    state: 'not_home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     below: 21
