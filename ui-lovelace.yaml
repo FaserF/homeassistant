@@ -193,6 +193,29 @@ views:
         step_size: '1'
       - type: vertical-stack
         cards:
+          - type: entities
+            title: Reiskocher
+            state_color: false
+            entities:
+              - entity: switch.xiaomi_miio_cooker
+              - entity: input_select.rice_cooker_program
+              - entity: sensor.xiaomi_miio_cooker_remaining
+              - entity: sensor.xiaomi_miio_cooker_mode
+                secondary_info: last-changed
+              - entity: sensor.xiaomi_miio_cooker_stage_name
+                secondary_info: last-changed
+              - entity: sensor.xiaomi_miio_cooker_stage_description
+              - entity: sensor.xiaomi_miio_cooker_rice_id
+              - entity: sensor.xiaomi_miio_cooker_state
+                secondary_info: last-changed
+              - entity: sensor.xiaomi_miio_cooker_taste
+              - entity: sensor.xiaomi_miio_cooker_taste_phase
+              - entity: sensor.xiaomi_miio_cooker_temperature
+              - entity: sensor.xiaomi_miio_cooker_menu
+                secondary_info: last-changed
+            show_header_toggle: false
+      - type: vertical-stack
+        cards:
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
@@ -378,7 +401,9 @@ views:
           - entity: switch.schreibtisch
           - entity: light.prismatik
           - entity: device_tracker.fabian_pc
+            secondary_info: last-changed
           - entity: device_tracker.nsta0516_lan
+            secondary_info: last-changed
           - entity: switch.fabian_pc_shutdown
           - entity: sensor.steckdose_schlafzimmer_energy_today
           - entity: sensor.steckdose_schlafzimmer_energy_power
@@ -411,8 +436,10 @@ views:
       - entities:
           - entity: input_boolean.vk_strom
           - entity: switch.nessie_pc_shutdown
-          - entity: device_tracker.nessie_macbook_lan
           - entity: device_tracker.schnuppes_pc
+            secondary_info: last-changed
+          - entity: device_tracker.nessie_macbook_lan
+            secondary_info: last-changed
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
         show_header_toggle: false

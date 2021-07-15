@@ -5325,6 +5325,61 @@
           entity_id: input_select.washing_machine_status
           option: Idle
 
+  - alias: Remind for finished rice cooker
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.xiaomi_miio_cooker_remaining
+        below: 5
+    condition:
+      - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_finished_rice_cooker.attributes.last_triggered) | int > 1200 }}"
+    action:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.rice_cooker_program
+          option: schnelles Kochen
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: 'Der Reiskocher ist in 4 Minuten fertig.'
+              - service: notify.telegram_fabian
+                data:
+                  message: 'Der Reiskocher ist in 4 Minuten fertig.'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_mini
+                    state: 'playing'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_mini
+                data:
+                  message: 'Der Reiskocher ist in 4 Minuten fertig.'
+
   - alias: 'Remind for going off'
     initial_state: on
     trigger:
@@ -5558,7 +5613,9 @@
           message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
       - service: androidtv.adb_command
         data:
-          entity_id: media_player.keller_tv
+          entity_id: 
+            - media_player.keller_tv
+            - media_player.wohnzimmer_tv
           command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
       - service: media_player.volume_set
         data:
