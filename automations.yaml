@@ -5333,7 +5333,7 @@
         below: 5
     condition:
       - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_finished_rice_cooker.attributes.last_triggered) | int > 1200 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_finished_rice_cooker.attributes.last_triggered) | int > 1200 }}"
     action:
       - service: input_select.select_option
         data:
