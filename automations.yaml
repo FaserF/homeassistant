@@ -3550,19 +3550,33 @@
     trigger:
       - platform: state
         entity_id: 
-        - binary_sensor.bad_battery_state
-        - binary_sensor.schlafzimmer_battery_state
+          - binary_sensor.bad_battery_state
+          - binary_sensor.schlafzimmer_battery_state
         from: 'off'
         to: 'on'
+      - platform: state
+        entity_id: 
+          - climate.wohnzimmer
+          - climate.gastezimmer
+        to: 'unavailable'
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: climate.bad
+          state: "unavailable"
+        - condition: state
+          entity_id: climate.schlafzimmer
+          state: "unavailable"
     action:
       - service: notify.telegram_fabian
         data_template:
           message: > 
             Die Batterie im Thermostat
-            {% if is_state('binary_sensor.gastezimmer_battery_state', 'on') %}
+            {% if is_state('state.climate.wohnzimmer', 'unavailable') %}
             Gästezimmer 
             {% endif %}
-            {% if is_state('binary_sensor.wohnzimmer_battery_state', 'on') %}
+            {% if is_state('state.climate.gastezimmer', 'unavailable') %}
             Wohnzimmer
             {% endif %}
             {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
@@ -3571,7 +3585,7 @@
             {% if is_state('binary_sensor.bad_battery_state', 'on') %}
             Bad
             {% endif %}
-            ist bald leer. Bitte auswechseln!
+            ist (bald) leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
       - service: notify.telegram_nessie
         data_template:
           message: > 
@@ -3588,7 +3602,7 @@
             {% if is_state('binary_sensor.bad_battery_state', 'on') %}
             Bad
             {% endif %}
-            ist bald leer. Bitte auswechseln!
+            ist (bald) leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
 
   - alias: Cast HA to TV if idleing
     trigger: 
@@ -3665,9 +3679,9 @@
         - media_player.gastezimmer_mini
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung' #und wird nun neugestartet.'
-      #- service: fritzbox_tools.reboot
-      #  data:
-      #    host: 192.168.178.1
+      - service: fritz.reboot
+        data:
+          host: 192.168.178.1
       - service: automation.turn_on
         data:
           entity_id: automation.fritzbox_internet_access_returned
@@ -4602,7 +4616,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4627,7 +4641,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4644,7 +4658,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai
@@ -4668,7 +4682,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4683,7 +4697,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
               - condition: or
                 conditions:
@@ -4706,7 +4720,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai
@@ -4748,7 +4762,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4771,7 +4785,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4786,7 +4800,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai
@@ -4847,7 +4861,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4872,7 +4886,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4889,7 +4903,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai
@@ -4913,7 +4927,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4943,7 +4957,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai
@@ -5008,7 +5022,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5033,7 +5047,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5050,7 +5064,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai
@@ -5074,7 +5088,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5104,7 +5118,7 @@
                     entity_id: device_tracker.flophone
                     state: home
                   - condition: state
-                    entity_id: device_tracker.maxiphone
+                    entity_id: device_tracker.galaxy_s9
                     state: home
                   - condition: state
                     entity_id: person.kai

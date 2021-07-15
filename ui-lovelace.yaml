@@ -159,54 +159,54 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: vertical-stack
         cards:
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: "6"
-            number_of_forecasts: "8"
+            forecastMaxColumn: '6'
+            number_of_forecasts: '8'
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: "6"
+            number_of_forecasts: '6'
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: "5"
+            forecastMaxColumn: '5'
       - artwork: cover
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
@@ -263,11 +263,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
         type: custom:mini-media-player
@@ -374,8 +374,8 @@ views:
         title: Licht & Strom
         type: entities
       - entities:
-          - entity: switch.schreibtisch
           - entity: input_boolean.fs_strom
+          - entity: switch.schreibtisch
           - entity: light.prismatik
           - entity: device_tracker.fabian_pc
           - entity: device_tracker.nsta0516_lan
@@ -390,10 +390,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
@@ -423,10 +423,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
@@ -583,10 +583,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: entities
         entities:
           - entity: sensor.kuche_mini_timers
@@ -655,8 +655,9 @@ views:
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: switch.fritzbox_3490_wifi
-          - entity: switch.fritzbox_3490_wifi_5ghz
+          - entity: sensor.fritz_box_3490_uptime
+          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb
+          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
         title: FritzBox
         type: entities
         show_header_toggle: false
@@ -667,7 +668,7 @@ views:
           - entity: person.kai
           - entity: device_tracker.flophone
           - entity: device_tracker.galaxy_s10_lite
-          - entity: device_tracker.maxiphone
+          - entity: device_tracker.galaxy_s9
           - entity: device_tracker.redminote8t_redminot
           - entity: device_tracker.isi_phone
           - entity: device_tracker.redminote9pro_redmin
@@ -769,7 +770,7 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'

@@ -602,53 +602,65 @@ light:
     profile_name: homeassistant
 
 homekit:
-  filter:
-    exclude_domains:
-      - automation
-      - script
-      - sensor
-      - climate #Tado has a direct homekit integration
-      - binary_sensor
-      - media_player
-      - person
-      - device_tracker
-    exclude_entity_globs:
-      - device_tracker.google_maps*
-      - device_tracker.*phone*
-      - device_tracker.*ipad*
-      - media_player.*_cast
-      - switch.*shutdown*
-      - switch.*hibernate*
-      - switch.*reboot*
-      - sensor.*_open_window
-      - switch.fritzbox_*
-      - switch.xiaomi_*
-      - light.xiaomi_*
-      - switch.adguard_*
-      - switch.*do_not_disturb
-    exclude_entities:
-      - binary_sensor.updater
-      - device_tracker.fabiannotebook_work
-      - input_boolean.silent_mode
-      - input_boolean.guest_mode
-      - input_boolean.away_mode
-      - input_boolean.climate_off
-      - media_player.mini_gruppe
-      - climate.rpi_cooling_fan_controller
-      - switch.rpi_cooling_fan
-      - media_player.mpd
-      - switch.schreibtisch
-      - switch.frei
-      - switch.bett
-      - light.yeelight_bslamp2_0x0000000013fea10f #Bedside Lamp has a direct Homekit integration
-      - light.prismatik
-      - switch.nessie_pc
-      - switch.fabian_strom
+  - filter:
+      exclude_domains:
+        - automation
+        - script
+        - sensor
+        - climate #Tado has a direct homekit integration
+        - binary_sensor
+        - person
+        - device_tracker
+        - media_player
+      exclude_entity_globs:
+        - device_tracker.google_maps*
+        - device_tracker.*phone*
+        - device_tracker.*ipad*
+        - media_player.*_cast
+        - switch.*shutdown*
+        - switch.*hibernate*
+        - switch.*reboot*
+        - sensor.*_open_window
+        - switch.fritz_box_*
+        - switch.xiaomi_*
+        - light.xiaomi_*
+        - switch.adguard_*
+        - switch.*do_not_disturb
+      exclude_entities:
+        - binary_sensor.updater
+        - device_tracker.fabiannotebook_work
+        - input_boolean.silent_mode
+        - input_boolean.guest_mode
+        - input_boolean.away_mode
+        - input_boolean.climate_off
+        - media_player.mini_gruppe
+        - climate.rpi_cooling_fan_controller
+        - switch.rpi_cooling_fan
+        - media_player.mpd
+        - switch.schreibtisch
+        - switch.frei
+        - switch.bett
+        - light.yeelight_bslamp2_0x0000000013fea10f #Bedside Lamp has a direct Homekit integration
+        - light.yeelight_stripe_0x00000000036d0c16
+        - light.prismatik
+        - switch.nessie_pc
+        - switch.fabian_strom
+        - media_player.mini_gruppe
+        - media_player.gastezimmer_mini
+        - media_player.kueche_mini
+        - media_player.wohnzimmer_mini
+        - media_player.schlafzimmer
 
 #no_ip:
 #  domain: !secret domain_noip
 #  username: !secret noip_username
 #  password: !secret noip_pw
+
+xiaomi_miio_cooker:
+  name: Xiaomi Rice Cooker
+  host: 192.168.31.195
+  token: !secret rice_cooker_token
+  model: chunmi.cooker.eh1
 
 mqtt:
   broker: core-mosquitto
@@ -757,15 +769,15 @@ google_assistant:
       expose: false
     light.keller_gluhbirne:
       expose: false
-    switch.fritzbox_3490_guest_wifi:
-      expose: false
     switch.fritzbox_3490_portforward_https_server:
       expose: false
     switch.fritzbox_3490_portforward_ssh:
       expose: false
-    switch.fritzbox_3490_wifi:
+    switch.fritz_box_3490_wi_fi_smartlife_fb:
       expose: false
-    switch.fritzbox_3490_wifi_5ghz:
+    switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz:
+      expose: false
+    switch.fritz_box_3490_wi_fi_fritz_box_gastzugang:
       expose: false
     switch.rpi_cooling_fan:
       expose: false
