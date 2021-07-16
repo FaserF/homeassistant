@@ -4609,6 +4609,7 @@
             - automation.detect_if_oven_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
       - choose:
+          # IF 5 friends are there
           - conditions:
               - condition: or
                 conditions:
@@ -4625,7 +4626,7 @@
                   message: 'Kohleanzünder wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - choose:
+          # ELIF only K&A are there
           - conditions:
               - condition: or
                 conditions:
@@ -4650,29 +4651,14 @@
                   message: 'Kohleanzünder wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Kohleanzünder wurde eingeschaltet.'
-                  inline_keyboard:
-                    - "Dauer:/remaining_time"
+        # ELSE only notify fabian
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Kohleanzünder wurde eingeschaltet.'
+              inline_keyboard:
+                - "Dauer:/remaining_time"
       - delay: '00:09:00'
       - choose:
           - conditions:
@@ -4689,7 +4675,6 @@
                 data_template:
                   target: !secret telegram_chat_5friends
                   message: 'Bitte Kohle wenden.'
-      - choose:
           - conditions:
               - condition: not
                 conditions:
@@ -4712,27 +4697,11 @@
                 data_template:
                   target: !secret telegram_chat_afk
                   message: 'Bitte Kohle wenden.'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Bitte Kohle wenden.'
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Bitte Kohle wenden.'
       - choose:
           - conditions:
               - condition: not
@@ -4769,7 +4738,6 @@
                 data_template:
                   target: !secret telegram_chat_5friends
                   message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - choose:
           - conditions:
               - condition: or
                 conditions:
@@ -4792,27 +4760,11 @@
                 data_template:
                   target: !secret telegram_chat_afk
                   message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
       - service: automation.turn_on
         data:
           entity_id: 
@@ -4870,7 +4822,6 @@
                   message: 'Der Ofen wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - choose:
           - conditions:
               - condition: or
                 conditions:
@@ -4895,29 +4846,13 @@
                   message: 'Der Ofen wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Der Ofen wurde eingeschaltet.'
-                  inline_keyboard:
-                    - "Dauer:/remaining_time"
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Der Ofen wurde eingeschaltet.'
+              inline_keyboard:
+                - "Dauer:/remaining_time"
       - delay: '00:13:00'
       - choose:
           - conditions:
@@ -4934,7 +4869,6 @@
                 data_template:
                   target: !secret telegram_chat_5friends
                   message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-      - choose:
           - conditions:
               - condition: or
                 conditions:
@@ -4949,27 +4883,11 @@
                 data_template:
                   target: !secret telegram_chat_afk
                   message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
       - service: automation.turn_on
         data:
           entity_id: 
@@ -5031,7 +4949,6 @@
                   message: 'Der Pizzamaker wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - choose:
           - conditions:
               - condition: or
                 conditions:
@@ -5056,29 +4973,13 @@
                   message: 'Der Pizzamaker wurde eingeschaltet.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Der Pizzamaker wurde eingeschaltet.'
-                  inline_keyboard:
-                    - "Dauer:/remaining_time"
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Der Pizzamaker wurde eingeschaltet.'
+              inline_keyboard:
+                - "Dauer:/remaining_time"
       - delay: '00:05:00'
       - choose:
           - conditions:
@@ -5095,7 +4996,6 @@
                 data_template:
                   target: !secret telegram_chat_5friends
                   message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-      - choose:
           - conditions:
               - condition: or
                 conditions:
@@ -5110,27 +5010,11 @@
                 data_template:
                   target: !secret telegram_chat_afk
                   message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_fabian
-                  message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
       - service: automation.turn_on
         data:
           entity_id: 
