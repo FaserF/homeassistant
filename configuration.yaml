@@ -338,10 +338,10 @@ climate:
     name: RPI Cooling Fan Controller
     heater: switch.rpi_cooling_fan
     target_sensor: sensor.processor_temperature
-    min_temp: 55
+    min_temp: 30
     max_temp: 80
     ac_mode: true
-    target_temp: 55
+    target_temp: 50
     cold_tolerance: 0.1
     hot_tolerance: 0.1
     min_cycle_duration:
@@ -673,7 +673,7 @@ mqtt:
 switch:
   - platform: rpi_gpio
     ports:
-      4: RPI Cooling Fan
+      18: RPI Cooling Fan
   - platform: command_line
     switches:
       fabian_pc_shutdown:
@@ -692,7 +692,6 @@ switch:
         turn_on:
           service: xiaomi_miio_cooker.start
           data_template:
-            #{{ states.sensor.cooker_planned_profile.state }}
             profile: >
               {% if is_state('input_select.rice_cooker_program', 'Kochen 1h') %}
                 02010000000001e101000000000000800101050814000000002091827d7800050091822d781c0a0091823c781c1e0091ff827820ffff91828278000500ffff8278ffffff91828278000d00ff828778ff000091827d7800000091827d7800ffff91826078ff0100490366780701086c0078090301af540266780801086c00780a02023c5701667b0e010a71007a0d02ffff5701667b0f010a73007d0d032005000000000000000000000000000000cf53
@@ -705,7 +704,7 @@ switch:
               {% elif is_state('input_select.rice_cooker_program', 'Sonstiges') %}
                 02010400000005e601000100000a00800102050a14000000002091827d7800000091827d7800000091827d78001e00915a7d7820000091827d7800000091826e78ff000091827d7800000091826e7810ffff91827d78ff000091827d7800000091827d780000a082007882140010871478030000eb820078821400108714780300012d8200788214001087147a0501ffff8200788214001087147d0501200000000000000000000000000000000020b5
               {% else %}
-                Invalid_profile
+                02010400000005e601000100000a00800102050a14000000002091827d7800000091827d7800000091827d78001e00915a7d7820000091827d7800000091826e78ff000091827d7800000091826e7810ffff91827d78ff000091827d7800000091827d780000a082007882140010871478030000eb820078821400108714780300012d8200788214001087147a0501ffff8200788214001087147d0501200000000000000000000000000000000020b5
               {% endif %}
         turn_off:
           service: xiaomi_miio_cooker.stop
@@ -946,6 +945,12 @@ input_select:
       - Sonstiges
     initial: schnelles Kochen
     icon: mdi:rice
+
+input_datetime:
+  cooker_start_time:
+    name: Reiskocher Startzeit
+    has_date: true
+    has_time: true
 
 input_boolean: !include input_boolean.yaml
 frontend:

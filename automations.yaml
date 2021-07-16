@@ -5325,6 +5325,18 @@
           entity_id: input_select.washing_machine_status
           option: Idle
 
+  - alias: Resume music in keller after coal video
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: media_player.keller_tv
+        attribute: app_id
+        from: com.tcl.videoplayer
+    action:
+      - service: media_player.media_play
+        data:
+          entity_id: media_player.keller_tv
+
   - alias: Remind for finished rice cooker
     initial_state: on
     trigger:
@@ -5335,10 +5347,6 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_finished_rice_cooker.attributes.last_triggered) | int > 1200 }}"
     action:
-      - service: input_select.select_option
-        data:
-          entity_id: input_select.rice_cooker_program
-          option: schnelles Kochen
       - choose:
           - conditions:
               - condition: not
@@ -5379,6 +5387,27 @@
                 entity_id: media_player.wohnzimmer_mini
                 data:
                   message: 'Der Reiskocher ist in 4 Minuten fertig.'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.rice_cooker_program
+          option: schnelles Kochen
+
+  - id: turn_on_rice_cooker_when_timer_started
+    alias: 'Turn on rice cooker when timer started'
+    initial_state: True
+    trigger:
+      - platform: template
+        value_template: "{{ as_timestamp(now()) | round(-1) == (states.input_datetime.cooker_start_time.attributes.timestamp) | round(-1) }}"
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.xiaomi_miio_cooker
+      - service: notify.telegram_nessie
+        data_template:
+          message: 'Der Reiskocher wurde automatisch angeschaltet im Programm {{ states.input_select.rice_cooker_program.state }}.'
+      - service: notify.telegram_fabian
+        data_template:
+          message: 'Der Reiskocher wurde automatisch angeschaltet im Programm {{ states.input_select.rice_cooker_program.state }}.'
 
   - alias: 'Remind for going off'
     initial_state: on
