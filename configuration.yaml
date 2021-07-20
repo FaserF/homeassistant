@@ -148,21 +148,25 @@ logbook:
 logger:
   filters:
     custom_components.prismatik.light:
-      - "Could not connect to Prismatik at $"
+      - "Could not connect to Prismatik at *"
     homeassistant.components.light:
       - "Setup of light platform prismatik is taking over 10 seconds."
     homeassistant.loader:
-      - "You are using a custom integration$"
+      - "You are using a custom integration*"
+      - "We found a custom integration * which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant"
     androidtv.adb_manager.adb_manager_async:
-      - "Couldn't connect to$"
+      - "Couldn't connect to*"
     homeassistant.components.androidtv.media_player:
-      - "Could not connect to$"
+      - "Could not connect to*"
     homeassistant.components.media_player:
-      - "Platform androidtv not ready yet. Retrying in$"
+      - "Platform androidtv not ready yet. Retrying in*"
     homeassistant.helpers.service:
       - "Unable to find referenced entities$"
     homeassistant.config_entries:
       - "Config entry '192.168.31.159' for miwifi integration not ready yet; Retrying in background"
+      - "Config entry '192.168.31.159' for miwifi integration not ready yet: None; Retrying in background"
+      - "Config entry 'Fabian-PC' for system_bridge integration not ready yet: Could not connect to System Bridge.; Retrying in background"
+      - "Config entry 'Schnuppes-PC' for system_bridge integration not ready yet: Could not connect to System Bridge.; Retrying in background"
 
 # Enables a map showing the location of tracked devices
 map:
@@ -174,13 +178,6 @@ device_tracker:
   #- platform: xiaomi
   #  host: 192.168.31.1
   #  password: !secret fritzbox
-  #OpenWRT Router
-  #- platform: luci
-  #  host: 192.168.178.8
-  #  username: root
-  #  password: !secret fritzbox
-  #  new_device_defaults:
-  #    track_new_devices: False
   - platform: google_maps
     username: !secret gmaps_mail
     max_gps_accuracy: 1000
@@ -664,29 +661,51 @@ xiaomi_miio_cooker:
   token: !secret rice_cooker_token
   model: chunmi.cooker.eh1
 
-mqtt:
-  broker: core-mosquitto
-  username: !secret mqttuser
-  password: !secret mqttpass
-  discovery: true
+rest_command:
+  fabian_pc_system_bridge:
+    method: POST
+    url: http://192.168.178.15:9170/command
+    headers:
+      api-key: !secret system_bridge_fabian
+    content_type: "application/json; charset=utf-8"
+    payload: '{ "command": "{{ command }}", "arguments": "{{ arguments }}" }'
+  nessie_pc_system_bridge:
+    method: POST
+    url: http://192.168.178.16:9170/command
+    headers:
+      api-key: !secret system_bridge_nessie
+    content_type: "application/json; charset=utf-8"
+    payload: '{ "command": "{{ command }}", "arguments": "{{ arguments }}" }'
 
 switch:
   - platform: rpi_gpio
     ports:
       18: RPI Cooling Fan
-  - platform: command_line
-    switches:
-      fabian_pc_shutdown:
-        command_off: "curl http://192.168.178.15:5001/shutdown"
-        friendly_name: Fabian PC herunterfahren
-  - platform: command_line
-    switches:
-      nessie_pc_shutdown:
-        command_off: "curl http://192.168.178.16:5001/shutdown"
-        friendly_name: Nessie PC herunterfahren
+  #- platform: rest
+  #  name: Fabian PC Shutdown
+  #  method: POST
+  #  resource: http://192.168.178.15:9170/command
+  #  headers:
+  #    Content-Type: 'application/json; charset=utf-8'
+  #    api-key: !secret system_bridge_fabian
+  #  payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
+  #- platform: rest
+  #  name: Nessie PC Shutdown
+  #  method: POST
+  #  resource: http://192.168.178.16:9170/command
+  #  headers:
+  #    Content-Type: 'application/json; charset=utf-8'
+  #    api-key: !secret system_bridge_nessie
+  #  payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
   - platform: template
     switches:
       xiaomi_miio_cooker:
+        icon_template: >-
+          {% if is_state('sensor.xiaomi_miio_cooker_mode', 'Running') %}
+            mdi:rice
+          {% else %}
+            mdi:bowl
+          {% endif %}
         friendly_name: "Reiskocher"
         value_template: "{{ is_state('sensor.xiaomi_miio_cooker_mode', 'Running') }}"
         turn_on:
@@ -944,7 +963,7 @@ input_select:
       - Wärmen
       - Sonstiges
     initial: schnelles Kochen
-    icon: mdi:rice
+    icon: mdi:import
 
 input_datetime:
   cooker_start_time:

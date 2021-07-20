@@ -131,11 +131,14 @@ views:
         type: entities
       - entities:
           - entity: switch.fernseher
+            secondary_info: last-changed
           - entity: switch.staubsauger
           - entity: input_boolean.fs_strom
+            secondary_info: last-changed
           - entity: switch.schreibtisch
           - entity: switch.bett_usb_ports
           - entity: input_boolean.vk_strom
+            secondary_info: last-changed
           - entity: switch.waschmaschine
           - entity: switch.kuhlschrank
           - entity: switch.fernseher_keller
@@ -211,6 +214,7 @@ views:
                 secondary_info: last-changed
               - entity: sensor.xiaomi_miio_cooker_taste
               - entity: sensor.xiaomi_miio_cooker_taste_phase
+              - entity: sensor.xiaomi_miio_cooker_cooking_delayed
               - entity: sensor.xiaomi_miio_cooker_temperature
               - entity: sensor.xiaomi_miio_cooker_menu
                 secondary_info: last-changed
@@ -405,9 +409,12 @@ views:
             secondary_info: last-changed
           - entity: device_tracker.nsta0516_lan
             secondary_info: last-changed
-          - entity: switch.fabian_pc_shutdown
           - entity: sensor.steckdose_schlafzimmer_energy_today
           - entity: sensor.steckdose_schlafzimmer_energy_power
+          - entity: sensor.fabian_pc_load
+          - entity: sensor.fabian_pc_memory_used
+          - entity: sensor.fabian_pc_cpu_speed
+          - entity: sensor.fabian_pc_cpu_temperature
         show_header_toggle: true
         title: Fabian PC
         type: entities
@@ -436,13 +443,15 @@ views:
         type: entities
       - entities:
           - entity: input_boolean.vk_strom
-          - entity: switch.nessie_pc_shutdown
           - entity: device_tracker.schnuppes_pc
             secondary_info: last-changed
           - entity: device_tracker.nessie_macbook_lan
             secondary_info: last-changed
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
+          - entity: sensor.schnuppes_pc_load
+          - entity: sensor.schnuppes_pc_memory_used_2
+          - entity: sensor.schnuppes_pc_cpu_speed
         show_header_toggle: false
         title: Nessie PC
         type: entities

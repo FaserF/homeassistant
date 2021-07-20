@@ -2653,9 +2653,10 @@
                     entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
-              - service: switch.turn_off
+              - service: rest_command.fabian_pc_system_bridge
                 data:
-                  entity_id: switch.fabian_pc_shutdown
+                  command: "shutdown"
+                  arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
           - conditions:
@@ -2668,9 +2669,10 @@
                     entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
-              - service: switch.turn_off
+              - service: rest_command.fabian_pc_system_bridge
                 data:
-                  entity_id: switch.fabian_pc_shutdown
+                  command: "shutdown"
+                  arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
           - conditions:
@@ -2683,9 +2685,10 @@
                     entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
-              - service: switch.turn_off
+              - service: rest_command.fabian_pc_system_bridge
                 data:
-                  entity_id: switch.fabian_pc_shutdown
+                  command: "shutdown"
+                  arguments: "/s /t 0"
               - delay: '00:01:00'
       - choose:
           - conditions:
@@ -2765,9 +2768,10 @@
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
             sequence:
-              - service: switch.turn_off
+              - service: rest_command.nessie_pc_system_bridge
                 data:
-                  entity_id: switch.nessie_pc_shutdown
+                  command: "shutdown"
+                  arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
           - conditions:
@@ -2780,9 +2784,10 @@
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
             sequence:
-              - service: switch.turn_off
+              - service: rest_command.nessie_pc_system_bridge
                 data:
-                  entity_id: switch.nessie_pc_shutdown
+                  command: "shutdown"
+                  arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
           - conditions:
@@ -2795,9 +2800,10 @@
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
             sequence:
-              - service: switch.turn_off
+              - service: rest_command.nessie_pc_system_bridge
                 data:
-                  entity_id: switch.nessie_pc_shutdown
+                  command: "shutdown"
+                  arguments: "/s /t 0"
               - delay: '00:01:00'
       - choose:
           - conditions:
@@ -5243,11 +5249,11 @@
                     state: 'home'
             sequence:
               - service: notify.telegram_nessie
-                data:
-                  message: 'Der Reiskocher ist in 4 Minuten fertig.'
+                data_template:
+                  message: 'Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig.'
               - service: notify.telegram_fabian
-                data:
-                  message: 'Der Reiskocher ist in 4 Minuten fertig.'
+                data_template:
+                  message: 'Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig.'
       - choose:
           - conditions:
               - condition: state
@@ -5269,8 +5275,8 @@
             sequence:
               - service: tts.google_say
                 entity_id: media_player.wohnzimmer_mini
-                data:
-                  message: 'Der Reiskocher ist in 4 Minuten fertig.'
+                data_template:
+                  message: 'Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig.'
       - service: input_select.select_option
         data:
           entity_id: input_select.rice_cooker_program
@@ -5858,7 +5864,10 @@
       event_data:
         data: '/hibernatefpc'
     action:
-      - service: shell_command.hibernatefpc
+      - service: rest_command.fabian_pc_system_bridge
+        data:
+          command: "shutdown"
+          arguments: " /h /t 0"
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
@@ -5898,7 +5907,10 @@
       event_data:
         data: '/hibernatenpc'
     action:
-      - service: shell_command.hibernatenpc
+      - service: rest_command.nessie_pc_system_bridge
+        data:
+          command: "shutdown"
+          arguments: " /h /t 0"
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
