@@ -397,10 +397,14 @@ counter:
     icon: mdi:pill
 
 sensor:
-  #- platform: rest
-  #  resource: https://lp.smartlife.tk/info
-  #  method: GET
-  #  unit_of_measurement: people
+  - platform: rest
+    name: Switch LAN-Play Online
+    resource: http://192.168.31.2:11451/info
+    method: GET
+    unit_of_measurement: people
+    json_attributes:
+      - version
+    value_template: "{{value_json.online}}"
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
   - platform: mqtt

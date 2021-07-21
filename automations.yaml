@@ -237,9 +237,9 @@
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.away_mode
-      - service: switch.turn_off
-        data: 
-          entity_id: switch.fritzbox_3490_portforward_ssh
+      #- service: switch.turn_off
+      #  data: 
+      #    entity_id: switch.fritzbox_3490_portforward_ssh
 
 #  - id: turn_on_ventilator_if_coming_home
 #  - alias: 'Turn on ventilator if coming home'
@@ -3631,6 +3631,28 @@
       - platform: state
         entity_id: sensor.fritz_netmonitor
         attribute: external_ip
+    condition:
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 360 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: 'sensor.fritz_netmonitor'
+            state: 'None'
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
+
+  - alias: Turn on Fritzbox Wifi if Miwifi is off
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sbinary_sensor.xiaomi_abd8_wan_state
+        attribute: external_ip
+      - platform: template
+        value_template: "{{ now().timetuple().tm_isdst }}"
+        {% if not is_state('input_select.housemode', 'auto')
     condition:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 360 }}"
