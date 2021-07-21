@@ -3647,15 +3647,14 @@
   - alias: Turn on Fritzbox Wifi if Miwifi is off
     initial_state: on
     trigger:
-      - platform: state
-        entity_id: sbinary_sensor.xiaomi_abd8_wan_state
-        attribute: external_ip
+      #- platform: state
+      #  entity_id: sbinary_sensor.xiaomi_abd8_wan_state
+      #  state: "not_connected"
       - platform: template
-        value_template: "{{ now().timetuple().tm_isdst }}"
-        {% if not is_state('input_select.housemode', 'auto')
+        value_template: "{{ if not is_state('sbinary_sensor.xiaomi_abd8_wan_state', 'connected'}}"
     condition:
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 360 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_fritzbox_wifi_if_miwifi_is_off.attributes.last_triggered) | int > 360 }}"
       - condition: not
         conditions:
           - condition: state
@@ -3664,7 +3663,7 @@
     action:
       - service: notify.telegram_fabian
         data:
-          message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
+          message: 'Miwifi hat kein Internet'
 
   - alias: Fritzbox no Internet access
     initial_state: on
