@@ -241,6 +241,21 @@
       #  data: 
       #    entity_id: switch.fritzbox_3490_portforward_ssh
 
+  - id: notify_if_someone_joined_lan_play_server
+    alias: Notify if someone joined lan play server
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.switch_lan_play_online
+        above: 0
+    condition:
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_if_someone_joined_lan_play_server.attributes.last_triggered) | int > 300 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Jemand ist dem LAN-Play Server beigetreten. Spieleranzahl: {{ states.sensor.switch_lan_play_online.state }}'
+
 #  - id: turn_on_ventilator_if_coming_home
 #  - alias: 'Turn on ventilator if coming home'
 #    initial_state: on
@@ -481,7 +496,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.isi_phone
+        entity_id: device_tracker.pocophonef1_pocophon
         from: 'not_home'
         to: 'home'
     condition:
@@ -509,11 +524,11 @@
     alias: 'Deactivate guest mode if no guest is here'
     initial_state: on
     trigger:
-      #- platform: state
-      #  entity_id: device_tracker.isi_phone
-      #  to: 'not_home'
-      #  for:
-      #    days: 1
+      - platform: state
+        entity_id: device_tracker.pocophonef1_pocophon
+        to: 'not_home'
+        for:
+          days: 1
       - platform: state
         entity_id: input_boolean.guest_mode
         to: 'on'
@@ -525,9 +540,9 @@
         - condition: state
           entity_id: input_boolean.guest_mode
           state: 'on'
-        #- condition: state
-        #  entity_id: device_tracker.isi_phone
-        #  state: 'not_home'
+        - condition: state
+          entity_id: device_tracker.pocophonef1_pocophon
+          state: 'not_home'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -1495,14 +1510,14 @@
       - platform: state
         entity_id: 
           - sensor.fabian_ipadpro_battery_state
-          - sensor.fabianphone_battery_state
-          - sensor.nessiephone_battery_state
+          - sensor.fabian_phone_battery_state
+          - sensor.nessie_phone_battery_state
         to: 'discharging'
       - platform: state
         entity_id: 
           - sensor.fabian_ipadpro_battery_state
-          - sensor.fabianphone_battery_state
-          - sensor.nessiephone_battery_state
+          - sensor.fabian_phone_battery_state
+          - sensor.nessie_phone_battery_state
         to: 'Not Charging'
       - platform: numeric_state
         entity_id: 
@@ -1524,7 +1539,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: sensor.fabianphone_battery_state
+              entity_id: sensor.fabian_phone_battery_state
               state: 'discharging'
             - condition: numeric_state
               entity_id: sensor.fabian_phone_battery_level
@@ -1532,7 +1547,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: sensor.nessiephone_battery_state
+              entity_id: sensor.nessie_phone_battery_state
               state: 'discharging'
             - condition: numeric_state
               entity_id: sensor.nessie_phone_battery_level
@@ -3110,6 +3125,18 @@
 
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
+                    Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.      
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_jutta
+                  disable_notification: true
+                  message: >
+                    Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
       - choose:
           - conditions:
@@ -3139,6 +3166,17 @@
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_jutta
+                  message: >
+                    Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+
+                    Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
       - choose:
           - conditions:
               - condition: state
@@ -3159,6 +3197,17 @@
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_nessie
+                  message: >
+                    ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
+                    *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
+
+
+                    {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
+                    
+                    Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_jutta
                   message: >
                     ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
                     *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
@@ -3644,26 +3693,26 @@
         data:
           message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
 
-  - alias: Turn on Fritzbox Wifi if Miwifi is off
-    initial_state: on
-    trigger:
-      #- platform: state
-      #  entity_id: sbinary_sensor.xiaomi_abd8_wan_state
-      #  state: "not_connected"
-      - platform: template
-        value_template: "{{ if not is_state('sbinary_sensor.xiaomi_abd8_wan_state', 'connected'}}"
-    condition:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_fritzbox_wifi_if_miwifi_is_off.attributes.last_triggered) | int > 360 }}"
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: 'sensor.fritz_netmonitor'
-            state: 'None'
-    action:
-      - service: notify.telegram_fabian
-        data:
-          message: 'Miwifi hat kein Internet'
+#  - alias: Turn on Fritzbox Wifi if Miwifi is off
+#    initial_state: on
+#    trigger:
+#      #- platform: state
+#      #  entity_id: sbinary_sensor.xiaomi_abd8_wan_state
+#      #  state: "not_connected"
+#      - platform: template
+#        value_template: "{{ if not is_state('sbinary_sensor.xiaomi_abd8_wan_state', 'connected'}}"
+#    condition:
+#      - condition: template
+#        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_fritzbox_wifi_if_miwifi_is_off.attributes.last_triggered) | int > 360 }}"
+#      - condition: not
+#        conditions:
+#          - condition: state
+#            entity_id: 'sensor.fritz_netmonitor'
+#            state: 'None'
+#    action:
+#      - service: notify.telegram_fabian
+#        data:
+#          message: 'Miwifi hat kein Internet'
 
   - alias: Fritzbox no Internet access
     initial_state: on

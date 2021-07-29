@@ -149,6 +149,14 @@ logger:
   filters:
     custom_components.prismatik.light:
       - "Could not connect to Prismatik at *"
+    homeassistant.helpers.entity:
+      - "Update of * is taking over 10 seconds"
+    homeassistant.components.switch:
+      - "Setup of switch platform adguard is taking over 10 seconds."
+    homeassistant.components.sensor:
+      - "Setup of sensor platform deutsche_bahn is taking over 10 seconds."
+    homeassistant.components.google_maps.device_tracker:
+      - "Ignoring * update because timestamp is older than last timestamp"
     homeassistant.components.light:
       - "Setup of light platform prismatik is taking over 10 seconds."
     homeassistant.loader:
@@ -219,6 +227,7 @@ telegram_bot:
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
       - !secret telegram_chat_triemagisch
+      - !secret telegram_chat_jutta
   #- platform: broadcast
   #  api_key: !secret telegram_bot_api_jek
   #  allowed_chat_ids:
@@ -338,7 +347,7 @@ climate:
     min_temp: 30
     max_temp: 80
     ac_mode: true
-    target_temp: 50
+    target_temp: 45
     cold_tolerance: 0.1
     hot_tolerance: 0.1
     min_cycle_duration:
@@ -404,6 +413,7 @@ sensor:
     unit_of_measurement: people
     json_attributes:
       - version
+      - idle
     value_template: "{{value_json.online}}"
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
@@ -604,56 +614,6 @@ light:
     name: "Prismatik"
     profile_name: homeassistant
 
-homekit:
-  - filter:
-      exclude_domains:
-        - automation
-        - script
-        - sensor
-        - climate #Tado has a direct homekit integration
-        - binary_sensor
-        - person
-        - device_tracker
-        - media_player
-      exclude_entity_globs:
-        - device_tracker.google_maps*
-        - device_tracker.*phone*
-        - device_tracker.*ipad*
-        - media_player.*_cast
-        - switch.*shutdown*
-        - switch.*hibernate*
-        - switch.*reboot*
-        - sensor.*_open_window
-        - switch.fritz_box_*
-        - switch.xiaomi_*
-        - light.xiaomi_*
-        - switch.adguard_*
-        - switch.*do_not_disturb
-      exclude_entities:
-        - binary_sensor.updater
-        - device_tracker.fabiannotebook_work
-        - input_boolean.silent_mode
-        - input_boolean.guest_mode
-        - input_boolean.away_mode
-        - input_boolean.climate_off
-        - media_player.mini_gruppe
-        - climate.rpi_cooling_fan_controller
-        - switch.rpi_cooling_fan
-        - media_player.mpd
-        - switch.schreibtisch
-        - switch.frei
-        - switch.bett
-        - light.yeelight_bslamp2_0x0000000013fea10f #Bedside Lamp has a direct Homekit integration
-        - light.yeelight_stripe_0x00000000036d0c16
-        - light.prismatik
-        - switch.nessie_pc
-        - switch.fabian_strom
-        - media_player.mini_gruppe
-        - media_player.gastezimmer_mini
-        - media_player.kueche_mini
-        - media_player.wohnzimmer_mini
-        - media_player.schlafzimmer
-
 #no_ip:
 #  domain: !secret domain_noip
 #  username: !secret noip_username
@@ -672,14 +632,14 @@ rest_command:
     headers:
       api-key: !secret system_bridge_fabian
     content_type: "application/json; charset=utf-8"
-    payload: '{ "command": "{{ command }}", "arguments": "{{ arguments }}" }'
+    payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
   nessie_pc_system_bridge:
     method: POST
     url: http://192.168.178.16:9170/command
     headers:
       api-key: !secret system_bridge_nessie
     content_type: "application/json; charset=utf-8"
-    payload: '{ "command": "{{ command }}", "arguments": "{{ arguments }}" }'
+    payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
 
 switch:
   - platform: rpi_gpio
