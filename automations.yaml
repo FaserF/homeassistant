@@ -2696,9 +2696,6 @@
                   - condition: state
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
-                  - condition: numeric_state
-                    entity_id: sensor.steckdose_schlafzimmer_energy_power
-                    above: 20
             sequence:
               - service: rest_command.fabian_pc_system_bridge
                 data:
@@ -2718,14 +2715,14 @@
             sequence:
               - service: notify.telegram_fabian
                 data:
-                  message: "Der PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
+                  message: "Der PC/Notebook ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
+              - service: input_boolean.turn_on
+                data:
+                  entity_id: input_boolean.fs_strom
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
-                  - condition: state
-                    entity_id: device_tracker.fabian_pc
-                    state: 'not_home'
                   - condition: numeric_state
                     entity_id: sensor.steckdose_schlafzimmer_energy_power
                     below: 21
@@ -6691,11 +6688,89 @@
       - condition: numeric_state
         entity_id: proximity.home_fabian
         above: 3
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        below: 30
       - condition: state
         entity_id: person.nessie
         state: home
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3700 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: "Arbeit Fabi"
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+
+  - alias: 'Notify Nessie Fabian on way home longer distance'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: proximity.home_fabian
+        attribute: dir_of_travel
+        to: 'towards'
+        for:
+          minutes: 10
+    condition:
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        above: 29
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        below: 90
+      - condition: state
+        entity_id: person.nessie
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3700 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: "Arbeit Fabi"
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+
+  - alias: 'Notify Nessie Fabian on way home long distance'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: proximity.home_fabian
+        attribute: dir_of_travel
+        to: 'towards'
+        for:
+          minutes: 15
+    condition:
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        above: 89
+      - condition: state
+        entity_id: person.nessie
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 3600 }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3700 }}"
       - condition: not
@@ -6721,11 +6796,99 @@
       - condition: numeric_state
         entity_id: proximity.home_nessie
         above: 3
+      - condition: numeric_state
+        entity_id: proximity.home_nessie
+        below: 30
       - condition: state
         entity_id: person.fabian
         state: home
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_longer_distance.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_long_distance.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.nessie
+            state: 'arbeit_nessie'
+          - condition: state
+            entity_id: person.nessie
+            state: 'Berufsschule'
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Nessie ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_nessie.state }} km entfernt von zu Hause."
+
+  - alias: 'Notify Fabian Nessie on way home longer distance'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: proximity.home_nessie
+        attribute: dir_of_travel
+        to: 'towards'
+        for:
+          minutes: 10
+    condition:
+      - condition: numeric_state
+        entity_id: proximity.home_nessie
+        above: 29
+      - condition: numeric_state
+        entity_id: proximity.home_nessie
+        below: 90
+      - condition: state
+        entity_id: person.fabian
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_longer_distance.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_long_distance.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.nessie
+            state: 'arbeit_nessie'
+          - condition: state
+            entity_id: person.nessie
+            state: 'Berufsschule'
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: "Nessie ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_nessie.state }} km entfernt von zu Hause."
+
+  - alias: 'Notify Fabian Nessie on way home long distance'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: proximity.home_nessie
+        attribute: dir_of_travel
+        to: 'towards'
+        for:
+          minutes: 15
+    condition:
+      - condition: numeric_state
+        entity_id: proximity.home_nessie
+        above: 89
+      - condition: state
+        entity_id: person.fabian
+        state: home
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_longer_distance.attributes.last_triggered) | int > 1800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_long_distance.attributes.last_triggered) | int > 1800 }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
       - condition: template
