@@ -1610,6 +1610,9 @@
         weekday:
           - mon
           - fri
+      - condition: state
+        entity_id: input_boolean.away_mode
+        state: "off"
     action:
       - service: switch.turn_on
         data:
@@ -1685,6 +1688,7 @@
                   entity_id: 
                     - light.leds_tisch
                     - light.yeelight_stripe_0x00000000036d0c16
+                    - light.yeelight_bslamp2_0x0000000013fea10f
                   brightness: 10
               - delay: '00:00:20'
               - service: automation.trigger
@@ -1739,6 +1743,9 @@
         conditions:
         - condition: state
           entity_id: light.yeelight_stripe_0x00000000036d0c16
+          state: 'off'
+        - condition: state
+          entity_id: light.yeelight_bslamp2_0x0000000013fea10f
           state: 'off'
         - condition: state
           entity_id: light.leds_tisch
@@ -1805,6 +1812,22 @@
                 entity_id: light.leds_tisch
                 data_template:
                   brightness: '{{states.light.leds_tisch.attributes.brightness + 5}}'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                state: 'on'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                    attribute: brightness
+                    state: '255'
+            sequence:
+              - service: light.turn_on
+                entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                data_template:
+                  brightness: '{{states.light.yeelight_bslamp2_0x0000000013fea10f.attributes.brightness + 5}}'
       - service: automation.trigger
         data:
           entity_id: automation.increase_lights_in_morning
@@ -2582,10 +2605,16 @@
       - service: input_boolean.turn_on
         data:
           entity_id: input_boolean.silent_mode
-      - service: climate.set_preset_mode
-        data:
-          entity_id: all
-          preset_mode: 'away'
+      - choose:
+          - conditions:
+            - condition: state
+              entity_id: 'input_boolean.climate_off'
+              state: 'off'
+            sequence:
+              - service: climate.set_preset_mode
+                data:
+                  entity_id: all
+                  preset_mode: 'away'
 
   - id: turn_off_away_mode
     alias: Turn off Away Mode
@@ -2598,10 +2627,16 @@
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.silent_mode
-      - service: climate.set_preset_mode
-        data:
-          entity_id: all
-          preset_mode: 'home'
+      - choose:
+          - conditions:
+            - condition: state
+              entity_id: 'input_boolean.climate_off'
+              state: 'off'
+            sequence:
+              - service: climate.set_preset_mode
+                data:
+                  entity_id: all
+                  preset_mode: 'home'
 
   - id: turn_on_climate_off_mode
     alias: Turn on Climate Off mode
@@ -2874,26 +2909,32 @@
         to: 'not_home'
         for:
           minutes: 1440
+      - platform: numeric_state
+        entity_id: proximity.home_fabian
+        above: 100
+        for:
+          minutes: 5
+      - platform: numeric_state
+        entity_id: proximity.home_nessie
+        above: 100
+        for:
+          minutes: 5
     condition:
       condition: and
       conditions:
         - condition: state
           entity_id: person.fabian
           state: not_home
-          for:
-            minutes: 1440
         - condition: state
           entity_id: person.nessie
-          state: home
-          for:
-            minutes: 1440
+          state: not_home
     action:
       - service: notify.telegram_fabian
         data:
-          message: "Away Mode wurde aktiviert, da keiner seit 24 Stunden daheim ist."
+          message: "Away Mode wurde aktiviert, da keiner daheim ist."
       - service: notify.telegram_nessie
         data:
-          message: "Away Mode wurde aktiviert, da keiner seit 24 Stunden daheim ist."
+          message: "Away Mode wurde aktiviert, da keiner daheim ist."
       - service: input_boolean.turn_on
         data:
           entity_id: input_boolean.away_mode
@@ -2931,6 +2972,7 @@
           - media_player.wohnzimmer_mini
           - media_player.kueche_mini
           - media_player.gastezimmer_mini
+          - media_player.kueche_mini
           - media_player.schlafzimmer
         data: 
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
@@ -3675,20 +3717,19 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.fritz_netmonitor
-        attribute: external_ip
+        entity_id: sensor.fritz_box_3490_external_ip
     condition:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 360 }}"
       - condition: not
         conditions:
           - condition: state
-            entity_id: 'sensor.fritz_netmonitor'
+            entity_id: 'sensor.fritz_box_3490_external_ip'
             state: 'None'
     action:
       - service: notify.telegram_fabian
         data:
-          message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_netmonitor.attributes.external_ip }}'
+          message: 'Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_box_3490_external_ip.state }}'
 
 #  - alias: Turn on Fritzbox Wifi if Miwifi is off
 #    initial_state: on
@@ -3704,8 +3745,8 @@
 #      - condition: not
 #        conditions:
 #          - condition: state
-#            entity_id: 'sensor.fritz_netmonitor'
-#            state: 'None'
+#            entity_id: 'binary_sensor.fritz_box_3490_connectivity'
+#            state: 'not_connected'
 #    action:
 #      - service: notify.telegram_fabian
 #        data:
@@ -3715,9 +3756,9 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.fritz_netmonitor
-        from: 'online'
-        to: 'offline'
+        entity_id: binary_sensor.fritz_box_3490_connectivity
+        from: 'Connected'
+        to: 'Not_Connected'
         for:
           seconds: 15
     condition:
@@ -3766,9 +3807,9 @@
     initial_state: off
     trigger:
       - platform: state
-        entity_id: sensor.fritz_netmonitor
-        from: 'offline'
-        to: 'online'
+        entity_id: binary_sensor.fritz_box_3490_connectivity
+        from: 'Not_Connected'
+        to: 'Connected'
     condition:
       condition: and
       conditions:
@@ -4164,14 +4205,34 @@
           entity_id:
             - media_player.schlafzimmer
             - media_player.wohnzimmer_mini
-      - service: media_player.media_pause
-        data: 
-          entity_id: media_player.wohnzimmer_tv
+      #- service: media_player.media_pause
+      #  data: 
+      #    entity_id: media_player.wohnzimmer_tv
+      - service: notify.wohnzimmer_tv
+        data_template:
+          message: >
+            Die Luftfeuchtigkeit ist zu hoch im Raum
+            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+            Gästezimmer, 
+            {% endif %}
+            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+            Wohnzimmer,
+            {% endif %}
+            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+            Schlafzimmer,
+            {% endif %}
+            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+            Bad,
+            {% endif %}
+            Bitte lüften.
       - choose:
           - conditions:
               - condition: state
                 entity_id: media_player.wohnzimmer_mini
                 state: 'off'
+              - condition: state
+                entity_id: media_player.wohnzimmer_tv
+                state: 'unavailable'
             sequence:
               - service: tts.google_say
                 entity_id: media_player.wohnzimmer_mini
@@ -5578,6 +5639,38 @@
         entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.kueche_mini
+        data_template:
+          message: >
+            Ding Dong, es klingelt.
+            {% if ("trigger.event.data.user_id", "649657901")%} 
+            Fabian 
+            {% elif ("trigger.event.data.user_id", "654536464")%} 
+            Nessie
+            {% elif ("trigger.event.data.user_id", "665446537")%} 
+            Kai
+            {% elif ("trigger.event.data.user_id", "159366362")%} 
+            Adri
+            {% else %}
+            Jemand
+            {% endif %}
+            ist da.
+      - service: notify.wohnzimmer_tv
+        data_template:
+          message: >
+            Ding Dong, es klingelt.
+            {% if ("trigger.event.data.user_id", "649657901")%} 
+            Fabian 
+            {% elif ("trigger.event.data.user_id", "654536464")%} 
+            Nessie
+            {% elif ("trigger.event.data.user_id", "665446537")%} 
+            Kai
+            {% elif ("trigger.event.data.user_id", "159366362")%} 
+            Adri
+            {% else %}
+            Jemand
+            {% endif %}
+            ist da.
+      - service: notify.keller_tv
         data_template:
           message: >
             Ding Dong, es klingelt.

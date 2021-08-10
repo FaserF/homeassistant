@@ -545,7 +545,6 @@ sensor:
         arg: /
       - type: memory_use_percent
       - type: processor_temperature
-  - platform: fritzbox_netmonitor
   - platform: deutsche_bahn
     from: !secret fabian_work
     to: !secret sbahn_home
@@ -691,6 +690,25 @@ switch:
               {% endif %}
         turn_off:
           service: xiaomi_miio_cooker.stop
+  - platform: template
+    switches:
+      fritzbox_restart:
+        icon_template: >-
+          {% if is_state('binary_sensor.fritz_box_3490_connectivity', 'Connected') %}
+            mdi:router-wireless
+          {% else %}
+            mdi:router
+          {% endif %}
+        friendly_name: "Fritzbox Neustart"
+        value_template: "{{ is_state('binary_sensor.fritz_box_3490_connectivity', 'do_not_fulfil_condition') }}"
+        turn_on:
+          service: fritz.reboot
+          data:
+            host: 192.168.178.1
+        turn_off:
+          service: switch.turn_off
+          target:
+            entity_id: switch.fritzbox_restart
   #- platform: sonoff_lan_mode_r3
   #name: Bett
   #device_id: 100016e326
