@@ -2601,6 +2601,10 @@
       - platform: state
         entity_id: input_boolean.away_mode
         to: 'on'
+    condition:
+      - condition: state
+        entity_id: 'input_boolean.away_mode'
+        state: 'off'
     action:
       - service: input_boolean.turn_on
         data:
@@ -2928,6 +2932,9 @@
         - condition: state
           entity_id: person.nessie
           state: not_home
+        - condition: state
+          entity_id: 'input_boolean.away_mode'
+          state: 'off'
     action:
       - service: notify.telegram_fabian
         data:
