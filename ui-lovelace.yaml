@@ -85,6 +85,7 @@ views:
       - entity: counter.pille
       - entity: sensor.coronavirus_lk_ebersberg
       - entity: sensor.coronavirus_lk_munchen
+      - entity: sensor.switch_lan_play_online
     cards:
       - entities:
           - entity: switch.deckenlampe
@@ -445,7 +446,7 @@ views:
           - entity: input_boolean.vk_strom
           - entity: device_tracker.schnuppes_pc
             secondary_info: last-changed
-          - entity: device_tracker.nessie_macbook_lan
+          - entity: device_tracker.vku_lb_20
             secondary_info: last-changed
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
@@ -670,8 +671,8 @@ views:
       - entities:
           - entity: switch.xiaomi_abd8_reboot
           - entity: light.xiaomi_abd8_led
-          - entity: sensor.xiaomi_abd8_memory_usage
           - entity: sensor.xiaomi_abd8_uptime
+          - entity: sensor.xiaomi_abd8_memory_usage
           - entity: sensor.xiaomi_abd8_devices
           - entity: sensor.xiaomi_abd8_devices_2_4ghz
           - entity: sensor.xiaomi_abd8_devices_5ghz
@@ -682,8 +683,8 @@ views:
       - entities:
           - entity: switch.xiaomi_89fb_7604_reboot
           - entity: light.xiaomi_89fb_7604_led
-          - entity: sensor.xiaomi_89fb_7604_memory_usage
           - entity: sensor.xiaomi_89fb_7604_uptime
+          - entity: sensor.xiaomi_89fb_7604_memory_usage
           - entity: sensor.xiaomi_89fb_7604_devices
           - entity: sensor.xiaomi_89fb_7604_devices_2_4ghz
           - entity: sensor.xiaomi_89fb_7604_devices_5ghz
@@ -692,10 +693,17 @@ views:
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: sensor.fritz_box_3490_uptime
+          - entity: switch.fritzbox_restart
+          - entity: sensor.fritz_box_3490_device_uptime
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
-        title: FritzBox
+          - entity: sensor.fritz_box_3490_connection_uptime
+          - entity: sensor.fritz_box_3490_kb_s_received
+          - entity: sensor.fritz_box_3490_kb_s_sent
+          - entity: binary_sensor.fritz_box_3490_connectivity
+          - entity: sensor.fritz_box_3490_max_kbit_s_received
+          - entity: sensor.fritz_box_3490_max_kbit_s_sent
+        title: FritzBox 3490 Verwaltung
         type: entities
         show_header_toggle: false
         state_color: false
@@ -707,7 +715,7 @@ views:
           - entity: device_tracker.galaxy_s10_lite
           - entity: device_tracker.galaxy_s9
           - entity: device_tracker.redminote8t_redminot
-          - entity: device_tracker.isi_phone
+          - entity: device_tracker.pocophonef1_pocophon
           - entity: device_tracker.redminote9pro_redmin
         title: Freunde & Bekannte
   - title: RaspberryPi

@@ -568,6 +568,9 @@
         - condition: state
           entity_id: input_boolean.silent_mode
           state: 'on'
+        - condition: state
+          entity_id: input_boolean.away_mode
+          state: 'off'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -636,7 +639,7 @@
               entity_id: device_tracker.schnuppes_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nessie_macbook_lan
+              entity_id: device_tracker.vku_lb_20
               state: 'home'
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_Nessie_to_ventilate.attributes.last_triggered) | int > 1800 }}"
@@ -716,6 +719,8 @@
               - condition: numeric_state
                 entity_id: sensor.dwd_illuminance
                 below: 2000
+              - condition: time
+                after: '17:00:00'
               - condition: or
                 conditions:
                   - condition: state
@@ -841,7 +846,7 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: 'device_tracker.nessie_macbook_lan'
+                        entity_id: 'device_tracker.vku_lb_20'
                         state: 'home'
                       - condition: state
                         entity_id: 'switch.nessie_pc'
@@ -872,6 +877,8 @@
               - condition: numeric_state
                 entity_id: sensor.dwd_illuminance
                 below: 2000
+              - condition: time
+                after: '15:00:00'
               - condition: or
                 conditions:
                   - condition: state
@@ -880,7 +887,7 @@
                   - condition: and
                     conditions:
                       - condition: state
-                        entity_id: 'device_tracker.nessie_macbook_lan'
+                        entity_id: 'device_tracker.vku_lb_20'
                         state: 'home'
                       - condition: state
                         entity_id: 'switch.nessie_pc'
@@ -902,7 +909,7 @@
         for:
           seconds: 30
       - platform: state
-        entity_id: device_tracker.nessie_macbook_lan
+        entity_id: device_tracker.vku_lb_20
         from: 'home'
         to: 'not_home'
         for:
@@ -924,7 +931,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook_lan
+                    entity_id: device_tracker.vku_lb_20
                     state: not_home
                     for:
                       seconds: 20
@@ -953,7 +960,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook_lan
+                    entity_id: device_tracker.vku_lb_20
                     state: not_home
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -972,7 +979,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.nessie_macbook_lan
+        entity_id: device_tracker.vku_lb_20
         from: 'home'
         to: 'not_home'
         for:
@@ -1039,6 +1046,8 @@
               - condition: numeric_state
                 entity_id: sensor.dwd_illuminance
                 below: 2000
+              - condition: time
+                after: '15:00:00'
             sequence:
               - service: light.turn_on
                 data:
@@ -1231,7 +1240,7 @@
                         entity_id: device_tracker.schnuppes_pc
                         state: 'not_home'
                       - condition: state
-                        entity_id: device_tracker.nessie_macbook_lan
+                        entity_id: device_tracker.vku_lb_20
                         state: 'not_home'
                       - condition: state
                         entity_id: device_tracker.tv
@@ -1270,7 +1279,7 @@
                     entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook_lan
+                    entity_id: device_tracker.vku_lb_20
                     state: 'home'
               - condition: not
                 conditions:
@@ -2114,19 +2123,23 @@
       entity_id: sensor.dwd_illuminance
       below: 2000
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: state
-          entity_id: 'device_tracker.schnuppes_pc'
-          state: 'home'
-        - condition: and
-          conditions:
+        - condition: time
+          after: '15:00:00'
+        - condition: or
+          conditions: 
             - condition: state
-              entity_id: 'device_tracker.nessie_macbook_lan'
+              entity_id: 'device_tracker.schnuppes_pc'
               state: 'home'
-            - condition: state
-              entity_id: 'switch.nessie_pc'
-              state: 'on'
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: 'device_tracker.vku_lb_20'
+                  state: 'home'
+                - condition: state
+                  entity_id: 'switch.nessie_pc'
+                  state: 'on'
     action:
       - service: light.turn_on
         data:
@@ -2224,13 +2237,13 @@
                 - condition: template
                   value_template: '{{ now().month <= 10 and now().month >= 2 }}'
             - condition: template
-              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= '12' }}"
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= 12 }}"
             - condition: and
               conditions:
                 - condition: template
                   value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] != 'sunny' }}"
                 - condition: template
-                  value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= '14' }}"
+                  value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= 14 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -2601,10 +2614,6 @@
       - platform: state
         entity_id: input_boolean.away_mode
         to: 'on'
-    condition:
-      - condition: state
-        entity_id: 'input_boolean.away_mode'
-        state: 'off'
     action:
       - service: input_boolean.turn_on
         data:
@@ -2666,6 +2675,30 @@
         data:
           entity_id: all
           hvac_mode: auto
+
+  - id: turn_on_guest_mode
+    alias: Turn on Guest Mode mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.guest_mode
+        to: 'on'
+    action:
+      - service: switch.turn_off
+        data:
+          entity_id: switch.adaptive_lighting_guest_room
+
+  - id: turn_off_climate_off_mode
+    alias: Turn off Climate Off mode
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.guest_mode
+        to: 'off'
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.adaptive_lighting_guest_room
 
   - id: turn_on_fs_strom
     alias: Turn on FS Strom
@@ -2864,7 +2897,7 @@
                     entity_id: device_tracker.schnuppes_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nessie_macbook_lan
+                    entity_id: device_tracker.vku_lb_20
                     state: 'not_home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -3147,6 +3180,9 @@
               - condition: state
                 entity_id: sensor.dwd_weather_warnings_current_warning_level
                 state: '2'
+              - condition: numeric_state
+                entity_id: proximity.home_fabian
+                below: 20
             sequence:
               - service: telegram_bot.send_message
                 data_template:
@@ -3160,6 +3196,15 @@
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '2'
+              - condition: numeric_state
+                entity_id: proximity.home_nessie
+                below: 20
+            sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_nessie
@@ -3171,7 +3216,13 @@
 
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
-                    Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.      
+                    Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '2'
+            sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_jutta
@@ -3189,6 +3240,9 @@
               - condition: state
                 entity_id: sensor.dwd_weather_warnings_current_warning_level
                 state: '3'
+              - condition: numeric_state
+                entity_id: proximity.home_fabian
+                below: 20
             sequence:
               - service: telegram_bot.send_message
                 data_template:
@@ -3201,6 +3255,15 @@
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '3'
+              - condition: numeric_state
+                entity_id: proximity.home_nessie
+                below: 20
+            sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_nessie
@@ -3212,6 +3275,12 @@
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '3'
+            sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_jutta
@@ -3228,6 +3297,9 @@
               - condition: state
                 entity_id: sensor.dwd_weather_warnings_current_warning_level
                 state: '4'
+              - condition: numeric_state
+                entity_id: proximity.home_fabian
+                below: 20
             sequence:
               - service: telegram_bot.send_message
                 data_template:
@@ -3240,6 +3312,15 @@
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '4'
+              - condition: numeric_state
+                entity_id: proximity.home_nessie
+                below: 20
+            sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_nessie
@@ -3251,6 +3332,12 @@
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
                     
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.dwd_weather_warnings_current_warning_level
+                state: '4'
+            sequence:
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_jutta
@@ -3686,15 +3773,19 @@
             {% if is_state('binary_sensor.bad_battery_state', 'on') %}
             Bad
             {% endif %}
-            ist (bald) leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
+            ist
+            {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') or is_state('binary_sensor.bad_battery_state', 'on') %}
+            bald
+            {% endif %}
+            leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
       - service: notify.telegram_nessie
         data_template:
           message: > 
             Die Batterie im Thermostat
-            {% if is_state('binary_sensor.gastezimmer_battery_state', 'on') %}
+            {% if is_state('state.climate.wohnzimmer', 'unavailable') %}
             Gästezimmer 
             {% endif %}
-            {% if is_state('binary_sensor.wohnzimmer_battery_state', 'on') %}
+            {% if is_state('state.climate.gastezimmer', 'unavailable') %}
             Wohnzimmer
             {% endif %}
             {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
@@ -3703,7 +3794,11 @@
             {% if is_state('binary_sensor.bad_battery_state', 'on') %}
             Bad
             {% endif %}
-            ist (bald) leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
+            ist
+            {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') or is_state('binary_sensor.bad_battery_state', 'on') %}
+            bald
+            {% endif %}
+            leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
 
   - alias: Cast HA to TV if idleing
     trigger: 
@@ -3732,7 +3827,7 @@
         conditions:
           - condition: state
             entity_id: 'sensor.fritz_box_3490_external_ip'
-            state: 'None'
+            state: 'unavailable'
     action:
       - service: notify.telegram_fabian
         data:
@@ -4215,23 +4310,31 @@
       #- service: media_player.media_pause
       #  data: 
       #    entity_id: media_player.wohnzimmer_tv
-      - service: notify.wohnzimmer_tv
-        data_template:
-          message: >
-            Die Luftfeuchtigkeit ist zu hoch im Raum
-            {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-            Gästezimmer, 
-            {% endif %}
-            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
-            Wohnzimmer,
-            {% endif %}
-            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
-            Schlafzimmer,
-            {% endif %}
-            {% if (states.climate.bad.attributes.current_humidity) > 60 %}
-            Bad,
-            {% endif %}
-            Bitte lüften.
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv
+                    state: 'unavailable'
+            sequence:
+              - service: notify.wohnzimmer_tv
+                data_template:
+                  message: >
+                    Die Luftfeuchtigkeit ist zu hoch im Raum
+                    {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+                    Gästezimmer, 
+                    {% endif %}
+                    {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+                    Wohnzimmer,
+                    {% endif %}
+                    {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+                    Schlafzimmer,
+                    {% endif %}
+                    {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+                    Bad,
+                    {% endif %}
+                    Bitte lüften.
       - choose:
           - conditions:
               - condition: state
@@ -4477,7 +4580,7 @@
         entity_id: 
           - climate.gastezimmer
           - climate.wohnzimmer
-          - climate.schlafzimme
+          - climate.schlafzimmer
           - climate.bad
         attribute: current_humidity
         above: 55
@@ -4859,6 +4962,10 @@
                 data:
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
+              - service: notify.keller_tv
+                data_template:
+                  message: >
+                    Bitte Kohle wenden.
       - delay: '00:08:00'
       - service: switch.turn_off
         data:
@@ -4912,14 +5019,26 @@
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_oven_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.keller_tv
-          command: "pm clear com.tcl.videoplayer"
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: unavailable
+            sequence:
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "pm clear com.tcl.videoplayer"
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
+              - service: notify.keller_tv
+                data_template:
+                  message: >
+                    Die Kohle sollte fertig sein!
 
   - alias: Detect if oven is currently active
     initial_state: on
@@ -5185,6 +5304,11 @@
         below: 469
         for:
           seconds: 40
+      - platform: numeric_state
+        entity_id: sensor.keller_steckdose_energy_power
+        above: 1800
+        for:
+          seconds: 5
     condition:
       condition: and
       conditions:
@@ -5251,9 +5375,9 @@
     trigger:
       - platform: numeric_state
         entity_id: sensor.keller_steckdose_energy_power
-        below: 5
+        below: 6
         for:
-          minutes: 3
+          minutes: 1
     condition:
       condition: and
       conditions:
@@ -5661,38 +5785,54 @@
             Jemand
             {% endif %}
             ist da.
-      - service: notify.wohnzimmer_tv
-        data_template:
-          message: >
-            Ding Dong, es klingelt.
-            {% if ("trigger.event.data.user_id", "649657901")%} 
-            Fabian 
-            {% elif ("trigger.event.data.user_id", "654536464")%} 
-            Nessie
-            {% elif ("trigger.event.data.user_id", "665446537")%} 
-            Kai
-            {% elif ("trigger.event.data.user_id", "159366362")%} 
-            Adri
-            {% else %}
-            Jemand
-            {% endif %}
-            ist da.
-      - service: notify.keller_tv
-        data_template:
-          message: >
-            Ding Dong, es klingelt.
-            {% if ("trigger.event.data.user_id", "649657901")%} 
-            Fabian 
-            {% elif ("trigger.event.data.user_id", "654536464")%} 
-            Nessie
-            {% elif ("trigger.event.data.user_id", "665446537")%} 
-            Kai
-            {% elif ("trigger.event.data.user_id", "159366362")%} 
-            Adri
-            {% else %}
-            Jemand
-            {% endif %}
-            ist da.
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_tv
+                    state: 'unavailable'
+            sequence:
+              - service: notify.wohnzimmer_tv
+                data_template:
+                  message: >
+                    Ding Dong, es klingelt.
+                    {% if ("trigger.event.data.user_id", "649657901")%} 
+                    Fabian 
+                    {% elif ("trigger.event.data.user_id", "654536464")%} 
+                    Nessie
+                    {% elif ("trigger.event.data.user_id", "665446537")%} 
+                    Kai
+                    {% elif ("trigger.event.data.user_id", "159366362")%} 
+                    Adri
+                    {% else %}
+                    Jemand
+                    {% endif %}
+                    ist da.
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: 'unavailable'
+            sequence:
+              - service: notify.keller_tv
+                data_template:
+                  message: >
+                    Ding Dong, es klingelt.
+                    {% if ("trigger.event.data.user_id", "649657901")%} 
+                    Fabian 
+                    {% elif ("trigger.event.data.user_id", "654536464")%} 
+                    Nessie
+                    {% elif ("trigger.event.data.user_id", "665446537")%} 
+                    Kai
+                    {% elif ("trigger.event.data.user_id", "159366362")%} 
+                    Adri
+                    {% else %}
+                    Jemand
+                    {% endif %}
+                    ist da.
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
@@ -6432,7 +6572,7 @@
         entity_id: device_tracker.nsta0516_lan
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessie_macbook_lan
+        entity_id: device_tracker.vku_lb_20
         to: 'home'
     condition:
       condition: and
@@ -6610,7 +6750,7 @@
         attribute: source_type
         to: null
         for:
-          minutes: 10
+          minutes: 15
     action:
       - service: notify.telegram_fabian
         data:
@@ -6773,7 +6913,7 @@
       - service: notify.telegram_fabian
         data_template:
           message: >
-            {% if (not is_state("device_tracker.google_maps_104418453164779945782", "Kai-Adri")) -%}Kai{% endif %}{% if (not is_state("device_tracker.google_maps_103127589611220223167", "Kai-Adri")) -%} Adri{% endif %} sind auf dem Weg nach Zorneding und noch {{ states.proximity.home_ka.state }} km entfernt von zu Hause.
+            {% if (not is_state("device_tracker.google_maps_104418453164779945782", "Kai-Adri")) -%}Kai {% endif %}{% if (not is_state("device_tracker.google_maps_103127589611220223167", "Kai-Adri")) -%} Adri{% endif %} sind auf dem Weg nach Zorneding und noch {{ states.proximity.home_ka.state }} km entfernt von zu Hause.
 
   - alias: 'Notify Nessie Fabian on way home'
     initial_state: on
