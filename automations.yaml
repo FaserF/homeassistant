@@ -2688,18 +2688,6 @@
         data:
           entity_id: switch.adaptive_lighting_guest_room
 
-  - id: turn_off_climate_off_mode
-    alias: Turn off Climate Off mode
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.guest_mode
-        to: 'off'
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.adaptive_lighting_guest_room
-
   - id: turn_on_fs_strom
     alias: Turn on FS Strom
     initial_state: on
