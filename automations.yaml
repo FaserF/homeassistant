@@ -491,14 +491,16 @@
             {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
                 |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|map(attribute='entity_id')|list }}
 
-  - id: activate_guest_mode_if_isi_is_here
-    alias: 'Activate guest mode if isi is here'
+  - id: activate_guest_mode_if_guest_is_here
+    alias: 'Activate guest mode if guest is here'
     initial_state: on
     trigger:
       - platform: state
         entity_id: device_tracker.pocophonef1_pocophon
         from: 'not_home'
         to: 'home'
+      - platform: time
+        at: '23:00:00'
     condition:
       condition: and
       conditions:
@@ -507,6 +509,23 @@
           state: 'off'
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.activate_guest_mode_if_isi_is_here.attributes.last_triggered) | int > 86400 }}"
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: device_tracker.pocophonef1_pocophon
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.google_maps_104418453164779945782
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.google_maps_103127589611220223167
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.redminote8t_redminot
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.redminote8t_redmi
+              state: 'home'
     action:
       - service: input_boolean.turn_on
         data:
@@ -514,11 +533,11 @@
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Gast Modus wurde aktiviert, da Isi zu Besuch ist. Automationen im Gästezimmer sind dadurch eingeschränkt.'
+          message: 'Gast Modus wurde aktiviert, da jemand vermutlich übernachtet. Automationen im Gästezimmer sind dadurch eingeschränkt.'
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie
-          message: 'Gast Modus wurde aktiviert, da Isi zu Besuch ist. Automationen im Gästezimmer sind dadurch eingeschränkt.'
+          message: 'Gast Modus wurde aktiviert, da jemand vermutlich übernachtet. Automationen im Gästezimmer sind dadurch eingeschränkt.'
 
   - id: deactivate_guest_mode_if_no_guest_is_here
     alias: 'Deactivate guest mode if no guest is here'
@@ -552,6 +571,24 @@
         data_template:
           target: !secret telegram_chat_nessie
           message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
+
+  - id: reactivate_adguard_protection
+    alias: 'Reactivate Adguard Protection'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: switch.adguard_protection
+        to: 'off'
+        for:
+          hours: 12
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.adguard_protection
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Adguard wurde wieder eingeschaltet.'
 
   - id: deactivate_silent_mode_after_12_hours
     alias: 'Deactivate silent mode after 12 hours'
@@ -5372,6 +5409,8 @@
         - condition: state
           entity_id: input_select.washing_machine_status
           state: Running
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 900 }}"
     action:
       - service: input_select.select_option
         data:
