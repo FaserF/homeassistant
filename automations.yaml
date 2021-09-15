@@ -6921,6 +6921,9 @@
       - condition: numeric_state
         entity_id: proximity.home_ka
         below: 7
+      - condition: numeric_state
+        entity_id: proximity.home_ka
+        above: 1
       - condition: state
         entity_id: person.fabian
         state: home
