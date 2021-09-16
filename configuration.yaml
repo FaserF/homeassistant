@@ -132,6 +132,7 @@ recorder:
       - counter.pille
       - sensor.xiaomi_miio_cooker_favorite
       - sensor.xiaomi_miio_cooker_duration
+      - sensor.staubsaugroboter_status
 
 # Checks for available updates
 updater:
@@ -370,25 +371,6 @@ shell_command:
   hibernatenpc: "curl http://192.168.178.16:5001/hibernate"
   #overtime_input: !secret overtime_input
 
-#rest_command:
-#  assistant_broadcast:
-#    url: http://192.168.178.2:3000/assistant
-#    method: POST
-#    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"username", "broadcast":true}'
-
-#  assistant_converse:
-#    url: http://192.168.178.2:3000/assistant
-#    method: POST
-#    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"username", "converse":true}'
-
-#  assistant_relay:
-#    url: http://192.168.178.2:3000/assistant
-#    method: POST
-#    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"username"}'
-
 #coinbase:
 #  api_key: !secret coinbase_key
 #  api_secret: !secret coinbase_secret
@@ -411,12 +393,34 @@ sensor:
   - platform: rest
     name: Switch LAN-Play Online
     resource: http://192.168.31.2:11451/info
+    scan_interval: 600
     method: GET
     unit_of_measurement: people
     json_attributes:
       - version
       - idle
     value_template: "{{value_json.online}}"
+  - platform: rest
+    name: Staubsaugroboter Status
+    resource: http://192.168.31.2:3000/api/assistant
+    scan_interval: 300
+    method: POST
+    payload: '{"command":"Was macht der Staubsaugroboter?", "user":"fabian"}'
+    headers:
+      Content-Type: application/json
+    json_attributes:
+      - text
+      - success
+    value_template: >
+      {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') %}
+        docked
+      {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter putzt.') %}
+        cleaning
+      {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
+        error
+      {% else %}
+        idle
+      {% endif %}
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
   - platform: mqtt
@@ -709,11 +713,35 @@ rest_command:
       api-key: !secret system_bridge_nessie
     content_type: "application/json; charset=utf-8"
     payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
+  assistant_relay:
+    method: POST
+    url: http://192.168.31.2:3000/api/assistant
+    content_type: "application/json"
+    payload: '{"command":"{{ command }}", "user":"username"}'
+#  assistant_broadcast:
+#    url: http://192.168.31.2:3000/api/assistant
+#    method: POST
+#    content_type: "application/json"
+#    payload: '{"command":"{{ command }}", "user":"username", "broadcast":true}'
+
+#  assistant_converse:
+#    url: http://192.168.31.2:3000/api/assistant
+#    method: POST
+#    content_type: "application/json"
+#    payload: '{"command":"{{ command }}", "user":"username", "converse":true}'
 
 switch:
   - platform: rpi_gpio
     ports:
       18: RPI Cooling Fan
+  #- platform: rest
+  #  resource: http://192.168.31.2:3000/api/assistant
+  #  body_on: '{"command":"Putze die Wohnung", "user":"fabian"}'
+  #  body_off: '{"command":"Stoppe den Staubsaugroboter", "user":"fabian"}'
+  #is_on_template: '{"command":"Was macht der Staubsaugroboter", "user":"fabian"}'
+  #  name: "Staubsaugroboter"
+  #  headers:
+  #    Content-Type: application/json
   #- platform: rest
   #  name: Fabian PC Shutdown
   #  method: POST
@@ -794,6 +822,49 @@ switch:
   #   device_id: 1000134649
   #   api_key: b7bbed8a-33b2-4260-ae2e-89a00fbd85c2
   #   icon: mdi:power-plug
+
+vacuum:
+  - platform: template
+    vacuums:
+      living_room_vacuum:
+        friendly_name: "Staubsaugroboter"
+        #value_template: "{{ states('sensor.staubsaugroboter_status') }}"
+        value_template: >
+          {% if not (is_state("sensor.staubsaugroboter_status", "unavailable")) -%}
+            {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') %}
+              docked
+            {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter putzt.') %}
+              cleaning
+            {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
+              error
+            {% else %}
+              idle
+            {% endif %}
+          {% else %}
+            error
+          {% endif %}
+        #battery_level_template: "{{ states('sensor.vacuum_battery_level')|int }}"
+        #fan_speed_template: "{{ states('sensor.vacuum_fan_speed') }}"
+        start:
+          - service: rest_command.assistant_relay
+            data:
+              command: "Putze die Wohnung"
+              user: "fabian"
+        pause:
+          - service: rest_command.assistant_relay
+            data:
+              command: "Pausiere den Staubsaugroboter"
+              user: "fabian"
+        stop:
+          - service: rest_command.assistant_relay
+            data:
+              command: "Stoppe den Staubsaugroboter"
+              user: "fabian"
+        return_to_base:
+          - service: rest_command.assistant_relay
+            data:
+              command: "Docke den Staubsaugroboter"
+              user: "fabian"
 
 google_assistant:
   project_id: !secret google_assistant_id

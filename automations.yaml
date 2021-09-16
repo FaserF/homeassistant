@@ -2713,6 +2713,36 @@
           entity_id: all
           hvac_mode: auto
 
+#  - alias: Turn on vacuum cleaner
+#    initial_state: on
+#    trigger: 
+#      - platform: state
+#        entity_id: input_boolean.vacuum_cleaner
+#        to: 'on'
+#    action:
+#      - service: rest_command.assistant_relay
+#        data:
+#          command: "Putze die Wohnung"
+#          user: "fabian"
+
+  - alias: Turn off Kuhlschrank Keller
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_boolean.vacuum_cleaner
+        to: 'off'
+    action:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.vacuum_cleaner
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.strom_keller
+      - service: rest_command.assistant_relay
+        data:
+          command: "Stoppe den Staubsaugroboter"
+          user: "fabian"
+
   - id: turn_on_guest_mode
     alias: Turn on Guest Mode mode
     initial_state: on
@@ -5800,16 +5830,16 @@
         data_template:
           message: >
             Ding Dong, es klingelt.
-            {% if ("trigger.event.data.user_id", "649657901")%} 
-            Fabian 
-            {% elif ("trigger.event.data.user_id", "654536464")%} 
-            Nessie
-            {% elif ("trigger.event.data.user_id", "665446537")%} 
-            Kai
-            {% elif ("trigger.event.data.user_id", "159366362")%} 
-            Adri
+            {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+              Fabian 
+            {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+              Nessie
+            {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+              Kai
+            {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+              Adri
             {% else %}
-            Jemand
+              Jemand
             {% endif %}
             ist da.
       - choose:
@@ -5824,16 +5854,16 @@
                 data_template:
                   message: >
                     Ding Dong, es klingelt.
-                    {% if ("trigger.event.data.user_id", "649657901")%} 
-                    Fabian 
-                    {% elif ("trigger.event.data.user_id", "654536464")%} 
-                    Nessie
-                    {% elif ("trigger.event.data.user_id", "665446537")%} 
-                    Kai
-                    {% elif ("trigger.event.data.user_id", "159366362")%} 
-                    Adri
+                    {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+                      Fabian 
+                    {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+                      Nessie
+                    {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+                      Kai
+                    {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+                      Adri
                     {% else %}
-                    Jemand
+                      Jemand
                     {% endif %}
                     ist da.
       - choose:
@@ -5848,16 +5878,16 @@
                 data_template:
                   message: >
                     Ding Dong, es klingelt.
-                    {% if ("trigger.event.data.user_id", "649657901")%} 
-                    Fabian 
-                    {% elif ("trigger.event.data.user_id", "654536464")%} 
-                    Nessie
-                    {% elif ("trigger.event.data.user_id", "665446537")%} 
-                    Kai
-                    {% elif ("trigger.event.data.user_id", "159366362")%} 
-                    Adri
+                    {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+                      Fabian 
+                    {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+                      Nessie
+                    {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+                      Kai
+                    {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+                      Adri
                     {% else %}
-                    Jemand
+                      Jemand
                     {% endif %}
                     ist da.
       - service: telegram_bot.send_message

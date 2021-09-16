@@ -16,3 +16,6 @@ fs_strom:
 vk_strom:
   name: Nessie Strom
   icon: mdi:desktop-tower-monitor
+#vacuum_cleaner:
+#  name: Staubsaugroboter
+#  icon: mdi:robot-vacuum
