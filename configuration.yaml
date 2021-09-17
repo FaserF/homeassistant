@@ -412,9 +412,9 @@ sensor:
       - text
       - success
     value_template: >
-      {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') %}
+      {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James ist angedockt.') %}
         docked
-      {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter putzt.') %}
+      {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter putzt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James putzt.') %}
         cleaning
       {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
         error
@@ -717,18 +717,18 @@ rest_command:
     method: POST
     url: http://192.168.31.2:3000/api/assistant
     content_type: "application/json"
-    payload: '{"command":"{{ command }}", "user":"username"}'
+    payload: '{"command":"{{ command }}", "user":"{{ user }}"}'
 #  assistant_broadcast:
 #    url: http://192.168.31.2:3000/api/assistant
 #    method: POST
 #    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"username", "broadcast":true}'
+#    payload: '{"command":"{{ command }}", "user":"{{ user }}", "broadcast":true}'
 
 #  assistant_converse:
 #    url: http://192.168.31.2:3000/api/assistant
 #    method: POST
 #    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"username", "converse":true}'
+#    payload: '{"command":"{{ command }}", "user":"{{ user }}", "converse":true}'
 
 switch:
   - platform: rpi_gpio
@@ -827,7 +827,7 @@ vacuum:
   - platform: template
     vacuums:
       living_room_vacuum:
-        friendly_name: "Staubsaugroboter"
+        friendly_name: "James (Staubsaugroboter)"
         #value_template: "{{ states('sensor.staubsaugroboter_status') }}"
         value_template: >
           {% if not (is_state("sensor.staubsaugroboter_status", "unavailable")) -%}
@@ -848,7 +848,7 @@ vacuum:
         start:
           - service: rest_command.assistant_relay
             data:
-              command: "Putze die Wohnung"
+              command: "Starte den Staubsaugroboter"
               user: "fabian"
         pause:
           - service: rest_command.assistant_relay
