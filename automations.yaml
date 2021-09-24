@@ -3802,6 +3802,8 @@
           - climate.wohnzimmer
           - climate.gastezimmer
         to: 'unavailable'
+        for:
+          minutes: 20
     condition:
       condition: not
       conditions:
@@ -3816,10 +3818,10 @@
         data_template:
           message: > 
             Die Batterie im Thermostat
-            {% if is_state('state.climate.wohnzimmer', 'unavailable') %}
+            {% if is_state('climate.wohnzimmer', 'unavailable') %}
             Gästezimmer 
             {% endif %}
-            {% if is_state('state.climate.gastezimmer', 'unavailable') %}
+            {% if is_state('climate.gastezimmer', 'unavailable') %}
             Wohnzimmer
             {% endif %}
             {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
@@ -3831,16 +3833,18 @@
             ist
             {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') or is_state('binary_sensor.bad_battery_state', 'on') %}
             bald
+            {% else %}
+            KOMPLETT
             {% endif %}
             leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
       - service: notify.telegram_nessie
         data_template:
           message: > 
             Die Batterie im Thermostat
-            {% if is_state('state.climate.wohnzimmer', 'unavailable') %}
+            {% if is_state('climate.wohnzimmer', 'unavailable') %}
             Gästezimmer 
             {% endif %}
-            {% if is_state('state.climate.gastezimmer', 'unavailable') %}
+            {% if is_state('climate.gastezimmer', 'unavailable') %}
             Wohnzimmer
             {% endif %}
             {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
@@ -3852,6 +3856,8 @@
             ist
             {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') or is_state('binary_sensor.bad_battery_state', 'on') %}
             bald
+            {% else %}
+            KOMPLETT
             {% endif %}
             leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
 

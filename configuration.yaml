@@ -132,7 +132,7 @@ recorder:
       - counter.pille
       - sensor.xiaomi_miio_cooker_favorite
       - sensor.xiaomi_miio_cooker_duration
-      - sensor.staubsaugroboter_status
+      #- sensor.staubsaugroboter_status
 
 # Checks for available updates
 updater:
@@ -367,8 +367,8 @@ shell_command:
   foodyes: !secret foodyes
   jek_telegram: !secret telegram_jek_open_command
   restartha: "ha host reboot"
-  hibernatefpc: "curl http://192.168.178.15:5001/hibernate"
-  hibernatenpc: "curl http://192.168.178.16:5001/hibernate"
+  hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
+  hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
   #overtime_input: !secret overtime_input
 
 #coinbase:
@@ -404,6 +404,7 @@ sensor:
     name: Staubsaugroboter Status
     resource: http://192.168.31.2:3000/api/assistant
     scan_interval: 300
+    timeout: 40
     method: POST
     payload: '{"command":"Was macht der Staubsaugroboter?", "user":"fabian"}'
     headers:
@@ -414,7 +415,7 @@ sensor:
     value_template: >
       {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James ist angedockt.') %}
         docked
-      {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter putzt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James putzt.') %}
+      {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.') %}
         cleaning
       {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
         error
@@ -665,7 +666,7 @@ light:
         name: LEDs Tisch
         mode: rgb
   - platform: prismatik
-    host: 192.168.178.15
+    host: 192.168.178.16
     name: "Prismatik"
     profile_name: homeassistant
 
@@ -701,14 +702,14 @@ xiaomi_miio_cooker:
 rest_command:
   fabian_pc_system_bridge:
     method: POST
-    url: http://192.168.178.15:9170/command
+    url: http://192.168.178.16:9170/command
     headers:
       api-key: !secret system_bridge_fabian
     content_type: "application/json; charset=utf-8"
     payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
   nessie_pc_system_bridge:
     method: POST
-    url: http://192.168.178.16:9170/command
+    url: http://192.168.178.15:9170/command
     headers:
       api-key: !secret system_bridge_nessie
     content_type: "application/json; charset=utf-8"
@@ -745,7 +746,7 @@ switch:
   #- platform: rest
   #  name: Fabian PC Shutdown
   #  method: POST
-  #  resource: http://192.168.178.15:9170/command
+  #  resource: http://192.168.178.16:9170/command
   #  headers:
   #    Content-Type: 'application/json; charset=utf-8'
   #    api-key: !secret system_bridge_fabian
@@ -753,7 +754,7 @@ switch:
   #- platform: rest
   #  name: Nessie PC Shutdown
   #  method: POST
-  #  resource: http://192.168.178.16:9170/command
+  #  resource: http://192.168.178.15:9170/command
   #  headers:
   #    Content-Type: 'application/json; charset=utf-8'
   #    api-key: !secret system_bridge_nessie
@@ -831,9 +832,9 @@ vacuum:
         #value_template: "{{ states('sensor.staubsaugroboter_status') }}"
         value_template: >
           {% if not (is_state("sensor.staubsaugroboter_status", "unavailable")) -%}
-            {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') %}
+            {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James ist angedockt.') %}
               docked
-            {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter putzt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter putzt.') %}
+            {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.') %}
               cleaning
             {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
               error
