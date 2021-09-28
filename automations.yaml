@@ -4900,7 +4900,7 @@
           seconds: 35
       - platform: state
         entity_id: switch.kohleanzunder
-        state: 'on'
+        to: 'on'
         for:
           minutes: 2
     condition:
