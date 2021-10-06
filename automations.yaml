@@ -732,13 +732,10 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_pc
-        from: 'not_home'
-        to: 'home'
-      - platform: state
-        entity_id: device_tracker.nsta0516_lan
-        from: 'not_home'
-        to: 'home'
+        entity_id: switch.fabian_strom
+        to: 'on'
+        for:
+          seconds: 5
     condition:
       condition: and
       conditions:
@@ -867,27 +864,14 @@
     alias: 'Turn on light and climate if npc started'
     initial_state: on
     trigger:
-      platform: state
-      entity_id: switch.nessie_pc
-      to: 'on'
-      for:
-        seconds: 40
+      - platform: state
+        entity_id: switch.nessie_pc
+        to: 'on'
+        for:
+          seconds: 5
     action:
       - choose:
           - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: 'device_tracker.schnuppes_pc'
-                    state: 'home'
-                  - condition: and
-                    conditions:
-                      - condition: state
-                        entity_id: 'device_tracker.vku_lb_20'
-                        state: 'home'
-                      - condition: state
-                        entity_id: 'switch.nessie_pc'
-                        state: 'on'
               - condition: numeric_state
                 entity_id: 'weather.dwd_weather_ebersberg_1h'
                 attribute: temperature
@@ -916,19 +900,6 @@
                 below: 2000
               - condition: time
                 after: '15:00:00'
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: 'device_tracker.schnuppes_pc'
-                    state: 'home'
-                  - condition: and
-                    conditions:
-                      - condition: state
-                        entity_id: 'device_tracker.vku_lb_20'
-                        state: 'home'
-                      - condition: state
-                        entity_id: 'switch.nessie_pc'
-                        state: 'on'
             sequence:
               - service: light.turn_on
                 data:
@@ -1144,14 +1115,29 @@
           entity_id: sensor.bad_heating
           above: 90
     action:
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
-          - media_player.gastezimmer_mini
-          - media_player.schlafzimmer
-        data: 
-          message: Es wurde vergessen das Fenster im Bad zu schließen.
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
+                  - media_player.gastezimmer_mini
+                  - media_player.schlafzimmer
+                data: 
+                  message: Es wurde vergessen das Fenster im Bad zu schließen.
+        default:
+          - service: telegram_bot.send_message
+            data: 
+              message: Es wurde vergessen das Fenster im Bad zu schließen.
 
   - id: remind_for_open_window_sleeping_room
     alias: 'Remind for open window sleeping room'
@@ -1173,13 +1159,29 @@
           entity_id: sensor.schlafzimmer_heating
           above: 90
     action:
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
-          - media_player.gastezimmer_mini
-        data: 
-          message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
+                  - media_player.gastezimmer_mini
+                  - media_player.schlafzimmer
+                data: 
+                  message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
+        default:
+          - service: telegram_bot.send_message
+            data: 
+              message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
 
   - id: remind_for_open_window_living_room
     alias: 'Remind for open window living room'
@@ -1201,13 +1203,29 @@
           entity_id: sensor.wohnzimmer_heating
           above: 90
     action:
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
-          - media_player.gastezimmer_mini
-        data: 
-          message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
+                  - media_player.gastezimmer_mini
+                  - media_player.schlafzimmer
+                data: 
+                  message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+        default:
+          - service: telegram_bot.send_message
+            data: 
+              message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
 
   - id: remind_for_open_window_guest_room
     alias: 'Remind for open window guest room'
@@ -1229,13 +1247,30 @@
           entity_id: sensor.gastezimmer_heating
           above: 90
     action:
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
-          - media_player.schlafzimmer
-        data: 
-          message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
+      action:
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini
+                  - media_player.gastezimmer_mini
+                  - media_player.schlafzimmer
+                data: 
+                  message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
+        default:
+          - service: telegram_bot.send_message
+            data: 
+              message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
 
   - id: remind_for_open_window_after_5_minutes_in_bathroom
     alias: 'Remind for open window after 5 minutes in bathroom'
@@ -4907,7 +4942,7 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 900 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 600 }}"
         - condition: state
           entity_id: switch.kohleanzunder
           state: 'on'
@@ -6023,6 +6058,9 @@
                   - condition: state
                     entity_id: climate.schlafzimmer
                     state: 'auto'
+                  - condition: state
+                    entity_id: device_tracker.fabian_pc
+                    state: 'home'
             sequence:
               - service: notify.telegram_fabian
                 data:
