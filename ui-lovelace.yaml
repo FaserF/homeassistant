@@ -75,7 +75,7 @@ views:
       - entity: sensor.fabian_phone_battery_level
       - entity: sensor.nessie_phone_battery_level
       - entity: sensor.fabian_ipadpro_battery_level
-      - entity: sensor.washing_machine_state
+      - entity: sensor.washing_machine_finish_duration
       - entity: sensor.nessie_pc_energy_power
       - entity: sensor.steckdose_schlafzimmer_energy_power
       - entity: sensor.keller_steckdose_energy_power
@@ -85,6 +85,8 @@ views:
       - entity: counter.pille
       - entity: sensor.coronavirus_lk_ebersberg
       - entity: sensor.coronavirus_lk_munchen
+      - entity: sensor.average_house_humidity
+      - entity: sensor.average_house_temp
       - entity: sensor.switch_lan_play_online
     cards:
       - entities:
@@ -100,10 +102,6 @@ views:
             type: custom:slider-entity-row
           - entity: switch.lichtschalter
           - entity: light.leds_tisch
-            group: true
-            toggle: true
-            type: custom:slider-entity-row
-          - entity: light.yeelight_stripe_0x00000000036d0c16
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -131,6 +129,7 @@ views:
         title: Licht
         type: entities
       - entities:
+          - entity: vacuum.living_room_vacuum
           - entity: switch.fernseher
             secondary_info: last-changed
           - entity: switch.staubsauger
@@ -163,38 +162,38 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: vertical-stack
         cards:
           - type: entities
@@ -226,16 +225,16 @@ views:
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: "6"
-            number_of_forecasts: "8"
+            forecastMaxColumn: '6'
+            number_of_forecasts: '8'
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: "6"
+            number_of_forecasts: '6'
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: "5"
+            forecastMaxColumn: '5'
       - artwork: cover
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
@@ -266,6 +265,8 @@ views:
     badges: []
     cards:
       - entities:
+          - entity: switch.adaptive_lighting_living_room
+            name: Adaptives Licht
           - entity: switch.deckenlampe
           - entity: switch.leds_wohnzimmer_tv
           - entity: light.leds_wohnzimmer
@@ -276,32 +277,37 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-        show_header_toggle: true
+        show_header_toggle: false
         title: Licht
         type: entities
       - entities:
           - entity: switch.fernseher
+          - entity: vacuum.living_room_vacuum
           - entity: switch.staubsauger
           - entity: automation.restart_bluetooth_on_tv
           - entity: device_tracker.tv
+          - entity: sensor.wohnzimmer_uhr_timers
         show_header_toggle: true
-        title: Strom
+        title: Weiteres
         type: entities
       - entity: climate.wohnzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
         type: custom:mini-media-player
       - artwork: cover
         entity: media_player.wohnzimmer_mini
+        type: custom:mini-media-player
+      - artwork: cover
+        entity: media_player.wohnzimmer_tv
         type: custom:mini-media-player
       - buttons:
           top:
@@ -383,15 +389,14 @@ views:
         name: Wohnzimmer TV
         remote_template: ccwgtv
         type: custom:generic-remote-control-card
-      - artwork: cover
-        entity: media_player.wohnzimmer_tv
-        type: custom:mini-media-player
   - icon: mdi:bed-empty
     path: schlafzimmer
     title: Schlafzimmer
     badges: []
     cards:
       - entities:
+          - entity: switch.adaptive_lighting_sleeping_room
+            name: Adaptives Licht
           - entity: switch.lichtschalter
           - entity: light.yeelight_bslamp2_0x0000000013fea10f
           - entity: light.yeelight_stripe_0x00000000036d0c16
@@ -412,10 +417,10 @@ views:
             secondary_info: last-changed
           - entity: sensor.steckdose_schlafzimmer_energy_today
           - entity: sensor.steckdose_schlafzimmer_energy_power
-          - entity: sensor.fabian_pc_load
-          - entity: sensor.fabian_pc_memory_used
-          - entity: sensor.fabian_pc_cpu_speed
-          - entity: sensor.fabian_pc_cpu_temperature
+          - entity: sensor.dell_9020_load
+          - entity: sensor.dell_9020_memory_used_2
+          - entity: sensor.dell_9020_cpu_speed
+          - entity: sensor.dell_9020_cpu_temperature
         show_header_toggle: true
         title: Fabian PC
         type: entities
@@ -424,10 +429,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
@@ -437,8 +442,10 @@ views:
     badges: []
     cards:
       - entities:
-          - light.lampe_gastezimmer
-          - light.leds_gastezimmer
+          - entity: switch.adaptive_lighting_guest_room
+            name: Adaptives Licht
+          - entity: light.lampe_gastezimmer
+          - entity: light.leds_gastezimmer
         show_header_toggle: true
         title: Licht
         type: entities
@@ -461,10 +468,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
@@ -498,6 +505,7 @@ views:
           - entity: sensor.washing_machine_mode
           - entity: sensor.washing_machine_finish_time
           - entity: sensor.washing_machine_finish_duration
+          - entity: input_select.washing_machine_status
         show_header_toggle: false
         title: Waschmaschine
         type: entities
@@ -621,23 +629,23 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: entities
         entities:
-          - entity: sensor.kuche_mini_timers
+          - entity: sensor.kuche_speaker_timers
           - entity: sensor.wohnzimmer_uhr_timers
           - entity: sensor.schlafzimmer_speaker_timers
           - entity: sensor.gastezimmer_mini_timers
-        title: Google Home Timers
+        title: Google Nest Timers
       - type: entities
         entities:
-          - switch.gastezimmer_mini_do_not_disturb
-          - switch.kuche_mini_do_not_disturb
-          - switch.schlafzimmer_speaker_do_not_disturb
-          - switch.wohnzimmer_uhr_do_not_disturb
+          - entity: switch.gastezimmer_mini_do_not_disturb
+          - entity: switch.schlafzimmer_speaker_do_not_disturb
+          - entity: switch.wohnzimmer_uhr_do_not_disturb
+          - entity: switch.kuche_speaker_do_not_disturb
         title: Google Nest DND
         show_header_toggle: false
   - path: router
@@ -815,7 +823,7 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
