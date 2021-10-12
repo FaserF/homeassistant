@@ -1247,7 +1247,6 @@
           entity_id: sensor.gastezimmer_heating
           above: 90
     action:
-      action:
       - choose:
           - conditions:
               - condition: or
@@ -1984,9 +1983,8 @@
         data_template: 
           message: >
             Es ist 
-            {{ now().hour }} Uhr {{ now().minute }} .
-            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+            {{ now().hour }} Uhr {{ now().minute }} . 
+            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
 
   - id: turn_on_light_in_sleeping_room_if_tv_turned_off
     alias: 'Turn on light in sleeping room if tv turned off'
@@ -2240,7 +2238,7 @@
       platform: numeric_state
       entity_id: weather.dwd_weather_ebersberg_1h
       attribute: temperature
-      above: 12
+      above: 14
     condition:
       condition: and
       conditions:
@@ -3943,7 +3941,7 @@
 #      - condition: not
 #        conditions:
 #          - condition: state
-#            entity_id: 'binary_sensor.fritz_box_3490_connectivity'
+#            entity_id: 'binary_sensor.fritz_box_3490_connection'
 #            state: 'not_connected'
 #    action:
 #      - service: notify.telegram_fabian
@@ -3954,7 +3952,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: binary_sensor.fritz_box_3490_connectivity
+        entity_id: binary_sensor.fritz_box_3490_connection
         from: 'Connected'
         to: 'Not_Connected'
         for:
@@ -4005,7 +4003,7 @@
     initial_state: off
     trigger:
       - platform: state
-        entity_id: binary_sensor.fritz_box_3490_connectivity
+        entity_id: binary_sensor.fritz_box_3490_connection
         from: 'Not_Connected'
         to: 'Connected'
     condition:
@@ -5428,13 +5426,13 @@
           message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
           data:
             inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb'
+            - '30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb'
       - service: notify.telegram_fabian
         data:
           message: 'Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:'
           data:
             inline_keyboard:
-            - '30° Pflegeleicht:/washerstart30, 40° Pflegeleicht:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb'
+            - '30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb'
       - service: automation.turn_on
         data:
           entity_id: 

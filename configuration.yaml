@@ -437,6 +437,20 @@ sensor:
     name: strip_keller
   - platform: template
     sensors:
+      average_house_humidity:
+        friendly_name: "Durchschn. Luftfeuchtigkeit"
+        unit_of_measurement: "%"
+        value_template: >-
+          {{ (float(states.climate.gastezimmer.attributes.current_humidity) + float(states.climate.wohnzimmer.attributes.current_humidity) + float(states.climate.schlafzimmer.attributes.current_humidity) + float(states.climate.bad.attributes.current_humidity)) / 4 | round(2) }}
+  - platform: template
+    sensors:
+      average_house_temp:
+        friendly_name: "Durchschn. Temp."
+        unit_of_measurement: "°C"
+        value_template: >-
+          {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+  - platform: template
+    sensors:
       washing_machine_state:
         value_template: "{{ states.input_select.washing_machine_status.state}}"
         friendly_name: "Waschmaschine Status"
@@ -464,37 +478,37 @@ sensor:
         value_template: >
           {% if (is_state("switch.waschmaschine", "on")) -%}
             {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered) ) < 3200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (2400) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (2400) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (5220) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered) ) < 14400 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (13560) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (13560) ) | timestamp_custom("%H:%M", true) }}
@@ -511,37 +525,37 @@ sensor:
         value_template: >
           {% if (is_state("switch.waschmaschine", "on")) -%}
             {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered) ) < 3200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (2400) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (2400) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (5220) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered) ) < 14400 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered ) %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) > (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered | int - (600) ) ) %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (13560) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (13560) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
