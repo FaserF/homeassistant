@@ -239,7 +239,7 @@ views:
         entity: media_player.schlafzimmer
         type: custom:mini-media-player
       - artwork: cover
-        entity: media_player.kueche_mini
+        entity: media_player.kueche_mini_neu
         type: custom:mini-media-player
       - artwork: cover
         entity: media_player.gastezimmer_mini

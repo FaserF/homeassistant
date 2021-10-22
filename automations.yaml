@@ -46,7 +46,7 @@
           entity_id: 
             - media_player.schlafzimmer
             - media_player.wohnzimmer_mini
-            - media_player.kueche_mini
+            - media_player.kueche_mini_neu
       - choose:
           - conditions:
               - condition: state
@@ -563,14 +563,13 @@
           entity_id: device_tracker.pocophonef1_pocophon
           state: 'not_home'
     action:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.guest_mode
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
-          message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_nessie
-          message: 'Gast Modus sollte deaktiviert werden, da niemand mehr zu Besuch ist.'
+          message: 'Gast Modus wurde deaktiviert, da niemand mehr zu Besuch ist.'
 
   - id: reactivate_adguard_protection
     alias: 'Reactivate Adguard Protection'
@@ -1129,7 +1128,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
                   - media_player.schlafzimmer
                 data: 
@@ -1173,7 +1172,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
                   - media_player.schlafzimmer
                 data: 
@@ -1217,7 +1216,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
                   - media_player.schlafzimmer
                 data: 
@@ -1261,7 +1260,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
                   - media_player.schlafzimmer
                 data: 
@@ -1294,28 +1293,11 @@
     action:
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: input_boolean.silent_mode
                     state: 'on'
-                  - condition: and
-                    conditions:
-                      - condition: state
-                        entity_id: device_tracker.fabian_pc
-                        state: 'not_home'
-                      - condition: state
-                        entity_id: device_tracker.nsta0516_lan
-                        state: 'not_home'
-                      - condition: state
-                        entity_id: device_tracker.schnuppes_pc
-                        state: 'not_home'
-                      - condition: state
-                        entity_id: device_tracker.vku_lb_20
-                        state: 'not_home'
-                      - condition: state
-                        entity_id: device_tracker.tv
-                        state: 'not_home'
             sequence:
               - service: notify.telegram_fabian
                 data:
@@ -1386,12 +1368,12 @@
                   entity_id:
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
-                    - media_player.kueche_mini
+                    - media_player.kueche_mini_neu
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.schlafzimmer
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                 data: 
                   message: Das Fenster im Bad kann wieder geschlossen werden.
               - service: media_player.volume_set
@@ -1400,7 +1382,7 @@
                   entity_id:
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
-                    - media_player.kueche_mini
+                    - media_player.kueche_mini_neu
 
   - id: remind_for_open_window_after_5_minutes_in_sleeping_room
     alias: 'Remind for open window after 5 minutes in sleeping room'
@@ -1448,7 +1430,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                 data: 
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
@@ -1573,7 +1555,7 @@
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.schlafzimmer
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                 data: 
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
@@ -1943,7 +1925,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
+          - media_player.kueche_mini_neu
           #- media_player.mpd
         data_template: 
           message: >
@@ -2244,6 +2226,10 @@
       conditions:
         - condition: template
           value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+        - condition: template
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
+        - condition: template
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= '14' }}"
         #- condition: state
         #  entity_id: 'weather.dwd_weather_ebersberg_1h'
         #  state: 'sunny'
@@ -3098,9 +3084,9 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
+          - media_player.kueche_mini_neu
           - media_player.gastezimmer_mini
-          - media_player.kueche_mini
+          - media_player.kueche_mini_neu
           - media_player.schlafzimmer
         data: 
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
@@ -3504,7 +3490,7 @@
       - platform: state
         entity_id: 
           - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
+          - media_player.kueche_mini_neu
           - media_player.schlafzimmer
           - media_player.gastezimmer_mini
           - media_player.wohnzimmer_tv_cast
@@ -3561,44 +3547,44 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     attribute: is_volume_muted
                     state: "false"
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     attribute: media_title
                     state: "Advertisement"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.kueche_mini
+                  entity_id: media_player.kueche_mini_neu
                   is_volume_muted: true
       - choose:
           - conditions:
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     attribute: media_title
                     state: "Advertisement"
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     attribute: is_volume_muted
                     state: "true"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.kueche_mini
+                  entity_id: media_player.kueche_mini_neu
                   is_volume_muted: false
       - choose:
           - conditions:
@@ -3985,7 +3971,7 @@
         entity_id: 
         - media_player.schlafzimmer
         - media_player.wohnzimmer_mini
-        - media_player.kueche_mini
+        - media_player.kueche_mini_neu
         - media_player.gastezimmer_mini
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung' #und wird nun neugestartet.'
@@ -4035,7 +4021,7 @@
                 entity_id: 
                   - media_player.schlafzimmer
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
                 data:
                   message: 'Die Internetverbindung ist wiederhergestellt.'
@@ -4459,11 +4445,11 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: media_player.kueche_mini
+                entity_id: media_player.kueche_mini_neu
                 state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: media_player.kueche_mini
+                entity_id: media_player.kueche_mini_neu
                 data_template:
                   message: >
                     Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -4632,7 +4618,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
+          - media_player.kueche_mini_neu
           - media_player.schlafzimmer
           #- media_player.mpd
         data_template: 
@@ -4702,7 +4688,7 @@
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
-        - media_player.kueche_mini
+        - media_player.kueche_mini_neu
         - media_player.schlafzimmer
         data_template:
           message: >
@@ -5523,11 +5509,11 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini
+                    entity_id: media_player.kueche_mini_neu
                     state: 'playing'
             sequence:
               - service: tts.google_say
-                entity_id: media_player.kueche_mini
+                entity_id: media_player.kueche_mini_neu
                 data:
                   message: 'Die Waschmaschine ist fertig.'
       - choose:
@@ -5783,7 +5769,7 @@
       - service: tts.google_say
         entity_id: 
         - media_player.wohnzimmer_mini
-        - media_player.kueche_mini
+        - media_player.kueche_mini_neu
         - media_player.schlafzimmer
         #- media_player.gastezimmer_mini
         data_template:
@@ -5874,7 +5860,7 @@
       - service: tts.google_say
         entity_id: 
           - media_player.wohnzimmer_mini
-          - media_player.kueche_mini
+          - media_player.kueche_mini_neu
         data_template:
           message: >
             Ding Dong, es klingelt.
@@ -7290,7 +7276,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
                 data_template:
                   message: 'Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
@@ -7396,7 +7382,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.schlafzimmer
                 data_template:
                   message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
@@ -7435,7 +7421,7 @@
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini
+                  - media_player.kueche_mini_neu
                   - media_player.schlafzimmer
                 data_template:
                   message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
