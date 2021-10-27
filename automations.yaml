@@ -497,10 +497,9 @@
     trigger:
       - platform: state
         entity_id: device_tracker.pocophonef1_pocophon
-        from: 'not_home'
         to: 'home'
       - platform: time
-        at: '23:00:00'
+        at: '00:00:00'
     condition:
       condition: and
       conditions:
@@ -508,7 +507,7 @@
           entity_id: input_boolean.guest_mode
           state: 'off'
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.activate_guest_mode_if_isi_is_here.attributes.last_triggered) | int > 86400 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.activate_guest_mode_if_guest_is_here.attributes.last_triggered) | int > 86400 }}"
         - condition: or
           conditions:
             - condition: state

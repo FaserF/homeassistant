@@ -133,6 +133,7 @@ recorder:
       - sensor.xiaomi_miio_cooker_favorite
       - sensor.xiaomi_miio_cooker_duration
       #- sensor.staubsaugroboter_status
+      - switch.rpi_cooling_fan
 
 # Checks for available updates
 updater:
