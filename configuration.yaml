@@ -903,6 +903,8 @@ google_assistant:
       expose: false
     switch.xiaomi_89fb_7604_reboot:
       expose: false
+    switch.kuche_speaker_do_not_disturb:
+      
     switch.schlafzimmer_speaker_do_not_disturb:
       expose: false
     switch.gastezimmer_mini_do_not_disturb:
