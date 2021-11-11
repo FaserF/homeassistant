@@ -899,7 +899,7 @@ google_assistant:
       expose: false
     switch.xiaomi_89fb_7604_reboot:
       expose: false
-    light.xiaomi_abd8_led_2:
+    light.xiaomi_abd8_led:
       expose: false
     switch.xiaomi_abd8_reboot_2:
       expose: false
