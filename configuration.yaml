@@ -899,21 +899,9 @@ google_assistant:
       expose: false
     switch.xiaomi_89fb_7604_reboot:
       expose: false
-    light.xiaomi_abd8_led:
+    light.xiaomi_89fb_7604_led:
       expose: false
-    switch.xiaomi_abd8_reboot_2:
-      expose: false
-    light.xiaomi_89fb_7604_led_2:
-      expose: false
-    switch.xiaomi_89fb_7604_reboot_2:
-      expose: false
-    light.xiaomi_abd8_led_3:
-      expose: false
-    switch.xiaomi_abd8_reboot_3:
-      expose: false
-    light.xiaomi_89fb_7604_led_3:
-      expose: false
-    switch.xiaomi_89fb_7604_reboot_3:
+    switch.xiaomi_89fb_7604_reboot:
       expose: false
     switch.schlafzimmer_speaker_do_not_disturb:
       expose: false
