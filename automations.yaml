@@ -1237,7 +1237,6 @@
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.kueche_mini_neu
-                  - media_player.gastezimmer_mini
                   - media_player.schlafzimmer
                 data: 
                   message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
@@ -1248,11 +1247,17 @@
               - condition: state
                 entity_id: input_boolean.silent_mode
                 state: 'off'
+              - condition: state
+                entity_id: person.nessie
+                state: 'home'
+              - condition: state
+                entity_id: person.fabian
+                state: 'home'
             sequence:
               - service: tts.google_say
                 entity_id: media_player.gastezimmer_mini
                 data: 
-                  message: Das Fenster im Bad kann wieder geschlossen werden.
+                  message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
         default:
           - service: notify.telegram_fabian
             data:
