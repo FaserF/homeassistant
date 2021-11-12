@@ -1102,8 +1102,13 @@
         to: 'off'
         for:
           minutes: 15
+      - platform: state
+        entity_id: binary_sensor.bad_open_window
+        to: 'off'
+        for:
+          minutes: 30
     condition:
-      condition: or
+      condition: and
       conditions:
         - condition: numeric_state
           entity_id: climate.bad
