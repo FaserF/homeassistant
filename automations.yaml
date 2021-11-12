@@ -1222,24 +1222,7 @@
           entity_id: sensor.wohnzimmer_heating
           above: 90
     action:
-      - choose:
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: person.nessie
-                    state: 'home'
-                  - condition: state
-                    entity_id: person.fabian
-                    state: 'home'
-            sequence:
-              - service: tts.google_say
-                entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
-                  - media_player.schlafzimmer
-                data: 
-                  message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+        - choose:
           - conditions:
               - condition: state
                 entity_id: input_boolean.guest_mode
@@ -1256,6 +1239,24 @@
             sequence:
               - service: tts.google_say
                 entity_id: media_player.gastezimmer_mini
+                data: 
+                  message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: 'home'
+                  - condition: state
+                    entity_id: person.fabian
+                    state: 'home'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_mini
+                  - media_player.kueche_mini_neu
+                  - media_player.schlafzimmer
                 data: 
                   message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
         default:
