@@ -1189,7 +1189,7 @@
         default:
           - service: telegram_bot.send_message
             data: 
-              message: Es wurde vermutlichvergessen das Fenster im Schlafzimmer zu schließen.
+              message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
 
   - id: remind_for_open_window_living_room
     alias: 'Remind for open window living room'
