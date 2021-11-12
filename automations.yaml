@@ -1780,6 +1780,9 @@
       #    entity_id: 
       #      - light.yeelight_bslamp2_0x0000000013fea10f
       - delay: '00:20:00'
+      - service: switch.turn_off
+        data:
+          entity_id: switch.adaptive_lighting_sleeping_room
       - choose:
           - conditions:
               - condition: state
