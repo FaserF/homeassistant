@@ -520,7 +520,7 @@
               entity_id: device_tracker.google_maps_103127589611220223167
               state: 'home'
             - condition: state
-              entity_id: device_tracker.samuel_iphone_2
+              entity_id: device_tracker.samuel_iphone
               state: 'home'
             - condition: state
               entity_id: device_tracker.redminote8t_redmi
