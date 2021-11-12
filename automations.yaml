@@ -1744,6 +1744,10 @@
                 entity_id: sensor.dwd_illuminance
                 below: 2000
             sequence:
+              - service: swit.turn_on
+                data:
+                  entity_id: 
+              switch.adaptive_lighting_sleeping_room
               - service: light.turn_on
                 data:
                   entity_id: 
@@ -1772,10 +1776,10 @@
             [0,0,0]
             {% endif %}
       - delay: '00:05:00'
-      - service: light.turn_off
-        data:
-          entity_id: 
-            - light.yeelight_bslamp2_0x0000000013fea10f
+      #- service: light.turn_off
+      #  data:
+      #    entity_id: 
+      #      - light.yeelight_bslamp2_0x0000000013fea10f
       - delay: '00:20:00'
       - choose:
           - conditions:
