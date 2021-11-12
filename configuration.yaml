@@ -679,7 +679,7 @@ adaptive_lighting:
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
       - light.bett_gluhbirne
-      - light.leds_tisch
+      #- light.leds_tisch
     min_brightness: 15
   - name: "guest_room"
     lights:
