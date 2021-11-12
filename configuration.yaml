@@ -674,7 +674,7 @@ adaptive_lighting:
     lights:
       - light.leds_wohnzimmer
       - light.yeelight_color_0x00000000036dc050
-    min_brightness: 30
+    min_brightness: 60
   - name: "sleeping_room"
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
@@ -685,7 +685,7 @@ adaptive_lighting:
     lights:
       - light.lampe_gastezimmer
       - light.leds_gastezimmer
-    min_brightness: 50
+    min_brightness: 80
 
 #no_ip:
 #  domain: !secret domain_noip
