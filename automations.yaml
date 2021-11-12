@@ -1186,16 +1186,15 @@
                   - media_player.wohnzimmer_mini
                   - media_player.kueche_mini_neu
                   - media_player.gastezimmer_mini
-                  - media_player.schlafzimmer
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
         default:
           - service: notify.telegram_fabian
             data:
-              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+              message: "Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen."
           - service: notify.telegram_nessie
             data:
-              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+              message: "Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen."
 
   - id: remind_for_open_window_living_room
     alias: 'Remind for open window living room'
