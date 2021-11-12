@@ -1241,6 +1241,18 @@
                   - media_player.schlafzimmer
                 data: 
                   message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.guest_mode
+                state: 'off'
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.gastezimmer_mini
+                data: 
+                  message: Das Fenster im Bad kann wieder geschlossen werden.
         default:
           - service: notify.telegram_fabian
             data:
