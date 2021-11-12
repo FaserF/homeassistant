@@ -1119,6 +1119,25 @@
           above: 90
     action:
       - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.guest_mode
+              state: 'off'
+            - condition: state
+              entity_id: input_boolean.silent_mode
+              state: 'off'
+            - condition: state
+              entity_id: person.nessie
+              state: 'home'
+            - condition: state
+              entity_id: person.fabian
+              state: 'home'
+          sequence:
+            - service: tts.google_say
+              entity_id: media_player.gastezimmer_mini
+              data: 
+                message: Es wurde vergessen das Fenster im Bad zu schließen.
+      - choose:
           - conditions:
               - condition: or
                 conditions:
@@ -1170,6 +1189,25 @@
           entity_id: sensor.schlafzimmer_heating
           above: 90
     action:
+      - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.guest_mode
+              state: 'off'
+            - condition: state
+              entity_id: input_boolean.silent_mode
+              state: 'off'
+            - condition: state
+              entity_id: person.nessie
+              state: 'home'
+            - condition: state
+              entity_id: person.fabian
+              state: 'home'
+          sequence:
+            - service: tts.google_say
+              entity_id: media_player.gastezimmer_mini
+              data: 
+                message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
       - choose:
           - conditions:
               - condition: or
