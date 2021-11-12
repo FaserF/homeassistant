@@ -1152,7 +1152,6 @@
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.kueche_mini_neu
-                  - media_player.gastezimmer_mini
                   - media_player.schlafzimmer
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
@@ -1223,7 +1222,6 @@
                 entity_id: 
                   - media_player.wohnzimmer_mini
                   - media_player.kueche_mini_neu
-                  - media_player.gastezimmer_mini
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
         default:
