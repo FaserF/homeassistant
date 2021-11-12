@@ -675,6 +675,7 @@ adaptive_lighting:
       - light.leds_wohnzimmer
       - light.yeelight_color_0x00000000036dc050
     min_brightness: 60
+    min_color_temp: 4000
   - name: "sleeping_room"
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
