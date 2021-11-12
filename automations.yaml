@@ -1254,7 +1254,6 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
                   - media_player.kueche_mini_neu
                   - media_player.schlafzimmer
                 data: 
@@ -1313,10 +1312,10 @@
         default:
           - service: notify.telegram_fabian
             data:
-              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+              message: "Es wurde vermutlich vergessen das Fenster im Gästezimmer zu schließen."
           - service: notify.telegram_nessie
             data:
-              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+              message: "Es wurde vermutlich vergessen das Fenster im Gästezimmer zu schließen."
 
   - id: remind_for_open_window_after_5_minutes_in_bathroom
     alias: 'Remind for open window after 5 minutes in bathroom'
