@@ -1138,9 +1138,12 @@
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
         default:
-          - service: telegram_bot.send_message
-            data: 
-              message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
+          - service: notify.telegram_fabian
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+          - service: notify.telegram_nessie
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
 
   - id: remind_for_open_window_sleeping_room
     alias: 'Remind for open window sleeping room'
@@ -1187,9 +1190,12 @@
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
         default:
-          - service: telegram_bot.send_message
-            data: 
-              message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
+          - service: notify.telegram_fabian
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+          - service: notify.telegram_nessie
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
 
   - id: remind_for_open_window_living_room
     alias: 'Remind for open window living room'
@@ -1231,9 +1237,12 @@
                 data: 
                   message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
         default:
-          - service: telegram_bot.send_message
-            data: 
-              message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+          - service: notify.telegram_fabian
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+          - service: notify.telegram_nessie
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
 
   - id: remind_for_open_window_guest_room
     alias: 'Remind for open window guest room'
