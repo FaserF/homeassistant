@@ -1206,8 +1206,13 @@
         to: 'off'
         for:
           minutes: 15
+      - platform: state
+        entity_id: binary_sensor.wohnzimmer_open_window
+        to: 'off'
+        for:
+          minutes: 30
     condition:
-      condition: or
+      condition: and
       conditions:
         - condition: numeric_state
           entity_id: 'climate.wohnzimmer'
@@ -1284,9 +1289,12 @@
                 data: 
                   message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
         default:
-          - service: telegram_bot.send_message
-            data: 
-              message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
+          - service: notify.telegram_fabian
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
+          - service: notify.telegram_nessie
+            data:
+              message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
 
   - id: remind_for_open_window_after_5_minutes_in_bathroom
     alias: 'Remind for open window after 5 minutes in bathroom'
