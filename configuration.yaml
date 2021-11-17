@@ -367,6 +367,7 @@ shell_command:
   randomfood: !secret randomfood
   foodyes: !secret foodyes
   jek_telegram: !secret telegram_jek_open_command
+  juz_telegram: !secret telegram_juz_open_command
   restartha: "ha host reboot"
   hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
@@ -675,7 +676,7 @@ adaptive_lighting:
       - light.leds_wohnzimmer
       - light.yeelight_color_0x00000000036dc050
     min_brightness: 60
-    min_color_temp: 4000
+    min_color_temp: 3700
   - name: "sleeping_room"
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
@@ -687,6 +688,7 @@ adaptive_lighting:
       - light.lampe_gastezimmer
       - light.leds_gastezimmer
     min_brightness: 80
+    min_color_temp: 4000
 
 #no_ip:
 #  domain: !secret domain_noip
