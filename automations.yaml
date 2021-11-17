@@ -914,14 +914,16 @@
                     below: 20
             sequence:
               - service: light.turn_on
-                data:
+                target:
                   entity_id: light.lampe_gastezimmer
+                data:
                   transition: 2
                   brightness: 255
-                  color_mode: white
+                  #color_mode: white
               - service: light.turn_on
-                data:
+                target:
                   entity_id: light.leds_gastezimmer
+                data:
                   transition: 2
                   brightness: 255
                   rgb_color: [255,255,255]
@@ -945,14 +947,18 @@
       - platform: numeric_state
         entity_id: sensor.nessie_pc_energy_power
         below: 25
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: 'input_boolean.guest_mode'
+          state: 'off'
     action:
       - choose:
           - conditions:
               - condition: state
                 entity_id: device_tracker.schnuppes_pc
                 state: not_home
-                for:
-                  seconds: 30
               - condition: numeric_state
                 entity_id: sensor.nessie_pc_energy_power
                 below: 25
@@ -961,16 +967,11 @@
                   - condition: state
                     entity_id: device_tracker.vku_lb_20
                     state: not_home
-                    for:
-                      seconds: 20
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
                     below: 15
               - condition: state
                 entity_id: 'input_boolean.climate_off'
-                state: 'off'
-              - condition: state
-                entity_id: 'input_boolean.guest_mode'
                 state: 'off'
             sequence:
               - service: climate.set_hvac_mode
@@ -979,9 +980,6 @@
                   hvac_mode: 'auto'
       - choose:
           - conditions:
-              - condition: state
-                entity_id: input_boolean.guest_mode
-                state: 'off'
               - condition: state
                 entity_id: device_tracker.schnuppes_pc
                 state: 'not_home'
