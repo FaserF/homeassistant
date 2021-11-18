@@ -693,7 +693,7 @@
         for:
           hours: 4
       - platform: state
-        entity_id: device_tracker.nsta0516_lan
+        entity_id: device_tracker.nsta0516_2
         to: 'home'
         for:
           hours: 4
@@ -713,7 +713,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nsta0516_lan
+              entity_id: device_tracker.nsta0516_2
               state: 'home'
     action:
       - service: tts.google_say
@@ -820,7 +820,7 @@
         for:
             minutes: 1
       - platform: state
-        entity_id: device_tracker.nsta0516_lan
+        entity_id: device_tracker.nsta0516_2
         from: 'home'
         to: 'not_home'
         for:
@@ -837,7 +837,7 @@
         for: 
           minutes: 1
       - condition: state
-        entity_id: device_tracker.nsta0516_lan
+        entity_id: device_tracker.nsta0516_2
         state: 'not_home'
         for: 
           seconds: 20
@@ -1036,7 +1036,7 @@
         for:
           minutes: 10
       - platform: state
-        entity_id: device_tracker.nsta0516_lan
+        entity_id: device_tracker.nsta0516_2
         from: 'home'
         to: 'not_home'
         for:
@@ -1425,7 +1425,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nsta0516_lan
+                    entity_id: device_tracker.nsta0516_2
                     state: 'home'
               - condition: not
                 conditions:
@@ -1702,6 +1702,9 @@
     condition:
       condition: and
       conditions:
+        - condition: state
+          entity_id: switch.bett_usb_ports
+          state: 'on'
         #- condition: or
         #  conditions:
         #    - condition: state
@@ -1747,6 +1750,12 @@
         to: 'on'
         for:
             minutes: 360
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: switch.bett_usb_ports
+          state: 'on'
     action:
       - service: switch.turn_off
         data:
@@ -2239,7 +2248,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.nsta0516_lan'
+              entity_id: 'device_tracker.nsta0516_2'
               state: 'home'
     action:
       - service: light.turn_on
@@ -2277,7 +2286,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.nsta0516_lan'
+              entity_id: 'device_tracker.nsta0516_2'
               state: 'home'
         - condition: or
           conditions:
@@ -3600,6 +3609,23 @@
           target: !secret telegram_chat_fabian
           message: 'ACHTUNG! RaspberryPi Temperatur sehr hoch: {{ states.sensor.processor_temperature.state }}'
 
+  - alias: 'RaspberryPi RAM Load Warning'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.memory_use_percent
+        above: 85
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.raspberrypi_ram_load_warning.attributes.last_triggered) | int > 3600 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'ACHTUNG! RaspberryPi RAM Auslastung sehr hoch: {{ states.sensor.memory_use_percent.state }}'
+
   - alias: Turn Schloss off after turning on
     initial_state: on
     trigger: 
@@ -3640,7 +3666,7 @@
 
   - id: mute_cast_spotify_ads
     alias: Mute Cast Spotify ads
-    initial_state: on
+    initial_state: off
     mode: single
     trigger:
       - platform: state
@@ -4705,6 +4731,8 @@
         attribute: current_humidity
         above: 67
     condition:
+      - condition: time
+        after: '06:00:00'
       - condition: state
         entity_id: device_tracker.fabian_iphone
         state: not_home
@@ -4813,6 +4841,7 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
+          - media_player.kueche_mini_neu
           
   - alias: Notify for high humidity when coming home weekend
     initial_state: true
@@ -4882,6 +4911,7 @@
           entity_id: 
           - media_player.wohnzimmer_mini
           - media_player.schlafzimmer
+          - media_player.kueche_mini_neu
 
   - alias: 'Notify for above 100 corona stats'
     initial_state: on
@@ -5866,7 +5896,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: home
                   - condition: state
-                    entity_id: device_tracker.nsta0516_lan
+                    entity_id: device_tracker.nsta0516_2
                     state: home
             sequence:
               #- service: notify.browser
@@ -6833,7 +6863,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nsta0516_lan
+        entity_id: device_tracker.nsta0516_2
         to: 'home'
       - platform: state
         entity_id: device_tracker.vku_lb_20
@@ -6853,7 +6883,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nsta0516_lan
+              entity_id: device_tracker.nsta0516_2
               state: 'home'
             - condition: not
               conditions:
@@ -6890,7 +6920,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.nsta0516_lan
+        entity_id: device_tracker.nsta0516_2
         to: 'not_home'
       - platform: state
         entity_id: switch.nessie_pc
