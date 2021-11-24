@@ -955,7 +955,7 @@ google_assistant:
       room: Schlafzimmer
     light.bett_gluhbirne:
       name: Bett Glühbirne
-      expose: true
+      expose: false
       room: Schlafzimmer
     light.leds_tisch:
       expose: true

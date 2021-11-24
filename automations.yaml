@@ -932,21 +932,11 @@
     alias: 'Turn off lights and climate if npc stopped'
     initial_state: on
     trigger:
-      - platform: state
-        entity_id: device_tracker.schnuppes_pc
-        from: 'home'
-        to: 'not_home'
-        for:
-          seconds: 30
-      - platform: state
-        entity_id: device_tracker.vku_lb_20
-        from: 'home'
-        to: 'not_home'
-        for:
-          seconds: 20
       - platform: numeric_state
         entity_id: sensor.nessie_pc_energy_power
-        below: 25
+        below: 15
+        for:
+          seconds: 30
     condition:
       condition: and
       conditions:
@@ -957,20 +947,6 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.schnuppes_pc
-                state: not_home
-              - condition: numeric_state
-                entity_id: sensor.nessie_pc_energy_power
-                below: 25
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.vku_lb_20
-                    state: not_home
-                  - condition: numeric_state
-                    entity_id: sensor.nessie_pc_energy_power
-                    below: 15
-              - condition: state
                 entity_id: 'input_boolean.climate_off'
                 state: 'off'
             sequence:
@@ -978,27 +954,13 @@
                 data:
                   entity_id: climate.gastezimmer
                   hvac_mode: 'auto'
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: device_tracker.schnuppes_pc
-                state: 'not_home'
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.vku_lb_20
-                    state: not_home
-                  - condition: numeric_state
-                    entity_id: sensor.nessie_pc_energy_power
-                    below: 15
-            sequence:
-              - service: light.turn_off
-                data:
-                  entity_id: group.gastezimmer
-              - service: media_player.volume_set
-                data:
-                  volume_level: 0.4
-                  entity_id: media_player.gastezimmer_mini
+      - service: light.turn_off
+        data:
+          entity_id: group.gastezimmer
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.4
+          entity_id: media_player.gastezimmer_mini
 
   - id: turn_off_strom_if_npc_stops
     alias: 'Turn off strom if npc stops'
@@ -1565,7 +1527,7 @@
         - condition: numeric_state
           entity_id: 'climate.wohnzimmer'
           attribute: current_temperature
-          below: 18
+          below: 20
         - condition: state
           entity_id: switch.fernseher
           state: 'off'
@@ -1595,15 +1557,23 @@
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.6
-                  entity_id: media_player.schlafzimmer
+                  entity_id: 
+                    - media_player.schlafzimmer
+                    - media_player.kueche_mini_neu
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer
+                data: 
+                  message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
+              - service: tts.google_say
+                entity_id: media_player.kueche_mini_neu
                 data: 
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.3
-                  entity_id: media_player.schlafzimmer
+                  entity_id: 
+                    - media_player.schlafzimmer
+                    - media_player.kueche_mini_neu
       - choose:
           - conditions:
               - condition: state
@@ -1633,7 +1603,7 @@
         - condition: numeric_state
           entity_id: 'climate.gastezimmer'
           attribute: current_temperature
-          below: 19
+          below: 20
         - condition: time
           before: '23:00:00'
         - condition: time
@@ -1663,6 +1633,7 @@
                   entity_id:
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
+                    - media_player.kueche_mini_neu
               - service: tts.google_say
                 entity_id: 
                   - media_player.wohnzimmer_mini
@@ -1676,6 +1647,7 @@
                   entity_id:
                     - media_player.schlafzimmer
                     - media_player.wohnzimmer_mini
+                    - media_player.kueche_mini_neu
 
   - id: turn_off_bett_if_no_device_is_charging
     alias: 'Turn off bett if no device is charging'
@@ -2985,9 +2957,10 @@
                     entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
-              - service: rest_command.fabian_pc_system_bridge
+              - service: system_bridge.send_command
                 data:
-                  command: "shutdown"
+                  bridge: adad8b8056b4dfcde2399824f9be1dd5
+                  command: shutdown
                   arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
@@ -3001,9 +2974,10 @@
                     entity_id: sensor.steckdose_schlafzimmer_energy_power
                     above: 20
             sequence:
-              - service: rest_command.fabian_pc_system_bridge
+              - service: system_bridge.send_command
                 data:
-                  command: "shutdown"
+                  bridge: adad8b8056b4dfcde2399824f9be1dd5
+                  command: shutdown
                   arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
@@ -3014,9 +2988,10 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
             sequence:
-              - service: rest_command.fabian_pc_system_bridge
+              - service: system_bridge.send_command
                 data:
-                  command: "shutdown"
+                  bridge: adad8b8056b4dfcde2399824f9be1dd5
+                  command: shutdown
                   arguments: "/s /t 0"
               - delay: '00:01:00'
       - choose:
@@ -3097,9 +3072,10 @@
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
             sequence:
-              - service: rest_command.nessie_pc_system_bridge
+              - service: system_bridge.send_command
                 data:
-                  command: "shutdown"
+                  bridge: adad8b8056b4dfcde2399???
+                  command: shutdown
                   arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
@@ -3113,9 +3089,10 @@
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
             sequence:
-              - service: rest_command.nessie_pc_system_bridge
+              - service: system_bridge.send_command
                 data:
-                  command: "shutdown"
+                  bridge: adad8b8056b4dfcde2399???
+                  command: shutdown
                   arguments: "/s /t 0"
               - delay: '00:30:00'
       - choose:
@@ -3129,9 +3106,10 @@
                     entity_id: sensor.nessie_pc_energy_power
                     above: 20
             sequence:
-              - service: rest_command.nessie_pc_system_bridge
+              - service: system_bridge.send_command
                 data:
-                  command: "shutdown"
+                  bridge: adad8b8056b4dfcde2399???
+                  command: shutdown
                   arguments: "/s /t 0"
               - delay: '00:01:00'
       - choose:
@@ -4377,7 +4355,7 @@
         device_id: d75263b1d81c803aac073abd2257aa2d
         type: button_double_press
         subtype: button_1
-        discovery_id: 68C63A87B4BF_button_1_SINGLE
+        discovery_id: 68C63A87B4BF_button_1_DOUBLE
     action:
       - choose:
           - conditions:
@@ -4513,7 +4491,7 @@
         device_id: 564e0bea23153d99c590e8fe2ef83464
         type: button_double_press
         subtype: button_1
-        discovery_id: 68C63AA72808_button_1_SINGLE
+        discovery_id: 68C63AA72808_button_1_DOUBLE
     action:
       - choose:
           - conditions:
@@ -6064,6 +6042,9 @@
       platform: time
       at: '19:50:00'
     action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.adaptive_lighting_sleeping_room
       - choose:
           - conditions:
               - condition: numeric_state
@@ -6350,10 +6331,11 @@
       event_data:
         data: '/hibernatefpc'
     action:
-      - service: rest_command.fabian_pc_system_bridge
+      - service: system_bridge.send_command
         data:
-          command: "shutdown"
-          arguments: " /h /t 0"
+          bridge: adad8b8056b4dfcde2399824f9be1dd5
+          command: shutdown
+          arguments: "/h /t 0"
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
@@ -6395,10 +6377,11 @@
       event_data:
         data: '/hibernatenpc'
     action:
-      - service: rest_command.nessie_pc_system_bridge
+      - service: system_bridge.send_command
         data:
-          command: "shutdown"
-          arguments: " /h /t 0"
+          bridge: adad8b8056b4dfcde239???
+          command: shutdown
+          arguments: "/h /t 0"
       - service: telegram_bot.answer_callback_query
         data_template:
           callback_query_id: '{{ trigger.event.data.id }}'
