@@ -896,7 +896,7 @@
               - service: climate.set_temperature
                 data:
                   entity_id: climate.gastezimmer
-                  temperature: 20
+                  temperature: 21,5
                   hvac_mode: heat
       - choose:
           - conditions:
@@ -1064,7 +1064,7 @@
               - service: climate.set_temperature
                 data:
                   entity_id: climate.wohnzimmer
-                  temperature: 21
+                  temperature: 22
                   hvac_mode: heat
 
   - id: turn_off_climate_if_tv_stops
