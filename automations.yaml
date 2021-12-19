@@ -896,7 +896,7 @@
               - service: climate.set_temperature
                 data:
                   entity_id: climate.gastezimmer
-                  temperature: 21,5
+                  temperature: 21.5
                   hvac_mode: heat
       - choose:
           - conditions:
@@ -1064,7 +1064,7 @@
               - service: climate.set_temperature
                 data:
                   entity_id: climate.wohnzimmer
-                  temperature: 22
+                  temperature: 21.5
                   hvac_mode: heat
 
   - id: turn_off_climate_if_tv_stops
@@ -5086,9 +5086,8 @@
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
               - service: notify.keller_tv
-                data_template:
-                  message: >
-                    Bitte Kohle wenden.
+                data:
+                  message: "Bitte Kohle wenden."
       - delay: '00:08:00'
       - service: switch.turn_off
         data:
@@ -5159,9 +5158,8 @@
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/bitte_gib_mir_die_shisha.mp4 -t video/mp4"
               - service: notify.keller_tv
-                data_template:
-                  message: >
-                    Die Kohle sollte fertig sein!
+                data:
+                  message: "Die Kohle sollte fertig sein!"
 
   - id: detect_if_oven_is_currently_active
     alias: Detect if oven is currently active
