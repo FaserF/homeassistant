@@ -343,7 +343,6 @@
                   inline_keyboard:
                     - 'Abbruch:/cancellight, Okay:/telegramno'
 
-
   - id: turn_off_light_at_night
     alias: 'Turn off light at night'
     initial_state: true
@@ -405,6 +404,58 @@
                   target: !secret telegram_chat_nessie
                   message: 'Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
 
+  - id: turn_off_devices_at_night_notify
+    alias: 'Turn off devices at night - notify'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '04:30:00'
+    condition:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: switch.fernseher
+            state: 'on'
+          - condition: state
+            entity_id: switch.kuhlschrank
+            state: 'on'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Fernseher & Kühlschrank werden in 20 Minuten ausgeschaltet.'
+          inline_keyboard:
+            - 'Abbruch:/cancellight, Okay:/telegramno'
+
+  - id: turn_off_devices_at_night
+    alias: 'Turn off devices at night'
+    initial_state: true
+    trigger:
+      platform: time
+      at: '04:50:00'
+    condition:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: switch.fernseher
+            state: 'on'
+          - condition: state
+            entity_id: switch.kuhlschrank
+            state: 'on'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
+    action:
+      - service: switch.turn_off
+        entity_id: 
+          - switch.fernseher
+          - switch.kuhlschrank
+      - service: media_player.turn_off
+        entity_id: media_player.keller_tv
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Fernseher & Kühlschrank wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden.'
+
   - id: set_climate_at_night
     alias: 'Set climate at night'
     initial_state: true
@@ -464,6 +515,34 @@
                 data:
                   entity_id: climate.gastezimmer
                   hvac_mode: 'off'
+
+  - id: set_climate_on_weekdays
+    alias: 'Set climate on weekdays'
+    initial_state: true
+    trigger:
+      - platform: time
+        at: '16:15:00'
+      - platform: time
+        at: '21:00:00'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - sun
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.climate_off
+                state: 'off'
+            sequence:
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: climate.wohnzimmer
+                  hvac_mode: 'auto'
 
   - id: remind_for_unavailable_device
     alias: 'Remind for unavailable device'
@@ -5161,133 +5240,133 @@
                 data:
                   message: "Die Kohle sollte fertig sein!"
 
-  - id: detect_if_oven_is_currently_active
-    alias: Detect if oven is currently active
-    initial_state: on
-    mode: single
-    trigger:
-      - platform: numeric_state
-        entity_id: sensor.keller_steckdose_energy_power
-        above: 1400
-        below: 1500
-        for:
-          seconds: 35
-    condition:
-      condition: and
-      conditions:
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1020 }}"
-        - condition: state
-          entity_id: switch.kohleanzunder
-          state: 'on'
-    action:
-      - service: automation.turn_off
-        data:
-          entity_id: 
-            - automation.detect_if_washing_machine_is_currently_active
-            - automation.detect_if_coal_lighter_is_currently_active
-            - automation.detect_if_pizzamaker_is_currently_active
-      - choose:
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_5friends
-                  message: 'Der Ofen wurde eingeschaltet.'
-                  inline_keyboard:
-                    - "Dauer:/remaining_time"
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_afk
-                  message: 'Der Ofen wurde eingeschaltet.'
-                  inline_keyboard:
-                    - "Dauer:/remaining_time"
-        default:
-          - service: telegram_bot.send_message
-            data_template:
-              target: !secret telegram_chat_fabian
-              message: 'Der Ofen wurde eingeschaltet.'
-              inline_keyboard:
-                - "Dauer:/remaining_time"
-      - delay: '00:13:00'
-      - choose:
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: device_tracker.flophone
-                    state: home
-                  - condition: state
-                    entity_id: device_tracker.galaxy_s9
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_5friends
-                  message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: person.kai
-                    state: home
-                  - condition: state
-                    entity_id: person.adri
-                    state: home
-            sequence:
-              - service: telegram_bot.send_message
-                data_template:
-                  target: !secret telegram_chat_afk
-                  message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-        default:
-          - service: telegram_bot.send_message
-            data_template:
-              target: !secret telegram_chat_fabian
-              message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-      - service: automation.turn_on
-        data:
-          entity_id: 
-            - automation.detect_if_washing_machine_is_currently_active
-            - automation.detect_if_coal_lighter_is_currently_active
-            - automation.detect_if_pizzamaker_is_currently_active
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.keller_tv
-          command: "pm clear com.tcl.videoplayer"
-      - service: androidtv.adb_command
-        data:
-          entity_id: media_player.keller_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/raab_mib.mp4 -t video/mp4"
-      - delay: '00:05:00'
-      - service: switch.turn_off
-        data:
-          entity_id: switch.kohleanzunder
+  # - id: detect_if_oven_is_currently_active
+  #   alias: Detect if oven is currently active
+  #   initial_state: on
+  #   mode: single
+  #   trigger:
+  #     - platform: numeric_state
+  #       entity_id: sensor.keller_steckdose_energy_power
+  #       above: 1400
+  #       below: 1500
+  #       for:
+  #         seconds: 35
+  #   condition:
+  #     condition: and
+  #     conditions:
+  #       - condition: template
+  #         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1020 }}"
+  #       - condition: state
+  #         entity_id: switch.kohleanzunder
+  #         state: 'on'
+  #   action:
+  #     - service: automation.turn_off
+  #       data:
+  #         entity_id: 
+  #           - automation.detect_if_washing_machine_is_currently_active
+  #           - automation.detect_if_coal_lighter_is_currently_active
+  #           - automation.detect_if_pizzamaker_is_currently_active
+  #     - choose:
+  #         - conditions:
+  #             - condition: or
+  #               conditions:
+  #                 - condition: state
+  #                   entity_id: device_tracker.flophone
+  #                   state: home
+  #                 - condition: state
+  #                   entity_id: device_tracker.galaxy_s9
+  #                   state: home
+  #           sequence:
+  #             - service: telegram_bot.send_message
+  #               data_template:
+  #                 target: !secret telegram_chat_5friends
+  #                 message: 'Der Ofen wurde eingeschaltet.'
+  #                 inline_keyboard:
+  #                   - "Dauer:/remaining_time"
+  #         - conditions:
+  #             - condition: or
+  #               conditions:
+  #                 - condition: state
+  #                   entity_id: person.kai
+  #                   state: home
+  #                 - condition: state
+  #                   entity_id: person.adri
+  #                   state: home
+  #             - condition: not
+  #               conditions:
+  #                 - condition: state
+  #                   entity_id: device_tracker.flophone
+  #                   state: home
+  #                 - condition: state
+  #                   entity_id: device_tracker.galaxy_s9
+  #                   state: home
+  #           sequence:
+  #             - service: telegram_bot.send_message
+  #               data_template:
+  #                 target: !secret telegram_chat_afk
+  #                 message: 'Der Ofen wurde eingeschaltet.'
+  #                 inline_keyboard:
+  #                   - "Dauer:/remaining_time"
+  #       default:
+  #         - service: telegram_bot.send_message
+  #           data_template:
+  #             target: !secret telegram_chat_fabian
+  #             message: 'Der Ofen wurde eingeschaltet.'
+  #             inline_keyboard:
+  #               - "Dauer:/remaining_time"
+  #     - delay: '00:13:00'
+  #     - choose:
+  #         - conditions:
+  #             - condition: or
+  #               conditions:
+  #                 - condition: state
+  #                   entity_id: device_tracker.flophone
+  #                   state: home
+  #                 - condition: state
+  #                   entity_id: device_tracker.galaxy_s9
+  #                   state: home
+  #           sequence:
+  #             - service: telegram_bot.send_message
+  #               data_template:
+  #                 target: !secret telegram_chat_5friends
+  #                 message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+  #         - conditions:
+  #             - condition: or
+  #               conditions:
+  #                 - condition: state
+  #                   entity_id: person.kai
+  #                   state: home
+  #                 - condition: state
+  #                   entity_id: person.adri
+  #                   state: home
+  #           sequence:
+  #             - service: telegram_bot.send_message
+  #               data_template:
+  #                 target: !secret telegram_chat_afk
+  #                 message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+  #       default:
+  #         - service: telegram_bot.send_message
+  #           data_template:
+  #             target: !secret telegram_chat_fabian
+  #             message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
+  #     - service: automation.turn_on
+  #       data:
+  #         entity_id: 
+  #           - automation.detect_if_washing_machine_is_currently_active
+  #           - automation.detect_if_coal_lighter_is_currently_active
+  #           - automation.detect_if_pizzamaker_is_currently_active
+  #     - service: androidtv.adb_command
+  #       data:
+  #         entity_id: media_player.keller_tv
+  #         command: "pm clear com.tcl.videoplayer"
+  #     - service: androidtv.adb_command
+  #       data:
+  #         entity_id: media_player.keller_tv
+  #         command: "am start -a android.intent.action.VIEW -d /sdcard/raab_mib.mp4 -t video/mp4"
+  #     - delay: '00:05:00'
+  #     - service: switch.turn_off
+  #       data:
+  #         entity_id: switch.kohleanzunder
 
   - id: detect_if_pizzamaker_is_currently_active
     alias: Detect if pizzamaker is currently active
@@ -5416,6 +5495,98 @@
       - service: switch.turn_off
         data:
           entity_id: switch.kohleanzunder
+
+  - id: check_if_coal_lighter_has_been_forgotten
+    alias: Check if coal_lighter has been forgotten
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: switch.kohleanzunder
+        to: 'on'
+        for: 
+          minutes: 20
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 1250 }}"
+        - condition: state
+          entity_id: switch.kohleanzunder
+          state: 'on'
+    action:
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.galaxy_s9
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_5friends
+                  message: 'Der Kohleanzunder wurde vor 20 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.kai
+                    state: home
+                  - condition: state
+                    entity_id: person.adri
+                    state: home
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: device_tracker.flophone
+                    state: home
+                  - condition: state
+                    entity_id: device_tracker.galaxy_s9
+                    state: home
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_afk
+                  message: 'Der Kohleanzunder wurde vor 20 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
+                  inline_keyboard:
+                    - "Dauer:/remaining_time"
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_fabian
+              message: 'Der Kohleanzunder wurde vor 20 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
+              inline_keyboard:
+                - "Dauer:/remaining_time"
+
+  - id: check_if_washing_machine_has_been_forgotten
+    alias: Check if washing machine has been forgotten
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: switch.waschmaschine
+        to: 'on'
+        for: 
+          hours: 6
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 21650 }}"
+        - condition: state
+          entity_id: switch.waschmaschine
+          state: 'on'
+    action:
+      - service: notify.telegram_nessie
+        data:
+          message: 'Die Waschmaschine wurde vor 6 Stunden eingeschaltet aber die Automation nicht gestartet. Fehler und Wäsche wurde vergessen?'
+      - service: notify.telegram_fabian
+        data:
+          message: 'Die Waschmaschine wurde vor 6 Stunden eingeschaltet aber die Automation nicht gestartet. Fehler und Wäsche wurde vergessen?'
 
   - id: detect_if_washing_machine_is_currently_active
     alias: Detect if Washing machine is currently active
