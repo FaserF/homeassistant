@@ -5060,7 +5060,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5085,7 +5085,7 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5111,7 +5111,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5125,7 +5125,7 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5177,7 +5177,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5199,7 +5199,7 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5271,7 +5271,7 @@
   #             - condition: or
   #               conditions:
   #                 - condition: state
-  #                   entity_id: device_tracker.flophone
+  #                   entity_id: device_tracker.florian_s_s20
   #                   state: home
   #                 - condition: state
   #                   entity_id: device_tracker.galaxy_s9
@@ -5295,7 +5295,7 @@
   #             - condition: not
   #               conditions:
   #                 - condition: state
-  #                   entity_id: device_tracker.flophone
+  #                   entity_id: device_tracker.florian_s_s20
   #                   state: home
   #                 - condition: state
   #                   entity_id: device_tracker.galaxy_s9
@@ -5320,7 +5320,7 @@
   #             - condition: or
   #               conditions:
   #                 - condition: state
-  #                   entity_id: device_tracker.flophone
+  #                   entity_id: device_tracker.florian_s_s20
   #                   state: home
   #                 - condition: state
   #                   entity_id: device_tracker.galaxy_s9
@@ -5399,7 +5399,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5423,7 +5423,7 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5448,7 +5448,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5504,12 +5504,12 @@
         entity_id: switch.kohleanzunder
         to: 'on'
         for: 
-          minutes: 20
+          minutes: 22
     condition:
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 1250 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int > 1260 }}"
         - condition: state
           entity_id: switch.kohleanzunder
           state: 'on'
@@ -5519,7 +5519,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5528,7 +5528,7 @@
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_5friends
-                  message: 'Der Kohleanzunder wurde vor 20 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
+                  message: 'Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
           - conditions:
@@ -5543,7 +5543,7 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.flophone
+                    entity_id: device_tracker.florian_s_s20
                     state: home
                   - condition: state
                     entity_id: device_tracker.galaxy_s9
@@ -5552,14 +5552,14 @@
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_afk
-                  message: 'Der Kohleanzunder wurde vor 20 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
+                  message: 'Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
                   inline_keyboard:
                     - "Dauer:/remaining_time"
         default:
           - service: telegram_bot.send_message
             data_template:
               target: !secret telegram_chat_fabian
-              message: 'Der Kohleanzunder wurde vor 20 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
+              message: 'Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig.'
               inline_keyboard:
                 - "Dauer:/remaining_time"
 

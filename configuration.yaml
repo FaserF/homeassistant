@@ -556,8 +556,6 @@ sensor:
           {% if (is_state("switch.kohleanzunder", "on")) -%}
             {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
               {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
-            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Ofen' %}
-              {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (780) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
             {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
               {{ (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int + (300) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
             {% else %}
@@ -568,19 +566,13 @@ sensor:
           {% endif %}
         friendly_name_template: >-
           {% if (is_state("switch.kohleanzunder", "on")) -%}
-            {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered))) %}
+            {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered)) %}
               {% if (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
                 Kohle
               {% else %}
                 Inaktiv
               {% endif %}
-            {% elif (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered))) %}
-              {% if (as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) + 780 - as_timestamp(now()) > 0 ) %}
-                Ofen
-              {% else %}
-                Inaktiv
-              {% endif %}
-            {% elif (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) and (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered))) %}
+            {% elif (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered)) %}
               {% if (as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) + 300 - as_timestamp(now()) > 0 ) %}
                 Pizzamaker
               {% else %}
