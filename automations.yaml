@@ -7102,7 +7102,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: 'device_tracker.google_maps_112174659110860535869'
+        entity_id: device_tracker.google_maps_112174659110860535869
         attribute: source_type
         to: null
         for:
