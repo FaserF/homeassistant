@@ -44,9 +44,9 @@
       - service: media_player.turn_off
         data:
           entity_id: 
-            - media_player.schlafzimmer
-            - media_player.wohnzimmer_mini
-            - media_player.kueche_mini_neu
+            - media_player.schlafzimmer_speaker
+            - media_player.wohnzimmer_uhr
+            - media_player.kuche_speaker
       - choose:
           - conditions:
               - condition: state
@@ -546,6 +546,33 @@
 
   - id: remind_for_unavailable_device
     alias: 'Remind for unavailable device'
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.unavailable_entities
+        above: 0
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_unavailable_device.attributes.last_triggered) | int > 3200 }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          disable_notification: true
+          message: >
+            {% if is_state("sensor.unavailable_entities", "1")%} 
+            Es ist eine Entität nicht verfügbar.
+            {% else %}
+            Es sind {{ states.sensor.unavailable_entities.state }} Entitäten nicht erreichbar.
+            {% endif %}
+            Darunter folgende Entitäten:
+
+            {{ states.sensor.unavailable_entities.attributes.entities }}
+
+  - id: remind_for_unavailable_device
+    alias: 'Remind for unavailable device'
     variables:
       watched: >
         {{states|selectattr('state','in',['unavailable','unknown','none'])
@@ -593,16 +620,13 @@
               entity_id: device_tracker.pocophonef1_pocophon
               state: 'home'
             - condition: state
-              entity_id: device_tracker.google_maps_104418453164779945782
+              entity_id: person.adrian
               state: 'home'
             - condition: state
-              entity_id: device_tracker.google_maps_103127589611220223167
+              entity_id: person.kai
               state: 'home'
             - condition: state
-              entity_id: device_tracker.samuel_iphone
-              state: 'home'
-            - condition: state
-              entity_id: device_tracker.redminote8t_redmi
+              entity_id: device_tracker.samuel_iphone_icloud
               state: 'home'
     action:
       - service: input_boolean.turn_on
@@ -662,6 +686,9 @@
       - service: switch.turn_on
         data:
           entity_id: switch.adguard_protection
+      - service: switch.turn_on
+        data:
+          entity_id: switch.adguard_filtering
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -772,7 +799,7 @@
         for:
           hours: 4
       - platform: state
-        entity_id: device_tracker.nsta0516_2
+        entity_id: device_tracker.nsta0552_lan
         to: 'home'
         for:
           hours: 4
@@ -792,11 +819,11 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nsta0516_2
+              entity_id: device_tracker.nsta0552_lan
               state: 'home'
     action:
       - service: tts.google_say
-        entity_id: media_player.schlafzimmer
+        entity_id: media_player.schlafzimmer_speaker
         data_template:
           message: >
             Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen.
@@ -899,7 +926,7 @@
         for:
             minutes: 1
       - platform: state
-        entity_id: device_tracker.nsta0516_2
+        entity_id: device_tracker.nsta0552_lan
         from: 'home'
         to: 'not_home'
         for:
@@ -916,7 +943,7 @@
         for: 
           minutes: 1
       - condition: state
-        entity_id: device_tracker.nsta0516_2
+        entity_id: device_tracker.nsta0552_lan
         state: 'not_home'
         for: 
           seconds: 20
@@ -930,7 +957,7 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.4
-          entity_id: media_player.schlafzimmer
+          entity_id: media_player.schlafzimmer_speaker
       - choose:
           - conditions:
               - condition: or
@@ -1077,7 +1104,7 @@
         for:
           minutes: 10
       - platform: state
-        entity_id: device_tracker.nsta0516_2
+        entity_id: device_tracker.nsta0552_lan
         from: 'home'
         to: 'not_home'
         for:
@@ -1178,16 +1205,37 @@
         to: 'off'
         for:
           minutes: 45
+      - platform: numeric_state
+        entity_id: sensor.bad_heating
+        above: '80'
+        for:
+          minutes: 20
     condition:
       condition: and
       conditions:
-        - condition: numeric_state
-          entity_id: climate.bad
-          attribute: current_temperature
-          below: 16
-        - condition: numeric_state
-          entity_id: sensor.bad_heating
-          above: 70
+        - condition: state
+          entity_id: binary_sensor.bad_open_window
+          state: 'off'
+          for:
+            minutes: 20
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.bad
+              attribute: current_temperature
+              below: 16
+            - condition: numeric_state
+              entity_id: sensor.bad_heating
+              above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.bad
+              attribute: current_temperature
+              below: 18
+            - condition: numeric_state
+              entity_id: sensor.bad_heating
+              above: 85
     action:
       - choose:
         - conditions:
@@ -1221,9 +1269,9 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
-                  - media_player.schlafzimmer
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                  - media_player.schlafzimmer_speaker
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
         default:
@@ -1248,16 +1296,32 @@
         to: 'off'
         for:
           minutes: 45
+      - platform: numeric_state
+        entity_id: sensor.schlafzimmer_heating
+        above: '80'
+        for:
+          minutes: 20
     condition:
-      condition: and
+      condition: or
       conditions:
-        - condition: numeric_state
-          entity_id: 'climate.schlafzimmer'
-          attribute: current_temperature
-          below: 16
-        - condition: numeric_state
-          entity_id: sensor.schlafzimmer_heating
-          above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.schlafzimmer
+              attribute: current_temperature
+              below: 16
+            - condition: numeric_state
+              entity_id: sensor.schlafzimmer_heating
+              above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.schlafzimmer
+              attribute: current_temperature
+              below: 18
+            - condition: numeric_state
+              entity_id: sensor.schlafzimmer_heating
+              above: 85
     action:
       - choose:
         - conditions:
@@ -1291,8 +1355,8 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
                 data: 
                   message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
         default:
@@ -1317,16 +1381,32 @@
         to: 'off'
         for:
           minutes: 45
+      - platform: numeric_state
+        entity_id: sensor.wohnzimmer_heating
+        above: '80'
+        for:
+          minutes: 20
     condition:
-      condition: and
+      condition: or
       conditions:
-        - condition: numeric_state
-          entity_id: 'climate.wohnzimmer'
-          attribute: current_temperature
-          below: 16
-        - condition: numeric_state
-          entity_id: sensor.wohnzimmer_heating
-          above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.wohnzimmer
+              attribute: current_temperature
+              below: 16
+            - condition: numeric_state
+              entity_id: sensor.wohnzimmer_heating
+              above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.wohntimmer
+              attribute: current_temperature
+              below: 18
+            - condition: numeric_state
+              entity_id: sensor.wohnzimmer_heating
+              above: 85
     action:
       - choose:
         - conditions:
@@ -1360,8 +1440,8 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.kueche_mini_neu
-                  - media_player.schlafzimmer
+                  - media_player.kuche_speaker
+                  - media_player.schlafzimmer_speaker
                 data: 
                   message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
         default:
@@ -1386,16 +1466,32 @@
         to: 'off'
         for:
           minutes: 45
+      - platform: numeric_state
+        entity_id: sensor.gastezimmer_heating
+        above: '80'
+        for:
+          minutes: 20
     condition:
-      condition: and
+      condition: or
       conditions:
-        - condition: numeric_state
-          entity_id: 'climate.gastezimmer'
-          attribute: current_temperature
-          below: 16
-        - condition: numeric_state
-          entity_id: sensor.gastezimmer_heating
-          above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.gastezimmer
+              attribute: current_temperature
+              below: 16
+            - condition: numeric_state
+              entity_id: sensor.gastezimmer_heating
+              above: 70
+        - condition: and
+          conditions:
+            - condition: numeric_state
+              entity_id: climate.gastezimmer
+              attribute: current_temperature
+              below: 18
+            - condition: numeric_state
+              entity_id: sensor.gastezimmer_heating
+              above: 85
     action:
       - choose:
           - conditions:
@@ -1410,9 +1506,9 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
-                  - media_player.schlafzimmer
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                  - media_player.schlafzimmer_speaker
                 data: 
                   message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
         default:
@@ -1466,12 +1562,12 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nsta0516_2
+                    entity_id: device_tracker.nsta0552_lan
                     state: 'home'
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     state: 'off'
             sequence:
               - service: notify.telegram_fabian
@@ -1519,23 +1615,23 @@
                 data_template:
                   volume_level: 0.6
                   entity_id:
-                    - media_player.schlafzimmer
-                    - media_player.wohnzimmer_mini
-                    - media_player.kueche_mini_neu
+                    - media_player.schlafzimmer_speaker
+                    - media_player.wohnzimmer_uhr
+                    - media_player.kuche_speaker
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.schlafzimmer
-                  - media_player.kueche_mini_neu
+                  - media_player.wohnzimmer_uhr
+                  - media_player.schlafzimmer_speaker
+                  - media_player.kuche_speaker
                 data: 
                   message: Das Fenster im Bad kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.3
                   entity_id:
-                    - media_player.schlafzimmer
-                    - media_player.wohnzimmer_mini
-                    - media_player.kueche_mini_neu
+                    - media_player.schlafzimmer_speaker
+                    - media_player.wohnzimmer_uhr
+                    - media_player.kuche_speaker
 
   - id: remind_for_open_window_after_5_minutes_in_sleeping_room
     alias: 'Remind for open window after 5 minutes in sleeping room'
@@ -1579,17 +1675,17 @@
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.6
-                  entity_id: media_player.wohnzimmer_mini
+                  entity_id: media_player.wohnzimmer_uhr
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
                 data: 
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.3
-                  entity_id: media_player.wohnzimmer_mini
+                  entity_id: media_player.wohnzimmer_uhr
 
   - id: remind_for_open_window_after_5_minutes_in_living room
     alias: 'Remind for open window after 5 minutes in living room'
@@ -1637,22 +1733,22 @@
                 data_template:
                   volume_level: 0.6
                   entity_id: 
-                    - media_player.schlafzimmer
-                    - media_player.kueche_mini_neu
+                    - media_player.schlafzimmer_speaker
+                    - media_player.kuche_speaker
               - service: tts.google_say
-                entity_id: media_player.schlafzimmer
+                entity_id: media_player.schlafzimmer_speaker
                 data: 
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
               - service: tts.google_say
-                entity_id: media_player.kueche_mini_neu
+                entity_id: media_player.kuche_speaker
                 data: 
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.3
                   entity_id: 
-                    - media_player.schlafzimmer
-                    - media_player.kueche_mini_neu
+                    - media_player.schlafzimmer_speaker
+                    - media_player.kuche_speaker
       - choose:
           - conditions:
               - condition: state
@@ -1710,23 +1806,23 @@
                 data_template:
                   volume_level: 0.6
                   entity_id:
-                    - media_player.schlafzimmer
-                    - media_player.wohnzimmer_mini
-                    - media_player.kueche_mini_neu
+                    - media_player.schlafzimmer_speaker
+                    - media_player.wohnzimmer_uhr
+                    - media_player.kuche_speaker
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.schlafzimmer
-                  - media_player.kueche_mini_neu
+                  - media_player.wohnzimmer_uhr
+                  - media_player.schlafzimmer_speaker
+                  - media_player.kuche_speaker
                 data: 
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.3
                   entity_id:
-                    - media_player.schlafzimmer
-                    - media_player.wohnzimmer_mini
-                    - media_player.kueche_mini_neu
+                    - media_player.schlafzimmer_speaker
+                    - media_player.wohnzimmer_uhr
+                    - media_player.kuche_speaker
 
   - id: turn_off_bett_if_no_device_is_charging
     alias: 'Turn off bett if no device is charging'
@@ -1929,7 +2025,6 @@
                 data:
                   entity_id: 
                     - light.leds_tisch
-                    - light.yeelight_stripe_0x00000000036d0c16
                     - light.yeelight_bslamp2_0x0000000013fea10f
                   brightness: 10
               - delay: '00:00:20'
@@ -1967,14 +2062,13 @@
                 entity_id: device_tracker.fabian_pc
                 state: 'not_home'
               - condition: state
-                entity_id: 'device_tracker.nsta0516_2'
+                entity_id: 'device_tracker.nsta0552_lan'
                 state: 'not_home'
             sequence:
               - service: light.turn_off
                 data:
                   entity_id: 
                     - light.leds_tisch
-                    - light.yeelight_stripe_0x00000000036d0c16
 
   - id: increase_lights_in_morning
     alias: 'Increase lights in morning'
@@ -1989,9 +2083,6 @@
       conditions:
       - condition: not
         conditions:
-        - condition: state
-          entity_id: light.yeelight_stripe_0x00000000036d0c16
-          state: 'off'
         - condition: state
           entity_id: light.yeelight_bslamp2_0x0000000013fea10f
           state: 'off'
@@ -2009,41 +2100,8 @@
               entity_id: light.leds_tisch
               attribute: brightness
               state: '255'
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: light.yeelight_stripe_0x00000000036d0c16
-          state: 'unavailable'
-        - condition: not
-          conditions:
-            - condition: state
-              entity_id: light.yeelight_stripe_0x00000000036d0c16
-              attribute: brightness
-              state: '255'
     action:
       - delay: '00:00:10'
-      #- service: light.turn_on
-      #  data:
-      #    entity_id: 
-      #      - light.leds_tisch
-      #      - light.yeelight_stripe_0x00000000036d0c16 
-      #    brightness_step: 30
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: light.yeelight_stripe_0x00000000036d0c16
-                state: 'on'
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: light.yeelight_stripe_0x00000000036d0c16
-                    attribute: brightness
-                    state: '255'
-            sequence:
-              - service: light.turn_on
-                entity_id: light.yeelight_stripe_0x00000000036d0c16
-                data_template:
-                  brightness: '{{states.light.yeelight_stripe_0x00000000036d0c16.attributes.brightness + 5}}'
       - choose:
           - conditions:
               - condition: state
@@ -2110,8 +2168,8 @@
     action:
       - service: tts.google_say
         entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini_neu
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
           #- media_player.mpd
         data_template: 
           message: >
@@ -2147,7 +2205,7 @@
         state: 'off'
     action:
       - service: tts.google_say
-        entity_id: media_player.schlafzimmer
+        entity_id: media_player.schlafzimmer_speaker
         data_template: 
           message: >
             Es ist 
@@ -2205,22 +2263,6 @@
         data:
           entity_id: 
             - light.leds_tisch
-            - light.yeelight_stripe_0x00000000036d0c16
-      - choose:
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity_id: light.yeelight_bslamp2_0x0000000013fea10f
-                    state: unavailable
-                  - condition: state
-                    entity_id: light.bett_gluhbirne
-                    state: unavailable
-            sequence:
-              - service: light.turn_on
-                data:
-                  entity_id: light.yeelight_stripe_0x00000000036d0c16
-                  brightness: 255
       - delay: '00:04:00'
       - service: light.turn_off
         data:
@@ -2303,7 +2345,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.nsta0516_2'
+              entity_id: 'device_tracker.nsta0552_lan'
               state: 'home'
     action:
       - service: light.turn_on
@@ -2341,7 +2383,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.nsta0516_2'
+              entity_id: 'device_tracker.nsta0552_lan'
               state: 'home'
         - condition: or
           conditions:
@@ -3311,11 +3353,11 @@
           message: 'ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!'
       - service: tts.google_say
         entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini_neu
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
           - media_player.gastezimmer_mini
-          - media_player.kueche_mini_neu
-          - media_player.schlafzimmer
+          - media_player.kuche_speaker
+          - media_player.schlafzimmer_speaker
         data: 
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
 
@@ -3383,11 +3425,11 @@
   #     - service: media_player.volume_set
   #       data:
   #         volume_level: 0.4
-  #         entity_id: media_player.wohnzimmer_mini
+  #         entity_id: media_player.wohnzimmer_uhr
   #     - service: tts.google_say
   #       entity_id: 
-  #       - media_player.wohnzimmer_mini
-  #       - media_player.schlafzimmer
+  #       - media_player.wohnzimmer_uhr
+  #       - media_player.schlafzimmer_speaker
   #       data_template: 
   #         message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
   #     - service: media_player.media_pause
@@ -3397,16 +3439,16 @@
   #     - service: media_player.volume_set
   #       data:
   #         volume_level: 0.3
-  #         entity_id: media_player.wohnzimmer_mini
+  #         entity_id: media_player.wohnzimmer_uhr
   #     - service: automation.turn_off
   #       data:
   #         entity_id: automation.incoming_call_fabian
   #     - service: media_player.turn_off
   #       data:
-  #         entity_id: media_player.wohnzimmer_mini
+  #         entity_id: media_player.wohnzimmer_uhr
   #     - service: media_player.turn_off
   #       data:
-  #         entity_id: media_player.schlafzimmer
+  #         entity_id: media_player.schlafzimmer_speaker
 
   # - id: incoming_call_nessie
   #   alias: 'Incoming Call Nessie'
@@ -3423,27 +3465,27 @@
   #     - service: media_player.volume_set
   #       data:
   #         volume_level: 0.7
-  #         entity_id: media_player.wohnzimmer_mini
+  #         entity_id: media_player.wohnzimmer_uhr
   #     - service: tts.google_say
   #       entity_id: 
-  #       - media_player.wohnzimmer_mini
-  #       - media_player.schlafzimmer
+  #       - media_player.wohnzimmer_uhr
+  #       - media_player.schlafzimmer_speaker
   #       data:
   #         message: 'Nessie wird soeben angerufen!'
   #     - delay: '00:00:10'
   #     - service: media_player.volume_set
   #       data:
   #         volume_level: 0.3
-  #         entity_id: media_player.wohnzimmer_mini
+  #         entity_id: media_player.wohnzimmer_uhr
   #     - service: automation.turn_off
   #       data:
   #         entity_id: automation.incoming_call_nessie
   #     - service: media_player.turn_off
   #       data:
-  #         entity_id: media_player.wohnzimmer_mini
+  #         entity_id: media_player.wohnzimmer_uhr
   #     - service: media_player.turn_off
   #       data:
-  #         entity_id: media_player.schlafzimmer
+  #         entity_id: media_player.schlafzimmer_speaker
 
 #not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
 #  - id: coinbase_balance_high
@@ -3713,9 +3755,17 @@
     alias: Nessie Phone Battery low
     initial_state: on
     trigger:
-      platform: numeric_state
-      entity_id: sensor.nessie_phone_battery_level
-      below: 5
+      - platform: numeric_state
+        entity_id: sensor.nessie_phone_battery_level
+        below: 5
+      - platform: numeric_state
+        entity_id: sensor.nessie_iphone_battery_state_icloud
+        below: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.nessie_phone_battery_low.attributes.last_triggered) | int > 3600 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -3727,9 +3777,17 @@
     alias: Fabi Phone Battery low
     initial_state: on
     trigger:
-      platform: numeric_state
-      entity_id: sensor.fabian_phone_battery_level
-      below: 5
+      - platform: numeric_state
+        entity_id: sensor.fabian_phone_battery_level
+        below: 5
+      - platform: numeric_state
+        entity_id: sensor.fabian_iphone_battery_state_icloud
+        below: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fabi_phone_battery_low.attributes.last_triggered) | int > 3600 }}"
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -3744,9 +3802,9 @@
     trigger:
       - platform: state
         entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini_neu
-          - media_player.schlafzimmer
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
+          - media_player.schlafzimmer_speaker
           - media_player.gastezimmer_mini
           - media_player.wohnzimmer_tv_cast
           - media_player.mini_gruppe
@@ -3758,132 +3816,132 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     attribute: is_volume_muted
                     state: "false"
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     attribute: media_title
                     state: "Advertisement"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.wohnzimmer_mini
+                  entity_id: media_player.wohnzimmer_uhr
                   is_volume_muted: true
       - choose:
           - conditions:
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     attribute: media_title
                     state: "Advertisement"
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     attribute: is_volume_muted
                     state: "true"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.wohnzimmer_mini
+                  entity_id: media_player.wohnzimmer_uhr
                   is_volume_muted: false
       - choose:
           - conditions:
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     attribute: is_volume_muted
                     state: "false"
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     attribute: media_title
                     state: "Advertisement"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.kueche_mini_neu
+                  entity_id: media_player.kuche_speaker
                   is_volume_muted: true
       - choose:
           - conditions:
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     attribute: media_title
                     state: "Advertisement"
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     attribute: is_volume_muted
                     state: "true"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.kueche_mini_neu
+                  entity_id: media_player.kuche_speaker
                   is_volume_muted: false
       - choose:
           - conditions:
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     attribute: is_volume_muted
                     state: "false"
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     attribute: media_title
                     state: "Advertisement"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.schlafzimmer
+                  entity_id: media_player.schlafzimmer_speaker
                   is_volume_muted: true
       - choose:
           - conditions:
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     attribute: media_title
                     state: "Advertisement"
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     attribute: media_title
                     state: "Spotify"
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     attribute: is_volume_muted
                     state: "true"
             sequence:
               - service: media_player.volume_mute
                 data:
-                  entity_id: media_player.schlafzimmer
+                  entity_id: media_player.schlafzimmer_speaker
                   is_volume_muted: false
       - choose:
           - conditions:
@@ -4229,9 +4287,9 @@
       #    user: "homeassistant"
       - service: tts.google_say
         entity_id: 
-        - media_player.schlafzimmer
-        - media_player.wohnzimmer_mini
-        - media_player.kueche_mini_neu
+        - media_player.schlafzimmer_speaker
+        - media_player.wohnzimmer_uhr
+        - media_player.kuche_speaker
         - media_player.gastezimmer_mini
         data:
           message: 'Die Fritzbox hat keine Internet Verbindung' #und wird nun neugestartet.'
@@ -4280,9 +4338,9 @@
               #    user: "homeassistant"
               - service: tts.google_say
                 entity_id: 
-                  - media_player.schlafzimmer
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
+                  - media_player.schlafzimmer_speaker
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
                   - media_player.gastezimmer_mini
                 data:
                   message: 'Die Internetverbindung ist wiederhergestellt.'
@@ -4494,50 +4552,25 @@
                       - condition: state
                         entity_id: light.leds_tisch
                         state: 'unavailable'
-                  - condition: or
-                    conditions:
-                      - condition: state
-                        entity_id: light.yeelight_stripe_0x00000000036d0c16
-                        state: 'off'
-                      - condition: state
-                        entity_id: light.yeelight_stripe_0x00000000036d0c16
-                        state: 'unavailable'
             sequence:
               - service: light.turn_on
                 data:
                   entity_id: 
                     - light.leds_tisch
-                    - light.yeelight_stripe_0x00000000036d0c16
                   brightness: 255
                   transition: 2
-              - choose:
-                  - conditions:
-                      - condition: or
-                        conditions:
-                          - condition: state
-                            entity_id: light.yeelight_stripe_0x00000000036d0c16
-                            state: 'unavailable'
-                          - condition: state
-                            entity_id: light.yeelight_stripe_0x00000000036d0c16
-                            state: 'unavailable'
-                    sequence:
-                      - service: light.turn_on
-                        data:
-                          entity_id: 
-                            - light.bett_gluhbirne
-                            - light.yeelight_bslamp2_0x0000000013fea10f
-                          brightness: 255
-                          color_temp: 225
-                          transition: 2
+              - service: light.turn_on
+                data:
+                  entity_id: 
+                    - light.bett_gluhbirne
+                    - light.yeelight_bslamp2_0x0000000013fea10f
+                  brightness: 255
+                  color_temp: 225
+                  transition: 2
       - choose:
           - conditions:
               - condition: or
                 conditions:
-                  - condition: state
-                    entity_id: light.yeelight_stripe_0x00000000036d0c16
-                    state: 'on'
-                    for:
-                      seconds: 1
                   - condition: state
                     entity_id: light.leds_tisch
                     state: 'on'
@@ -4704,7 +4737,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: media_player.wohnzimmer_mini
+                entity_id: media_player.wohnzimmer_uhr
                 state: 'off'
               - condition: state
                 entity_id: media_player.wohnzimmer_tv
@@ -4713,9 +4746,9 @@
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.6
-                  entity_id: media_player.wohnzimmer_mini
+                  entity_id: media_player.wohnzimmer_uhr
               - service: tts.google_say
-                entity_id: media_player.wohnzimmer_mini
+                entity_id: media_player.wohnzimmer_uhr
                 data_template:
                   message: >
                     Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -4735,15 +4768,15 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: media_player.kueche_mini_neu
+                entity_id: media_player.kuche_speaker
                 state: 'off'
             sequence:
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.6
-                  entity_id: media_player.kueche_mini_neu
+                  entity_id: media_player.kuche_speaker
               - service: tts.google_say
-                entity_id: media_player.kueche_mini_neu
+                entity_id: media_player.kuche_speaker
                 data_template:
                   message: >
                     Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -4763,15 +4796,15 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: media_player.schlafzimmer
+                entity_id: media_player.schlafzimmer_speaker
                 state: 'off'
             sequence:
               - service: media_player.volume_set
                 data_template:
                   volume_level: 0.6
-                  entity_id: media_player.schlafzimmer
+                  entity_id: media_player.schlafzimmer_speaker
               - service: tts.google_say
-                entity_id: media_player.schlafzimmer
+                entity_id: media_player.schlafzimmer_speaker
                 data_template:
                   message: >
                     Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -4819,9 +4852,9 @@
         data:
           volume_level: 0.3
           entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
-          - media_player.kueche_mini_neu
+          - media_player.wohnzimmer_uhr
+          - media_player.schlafzimmer_speaker
+          - media_player.kuche_speaker
 
   - id: notify_for_extreme_high_humidity
     alias: Notify for extreme high humidity
@@ -4916,13 +4949,13 @@
         data_template:
           volume_level: 0.7
           entity_id:
-            - media_player.schlafzimmer
-            - media_player.wohnzimmer_mini
+            - media_player.schlafzimmer_speaker
+            - media_player.wohnzimmer_uhr
       - service: tts.google_say
         entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini_neu
-          - media_player.schlafzimmer
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
+          - media_player.schlafzimmer_speaker
           #- media_player.mpd
         data_template: 
           message: >
@@ -4944,9 +4977,9 @@
         data:
           volume_level: 0.3
           entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
-          - media_player.kueche_mini_neu
+          - media_player.wohnzimmer_uhr
+          - media_player.schlafzimmer_speaker
+          - media_player.kuche_speaker
 
   - id: notify_for_high_humidity_when_coming_home_weekend    
     alias: Notify for high humidity when coming home weekend
@@ -4988,13 +5021,13 @@
         data:
           volume_level: 0.7
           entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
+          - media_player.wohnzimmer_uhr
+          - media_player.schlafzimmer_speaker
       - service: tts.google_say
         entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.kueche_mini_neu
-        - media_player.schlafzimmer
+        - media_player.wohnzimmer_uhr
+        - media_player.kuche_speaker
+        - media_player.schlafzimmer_speaker
         data_template:
           message: >
             Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im
@@ -5015,9 +5048,9 @@
         data:
           volume_level: 0.3
           entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.schlafzimmer
-          - media_player.kueche_mini_neu
+          - media_player.wohnzimmer_uhr
+          - media_player.schlafzimmer_speaker
+          - media_player.kuche_speaker
 
   - id: detect_if_coal_lighter_is_currently_active
     alias: Detect if coal lighter is currently active
@@ -5702,11 +5735,11 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     state: 'playing'
             sequence:
               - service: tts.google_say
-                entity_id: media_player.wohnzimmer_mini
+                entity_id: media_player.wohnzimmer_uhr
                 data:
                   message: 'Die Waschmaschine ist fertig.'
       - choose:
@@ -5717,11 +5750,11 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.kueche_mini_neu
+                    entity_id: media_player.kuche_speaker
                     state: 'playing'
             sequence:
               - service: tts.google_say
-                entity_id: media_player.kueche_mini_neu
+                entity_id: media_player.kuche_speaker
                 data:
                   message: 'Die Waschmaschine ist fertig.'
       - choose:
@@ -5732,11 +5765,11 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.schlafzimmer
+                    entity_id: media_player.schlafzimmer_speaker
                     state: 'playing'
             sequence:
               - service: tts.google_say
-                entity_id: media_player.schlafzimmer
+                entity_id: media_player.schlafzimmer_speaker
                 data:
                   message: 'Die Waschmaschine ist fertig.'
       - service: automation.turn_on
@@ -5748,8 +5781,8 @@
             - automation.detect_if_pizzamaker_is_currently_active
       #- service: tts.google_say
       #  entity_id: 
-      #  - media_player.wohnzimmer_mini
-      #  - media_player.schlafzimmer
+      #  - media_player.wohnzimmer_uhr
+      #  - media_player.schlafzimmer_speaker
       #  data_template:
       #    message: '{% if (is_state("input_boolean.silent_mode", "off")) -%} Die Waschmaschine ist fertig. {%- endif %} '
       - service: switch.turn_off
@@ -5823,7 +5856,7 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: media_player.wohnzimmer_mini
+                    entity_id: media_player.wohnzimmer_uhr
                     state: 'playing'
               - condition: or
                 conditions:
@@ -5835,11 +5868,11 @@
                     state: 'home'
             sequence:
               - service: tts.google_say
-                entity_id: media_player.wohnzimmer_mini
+                entity_id: media_player.wohnzimmer_uhr
                 data_template:
                   message: 'Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig.'
               - service: tts.google_say
-                entity_id: media_player.kueche_mini_neu
+                entity_id: media_player.kuche_speaker
                 data_template:
                   message: 'Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig.'
       - service: input_select.select_option
@@ -5912,7 +5945,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: home
                   - condition: state
-                    entity_id: device_tracker.nsta0516_2
+                    entity_id: device_tracker.nsta0552_lan
                     state: home
             sequence:
               #- service: notify.browser
@@ -5983,12 +6016,12 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.7
-          entity_id: media_player.wohnzimmer_mini
+          entity_id: media_player.wohnzimmer_uhr
       - service: tts.google_say
         entity_id: 
-        - media_player.wohnzimmer_mini
-        - media_player.kueche_mini_neu
-        - media_player.schlafzimmer
+        - media_player.wohnzimmer_uhr
+        - media_player.kuche_speaker
+        - media_player.schlafzimmer_speaker
         #- media_player.gastezimmer_mini
         data_template:
           message: >
@@ -6012,7 +6045,7 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.3
-          entity_id: media_player.wohnzimmer_mini
+          entity_id: media_player.wohnzimmer_uhr
 
   - id: telegram_open_door
     alias: 'Telegram open door'
@@ -6079,11 +6112,11 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.7
-          entity_id: media_player.wohnzimmer_mini
+          entity_id: media_player.wohnzimmer_uhr
       - service: tts.google_say
         entity_id: 
-          - media_player.wohnzimmer_mini
-          - media_player.kueche_mini_neu
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
         data_template:
           message: >
             Ding Dong, es klingelt.
@@ -6160,16 +6193,20 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.3
-          entity_id: media_player.wohnzimmer_mini
+          entity_id: media_player.wohnzimmer_uhr
 
   - id: telegram_pill_marked_done
     alias: 'Telegram pill marked done'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_callback
-      event_data:
-        data: '/pilldone'
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/pilldone'
+      - platform: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: pilldone
     action:
       - service: telegram_bot.answer_callback_query
         data_template:
@@ -6239,6 +6276,21 @@
                 entity_id: counter.pille
                 below: '21'
             sequence:
+              - service: notify.mobile_app_nessie_handy
+                data_template:
+                  title: "Pillen Reminder"
+                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
+                  data:
+                    actions:
+                      - action: "pilldone"
+                        title: "Erledigt"
+                      - action: "pill1h"
+                        title: "Erinnern in 1h"
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.1
               - service: notify.telegram_nessie
                 data_template:
                   message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
@@ -6292,6 +6344,13 @@
     condition:
       condition: and
       conditions:
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - sun
         - condition: not
           conditions:
             - condition: state
@@ -6301,31 +6360,101 @@
         - condition: numeric_state
           entity_id: counter.pille
           below: '22'
-        - condition: state
-          entity_id: person.nessie
-          state: home
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 10800 }}"
     action:
-      - service: tts.google_say
-        entity_id: media_player.schlafzimmer
-        data:
-          message: 'Nessie, du hast die Pille vergessen'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: person.nessie
+                state: home
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.schlafzimmer_speaker
+                data:
+                  message: 'Nessie, du hast die Pille vergessen'
       - service: notify.telegram_nessie
         data:
           message: "Du hast die Pille vergessen!"
+      - service: notify.mobile_app_nessie_handy
+        data:
+          message: "Du hast die Pille vergessen!"
           data:
-            inline_keyboard:
-            - 'Erledigt:/pilldone, Erinnern1h:/pill1h'
+            push:
+              sound:
+                name: "default"
+                critical: 1
+                volume: 1.0
+
+  - id: nessie_forgot_pill_weekend
+    alias: 'Nessie forgot pill weekend'
+    initial_state: on
+    trigger:
+      - platform: time
+        at: '00:00:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - fri
+            - sat
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: automation.telegram_pill_marked_done
+              attribute: last_triggered
+              state: none
+        - condition: numeric_state
+          entity_id: counter.pille
+          below: '22'
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 14760 }}"
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: person.nessie
+                state: home
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.schlafzimmer_speaker
+                data:
+                  message: 'Nessie, du hast die Pille vergessen'
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: home
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: "Du hast die Pille vergessen!"
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: person.nessie
+                    state: home
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: "Du hast die Pille vergessen!"
 
   - id: telegram_pill_1h
     alias: 'Telegram pill 1h'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_callback
-      event_data:
-        data: '/pill1h'
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/pill1h'
+      - platform: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: pill1h
     action:
       - service: telegram_bot.answer_callback_query
         data_template:
@@ -6919,7 +7048,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nsta0516_2
+        entity_id: device_tracker.nsta0552_lan
         to: 'home'
       - platform: state
         entity_id: device_tracker.vku_lb_20
@@ -6939,7 +7068,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nsta0516_2
+              entity_id: device_tracker.nsta0552_lan
               state: 'home'
             - condition: not
               conditions:
@@ -6977,7 +7106,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.nsta0516_2
+        entity_id: device_tracker.nsta0552_lan
         to: 'not_home'
       - platform: state
         entity_id: switch.nessie_pc
@@ -7549,8 +7678,8 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
                   - media_player.gastezimmer_mini
                 data_template:
                   message: 'Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
@@ -7659,9 +7788,9 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
-                  - media_player.schlafzimmer
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                  - media_player.schlafzimmer_speaker
                 data_template:
                   message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
       - service: notify.telegram_fabian
@@ -7699,9 +7828,9 @@
             sequence:
               - service: tts.google_say
                 entity_id: 
-                  - media_player.wohnzimmer_mini
-                  - media_player.kueche_mini_neu
-                  - media_player.schlafzimmer
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                  - media_player.schlafzimmer_speaker
                 data_template:
                   message: 'Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an.'
       - service: notify.telegram_fabian

@@ -73,6 +73,7 @@ ignored_entities:
     - media_player.chromecast
     - media_player.chromecast_cast
     - light.keller_gluhbirne
+    - light.keller_bulb
     - light.prismatik
     - sensor.nessie_phone_charger_type
     - sensor.fabian_phone_charger_type
@@ -90,19 +91,68 @@ ignored_entities:
     - switch.shutdown_fabian_pc
     - switch.hibernate_fabian_pc
     - sensor.cpu_load_fabian_pc
+    - sensor.corona_news
+    - sensor.dell_9020_c_space_used
+    - sensor.dell_9020_cpu_speed
     - sensor.washing_machine_mode
-    - automation.turn_off_5ghz_wifi_and_turn_on_ssh_if_nobody_is_at_home
-    - automation.turn_on_bett_if_bett_usb_ports_turned_on
-    - automation.turn_off_bett_if_bett_usb_ports_turned_off
-    - automation.turn_on_light_if_tv_starts
-    - automation.turn_on_climate_if_tv_starts
-    - automation.turn_off_bett_after_25_hours
-    - automation.turn_off_staubsauger_after_3_hours
-    - automation.turn_on_lights_in_guest_room_room_when_dark_outside
-    - device_tracker.maxi_phone_2
-    - device_tracker.maxiphone
+    - sensor.dell_9020_cpu_temperature
+    - sensor.dell_9020_d_space_used
+    - sensor.dell_9020_e_space_used
+    - sensor.dell_9020_f_space_used
+    - sensor.dell_9020_geforce_gtx_1070_memory_free
+    - sensor.dell_9020_geforce_gtx_1070_memory_used
+    - sensor.dell_9020_geforce_gtx_1070_usage
+    - sensor.dell_9020_load
+    - sensor.dell_9020_memory_free
+    - sensor.dell_9020_memory_used_2
+    - sensor.gastezimmer_mini_alarms
+    - sensor.gastezimmer_mini_timers
+    - sensor.kuche_speaker_alarms
+    - sensor.kuche_speaker_timers
+    - sensor.mydealz
+    - sensor.playlists_sensor
+    - sensor.wohnzimmer_uhr_alarms
+    - sensor.wohnzimmer_uhr_timers
+    - sensor.xiaomi_89fb_7604_devices
+    - sensor.xiaomi_89fb_7604_devices_2_4ghz
+    - sensor.xiaomi_89fb_7604_devices_5ghz
+    - sensor.xiaomi_89fb_7604_devices_5ghz_game
+    - sensor.xiaomi_89fb_7604_memory_usage
+    - sensor.xiaomi_89fb_7604_uptime
+    - sensor.xiaomi_miio_cooker_cooking_delayed
+    - sensor.xiaomi_miio_cooker_duration
+    - sensor.xiaomi_miio_cooker_favorite
+    - sensor.xiaomi_miio_cooker_menu
+    - sensor.xiaomi_miio_cooker_mode
+    - sensor.xiaomi_miio_cooker_remaining
+    - sensor.xiaomi_miio_cooker_rice_id
+    - sensor.xiaomi_miio_cooker_stage_description
+    - sensor.xiaomi_miio_cooker_stage_name
+    - sensor.xiaomi_miio_cooker_state
+    - sensor.xiaomi_miio_cooker_taste
+    - sensor.xiaomi_miio_cooker_taste_phase
+    - sensor.xiaomi_miio_cooker_temperature
+    - switch.xiaomi_89fb_7604_reboot
+    - device_tracker.galaxy_s9
     - device_tracker.galaxy_s10_lite
-    - device_tracker.mi9t_ksmi9t
+    - device_tracker.florian_s_s20
     - device_tracker.9a_27_b0_8d_70_93
     - device_tracker.iphone_2
     - device_tracker.iphone
+    - device_tracker.huawei_p30_lite_aec7d0205
+    - device_tracker.ea_39_66_3f_03_75
+    - binary_sensor.xiaomi_89fb_7604_state
+    - binary_sensor.xiaomi_89fb_7604_wifi_state
+    - light.xiaomi_89fb_7604_led
+    - number.gastezimmer_mini_alarm_volume
+    - number.kuche_speaker_alarm_volume
+    - number.schlafzimmer_speaker_alarm_volume
+    - number.wohnzimmer_uhr_alarm_volume
+    - sensor.schlafzimmer_speaker_device
+    - sensor.wohnzimmer_uhr_device
+    - switch.schlafzimmer_speaker_do_not_disturb
+    - switch.wohnzimmer_uhr_do_not_disturb
+    - sensor.gastezimmer_mini_device
+    - sensor.kuche_speaker_device
+    - switch.gastezimmer_mini_do_not_disturb
+    - switch.kuche_speaker_do_not_disturb

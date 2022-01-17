@@ -404,7 +404,7 @@ template:
         attributes:
           entities: >
             {% if state_attr('group.ignored_entities','entity_id') != none %}
-              {% set ignore_seconds = 120 %}
+              {% set ignore_seconds = 360 %}
               {% set ignore_ts = (now().timestamp() - ignore_seconds)|as_datetime %}
               {{ states
                 |rejectattr('domain','eq','group')
@@ -464,7 +464,11 @@ sensor:
         unit_of_measurement: "°C"
         value_template: >-
           {% if (is_state("switch.xiaomi_miio_cooker", "off")) -%}
-            {{ (float(states.sensor.xiaomi_miio_cooker_temperature.state) + float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 5 | round(2) }}
+            {% if not(is_state("sensor.xiaomi_miio_cooker_temperature", "unknown")) -%}
+              {{ (float(states.sensor.xiaomi_miio_cooker_temperature.state) + float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 5 | round(2) }}
+            {% else %}
+              {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+            {% endif %}
           {% else %}
             {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
           {% endif %}
@@ -641,33 +645,33 @@ sensor:
   - platform: spotcast
     sp_dc: !secret sp_dc
     sp_key: !secret sp_key
-  #- platform: email
-  #  email: !secret vapid_email
-  #  password: !secret email_pw
+  # - platform: email
+  #   email: !secret vapid_email
+  #   password: !secret email_pw
   # - platform: feedparser
   #   name: Corona News
   #   feed_url: "https://www.rki.de/SiteGlobals/Functions/RSSFeed/RSSGenerator_nCoV.xml"
   #   date_format: "%a, %d %b %H:%M:%S %Z"
   #   inclusions:
-  #    - title
-      - description
-      - link
-      - pubDate
-    exclusions:
-      - language
-      - image
-  - platform: feedparser
-    name: Mydealz
-    feed_url: !secret mydealz_rss
-    date_format: "%a, %d %b %H:%M:%S %Z"
-    inclusions:
-      - title
-      - link
-      - pubDate
-    exclusions:
-      - language
-      - description
-      - image
+  #     - title
+  #     - description
+  #     - link
+  #     - pubDate
+  #   exclusions:
+  #     - language
+  #     - image
+  # - platform: feedparser
+  #   name: Mydealz
+  #   feed_url: !secret mydealz_rss
+  #   date_format: "%a, %d %b %H:%M:%S %Z"
+  #   inclusions:
+  #     - title
+  #     - link
+  #     - pubDate
+  #   exclusions:
+  #     - language
+  #     - description
+  #     - image
 
 light:
   - platform: prismatik

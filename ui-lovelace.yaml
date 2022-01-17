@@ -81,14 +81,12 @@ views:
       - entity: sensor.keller_steckdose_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
-      - entity: sensor.dwd_illuminance
       - entity: sensor.fabian_s_zuhause_solar_percentage
       - entity: counter.pille
       - entity: sensor.coronavirus_lk_ebersberg
       - entity: sensor.coronavirus_lk_munchen
       - entity: sensor.average_house_humidity
       - entity: sensor.average_house_temp
-      - entity: sensor.switch_lan_play_online
     cards:
       - entities:
           - entity: switch.deckenlampe
@@ -166,6 +164,8 @@ views:
             unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
+          - entity: binary_sensor.wohnzimmer_open_window
+            name: Fenster
         step_layout: column
         step_size: "1"
       - entity: climate.schlafzimmer
@@ -176,6 +176,8 @@ views:
             unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
+          - entity: binary_sensor.schlafzimmer_open_window
+            name: Fenster
         step_size: "1"
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
@@ -185,6 +187,8 @@ views:
             unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
+          - entity: binary_sensor.gastezimmer_open_window
+            name: Fenster
         step_size: "1"
       - entity: climate.bad
         type: custom:simple-thermostat
@@ -194,6 +198,8 @@ views:
             unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
+          - entity: binary_sensor.bad_open_window
+            name: Fenster
         step_size: "1"
       - type: vertical-stack
         cards:
@@ -265,6 +271,8 @@ views:
     title: Wohnzimmer
     badges: []
     cards:
+      - type: area
+        area: 7c05afe47efd44f5a0a064769ad6e105
       - entities:
           - entity: switch.adaptive_lighting_living_room
             name: Adaptives Licht
@@ -395,6 +403,8 @@ views:
     title: Schlafzimmer
     badges: []
     cards:
+      - type: area
+        area: 33e9a108bf1948e5848f156e0851d50c
       - entities:
           - entity: switch.adaptive_lighting_sleeping_room
             name: Adaptives Licht
@@ -403,7 +413,6 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_stripe_0x00000000036d0c16
           - entity: light.leds_tisch
             group: true
             toggle: true
@@ -451,6 +460,8 @@ views:
     title: Gästezimmer
     badges: []
     cards:
+      - type: area
+        area: b67ac5462e454381aa87f812161d8578
       - entities:
           - entity: switch.adaptive_lighting_guest_room
             name: Adaptives Licht
@@ -498,6 +509,8 @@ views:
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.steckerleiste_keller_energy_today
     cards:
+      - type: area
+        area: fd6f6d3c931e48348d9437fc4d103fb4
       - entities:
           - entity: light.keller_bulb
             group: true
@@ -735,7 +748,7 @@ views:
         entities:
           - entity: person.adri
           - entity: person.kai
-          - entity: device_tracker.flophone
+          - entity: device_tracker.florian_s_s20
           - entity: device_tracker.galaxy_s9
             name: Maxi Phone
           - entity: device_tracker.pocophonef1_pocophon
@@ -757,6 +770,7 @@ views:
           - entity: sensor.processor_temperature
           - entity: sensor.memory_use_percent
           - entity: sensor.disk_use_percent
+          - entity: sensor.unavailable_entities
       - type: sensor
         entity: sensor.processor_temperature
         graph: line
