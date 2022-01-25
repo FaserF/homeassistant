@@ -620,7 +620,7 @@
               entity_id: device_tracker.pocophonef1_pocophon
               state: 'home'
             - condition: state
-              entity_id: person.adrian
+              entity_id: person.adri
               state: 'home'
             - condition: state
               entity_id: person.kai
@@ -1205,37 +1205,16 @@
         to: 'off'
         for:
           minutes: 45
-      - platform: numeric_state
-        entity_id: sensor.bad_heating
-        above: '80'
-        for:
-          minutes: 20
     condition:
       condition: and
       conditions:
-        - condition: state
-          entity_id: binary_sensor.bad_open_window
-          state: 'off'
-          for:
-            minutes: 20
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.bad
-              attribute: current_temperature
-              below: 16
-            - condition: numeric_state
-              entity_id: sensor.bad_heating
-              above: 70
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.bad
-              attribute: current_temperature
-              below: 18
-            - condition: numeric_state
-              entity_id: sensor.bad_heating
-              above: 85
+        - condition: numeric_state
+          entity_id: climate.bad
+          attribute: current_temperature
+          below: 18
+        - condition: numeric_state
+          entity_id: sensor.bad_heating
+          above: 35
     action:
       - choose:
         - conditions:
@@ -1273,7 +1252,7 @@
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
                 data: 
-                  message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
+                  message: Es wurde eventuell vermutlich vergessen das Fenster im Bad zu schließen.
         default:
           - service: notify.telegram_fabian
             data:
@@ -1296,32 +1275,16 @@
         to: 'off'
         for:
           minutes: 45
-      - platform: numeric_state
-        entity_id: sensor.schlafzimmer_heating
-        above: '80'
-        for:
-          minutes: 20
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.schlafzimmer
-              attribute: current_temperature
-              below: 16
-            - condition: numeric_state
-              entity_id: sensor.schlafzimmer_heating
-              above: 70
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.schlafzimmer
-              attribute: current_temperature
-              below: 18
-            - condition: numeric_state
-              entity_id: sensor.schlafzimmer_heating
-              above: 85
+        - condition: numeric_state
+          entity_id: climate.schlafzimmer
+          attribute: current_temperature
+          below: 18
+        - condition: numeric_state
+          entity_id: sensor.schlafzimmer_heating
+          above: 35
     action:
       - choose:
         - conditions:
@@ -1341,7 +1304,7 @@
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
               data: 
-                message: Es wurde vergessen das Fenster im Schlafzimmer zu schließen.
+                message: Es wurde eventuell vergessen das Fenster im Schlafzimmer zu schließen.
       - choose:
           - conditions:
               - condition: or
@@ -1381,32 +1344,16 @@
         to: 'off'
         for:
           minutes: 45
-      - platform: numeric_state
-        entity_id: sensor.wohnzimmer_heating
-        above: '80'
-        for:
-          minutes: 20
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.wohnzimmer
-              attribute: current_temperature
-              below: 16
-            - condition: numeric_state
-              entity_id: sensor.wohnzimmer_heating
-              above: 70
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.wohntimmer
-              attribute: current_temperature
-              below: 18
-            - condition: numeric_state
-              entity_id: sensor.wohnzimmer_heating
-              above: 85
+        - condition: numeric_state
+          entity_id: climate.wohntimmer
+          attribute: current_temperature
+          below: 18
+        - condition: numeric_state
+          entity_id: sensor.wohnzimmer_heating
+          above: 35
     action:
       - choose:
         - conditions:
@@ -1426,7 +1373,7 @@
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
               data: 
-                message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+                message: Es wurde eventuell vergessen das Fenster im Wohnzimmer zu schließen.
       - choose:
           - conditions:
               - condition: or
@@ -1443,7 +1390,7 @@
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
                 data: 
-                  message: Es wurde vergessen das Fenster im Wohnzimmer zu schließen.
+                  message: Es wurde eventuell vergessen das Fenster im Wohnzimmer zu schließen.
         default:
           - service: notify.telegram_fabian
             data:
@@ -1466,32 +1413,16 @@
         to: 'off'
         for:
           minutes: 45
-      - platform: numeric_state
-        entity_id: sensor.gastezimmer_heating
-        above: '80'
-        for:
-          minutes: 20
     condition:
-      condition: or
+      condition: and
       conditions:
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.gastezimmer
-              attribute: current_temperature
-              below: 16
-            - condition: numeric_state
-              entity_id: sensor.gastezimmer_heating
-              above: 70
-        - condition: and
-          conditions:
-            - condition: numeric_state
-              entity_id: climate.gastezimmer
-              attribute: current_temperature
-              below: 18
-            - condition: numeric_state
-              entity_id: sensor.gastezimmer_heating
-              above: 85
+        - condition: numeric_state
+          entity_id: climate.gastezimmer
+          attribute: current_temperature
+          below: 18
+        - condition: numeric_state
+          entity_id: sensor.gastezimmer_heating
+          above: 85
     action:
       - choose:
           - conditions:
@@ -1510,7 +1441,7 @@
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
                 data: 
-                  message: Es wurde vergessen das Fenster im Gästezimmer zu schließen.
+                  message: Es wurde eventuell vergessen das Fenster im Gästezimmer zu schließen.
         default:
           - service: notify.telegram_fabian
             data:
@@ -5072,14 +5003,14 @@
       condition: and
       conditions:
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 600 }}"
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1080 }}"
         - condition: state
           entity_id: switch.kohleanzunder
           state: 'on'
         - condition: numeric_state
           entity_id: sensor.keller_steckdose_energy_power
           above: 420
-          below: 540
+          below: 570
     action:
       - service: automation.turn_off
         data:
@@ -5200,7 +5131,23 @@
               - service: notify.keller_tv
                 data:
                   message: "Bitte Kohle wenden."
-      - delay: '00:08:00'
+      - delay: '00:06:00'
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: unavailable
+            sequence:
+              - service: notify.keller_tv
+                data:
+                  message: "Der Eisschlauch kann schon mal geholt werden."
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_fabian
+          message: 'Der Eisschlauch kann schon mal geholt werden.'
+      - delay: '00:02:00'
       - service: switch.turn_off
         data:
           entity_id: switch.kohleanzunder
@@ -6156,6 +6103,10 @@
                       Jemand
                     {% endif %}
                     ist da.
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.wohnzimmer_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
       - choose:
           - conditions:
               - condition: not
@@ -6180,16 +6131,14 @@
                       Jemand
                     {% endif %}
                     ist da.
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
           message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
-      - service: androidtv.adb_command
-        data:
-          entity_id: 
-            - media_player.keller_tv
-            - media_player.wohnzimmer_tv
-          command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
       - service: media_player.volume_set
         data:
           volume_level: 0.3

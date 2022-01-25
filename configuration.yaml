@@ -132,6 +132,13 @@ recorder:
       - counter.pille
       - sensor.xiaomi_miio_cooker_favorite
       - sensor.xiaomi_miio_cooker_duration
+      - sensor.xiaomi_abd8_uptime
+      - sensor.xiaomi_89fb_7604_uptime
+      - sensor.fritz_box_3490_device_uptime
+      - sensor.fritz_box_3490_connection_uptime
+      - sensor.fritz_box_3490_max_kbit_s_sent
+      - sensor.fritz_box_3490_max_kbit_s_received
+      - sensor.unavailable_entities
       #- sensor.staubsaugroboter_status
       - switch.rpi_cooling_fan
 
