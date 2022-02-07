@@ -156,3 +156,7 @@ ignored_entities:
     - sensor.kuche_speaker_device
     - switch.gastezimmer_mini_do_not_disturb
     - switch.kuche_speaker_do_not_disturb
+    - sensor.ks_battery_state
+    - sensor.samuel_iphone_battery_state
+    - sensor.adri_iphone_battery_state
+    - sensor.fabian_iphone7_battery_state

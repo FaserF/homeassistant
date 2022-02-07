@@ -171,12 +171,6 @@ logger:
     homeassistant.loader:
       - "You are using a custom integration*"
       - "We found a custom integration * which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant"
-    androidtv.adb_manager.adb_manager_async:
-      - "Couldn't connect to*"
-    homeassistant.components.androidtv.media_player:
-      - "Could not connect to*"
-    homeassistant.components.media_player:
-      - "Platform androidtv not ready yet. Retrying in*"
     homeassistant.helpers.service:
       - "Unable to find referenced entities$"
     homeassistant.config_entries:
@@ -257,98 +251,12 @@ notify:
     vapid_prv_key: !secret vapid_prv_key
     vapid_email: !secret vapid_email
 
-media_player:
-  - platform: androidtv
-    name: Wohnzimmer TV
-    device_class: androidtv
-    host: 192.168.31.10
-    adb_server_ip: 127.0.0.1
-    exclude_unnamed_apps: true
-    apps:
-      com.liskovsoft.smarttubetv.beta: "YouTube TV - SmartTubeNext"
-      exp.animo.fireanime: "FireAnime"
-      com.crunchyroll.crunchyroid: "Crunchyroll"
-      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
-      com.netflix.ninja: "Netflix"
-      com.valvesoftware.steamlink: "Steam Link"
-      com.zdf.android.mediathek: "ZDF Mediathek"
-      tv.emby.embyatv: "Emby"
-      com.google.android.apps.mediashell: "Chromecast"
-      de.prosiebensat1digital.prosieben: "Pro7"
-      de.prosiebensat1digital.seventv: "Joyn"
-      com.tcl.tv: "HDMI"
-      com.tcl.settings: "Einstellungen TCL"
-      com.android.tv.settings: "Einstellungen"
-    state_detection_rules:
-      "com.google.android.tvlauncher":
-        - "standby"
-      "com.tcl.tv":
-        - "playing"
-      "com.netflix.ninja":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.spotify.tv.android":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.google.android.apps.mediashell":
-        - "audio_state"
-      "com.liskovsoft.videomanager":
-        - "playing":
-            "media_session_state": 3
-  - platform: androidtv
-    name: Keller TV
-    device_class: androidtv
-    host: 192.168.31.12
-    adb_server_ip: 127.0.0.1
-    exclude_unnamed_apps: true
-    apps:
-      com.liskovsoft.smarttubetv.beta: "YouTube TV - SmartTubeNext"
-      exp.animo.fireanime: "FireAnime"
-      com.crunchyroll.crunchyroid: "Crunchyroll"
-      com.amazon.amazonvideo.livingroom: "Amazon Prime Video"
-      com.netflix.ninja: "Netflix"
-      com.valvesoftware.steamlink: "Steam Link"
-      com.zdf.android.mediathek: "ZDF Mediathek"
-      tv.emby.embyatv: "Emby"
-      com.google.android.apps.mediashell: "Chromecast"
-      de.prosiebensat1digital.prosieben: "Pro7"
-      de.prosiebensat1digital.seventv: "Joyn"
-      com.tcl.tv: "HDMI"
-      com.tcl.settings: "Einstellungen TCL"
-      com.android.tv.settings: "Einstellungen"
-    state_detection_rules:
-      "com.google.android.tvlauncher":
-        - "standby"
-      "com.tcl.tv":
-        - "playing"
-      "com.netflix.ninja":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.spotify.tv.android":
-        - "playing":
-            "media_session_state": 3
-        - "paused":
-            "media_session_state": 2
-      "com.google.android.apps.mediashell":
-        - "audio_state"
-      "com.liskovsoft.videomanager":
-        - "playing":
-            "media_session_state": 3
+#media_player:
 #  - platform: mpd
 #    host: 127.0.0.1
 
 #speedtestdotnet:
 #  server_id: 21514
-
-spotcast:
-  sp_dc: !secret sp_dc
-  sp_key: !secret sp_key
 
 climate:
   - platform: generic_thermostat
@@ -415,6 +323,7 @@ template:
               {% set ignore_ts = (now().timestamp() - ignore_seconds)|as_datetime %}
               {{ states
                 |rejectattr('domain','eq','group')
+                |rejectattr('domain','eq','button')
                 |rejectattr('domain','eq','automation')
                 |rejectattr('domain','eq','device_tracker')
                 |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))
@@ -807,25 +716,6 @@ switch:
               {% endif %}
         turn_off:
           service: xiaomi_miio_cooker.stop
-  - platform: template
-    switches:
-      fritzbox_restart:
-        icon_template: >-
-          {% if is_state('binary_sensor.fritz_box_3490_connectivity', 'Connected') %}
-            mdi:router-wireless
-          {% else %}
-            mdi:router
-          {% endif %}
-        friendly_name: "Fritzbox Neustart"
-        value_template: "{{ is_state('binary_sensor.fritz_box_3490_connectivity', 'do_not_fulfil_condition') }}"
-        turn_on:
-          service: fritz.reboot
-          data:
-            host: 192.168.178.1
-        turn_off:
-          service: switch.turn_off
-          target:
-            entity_id: switch.fritzbox_restart
   #- platform: sonoff_lan_mode_r3
   #name: Bett
   #device_id: 100016e326
