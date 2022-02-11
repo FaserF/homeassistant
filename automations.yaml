@@ -4781,6 +4781,10 @@
         type: button_long_press
         subtype: button_1
         discovery_id: 68C63A87B4BF_button_1_HOLD
+      - platform: event         
+        event_type: ios.action_fired         
+        event_data:           
+          actionName: 'Light Livingroom'   
     action:
       - choose:
           - conditions:
@@ -4895,6 +4899,10 @@
         type: button_long_press
         subtype: button_1
         discovery_id: 68C63AA72808_button_1_HOLD
+      - platform: event         
+        event_type: ios.action_fired         
+        event_data:           
+          actionName: 'Light Sleepingroom'  
     action:
       - choose:
           - conditions:

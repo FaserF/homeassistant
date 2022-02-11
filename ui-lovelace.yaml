@@ -242,15 +242,6 @@ views:
             details: false
             forecast: true
             forecastMaxColumn: "5"
-      - artwork: cover
-        entity: media_player.schlafzimmer
-        type: custom:mini-media-player
-      - artwork: cover
-        entity: media_player.kueche_mini_neu
-        type: custom:mini-media-player
-      - artwork: cover
-        entity: media_player.gastezimmer_mini
-        type: custom:mini-media-player
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
@@ -259,13 +250,21 @@ views:
           - type: custom:mini-media-player
             entity: media_player.wohnzimmer_tv_cast
           - type: custom:mini-media-player
-            entity: media_player.wohnzimmer_mini
+            entity: media_player.wohnzimmer_uhr
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
             entity: media_player.keller_tv
           - type: custom:mini-media-player
             entity: media_player.keller_tv_cast
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            entity: media_player.schlafzimmer_speaker
+          - type: custom:mini-media-player
+            entity: media_player.kuche_speaker
+          - type: custom:mini-media-player
+            entity: media_player.gastezimmer_mini
   - icon: mdi:television
     path: wohnzimmer
     title: Wohnzimmer
@@ -313,7 +312,7 @@ views:
         entity: media_player.wohnzimmer_tv_cast
         type: custom:mini-media-player
       - artwork: cover
-        entity: media_player.wohnzimmer_mini
+        entity: media_player.wohnzimmer_uhr
         type: custom:mini-media-player
       - artwork: cover
         entity: media_player.wohnzimmer_tv
@@ -432,7 +431,7 @@ views:
           - entity: light.prismatik
           - entity: device_tracker.fabian_pc
             secondary_info: last-changed
-          - entity: device_tracker.nsta0516_2
+          - entity: device_tracker.nsta0552_lan
             secondary_info: last-changed
           - entity: sensor.steckdose_schlafzimmer_energy_today
           - entity: sensor.steckdose_schlafzimmer_energy_power
@@ -453,7 +452,10 @@ views:
             name: Heizleistung
         step_size: "1"
       - artwork: cover
-        entity: media_player.schlafzimmer
+        entity: media_player.schlafzimmer_speaker
+        type: custom:mini-media-player
+      - artwork: cover
+        entity: media_player.ytube_music_player
         type: custom:mini-media-player
   - icon: mdi:desktop-tower
     path: gastezimmer
@@ -473,6 +475,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
+          - entity: number.leds_gastezimmer_effect_speed
         show_header_toggle: true
         title: Licht
         type: entities
@@ -482,6 +485,7 @@ views:
             secondary_info: last-changed
           - entity: device_tracker.vku_lb_20
             secondary_info: last-changed
+          - entity: device_tracker.vku_lb_20_2
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
           - entity: sensor.schnuppes_pc_load
@@ -638,20 +642,8 @@ views:
       - user: 223709d150e743c993e7a9215f63d8a8
     badges: []
     cards:
-      - type: custom:spotify-card
-        limit: 10
-        account: default
-        spotify_entity: media_player.schlafzimmer
-        playlist_type: default
-        always_play_random_song: true
-        default_device: media_player.schlafzimmer
-        grid_covers_per_row: 5
-        display_style: list
       - artwork: cover
-        entity: media_player.wohnzimmer_gruppe
-        type: custom:mini-media-player
-      - artwork: cover
-        entity: media_player.mini_gruppe
+        entity: media_player.alle_nests
         type: custom:mini-media-player
       - entity: climate.bad
         type: custom:simple-thermostat
@@ -730,7 +722,7 @@ views:
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: switch.fritzbox_restart
+          - entity: button.fritz_box_3490_reboot
           - entity: sensor.fritz_box_3490_device_uptime
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
@@ -740,6 +732,9 @@ views:
           - entity: sensor.fritz_box_3490_max_kbit_s_received
           - entity: sensor.fritz_box_3490_max_kbit_s_sent
           - entity: binary_sensor.fritz_box_3490_connection
+          - entity: button.fritz_box_3490_reconnect
+          - entity: binary_sensor.fritz_box_3490_firmware_update
+          - entity: button.fritz_box_3490_firmware_update
         title: FritzBox 3490 Verwaltung
         type: entities
         show_header_toggle: false
@@ -751,11 +746,9 @@ views:
           - entity: device_tracker.florian_s_s20
           - entity: device_tracker.galaxy_s9
             name: Maxi Phone
+          - entity: device_tracker.samuel_iphone_icloud
           - entity: device_tracker.pocophonef1_pocophon
             name: Isi Phone
-          - entity: device_tracker.samuel_iphone_2
-            name: Samuel Phone
-          - entity: device_tracker.samuel_iphone
         title: Freunde & Bekannte
   - title: RaspberryPi
     path: raspberrypi

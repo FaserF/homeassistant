@@ -29,6 +29,8 @@ homeassistant:
   allowlist_external_dirs:
     - "/share/scripts"
     - "/media/netboot"
+  media_dirs:
+    media: "/media"
 
 zone:
   # This will override the default home zone
@@ -558,9 +560,9 @@ sensor:
         value_template: "unbekannter"
   - platform: dwd_weather_warnings
     region_name: !secret dwd_cell_id
-  - platform: spotcast
-    sp_dc: !secret sp_dc
-    sp_key: !secret sp_key
+  #- platform: spotcast
+  #  sp_dc: !secret sp_dc
+  #  sp_key: !secret sp_key
   # - platform: email
   #   email: !secret vapid_email
   #   password: !secret email_pw
