@@ -344,6 +344,10 @@ sensor:
       - version
       - idle
     value_template: "{{value_json.online}}"
+  - platform: command_line
+    name: "Latest Tasmota"
+    command: "curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d'\"' -f2 | rev | cut -d'/' -f1 | rev"
+    scan_interval: 600
   - platform: rest
     name: Staubsaugroboter Status
     resource: http://192.168.31.2:3000/api/assistant
