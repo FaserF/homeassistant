@@ -4771,20 +4771,20 @@
   #       data: 
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-  - id: update_tasmota
-    alias: Update Tasmota
-    initial_state: on
-    trigger: 
-      - platform: numeric_state
-        entity_id: sensor.latest_tasmota 
-    action:
-      - service: notify.telegram_fabian
-        data:
-          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states('sensor.latest_tasmota ') }}.'
-      - service: mqtt.publish
-        data:
-          topic: cmnd/tasmotas/Upgrade
-          payload: 1
+#  - id: update_tasmota
+#    alias: Update Tasmota
+#    initial_state: on
+#    trigger: 
+#      - platform: numeric_state
+#        entity_id: sensor.latest_tasmota 
+#    action:
+#      - service: notify.telegram_fabian
+#        data:
+#          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states('sensor.latest_tasmota ') }}.'
+#      - service: mqtt.publish
+#        data:
+#          topic: cmnd/tasmotas/Upgrade
+#          payload: 1
 
   - id: deckenlampe_button_hold
     alias: Deckenlampe Button Hold
