@@ -72,8 +72,8 @@ views:
     badges:
       - entity: person.fabian
       - entity: person.nessie
-      - entity: sensor.fabian_phone_battery_level
-      - entity: sensor.nessie_phone_battery_level
+      - entity: sensor.fabian_iphone_battery_state
+      - entity: sensor.nessie_iphone_battery_state
       - entity: sensor.fabian_ipadpro_battery_level
       - entity: sensor.washing_machine_finish_duration
       - entity: sensor.nessie_pc_energy_power
@@ -764,6 +764,8 @@ views:
           - entity: sensor.memory_use_percent
           - entity: sensor.disk_use_percent
           - entity: sensor.unavailable_entities
+          - entity: sensor.latest_tasmota
+          - entity: automation.update_tasmota
       - type: sensor
         entity: sensor.processor_temperature
         graph: line

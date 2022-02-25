@@ -597,32 +597,6 @@
 
             {{ states.sensor.unavailable_entities.attributes.entities }}
 
-  - id: remind_for_unavailable_device
-    alias: 'Remind for unavailable device'
-    variables:
-      watched: >
-        {{states|selectattr('state','in',['unavailable','unknown','none'])
-                |rejectattr('domain','eq','group')
-                |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))
-                |map(attribute='entity_id')
-                |list}}
-    trigger:
-      platform: template
-      value_template: >
-        {{watched|count|int > 0}}
-      for:
-        minutes: 5
-    action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_fabian
-          disable_notification: true
-          message: >
-            Es sind {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
-            |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|list|count }} Gerät(e) nicht verfügbar, bitte prüfen:
-            {{ states|selectattr('state','in',['unavailable','unknown','none'])|rejectattr('domain','eq','group')
-                |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))|map(attribute='entity_id')|list }}
-
   - id: activate_guest_mode_if_guest_is_here
     alias: 'Activate guest mode if guest is here'
     initial_state: on
@@ -1507,7 +1481,7 @@
                     entity_id: input_boolean.silent_mode
                     state: 'on'
             sequence:
-              - service: notify.mobile_app_nessie_handy
+              - service: notify.mobile_app_nessie_iphone
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
                   data:
@@ -1595,7 +1569,7 @@
               - service: notify.telegram_nessie
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
-              - service: notify.mobile_app_nessie_handy
+              - service: notify.mobile_app_nessie_iphone
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
                   data:
@@ -2204,19 +2178,19 @@
         entity_id: 
           - sensor.fabian_ipadpro_battery_state
           - sensor.fabian_phone_battery_state
-          - sensor.nessie_phone_battery_state
+          - sensor.nessie_iphone_battery_state_2
         to: 'discharging'
       - platform: state
         entity_id: 
           - sensor.fabian_ipadpro_battery_state
           - sensor.fabian_phone_battery_state
-          - sensor.nessie_phone_battery_state
+          - sensor.nessie_iphone_battery_state_2
         to: 'Not Charging'
       - platform: numeric_state
         entity_id: 
           - sensor.fabian_ipadpro_battery_level
-          - sensor.fabian_phone_battery_level
-          - sensor.nessie_phone_battery_level
+          - sensor.fabian_iphone_battery_state
+          - sensor.nessie_iphone_battery_state
         above: 90
     condition:
       condition: and
@@ -2238,12 +2212,12 @@
               entity_id: sensor.fabian_phone_battery_state
               state: 'discharging'
             - condition: numeric_state
-              entity_id: sensor.fabian_phone_battery_level
+              entity_id: sensor.fabian_iphone_battery_state
               above: 80
         - condition: or
           conditions:
             - condition: state
-              entity_id: sensor.nessie_phone_battery_state
+              entity_id: sensor.nessie_iphone_battery_state_2
               state: 'discharging'
             - condition: numeric_state
               entity_id: sensor.nessie_phone_battery_level
@@ -2542,13 +2516,47 @@
         entity_id: 
           - media_player.wohnzimmer_uhr
           - media_player.kuche_speaker
-          #- media_player.mpd
         data_template: 
           message: >
-            Es ist 
-            {{ now().hour }} Uhr {{ now().minute }} .
+            Es ist {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: binary_sensor.schlafzimmer_open_window
+                    state: 'on'
+                  - condition: state
+                    entity_id: binary_sensor.gastezimmer_open_window
+                    state: 'on'
+                  - condition: state
+                    entity_id: binary_sensor.wohnzimmer_open_window
+                    state: 'on'
+                  - condition: state
+                    entity_id: binary_sensor.bad_open_window
+                    state: 'on'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                data_template: 
+                  message: >
+                    Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
+                      Schlafzimmer 
+                    {% endif %}
+                    {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
+                      Gästezimmer
+                    {% endif %}
+                    {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
+                      Wohnzimmer
+                    {% endif %}
+                    {% if is_state('binary_sensor.bad_open_window', 'on') %}
+                      Bad
+                    {% endif %}
+                    muss noch geschlossen werden.
 
   - id: remind_for_leaving_schlafzimmer
     alias: 'Remind for leaving schlafzimmer'
@@ -2577,12 +2585,50 @@
         state: 'off'
     action:
       - service: tts.google_say
-        entity_id: media_player.schlafzimmer_speaker
+        entity_id: 
+          - media_player.schlafzimmer_speaker
+          - media_player.kuche_speaker
         data_template: 
           message: >
             Es ist 
             {{ now().hour }} Uhr {{ now().minute }} . 
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: binary_sensor.schlafzimmer_open_window
+                    state: 'on'
+                  - condition: state
+                    entity_id: binary_sensor.gastezimmer_open_window
+                    state: 'on'
+                  - condition: state
+                    entity_id: binary_sensor.wohnzimmer_open_window
+                    state: 'on'
+                  - condition: state
+                    entity_id: binary_sensor.bad_open_window
+                    state: 'on'
+            sequence:
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.schlafzimmer_speaker
+                  - media_player.kuche_speaker
+                data_template: 
+                  message: >
+                    Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
+                      Schlafzimmer 
+                    {% endif %}
+                    {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
+                      Gästezimmer
+                    {% endif %}
+                    {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
+                      Wohnzimmer
+                    {% endif %}
+                    {% if is_state('binary_sensor.bad_open_window', 'on') %}
+                      Bad
+                    {% endif %}
+                    muss noch geschlossen werden.
 
   - id: turn_on_light_in_sleeping_room_if_tv_turned_off
     alias: 'Turn on light in sleeping room if tv turned off'
@@ -4128,10 +4174,7 @@
     initial_state: on
     trigger:
       - platform: numeric_state
-        entity_id: sensor.nessie_phone_battery_level
-        below: 5
-      - platform: numeric_state
-        entity_id: sensor.nessie_iphone_battery_state_icloud
+        entity_id: sensor.nessie_iphone_battery_state
         below: 5
     condition:
       condition: and
@@ -4150,10 +4193,7 @@
     initial_state: on
     trigger:
       - platform: numeric_state
-        entity_id: sensor.fabian_phone_battery_level
-        below: 5
-      - platform: numeric_state
-        entity_id: sensor.fabian_iphone_battery_state_icloud
+        entity_id: sensor.fabian_iphone_battery_state
         below: 5
     condition:
       condition: and
@@ -4771,20 +4811,21 @@
   #       data: 
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-#  - id: update_tasmota
-#    alias: Update Tasmota
-#    initial_state: on
-#    trigger: 
-#      - platform: numeric_state
-#        entity_id: sensor.latest_tasmota 
-#    action:
-#      - service: notify.telegram_fabian
-#        data:
-#          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states('sensor.latest_tasmota ') }}.'
-#      - service: mqtt.publish
-#        data:
-#          topic: cmnd/tasmotas/Upgrade
-#          payload: 1
+  - id: update_tasmota
+    alias: Update Tasmota
+    initial_state: on
+    trigger: 
+      - platform: numeric_state
+        entity_id: sensor.latest_tasmota
+        above: 0
+    action:
+      - service: notify.telegram_fabian
+        data:
+          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
+      - service: mqtt.publish
+        data:
+          topic: cmnd/tasmotas/Upgrade
+          payload: 1
 
   - id: deckenlampe_button_hold
     alias: Deckenlampe Button Hold
@@ -6424,7 +6465,7 @@
         data_template:
           target: "{{ trigger.event.data.user_id }}"
           message: 'Alle Google Homes werden Fabi/Nessie über eine wichtige Nachricht bescheid geben.'
-      - service: notify.mobile_app_nessie_handy
+      - service: notify.mobile_app_nessie_iphone
         data:
           message: "Wichtige Nachricht, schau auf dein Handy!"
           data:
@@ -6716,7 +6757,13 @@
                 entity_id: counter.pille
                 below: '21'
             sequence:
-              - service: notify.mobile_app_nessie_handy
+              - service: notify.telegram_nessie
+                data_template:
+                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
+                  data:
+                    inline_keyboard:
+                    - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'
+              - service: notify.mobile_app_nessie_iphone
                 data_template:
                   title: "Pillen Reminder"
                   message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
@@ -6731,12 +6778,6 @@
                         name: "default"
                         critical: 1
                         volume: 0.1
-              - service: notify.telegram_nessie
-                data_template:
-                  message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
-                  data:
-                    inline_keyboard:
-                    - 'Erledigt:/pilldone, Erinnern in 1h:/pill1h'
       - choose:
           - conditions:
               - condition: numeric_state
@@ -6753,6 +6794,21 @@
               - service: notify.telegram_fabian
                 data:
                   message: "Heute ist der letze Tag, an dem Nessie die Pille nimmt für 7 Tage."
+              - service: notify.mobile_app_nessie_iphone
+                data_template:
+                  title: "Pillen Reminder"
+                  message: "Pille nehmen nicht vergessen! Heute ist der letze Tag, an dem du die Pille nehmen musst. Ab morgen kommen für 7 Tage keine Erinnerungen."
+                  data:
+                    actions:
+                      - action: "pilldone"
+                        title: "Erledigt"
+                      - action: "pill1h"
+                        title: "Erinnern in 1h"
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.1
       - choose:
           - conditions:
               - condition: state
@@ -6816,7 +6872,7 @@
       - service: notify.telegram_nessie
         data:
           message: "Du hast die Pille vergessen!"
-      - service: notify.mobile_app_nessie_handy
+      - service: notify.mobile_app_nessie_iphone
         data:
           message: "Du hast die Pille vergessen!"
           data:
@@ -6864,7 +6920,7 @@
       - service: notify.telegram_nessie
         data:
           message: "Du hast die Pille vergessen!"
-      - service: notify.mobile_app_nessie_handy
+      - service: notify.mobile_app_nessie_iphone
         data:
           message: "Du hast die Pille vergessen!"
           data:
@@ -8361,21 +8417,6 @@
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
             Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
-
-  - id: remind_for_jek
-    alias: 'remind for jek'
-    initial_state: True
-    trigger:
-      - platform: template
-        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.jugendtreffjek_gmail_com.attributes.start_time) - 86400) }}"
-      - platform: template
-        value_template: "{{ is_state_attr('calendar.jugendtreffjek_gmail_com', 'offset_reached', 'true') }}"
-    action:
-      - service: shell_command.jek_telegram
-      #- service: telegram_bot.send_message
-      #  data_template:
-      #    target: !secret telegram_chat_jek_group
-      #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
 
   - id: remind_for_juz
     alias: 'remind for juz'
