@@ -605,7 +605,7 @@
         entity_id: device_tracker.pocophonef1_pocophon
         to: 'home'
       - platform: time
-        at: '00:00:00'
+        at: '01:00:00'
     condition:
       condition: and
       conditions:
@@ -1247,6 +1247,9 @@
                   - condition: state
                     entity_id: person.fabian
                     state: 'home'
+                  - condition: state
+                    entity_id: input_boolean.silent_mode
+                    state: 'off'
             sequence:
               - service: tts.google_say
                 entity_id: 
@@ -1317,6 +1320,9 @@
                   - condition: state
                     entity_id: person.fabian
                     state: 'home'
+                  - condition: state
+                    entity_id: input_boolean.silent_mode
+                    state: 'off'
             sequence:
               - service: tts.google_say
                 entity_id: 
@@ -1436,6 +1442,9 @@
                   - condition: state
                     entity_id: person.fabian
                     state: 'home'
+                  - condition: state
+                    entity_id: input_boolean.silent_mode
+                    state: 'off'
             sequence:
               - service: tts.google_say
                 entity_id: 
@@ -1667,19 +1676,32 @@
               - service: notify.wohnzimmer_tv
                 data:
                   message: Das Fenster im Bad kann wieder geschlossen werden.
-        default:
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.6
-              entity_id: media_player.wohnzimmer_uhr
-          - service: tts.google_say
-            entity_id: media_player.wohnzimmer_uhr
-            data:
-              message: Das Fenster im Bad kann wieder geschlossen werden.
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.3
-              entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_uhr
+                    state: 'off'
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_uhr
+                    state: 'idle'
+            sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id: media_player.wohnzimmer_uhr
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_uhr
+                data:
+                  message: Das Fenster im Bad kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_uhr
 
   - id: remind_for_open_window_after_5_minutes_in_sleeping_room
     alias: 'Remind for open window after 5 minutes in sleeping room'
@@ -1824,19 +1846,32 @@
               - service: notify.wohnzimmer_tv
                 data:
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
-        default:
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.6
-              entity_id: media_player.wohnzimmer_uhr
-          - service: tts.google_say
-            entity_id: media_player.wohnzimmer_uhr
-            data:
-              message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.3
-              entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_uhr
+                    state: 'off'
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_uhr
+                    state: 'idle'
+            sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id: media_player.wohnzimmer_uhr
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_uhr
+                data:
+                  message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_uhr
 
   - id: remind_for_open_window_after_5_minutes_in_living room
     alias: 'Remind for open window after 5 minutes in living room'
@@ -2156,19 +2191,32 @@
               - service: notify.wohnzimmer_tv
                 data:
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
-        default:
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.6
-              entity_id: media_player.wohnzimmer_uhr
-          - service: tts.google_say
-            entity_id: media_player.wohnzimmer_uhr
-            data:
-              message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.3
-              entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.silent_mode
+                state: 'off'
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_uhr
+                    state: 'off'
+                  - condition: state
+                    entity_id: media_player.wohnzimmer_uhr
+                    state: 'idle'
+            sequence:
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.6
+                  entity_id: media_player.wohnzimmer_uhr
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_uhr
+                data:
+                  message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
+              - service: media_player.volume_set
+                data_template:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_uhr
 
   - id: turn_off_bett_if_no_device_is_charging
     alias: 'Turn off bett if no device is charging'
@@ -3459,6 +3507,7 @@
   - id: turn_on_fs_strom
     alias: Turn on FS Strom
     initial_state: on
+    mode: single
     trigger: 
       - platform: state
         entity_id: input_boolean.fs_strom
@@ -3487,7 +3536,10 @@
     action:
       - choose:
           - conditions:
-              - condition: or
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.fabian_pc
@@ -3504,7 +3556,10 @@
               - delay: '00:30:00'
       - choose:
           - conditions:
-              - condition: or
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.fabian_pc
@@ -3521,11 +3576,17 @@
               - delay: '00:30:00'
       - choose:
           - conditions:
-              - condition: or
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
+                  - condition: numeric_state
+                    entity_id: sensor.steckdose_schlafzimmer_energy_power
+                    above: 20
             sequence:
               - service: system_bridge.send_command
                 data:
@@ -3535,7 +3596,10 @@
               - delay: '00:01:00'
       - choose:
           - conditions:
-              - condition: or
+              - condition: state
+                entity_id: switch.fabian_strom
+                state: 'on'
+              - condition: and
                 conditions:
                   - condition: state
                     entity_id: device_tracker.fabian_pc
@@ -3784,16 +3848,16 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: binary_sensor.updater
+        entity_id: binary_sensor.home_assistant_versions_update_available
         from: 'off'
         to: 'on'
     action:
       - service: telegram_bot.send_message
         data_template:
-          message: "Home Assistant  {{ state_attr('binary_sensor.updater', 'newest_version') }}  ist nun verfügbar. Changelog: {{ state_attr('binary_sensor.updater', 'release_notes') }}"
+          message: "Home Assistant  {{ states.sensor.home_assistant_versions.state }} & Homeassistant OS {{ state_attr('sensor.home_assistant_versions', 'os') }} ist nun verfügbar. Changelog: https://www.home-assistant.io/blog/"
           target: !secret telegram_chat_fabian
-          inline_keyboard:
-          - 'Update starten:/updateha'
+          #inline_keyboard:
+          #- 'Update starten:/updateha'
 
   - id: hacs_update_available
     alias: 'HACS Update available'
@@ -6611,6 +6675,14 @@
               Jemand
             {% endif %}
             ist da.
+      - service: telegram_bot.send_message
+        data_template:
+          target: "{{ trigger.event.data.user_id }}"
+          message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_uhr
       - choose:
           - conditions:
               - condition: not
@@ -6619,6 +6691,10 @@
                     entity_id: media_player.wohnzimmer_tv
                     state: 'unavailable'
             sequence:
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.wohnzimmer_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
               - service: notify.wohnzimmer_tv
                 data_template:
                   message: >
@@ -6635,10 +6711,6 @@
                       Jemand
                     {% endif %}
                     ist da.
-              - service: androidtv.adb_command
-                data:
-                  entity_id: media_player.wohnzimmer_tv
-                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
       - choose:
           - conditions:
               - condition: not
@@ -6647,6 +6719,10 @@
                     entity_id: media_player.keller_tv
                     state: 'unavailable'
             sequence:
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
               - service: notify.keller_tv
                 data_template:
                   message: >
@@ -6663,18 +6739,6 @@
                       Jemand
                     {% endif %}
                     ist da.
-              - service: androidtv.adb_command
-                data:
-                  entity_id: media_player.keller_tv
-                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
-      - service: telegram_bot.send_message
-        data_template:
-          target: "{{ trigger.event.data.user_id }}"
-          message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: media_player.wohnzimmer_uhr
 
   - id: telegram_pill_marked_done
     alias: 'Telegram pill marked done'
@@ -6722,16 +6786,44 @@
           entity_id: counter.pille
           value: 28
 
-  - id: remind_nessie_for_pill_and_check_termostat_sleepingroom
-    alias: 'Remind Nessie for pill and check thermostats'
+  - id: check_termostat_sleepingroom
+    alias: 'check thermostats'
     initial_state: on
     trigger:
       platform: time
-      at: '19:50:00'
+      at: '19:40:00'
     action:
       - service: switch.turn_on
         data:
           entity_id: switch.adaptive_lighting_sleeping_room
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'off'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: climate.schlafzimmer
+                    state: 'auto'
+                  - condition: state
+                    entity_id: device_tracker.fabian_pc
+                    state: 'home'
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
+              - service: climate.set_hvac_mode
+                data:
+                  entity_id: climate.schlafzimmer
+                  hvac_mode: auto
+
+  - id: pill_reminder
+    alias: 'Pill Reminder'
+    trigger:
+      platform: time
+      at: '19:50:00'
+    action:
       - choose:
           - conditions:
               - condition: numeric_state
@@ -6809,27 +6901,6 @@
                         name: "default"
                         critical: 1
                         volume: 0.1
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: 'input_boolean.climate_off'
-                state: 'off'
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: climate.schlafzimmer
-                    state: 'auto'
-                  - condition: state
-                    entity_id: device_tracker.fabian_pc
-                    state: 'home'
-            sequence:
-              - service: notify.telegram_fabian
-                data:
-                  message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
-              - service: climate.set_hvac_mode
-                data:
-                  entity_id: climate.schlafzimmer
-                  hvac_mode: auto
 
   - id: nessie_forgot_pill
     alias: 'Nessie forgot pill'
