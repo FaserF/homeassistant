@@ -8421,7 +8421,7 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
-            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
   - id: telegram_send_daily_weather_forecast_fabian
     alias: 'Telegram send daily weather forecast fabian'
@@ -8454,7 +8454,7 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
-            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
   - id: telegram_send_daily_weather_forecast_nessie
     alias: 'Telegram send daily weather forecast nessie'
@@ -8487,7 +8487,7 @@
             
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
-            Corona 7 Tage Inzidenzwert: {{state_attr('sensor.coronavirus_lk_ebersberg', 'incidence')}}
+            Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
   - id: remind_for_juz
     alias: 'remind for juz'
