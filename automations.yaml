@@ -2569,6 +2569,7 @@
             Es ist {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+      - delay: '00:00:30'
       - choose:
           - conditions:
               - condition: or
@@ -2641,6 +2642,7 @@
             Es ist 
             {{ now().hour }} Uhr {{ now().minute }} . 
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+      - delay: '00:00:30'
       - choose:
           - conditions:
               - condition: or
@@ -3847,14 +3849,26 @@
     alias: 'HA Update Available'
     initial_state: on
     trigger:
+      #- platform: state
+      #  entity_id: binary_sensor.home_assistant_versions_update_available
+      #  from: 'off'
+      #  to: 'on'
       - platform: state
-        entity_id: binary_sensor.home_assistant_versions_update_available
-        from: 'off'
-        to: 'on'
+        entity_id: sensor.home_assistant_versions
+      - platform: state
+        entity_id: sensor.home_assistant_versions
+        attribute: os
     action:
       - service: telegram_bot.send_message
-        data_template:
-          message: "Home Assistant  {{ states.sensor.home_assistant_versions.state }} & Homeassistant OS {{ state_attr('sensor.home_assistant_versions', 'os') }} ist nun verfügbar. Changelog: https://www.home-assistant.io/blog/"
+        data_template: 
+          message: >
+            {% if states.sensor.home_assistant_versions.state != states.sensor.current_version.state %} 
+              Home Assistant {{ states.sensor.home_assistant_versions.state }}
+            {% endif %}
+            {% if states.sensor.home_assistant_versions.attributes.os != states.sensor.current_version.state %} 
+              & Homeassistant OS {{ state_attr('sensor.home_assistant_versions', 'os') }}
+            {% endif %}
+            ist nun verfügbar. Changelog: https://www.home-assistant.io/blog/
           target: !secret telegram_chat_fabian
           #inline_keyboard:
           #- 'Update starten:/updateha'
