@@ -4242,7 +4242,7 @@
         entity_id: switch.schloss
         to: 'on'
     action:
-      - delay: '00:00:02'
+      - delay: '00:00:01'
       - service: switch.turn_off
         data:
           entity_id: switch.schloss
@@ -8517,3 +8517,16 @@
       #  data_template:
       #    target: !secret telegram_chat_jek_group
       #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
+
+  - id: send_juz_mails_to_telegram
+    alias: 'send juz mails to telegram'
+    initial_state: True
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.info_juzzo_de_2
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_juz_mail
+          message: 'Es gibt {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'

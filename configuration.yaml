@@ -235,6 +235,7 @@ telegram_bot:
       - !secret telegram_chat_afk
       - !secret telegram_chat_triemagisch
       - !secret telegram_chat_jutta
+      - !secret telegram_chat_juz_mail
   #- platform: broadcast
   #  api_key: !secret telegram_bot_api_jek
   #  allowed_chat_ids:
@@ -344,14 +345,26 @@ sensor:
       - version
       - idle
     value_template: "{{value_json.online}}"
+  - platform: imap_email_content
+    server: imap.ionos.de
+    port: 993
+    username: !secret juz_mail
+    password: !secret juz_mail_pw
+    senders:
+      - !secret vapid_email
+      - !secret juz_mail
+  - platform: imap
+    server: imap.ionos.de
+    username: !secret juz_mail
+    password: !secret juz_mail_pw
   - platform: command_line
     name: "Latest Tasmota"
-    command: "curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d'\"' -f2 | rev | cut -d'/' -f1 | cut -c 1- | rev"
+    command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | rev'
     scan_interval: 86400
   - platform: rest
     name: Staubsaugroboter Status
     resource: http://192.168.31.2:3000/api/assistant
-    scan_interval: 900
+    scan_interval: 1800
     timeout: 40
     method: POST
     payload: '{"command":"Was macht der Staubsaugroboter?", "user":"fabian"}'
