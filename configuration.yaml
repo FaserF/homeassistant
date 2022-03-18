@@ -353,6 +353,16 @@ sensor:
     senders:
       - !secret vapid_email
       - !secret juz_mail
+      - !secret gerhard_mail
+      - !secret fv_mail
+      - !secret moser_mail
+      - !secret grothe_mail
+      - !secret gl_mail
+      - !secret simon_mail
+      - !secret maxi_mail
+      - !secret fabi_yahoo_mail
+      - !secret gabi_mail
+      - !secret bm_mail
   - platform: imap
     server: imap.ionos.de
     username: !secret juz_mail

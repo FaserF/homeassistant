@@ -8523,10 +8523,23 @@
     initial_state: True
     trigger:
       - platform: state
-        entity_id:
-          - sensor.info_juzzo_de_2
+        entity_id: sensor.info_juzzo_de_2
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.info_juzzo_de_2
+        above: 0
     action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_juz_mail
-          message: 'Es gibt {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
+          message: >
+            Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %}.
+
+            Neueste Mail vom {{ state_attr('sensor.info_juzzo_de','date') }}: 
+
+
+            Absender: {{ state_attr('sensor.info_juzzo_de','from') }}
+
+            Titel: {{ state_attr('sensor.info_juzzo_de','subject') }}
+
+            Inhalt: {{ state_attr('sensor.info_juzzo_de','body') }}
