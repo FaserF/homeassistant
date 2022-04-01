@@ -160,3 +160,4 @@ ignored_entities:
     - sensor.samuel_iphone_battery_state
     - sensor.adri_iphone_battery_state
     - sensor.fabian_iphone7_battery_state
+    - sensor.info_juzzo_de

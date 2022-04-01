@@ -66,7 +66,8 @@ animated_background:
 path: default_view
 title: Smart Life Home
 views:
-  - icon: mdi:home-variant
+  - theme: Backend-selected
+    icon: mdi:home-variant
     title: Home
     path: home
     badges:
@@ -83,8 +84,8 @@ views:
       - entity: sensor.zorneding_to_leuchtenbergring
       - entity: sensor.fabian_s_zuhause_solar_percentage
       - entity: counter.pille
-      - entity: sensor.coronavirus_lk_ebersberg
-      - entity: sensor.coronavirus_lk_munchen
+      - entity: sensor.lk_ebersberg_weekincidence
+      - entity: sensor.lk_munchen_weekincidence
       - entity: sensor.average_house_humidity
       - entity: sensor.average_house_temp
     cards:
@@ -161,46 +162,46 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.wohnzimmer_open_window
             name: Fenster
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.schlafzimmer_open_window
             name: Fenster
-        step_size: "1"
+        step_size: '1'
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
           - entity: binary_sensor.gastezimmer_open_window
             name: Fenster
-        step_size: "1"
+        step_size: '1'
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
           - entity: binary_sensor.bad_open_window
             name: Fenster
-        step_size: "1"
+        step_size: '1'
       - type: vertical-stack
         cards:
           - type: entities
@@ -232,16 +233,16 @@ views:
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: "6"
-            number_of_forecasts: "8"
+            forecastMaxColumn: '6'
+            number_of_forecasts: '8'
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: "6"
+            number_of_forecasts: '6'
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: "5"
+            forecastMaxColumn: '5'
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
@@ -303,11 +304,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
         type: custom:mini-media-player
@@ -447,10 +448,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.schlafzimmer_speaker
         type: custom:mini-media-player
@@ -499,10 +500,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
@@ -650,10 +651,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: entities
         entities:
           - entity: sensor.kuche_speaker_timers
@@ -669,6 +670,14 @@ views:
           - entity: switch.kuche_speaker_do_not_disturb
         title: Google Nest DND
         show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: automation.pill_reminder
+          - entity: sensor.info_juzzo_de
+          - entity: sensor.info_juzzo_de_2
+          - entity: automation.find_fabians_phone_by_sound
+          - entity: automation.find_nessies_phone_by_sound
+          - entity: automation.find_fabians_ipad_by_sound
   - path: router
     title: Frtizbox
     icon: mdi:router-wireless
@@ -724,7 +733,7 @@ views:
       - entities:
           - entity: button.fritz_box_3490_reboot
           - entity: sensor.fritz_box_3490_device_uptime
-          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb
+          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_2_4ghz
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
           - entity: sensor.fritz_box_3490_connection_uptime
           - entity: sensor.fritz_box_3490_kb_s_received
@@ -850,7 +859,7 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'

@@ -865,7 +865,9 @@
                         after: '16:00:00'
                   - condition: numeric_state
                     entity_id: sensor.fabian_s_zuhause_solar_percentage
-                    below: 20
+                    below: 15
+                  - condition: time
+                    after: '14:00:00'
               - condition: or
                 conditions:
                   - condition: state
@@ -1150,7 +1152,7 @@
                         after: '15:00:00'
                   - condition: numeric_state
                     entity_id: sensor.fabian_s_zuhause_solar_percentage
-                    below: 20
+                    below: 15
             sequence:
               - service: light.turn_on
                 data:
@@ -2569,7 +2571,7 @@
             Es ist {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
-      - delay: '00:00:30'
+      - delay: '00:00:15'
       - choose:
           - conditions:
               - condition: or
@@ -2642,7 +2644,7 @@
             Es ist 
             {{ now().hour }} Uhr {{ now().minute }} . 
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
-      - delay: '00:00:30'
+      - delay: '00:00:15'
       - choose:
           - conditions:
               - condition: or
@@ -6530,6 +6532,66 @@
 #          data:
 #            tag: 'notification-about-sensor'
 
+  - id: find_phone_fabian
+    alias: 'Find Fabians Phone by sound'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/lostfabian'
+    action:
+      - service: notify.mobile_app_fabian_phone
+        data:
+          message: "This phone is marked as lost! +49176 66334870"
+          data:
+            push:
+              sound:
+                name: "default"
+                critical: 1
+                volume: 1.0
+      - service: icloud.play_sound
+        data:
+          account: !secret vapid_email
+          device_name: Fabian-iPhone
+
+  - id: find_ipad_fabian
+    alias: 'Find Fabians ipad by sound'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/lostfabian'
+    action:
+      - service: icloud.play_sound
+        data:
+          account: !secret vapid_email
+          device_name: Fabian-iPad
+
+  - id: find_phone_nessie
+    alias: 'Find Nessies Phone by sound'
+    initial_state: on
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: '/lostnessie'
+    action:
+      - service: notify.mobile_app_nessie_iphone
+        data:
+          message: "This phone is marked as lost! +49176 47365403"
+          data:
+            push:
+              sound:
+                name: "default"
+                critical: 1
+                volume: 1.0
+      - service: icloud.play_sound
+        data:
+          account: !secret vapid_email
+          device_name: Nessie-iPhone 
+
   - id: telegram_urgent_message
     alias: 'Telegram urgent message'
     initial_state: on
@@ -7874,8 +7936,11 @@
         - condition: state
           entity_id: device_tracker.fabian_iphone
           state: home
+        - condition: numeric_state
+          entity_id: proximity.home_fabian
+          below: 89
         - condition: template
-          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.attributes.last_seen)) < 3600 }}"
+          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.attributes.last_seen)) < 11600 }}"
         - condition: time
           after: '06:30:00'
           before: '07:10:00'
@@ -7914,6 +7979,9 @@
             - tue
             - wed
             - thu
+        - condition: numeric_state
+          entity_id: proximity.home_fabian
+          below: 89
         - condition: not
           conditions:
             - condition: state
@@ -8039,13 +8107,13 @@
         entity_id: person.nessie
         state: home
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home.attributes.last_triggered) | int > 4600 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 4600 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 4600 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3700 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 4700 }}"
       - condition: not
         conditions:
           - condition: state
@@ -8525,21 +8593,62 @@
       - platform: state
         entity_id: sensor.info_juzzo_de_2
     condition:
-      - condition: numeric_state
-        entity_id: sensor.info_juzzo_de_2
-        above: 0
+      condition: not
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.info_juzzo_de_2
+          below: 1
+        - condition: state
+          entity_id: sensor.info_juzzo_de
+          attribute: from
+          state: "noreply@ionos.de"
     action:
-      - service: telegram_bot.send_message
-        data_template:
-          target: !secret telegram_chat_juz_mail
-          message: >
-            Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %}.
+      - delay: '00:00:30'
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: sensor.info_juzzo_de
+                    state: none
+                  - condition: state
+                    entity_id: sensor.info_juzzo_de
+                    state: unknown
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: sensor.info_juzzo_de
+                    attribute: from
+                    state: "noreply@ionos.de"
+            sequence:
+              - service: telegram_bot.send_message
+                data_template:
+                  target: !secret telegram_chat_juz_mail
+                  disable_notification: True
+                  message: >
+                    Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene (vermutlich) *SPAM* Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %}.
+          - conditions:
+              - condition: state
+                entity_id: sensor.info_juzzo_de
+                attribute: from
+                state: "noreply@ionos.de"
+            sequence:
+              - delay: '00:00:01'
+        default:
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_juz_mail
+              message: >
+                Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %}.
 
-            Neueste Mail vom {{ state_attr('sensor.info_juzzo_de','date') }}: 
+                Neueste Mail vom {{ state_attr('sensor.info_juzzo_de','date') }}: 
 
 
-            Absender: {{ state_attr('sensor.info_juzzo_de','from') }}
+                Absender: {{ state_attr('sensor.info_juzzo_de','from') }}
 
-            Titel: {{ state_attr('sensor.info_juzzo_de','subject') }}
-
-            Inhalt: {{ state_attr('sensor.info_juzzo_de','body') }}
+                Titel: {{ state_attr('sensor.info_juzzo_de','subject') }}
+          - service: telegram_bot.send_message
+            data_template:
+              target: !secret telegram_chat_juz_mail
+              message: >
+                Inhalt: {{ state_attr('sensor.info_juzzo_de','body') }}

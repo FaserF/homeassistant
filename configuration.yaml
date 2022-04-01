@@ -363,6 +363,7 @@ sensor:
       - !secret fabi_yahoo_mail
       - !secret gabi_mail
       - !secret bm_mail
+      - noreply@ionos.de
   - platform: imap
     server: imap.ionos.de
     username: !secret juz_mail
