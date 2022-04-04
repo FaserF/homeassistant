@@ -107,6 +107,9 @@
               - service: light.turn_off
                 data:
                   entity_id: group.gastezimmer
+              - service: switch.turn_off
+                  data:
+                    entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
               - service: media_player.turn_off
                 data:
                   entity_id: media_player.gastezimmer_mini
@@ -231,9 +234,9 @@
         from: 'not_home'
         to: 'home'
     action:
-      #- service: switch.turn_on
-      #  data:
-      #    entity_id: switch.fritzbox_3490_wifi_5ghz
+      - service: switch.turn_on
+        data:
+          entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.away_mode

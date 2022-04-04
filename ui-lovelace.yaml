@@ -635,12 +635,14 @@ views:
         name: Keller TV
         remote_template: ccwgtv
         type: custom:generic-remote-control-card
-  - title: other
+  - theme: Backend-selected
+    title: other
     path: other
     icon: mdi:perspective-more
     visible:
       - user: b3f36b2d84254a458f3e592a2eb7b130
       - user: 223709d150e743c993e7a9215f63d8a8
+      - user: 427eee202b4c4ffbad381db4991972dc
     badges: []
     cards:
       - artwork: cover
@@ -675,6 +677,7 @@ views:
           - entity: automation.pill_reminder
           - entity: sensor.info_juzzo_de
           - entity: sensor.info_juzzo_de_2
+          - entity: automation.send_juz_mails_to_telegram
           - entity: automation.find_fabians_phone_by_sound
           - entity: automation.find_nessies_phone_by_sound
           - entity: automation.find_fabians_ipad_by_sound
@@ -707,25 +710,28 @@ views:
         min: 0
         type: gauge
       - entities:
-          - entity: switch.xiaomi_abd8_reboot
-          - entity: light.xiaomi_abd8_led
-          - entity: sensor.xiaomi_abd8_uptime
-          - entity: sensor.xiaomi_abd8_memory_usage
-          - entity: sensor.xiaomi_abd8_devices
-          - entity: sensor.xiaomi_abd8_devices_2_4ghz
-          - entity: sensor.xiaomi_abd8_devices_5ghz
+          - entity: button.miwifi_28_d1_27_fc_ab_d8_reboot
+          - entity: light.miwifi_28_d1_27_fc_ab_d8_led
+          - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
+          - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_uptime
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_2_4g
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_5g
         title: Xiaomi AX3600 Verwaltung
         type: entities
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: switch.xiaomi_89fb_7604_reboot
-          - entity: light.xiaomi_89fb_7604_led
-          - entity: sensor.xiaomi_89fb_7604_uptime
-          - entity: sensor.xiaomi_89fb_7604_memory_usage
-          - entity: sensor.xiaomi_89fb_7604_devices
-          - entity: sensor.xiaomi_89fb_7604_devices_2_4ghz
-          - entity: sensor.xiaomi_89fb_7604_devices_5ghz
+          - entity: button.miwifi_28_d1_27_fc_ab_d8_reboot
+          - entity: light.miwifi_28_d1_27_fc_ab_d8_led
+          - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_uptime
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_2_4g
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_5g
         title: Xiaomi AX1800 Verwaltung
         type: entities
         show_header_toggle: false

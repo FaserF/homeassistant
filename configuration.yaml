@@ -182,6 +182,9 @@ logger:
       - "Config entry 'Schnuppes-PC' for system_bridge integration not ready yet: Could not connect to System Bridge.; Retrying in background"
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
+  default: error
+  logs:
+    custom_components.miwifi: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -830,9 +833,13 @@ google_assistant:
       expose: false
     light.prismatik:
       expose: false
-    light.xiaomi_abd8_led:
+    light.miwifi_28_d1_27_fc_ab_d8_led:
       expose: false
-    switch.xiaomi_abd8_reboot:
+    button.miwifi_28_d1_27_fc_ab_d8_reboot:
+      expose: false
+    switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g:
+      expose: false
+    switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g:
       expose: false
     light.xiaomi_89fb_7604_led:
       expose: false
