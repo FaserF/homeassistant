@@ -38,8 +38,6 @@
             - switch.bett
             - switch.keller_usb_ports
             - switch.strom_keller
-            - switch.lichtschalter
-            - switch.deckenlampe
             - switch.schreibtisch
       - service: media_player.turn_off
         data:
@@ -108,8 +106,8 @@
                 data:
                   entity_id: group.gastezimmer
               - service: switch.turn_off
-                  data:
-                    entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
+                data:
+                  entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
               - service: media_player.turn_off
                 data:
                   entity_id: media_player.gastezimmer_mini
@@ -170,13 +168,13 @@
 #    initial_state: on
 #    trigger:
 #      - platform: state
-#        entity_id: device_tracker.fabian_iphone
+#        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
 #        from: 'home'
 #        to: 'not_home'
 #        for:
 #          minutes: 10
 #      - platform: state
-#        entity_id: device_tracker.nessie_iphone
+#        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
 #        from: 'home'
 #        to: 'not_home'
 #        for:
@@ -200,10 +198,10 @@
 #          entity_id: input_boolean.guest_mode
 #          state: 'off'
 #        - condition: state
-#          entity_id: device_tracker.fabian_iphone
+#          entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
 #          state: not_home
 #        - condition: state
-#          entity_id: device_tracker.nessie_iphone
+#          entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
 #          state: not_home
 #    action:
       #- service: switch.turn_off
@@ -218,11 +216,11 @@
     initial_state: true
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessie_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
       - platform: state
@@ -605,7 +603,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.pocophonef1_pocophon
+        entity_id: person.isi
         to: 'home'
       - platform: time
         at: '01:00:00'
@@ -620,7 +618,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.pocophonef1_pocophon
+              entity_id: person.isi
               state: 'home'
             - condition: state
               entity_id: person.adri
@@ -629,7 +627,7 @@
               entity_id: person.kai
               state: 'home'
             - condition: state
-              entity_id: device_tracker.samuel_iphone_icloud
+              entity_id: person.samuel
               state: 'home'
     action:
       - service: input_boolean.turn_on
@@ -649,7 +647,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.pocophonef1_pocophon
+        entity_id: person.isi
         to: 'not_home'
         for:
           days: 1
@@ -665,7 +663,7 @@
           entity_id: input_boolean.guest_mode
           state: 'on'
         - condition: state
-          entity_id: device_tracker.pocophonef1_pocophon
+          entity_id: person.isi
           state: 'not_home'
     action:
       - service: input_boolean.turn_off
@@ -751,47 +749,6 @@
 #        data:
 #          entity_id: switch.bett
 
-  - id: remind_Nessie_to_ventilate
-    alias: 'Remind Nessie to ventilate'
-    initial_state: off
-    trigger:
-      - platform: state
-        entity_id: device_tracker.schnuppes_pc
-        to: 'home'
-        for:
-          hours: 4
-      - platform: state
-        entity_id: switch.nessie_pc
-        to: 'on'
-        for:
-          hours: 4
-    condition:
-      condition: and
-      conditions:
-        - condition: numeric_state
-          entity_id: climate.gastezimmer
-          attribute: current_humidity
-          above: 50
-        - condition: state
-          entity_id: 
-            - input_boolean.silent_mode
-            - input_boolean.guest_mode
-          state: 'off'
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: device_tracker.schnuppes_pc
-              state: 'home'
-            - condition: state
-              entity_id: device_tracker.vku_lb_20
-              state: 'home'
-        - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_Nessie_to_ventilate.attributes.last_triggered) | int > 1800 }}"
-    action:
-      - service: notify.telegram_nessie
-        data:
-          message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
-
   - id: remind_fabi_to_ventilate
     alias: 'Remind Fabi to ventilate'
     initial_state: on
@@ -813,6 +770,8 @@
           entity_id: climate.schlafzimmer
           attribute: current_humidity
           above: 50
+        - condition: time
+          before: '22:00:00'
         - condition: state
           entity_id: input_boolean.silent_mode
           state: 'off'
@@ -849,7 +808,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.tv
+              entity_id: device_tracker.miwifi_34_51_80_d0_44_29
               state: 'not_home'
             - condition: state
               entity_id: switch.fernseher
@@ -857,6 +816,8 @@
     action:
       - choose:
           - conditions:
+              - condition: time
+                after: '16:00:00'
               - condition: or
                 conditions:
                   - condition: and
@@ -864,8 +825,6 @@
                       - condition: numeric_state
                         entity_id: sensor.dwd_illuminance
                         below: 2000
-                      - condition: time
-                        after: '16:00:00'
                   - condition: numeric_state
                     entity_id: sensor.fabian_s_zuhause_solar_percentage
                     below: 15
@@ -874,7 +833,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.tv
+                    entity_id: device_tracker.miwifi_34_51_80_d0_44_29
                     state: 'not_home'
                   - condition: state
                     entity_id: switch.fernseher
@@ -903,7 +862,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.tv
+                    entity_id: device_tracker.miwifi_34_51_80_d0_44_29
                     state: 'not_home'
                   - condition: state
                     entity_id: switch.fernseher
@@ -1138,7 +1097,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.tv
+        entity_id: device_tracker.miwifi_34_51_80_d0_44_29
         from: 'not_home'
         to: 'home'
     action:
@@ -1185,7 +1144,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.tv
+        entity_id: device_tracker.miwifi_34_51_80_d0_44_29
         from: 'home'
         to: 'not_home'
     condition:
@@ -2338,7 +2297,7 @@
       - condition: time
         weekday:
           - mon
-          - fri
+          - thu
       - condition: state
         entity_id: input_boolean.away_mode
         state: "off"
@@ -2346,17 +2305,98 @@
       - service: switch.turn_on
         data:
           entity_id: switch.staubsauger
+      - service: mqtt.publish
+        data:
+          topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+          payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
+
+  - id: james_room_cleaning
+    alias: 'James Raum Reinigiung'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: automation.james_room_cleaning
+        to: 'on'
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Wohnzimmer'
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["6"]}'
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Küche'
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["4"]}'
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Schlafzimmer'
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["3"]}'
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Gästezimmer'
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["2"]}'
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Bad'
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["1"]}'
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Flur'
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["5"]}'
+          - conditions:
+              - condition: state
+                entity_id: input_select.vacuum_cleaning_location
+                state: 'Gesamt'
+            sequence:
+              - service: vacuum.start
+                data:
+                  entity_id: vacuum.valetudo_dreamez10pro
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.vacuum_cleaning_location
+        data:
+          option: Gesamt
 
   - id: turn_on_lights_in_morning
     alias: 'Turn on lights in morning'
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.fabian_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nessie_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
     condition:
@@ -2380,15 +2420,15 @@
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.fabian_iphone
+                  entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                   state: home
                 - condition: state
-                  entity_id: device_tracker.nessie_iphone
+                  entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
                   state: home
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.nessie_iphone
+                  entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
                   state: home
                 - condition: not
                   conditions:
@@ -2398,7 +2438,7 @@
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.fabian_iphone
+                  entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                   state: home
                 - condition: not
                   conditions:
@@ -2425,8 +2465,8 @@
                   entity_id: 
                     - light.leds_tisch
                     - light.yeelight_bslamp2_0x0000000013fea10f
-                  brightness: 10
-              - delay: '00:00:20'
+                  brightness: 2
+              - delay: '00:02:30'
               - service: automation.trigger
                 entity_id: automation.increase_lights_in_morning
       - delay: '00:00:30'
@@ -2434,7 +2474,7 @@
         entity_id: automation.notify_for_high_humidity
       - service: light.turn_on
         data_template:
-          entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+          entity_id: light.bett_gluhbirne
           brightness: 100
           rgb_color: > 
             {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
@@ -2500,7 +2540,7 @@
               attribute: brightness
               state: '255'
     action:
-      - delay: '00:00:10'
+      - delay: '00:00:15'
       - choose:
           - conditions:
               - condition: state
@@ -2559,10 +2599,10 @@
         - condition: or
           conditions:
           - condition: state
-            entity_id: device_tracker.nessie_iphone
+            entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
             state: home
           - condition: state
-            entity_id: device_tracker.fabian_iphone
+            entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
             state: home
     action:
       - service: tts.google_say
@@ -2629,10 +2669,10 @@
           - thu
           - fri
       - condition: state
-        entity_id: device_tracker.fabian_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         state: home
       - condition: state
-        entity_id: device_tracker.nessie_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         state: home
       - condition: state
         entity_id: 'input_boolean.silent_mode'
@@ -2690,7 +2730,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: device_tracker.tv
+        entity_id: device_tracker.miwifi_34_51_80_d0_44_29
         from: 'home'
         to: 'not_home'
         for:
@@ -2740,11 +2780,6 @@
       - service: light.turn_off
         data:
           entity_id: group.wohnzimmer
-      - service: switch.turn_off
-        data:
-          entity_id: 
-            - switch.deckenlampe
-            - switch.leds_wohnzimmer_tv
 
   - id: turn_on_lights_in_livingroom_when_dark_outside
     alias: 'Turn on lights in livingroom when dark outside'
@@ -2761,7 +2796,7 @@
         offset: "-00:30:00"
     condition:
       - condition: state
-        entity_id: device_tracker.tv
+        entity_id: device_tracker.miwifi_34_51_80_d0_44_29
         state: home
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_livingroom_when_dark_outside.attributes.last_triggered) | int > 1800 }}"
@@ -2810,7 +2845,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: 'device_tracker.tv'
+          entity_id: 'device_tracker.miwifi_34_51_80_d0_44_29'
           state: 'not_home'
         - condition: or
           conditions:
@@ -2861,7 +2896,7 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.tv
+              entity_id: device_tracker.miwifi_34_51_80_d0_44_29
               state: 'not_home'
             - condition: state
               entity_id: switch.fernseher
@@ -4768,10 +4803,10 @@
         - condition: or
           conditions:
           - condition: state
-            entity_id: device_tracker.nessie_iphone
+            entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
             state: home
           - condition: state
-            entity_id: device_tracker.fabian_iphone
+            entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
             state: home
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
@@ -4821,10 +4856,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessie_iphone
+                    entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
                     state: home
                   - condition: state
-                    entity_id: device_tracker.fabian_iphone
+                    entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                     state: home
             sequence:
               #- service: rest_command.assistant_broadcast
@@ -4844,10 +4879,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.nessie_iphone
+                    entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
                     state: home
                   - condition: state
-                    entity_id: device_tracker.fabian_iphone
+                    entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -4946,10 +4981,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: switch.leds_wohnzimmer_tv
+                    entity_id: light.leds_wohnzimmer_tv
                     state: 'off'
                   - condition: state
-                    entity_id: switch.leds_wohnzimmer_tv
+                    entity_id: light.leds_wohnzimmer_tv
                     state: 'unavailable'
             sequence:
               #- service: light.turn_on
@@ -4989,11 +5024,6 @@
                     for:
                       seconds: 1
             sequence:
-              - service: switch.turn_off
-                data:
-                  entity_id: 
-                    - switch.deckenlampe
-                    - switch.leds_wohnzimmer_tv
               - service: light.turn_off
                 data:
                   entity_id: group.wohnzimmer
@@ -5106,9 +5136,6 @@
                     for:
                       seconds: 1
             sequence:
-              - service: switch.turn_off
-                data:
-                  entity_id: switch.lichtschalter
               - service: light.turn_off
                 data:
                   entity_id: group.schlafzimmer
@@ -5154,7 +5181,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.tv
+          entity_id: device_tracker.miwifi_34_51_80_d0_44_29
           state: 'home'
     action:
       - service: androidtv.adb_command
@@ -5204,10 +5231,10 @@
         - condition: or
           conditions:
             - condition: state
-              entity_id: device_tracker.fabian_iphone
+              entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
               state: home
             - condition: state
-              entity_id: device_tracker.nessie_iphone
+              entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
               state: home
         - condition: or
           conditions:
@@ -5266,6 +5293,7 @@
                 data_template:
                   volume_level: 0.6
                   entity_id: media_player.schlafzimmer_speaker
+              - delay: 00:00:03
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer_speaker
                 data_template:
@@ -5390,10 +5418,10 @@
       - condition: time
         after: '06:00:00'
       - condition: state
-        entity_id: device_tracker.fabian_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         state: not_home
       - condition: state
-        entity_id: device_tracker.nessie_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         state: not_home
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
@@ -5412,11 +5440,11 @@
     initial_state: true
     trigger:
       - platform: state
-        entity_id: device_tracker.nessie_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabian_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
     condition:
@@ -5505,11 +5533,11 @@
     initial_state: true
     trigger:
       - platform: state
-        entity_id: device_tracker.nessie_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
       - platform: state
-        entity_id: device_tracker.fabian_iphone
+        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
     condition:
@@ -5612,10 +5640,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5637,10 +5665,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5663,10 +5691,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5677,10 +5705,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
               - condition: or
                 conditions:
@@ -5745,10 +5773,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5767,10 +5795,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5839,10 +5867,10 @@
   #             - condition: or
   #               conditions:
   #                 - condition: state
-  #                   entity_id: device_tracker.florian_s_s20
+  #                   entity_id: person.flo
   #                   state: home
   #                 - condition: state
-  #                   entity_id: device_tracker.galaxy_s9
+  #                   entity_id: person.maxi
   #                   state: home
   #           sequence:
   #             - service: telegram_bot.send_message
@@ -5863,10 +5891,10 @@
   #             - condition: not
   #               conditions:
   #                 - condition: state
-  #                   entity_id: device_tracker.florian_s_s20
+  #                   entity_id: person.flo
   #                   state: home
   #                 - condition: state
-  #                   entity_id: device_tracker.galaxy_s9
+  #                   entity_id: person.maxi
   #                   state: home
   #           sequence:
   #             - service: telegram_bot.send_message
@@ -5888,10 +5916,10 @@
   #             - condition: or
   #               conditions:
   #                 - condition: state
-  #                   entity_id: device_tracker.florian_s_s20
+  #                   entity_id: person.flo
   #                   state: home
   #                 - condition: state
-  #                   entity_id: device_tracker.galaxy_s9
+  #                   entity_id: person.maxi
   #                   state: home
   #           sequence:
   #             - service: telegram_bot.send_message
@@ -5967,10 +5995,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -5991,10 +6019,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -6016,10 +6044,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -6087,10 +6115,10 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -6111,10 +6139,10 @@
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.florian_s_s20
+                    entity_id: person.flo
                     state: home
                   - condition: state
-                    entity_id: device_tracker.galaxy_s9
+                    entity_id: person.maxi
                     state: home
             sequence:
               - service: telegram_bot.send_message
@@ -6519,7 +6547,7 @@
 #            - thu
 #            - sun
 #        - condition: state
-#          entity_id: device_tracker.fabian_iphone
+#          entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
 #          state: home
 #        - condition: template
 #          value_template: >
@@ -7937,7 +7965,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: device_tracker.fabian_iphone
+          entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
           state: home
         - condition: numeric_state
           entity_id: proximity.home_fabian
@@ -8314,7 +8342,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.nessie_iphone
+                entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
                 state: home
               - condition: state
                 entity_id: 
@@ -8426,7 +8454,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabian_iphone
+                entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                 state: home
               - condition: state
                 entity_id: input_boolean.silent_mode
@@ -8466,7 +8494,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.fabian_iphone
+                entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                 state: home
               - condition: state
                 entity_id: input_boolean.silent_mode
@@ -8514,7 +8542,7 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.fabian_iphone
+          - device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
     condition:
@@ -8547,7 +8575,7 @@
     trigger:
       - platform: state
         entity_id:
-          - device_tracker.nessie_iphone
+          - device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
     condition:

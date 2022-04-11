@@ -113,12 +113,11 @@ ignored_entities:
     - sensor.playlists_sensor
     - sensor.wohnzimmer_uhr_alarms
     - sensor.wohnzimmer_uhr_timers
-    - sensor.xiaomi_89fb_7604_devices
-    - sensor.xiaomi_89fb_7604_devices_2_4ghz
-    - sensor.xiaomi_89fb_7604_devices_5ghz
-    - sensor.xiaomi_89fb_7604_devices_5ghz_game
-    - sensor.xiaomi_89fb_7604_memory_usage
-    - sensor.xiaomi_89fb_7604_uptime
+    - sensor.miwifi_9c_9d_7e_30_89_fb_devices
+    - sensor.miwifi_9c_9d_7e_30_89_fb_memory_usage
+    - sensor.miwifi_9c_9d_7e_30_89_fb_uptime
+    - switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
+    - light.miwifi_9c_9d_7e_30_89_fb_led
     - sensor.xiaomi_miio_cooker_cooking_delayed
     - sensor.xiaomi_miio_cooker_duration
     - sensor.xiaomi_miio_cooker_favorite
@@ -161,3 +160,7 @@ ignored_entities:
     - sensor.adri_iphone_battery_state
     - sensor.fabian_iphone7_battery_state
     - sensor.info_juzzo_de
+    - sensor.valetudo_dreamez10pro_error_description
+    - person.flo
+    - person.isi
+    - person.maxi

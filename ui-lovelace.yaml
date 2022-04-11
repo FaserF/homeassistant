@@ -90,8 +90,8 @@ views:
       - entity: sensor.average_house_temp
     cards:
       - entities:
-          - entity: switch.deckenlampe
-          - entity: switch.leds_wohnzimmer_tv
+          - entity: light.deckenlampe
+          - entity: light.leds_wohnzimmer_tv
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
@@ -100,7 +100,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: switch.lichtschalter
+          - entity: light.lichtschalter
           - entity: light.leds_tisch
             group: true
             toggle: true
@@ -129,7 +129,7 @@ views:
         title: Licht
         type: entities
       - entities:
-          - entity: vacuum.living_room_vacuum
+          - entity: vacuum.valetudo_dreamez10pro
           - entity: switch.fernseher
             secondary_info: last-changed
           - entity: switch.staubsauger
@@ -276,8 +276,8 @@ views:
       - entities:
           - entity: switch.adaptive_lighting_living_room
             name: Adaptives Licht
-          - entity: switch.deckenlampe
-          - entity: switch.leds_wohnzimmer_tv
+          - entity: light.deckenlampe
+          - entity: light.leds_wohnzimmer_tv
           - entity: light.leds_wohnzimmer
             group: true
             toggle: true
@@ -294,7 +294,7 @@ views:
           - entity: vacuum.living_room_vacuum
           - entity: switch.staubsauger
           - entity: automation.restart_bluetooth_on_tv
-          - entity: device_tracker.tv
+          - entity: device_tracker.miwifi_34_51_80_d0_44_29
           - entity: sensor.wohnzimmer_uhr_timers
         show_header_toggle: true
         title: Weiteres
@@ -312,6 +312,30 @@ views:
       - artwork: cover
         entity: media_player.wohnzimmer_tv_cast
         type: custom:mini-media-player
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: entities
+            entities:
+              - entity: vacuum.valetudo_dreamez10pro
+              - entity: input_select.vacuum_cleaning_location
+              - entity: automation.james_raum_reinigiung
+              - entity: sensor.valetudo_dreamez10pro_current_statistics_area
+              - entity: sensor.valetudo_dreamez10pro_current_statistics_time
+              - entity: sensor.valetudo_dreamez10pro_error_description
+              - entity: sensor.valetudo_dreamez10pro_main_brush
+              - entity: sensor.valetudo_dreamez10pro_main_filter
+              - entity: sensor.valetudo_dreamez10pro_map_segments
+              - entity: sensor.valetudo_dreamez10pro_right_brush
+              - entity: sensor.valetudo_dreamez10pro_sensor_cleaning
+              - entity: select.valetudo_dreamez10pro_water_grade
+              - entity: sensor.valetudo_dreamez10pro_wi_fi_configuration
+              - entity: sensor.valetudo_dreamez10pro_zone_presets
+          - type: picture-entity
+            entity: camera.dreamez10pro_rendered_map
+          - type: custom:valetudo-map-card
+            vacuum: valetudo_dreamez10pro
       - artwork: cover
         entity: media_player.wohnzimmer_uhr
         type: custom:mini-media-player
@@ -408,7 +432,7 @@ views:
       - entities:
           - entity: switch.adaptive_lighting_sleeping_room
             name: Adaptives Licht
-          - entity: switch.lichtschalter
+          - entity: light.lichtschalter
           - entity: light.yeelight_bslamp2_0x0000000013fea10f
             group: true
             toggle: true
@@ -719,19 +743,19 @@ views:
           - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices
           - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_2_4g
           - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_5g
+          - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+          - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
         title: Xiaomi AX3600 Verwaltung
         type: entities
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: button.miwifi_28_d1_27_fc_ab_d8_reboot
-          - entity: light.miwifi_28_d1_27_fc_ab_d8_led
-          - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_uptime
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_2_4g
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_5g
+          - entity: button.miwifi_9c_9d_7e_30_89_fb_reboot
+          - entity: light.miwifi_9c_9d_7e_30_89_fb_led
+          - entity: switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
+          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_uptime
+          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_memory_usage
+          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_devices
         title: Xiaomi AX1800 Verwaltung
         type: entities
         show_header_toggle: false
@@ -758,12 +782,11 @@ views:
         entities:
           - entity: person.adri
           - entity: person.kai
-          - entity: device_tracker.florian_s_s20
-          - entity: device_tracker.galaxy_s9
+          - entity: person.flo
+          - entity: person.maxi
             name: Maxi Phone
-          - entity: device_tracker.samuel_iphone_icloud
-          - entity: device_tracker.pocophonef1_pocophon
-            name: Isi Phone
+          - entity: person.samuel
+          - entity: person.isi
         title: Freunde & Bekannte
   - title: RaspberryPi
     path: raspberrypi
@@ -819,7 +842,7 @@ views:
     badges: []
     cards:
       - entities:
-          - entity: switch.lichtschalter
+          - entity: light.lichtschalter
           - entity: input_boolean.fs_strom
           - entity: light.leds_tisch
             group: true
@@ -847,7 +870,7 @@ views:
     badges: []
     cards:
       - entities:
-          - entity: switch.lichtschalter
+          - entity: light.lichtschalter
           - entity: input_boolean.vk_strom
           - entity: light.lampe_gastezimmer
             group: true

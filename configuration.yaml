@@ -141,11 +141,7 @@ recorder:
       - sensor.fritz_box_3490_max_kbit_s_sent
       - sensor.fritz_box_3490_max_kbit_s_received
       - sensor.unavailable_entities
-      #- sensor.staubsaugroboter_status
       - switch.rpi_cooling_fan
-
-# Checks for available updates
-updater:
 
 # Discover some devices automatically
 discovery:
@@ -256,6 +252,8 @@ notify:
     vapid_pub_key: !secret vapid_pub_key
     vapid_prv_key: !secret vapid_prv_key
     vapid_email: !secret vapid_email
+
+media_source:
 
 #media_player:
 #  - platform: mpd
@@ -375,28 +373,6 @@ sensor:
     name: "Latest Tasmota"
     command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | rev'
     scan_interval: 86400
-  - platform: rest
-    name: Staubsaugroboter Status
-    resource: http://192.168.31.2:3000/api/assistant
-    scan_interval: 1800
-    timeout: 40
-    method: POST
-    payload: '{"command":"Was macht der Staubsaugroboter?", "user":"fabian"}'
-    headers:
-      Content-Type: application/json
-    json_attributes:
-      - text
-      - success
-    value_template: >
-      {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James ist angedockt.') %}
-        docked
-      {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.') %}
-        cleaning
-      {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
-        error
-      {% else %}
-        idle
-      {% endif %}
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
   - platform: template
@@ -696,14 +672,6 @@ switch:
     ports:
       18: RPI Cooling Fan
   #- platform: rest
-  #  resource: http://192.168.31.2:3000/api/assistant
-  #  body_on: '{"command":"Putze die Wohnung", "user":"fabian"}'
-  #  body_off: '{"command":"Stoppe den Staubsaugroboter", "user":"fabian"}'
-  #is_on_template: '{"command":"Was macht der Staubsaugroboter", "user":"fabian"}'
-  #  name: "Staubsaugroboter"
-  #  headers:
-  #    Content-Type: application/json
-  #- platform: rest
   #  name: Fabian PC Shutdown
   #  method: POST
   #  resource: http://192.168.178.16:9170/command
@@ -765,49 +733,6 @@ switch:
   #   api_key: b7bbed8a-33b2-4260-ae2e-89a00fbd85c2
   #   icon: mdi:power-plug
 
-vacuum:
-  - platform: template
-    vacuums:
-      living_room_vacuum:
-        friendly_name: "James (Staubsaugroboter)"
-        #value_template: "{{ states('sensor.staubsaugroboter_status') }}"
-        value_template: >
-          {% if not (is_state("sensor.staubsaugroboter_status", "unavailable")) -%}
-            {% if is_state_attr('sensor.staubsaugroboter_status', 'text', '         Der Staubsaugroboter ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         James ist angedockt.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Der Staubsaugroboter ist angedockt.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'James ist angedockt.') %}
-              docked
-            {% elif is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', '         Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.   ') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, der Staubsaugroboter ist aktuell nicht erreichbar. Bitte versuch es noch mal.') or is_state_attr('sensor.staubsaugroboter_status', 'text', 'Entschuldige, James ist aktuell nicht erreichbar. Bitte versuch es noch mal.') %}
-              cleaning
-            {% elif is_state_attr('sensor.staubsaugroboter_status', 'success', 'False') %}
-              error
-            {% else %}
-              idle
-            {% endif %}
-          {% else %}
-            error
-          {% endif %}
-        #battery_level_template: "{{ states('sensor.vacuum_battery_level')|int }}"
-        #fan_speed_template: "{{ states('sensor.vacuum_fan_speed') }}"
-        start:
-          - service: rest_command.assistant_relay
-            data:
-              command: "Starte den Staubsaugroboter"
-              user: "fabian"
-        pause:
-          - service: rest_command.assistant_relay
-            data:
-              command: "Pausiere den Staubsaugroboter"
-              user: "fabian"
-        stop:
-          - service: rest_command.assistant_relay
-            data:
-              command: "Stoppe den Staubsaugroboter"
-              user: "fabian"
-        return_to_base:
-          - service: rest_command.assistant_relay
-            data:
-              command: "Docke den Staubsaugroboter"
-              user: "fabian"
-
 google_assistant:
   project_id: !secret google_assistant_id
   service_account: !include Homeassistant SmartLife-f9d43c517637.json
@@ -816,6 +741,7 @@ google_assistant:
     - switch
     - light
     - input_boolean
+    - vacuum
   expose_by_default: false
   entity_config:
     #Disabled Entitys
@@ -903,7 +829,7 @@ google_assistant:
     switch.regal_leds:
       expose: True
       room: Schlafzimmer
-    switch.lichtschalter:
+    light.lichtschalter:
       name: Licht Schalter
       expose: True
       room: Schlafzimmer
@@ -937,11 +863,11 @@ google_assistant:
       expose: true
       room: Gästezimmer
     ##Wohnzimmer
-    switch.deckenlampe:
+    light.deckenlampe:
       name: Deckenlampe Licht
       expose: true
       room: Wohnzimmer
-    switch.leds_wohnzimmer_tv:
+    light.leds_wohnzimmer_tv:
       name: LEDs Wohnzimmer TV
       expose: true
       room: Wohnzimmer
@@ -956,6 +882,9 @@ google_assistant:
       expose: True
       room: Wohnzimmer
     switch.staubsauger:
+      expose: True
+      room: Wohnzimmer
+    vacuum.valetudo_dreamez10pro:
       expose: True
       room: Wohnzimmer
     ##Keller
@@ -1017,6 +946,17 @@ input_select:
       - Sonstiges
     initial: schnelles Kochen
     icon: mdi:import
+  vacuum_cleaning_location:
+    name: Raumauswahl
+    options:
+      - Wohnzimmer
+      - Küche
+      - Schlafzimmer
+      - Gästezimmer
+      - Bad
+      - Flur
+      - Gesamt
+    initial: Gesamt
 
 input_datetime:
   cooker_start_time:
