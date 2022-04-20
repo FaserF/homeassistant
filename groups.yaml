@@ -11,11 +11,11 @@ Wohnzimmer:
     - media_player.wohnzimmer_uhr
     - light.yeelight_color_0x00000000036dc050 #Stehlampe
     - light.leds_wohnzimmer
-    - switch.leds_wohnzimmer_tv
+    - light.leds_wohnzimmer_tv
     #- climate.wohnzimmer
     - switch.fernseher
     - switch.staubsauger
-    - switch.deckenlampe
+    - light.deckenlampe
 
 Schlafzimmer:
   name: Schlafzimmer
@@ -33,7 +33,7 @@ Schlafzimmer:
     - switch.fabian_strom
     - switch.fabian_pc_shutdown
     - switch.schreibtisch
-    - switch.lichtschalter
+    - light.lichtschalter
 
 Gästezimmer:
   name: Gästezimmer
@@ -88,23 +88,7 @@ ignored_entities:
     - sensor.kuche_mini_timers
     - sensor.schlafzimmer_speaker_alarms
     - sensor.schlafzimmer_speaker_timers
-    - switch.shutdown_fabian_pc
-    - switch.hibernate_fabian_pc
-    - sensor.cpu_load_fabian_pc
-    - sensor.corona_news
-    - sensor.dell_9020_c_space_used
-    - sensor.dell_9020_cpu_speed
     - sensor.washing_machine_mode
-    - sensor.dell_9020_cpu_temperature
-    - sensor.dell_9020_d_space_used
-    - sensor.dell_9020_e_space_used
-    - sensor.dell_9020_f_space_used
-    - sensor.dell_9020_geforce_gtx_1070_memory_free
-    - sensor.dell_9020_geforce_gtx_1070_memory_used
-    - sensor.dell_9020_geforce_gtx_1070_usage
-    - sensor.dell_9020_load
-    - sensor.dell_9020_memory_free
-    - sensor.dell_9020_memory_used_2
     - sensor.gastezimmer_mini_alarms
     - sensor.gastezimmer_mini_timers
     - sensor.kuche_speaker_alarms
@@ -161,6 +145,7 @@ ignored_entities:
     - sensor.fabian_iphone7_battery_state
     - sensor.info_juzzo_de
     - sensor.valetudo_dreamez10pro_error_description
+    - sensor.fabian_watch3_battery_state
     - person.flo
     - person.isi
     - person.maxi

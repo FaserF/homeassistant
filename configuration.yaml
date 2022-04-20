@@ -154,8 +154,14 @@ logbook:
 
 logger:
   filters:
-    custom_components.prismatik.light:
-      - "Could not connect to Prismatik at *"
+    custom_components.prismatik.prismatik:
+      - "Could not connect to Prismatik at*"
+      - "Could not connect to Prismatik at 192.168.178.16:3636"
+    custom_components.xiaomi_miio_cooker:
+      - "Got exception while fetching the state: Unable to discover the device 192.168.31.195"
+    custom_components.miwifi.updater:
+      - "Error connecting to router (attempt #10 of 10): LuciConnectionException*"
+      - "Error connecting to router (attempt #$ of 10): LuciConnectionException*"
     homeassistant.helpers.entity:
       - "Update of * is taking over 10 seconds"
     homeassistant.components.switch:
@@ -178,9 +184,9 @@ logger:
       - "Config entry 'Schnuppes-PC' for system_bridge integration not ready yet: Could not connect to System Bridge.; Retrying in background"
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
-  default: error
-  logs:
-    custom_components.miwifi: debug
+  #default: error
+  #logs:
+  #  custom_components.miwifi: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -213,8 +219,8 @@ proximity:
     zone: home
     ignored_zones: kai_adri
     devices:
-      - !secret kai_maps
-      - !secret adri_maps
+      - person.kai
+      - person.adri
     tolerance: 50
 
 telegram_bot:
@@ -371,7 +377,7 @@ sensor:
     password: !secret juz_mail_pw
   - platform: command_line
     name: "Latest Tasmota"
-    command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | rev'
+    command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c 2- | rev'
     scan_interval: 86400
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
