@@ -34,8 +34,7 @@
         data:
           entity_id: 
             - group.wohnzimmer
-            - switch.bett_usb_ports
-            - switch.bett
+            - switch.smart_power_strip_pro_usb_1
             - switch.keller_usb_ports
             - switch.strom_keller
             - switch.schreibtisch
@@ -105,18 +104,20 @@
               - service: light.turn_off
                 data:
                   entity_id: group.gastezimmer
-              - service: switch.turn_off
-                data:
-                  entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-              #- delay: '00:00:40'
-              #- service: select.select_option
-              #  data:
-              #    option: min
-              #  target:
-              #    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
               - service: media_player.turn_off
                 data:
                   entity_id: media_player.gastezimmer_mini
+              - service: select.select_option
+                data:
+                  option: min
+                target:
+                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+              - delay: '00:00:40'
+              - service: select.select_option
+                data:
+                  option: min
+                target:
+                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
       - choose:
           - conditions:
               - condition: state
@@ -182,13 +183,9 @@
         from: 'not_home'
         to: 'home'
     action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
       - service: input_boolean.turn_off
         data:
           entity_id: input_boolean.away_mode
-      - delay: '00:00:40'
       - choose:
           - conditions:
               - condition: not
@@ -232,16 +229,21 @@
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         state: not_home
-      - condition: not
+      - condition: or
         conditions:
-          - condition: state
+          - condition: numeric_state
             entity_id: proximity.home_fabian
-            attribute: dir_of_travel
-            state: 'away_from'
+            below: 2
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: proximity.home_fabian
+                attribute: dir_of_travel
+                state: 'away_from'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_fabian.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_nessie.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
     action:
       - service: switch.turn_on
         data:
@@ -263,16 +265,21 @@
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         state: not_home
-      - condition: not
+      - condition: or
         conditions:
-          - condition: state
+          - condition: numeric_state
             entity_id: proximity.home_nessie
-            attribute: dir_of_travel
-            state: 'away_from'
+            below: 2
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: proximity.home_nessie
+                attribute: dir_of_travel
+                state: 'away_from'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_fabian.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_nessie.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
     action:
       - service: switch.turn_on
         data:
@@ -294,20 +301,20 @@
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_xx
         state: not_home
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: proximity.home_ka
-            attribute: dir_of_travel
-            state: 'away_from'
+      #- condition: not
+      #  conditions:
+      #    - condition: state
+      #      entity_id: proximity.home_ka
+      #      attribute: dir_of_travel
+      #      state: 'away_from'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_fabian.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_nessie.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_adri.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_adri_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_kai.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_kai_if_coming_home.attributes.last_triggered) | int > 180 }}"
     action:
       - service: switch.turn_on
         data:
@@ -315,7 +322,45 @@
       - service: telegram_bot.send_message
         data:
           target: !secret telegram_chat_adrian
-          message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist.'
+          message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
+      - service: notify.mobile_app_fabian_phone
+        data:
+          message: "Adri ist gleich da"
+          data:
+            push:
+              sound:
+                name: "default"
+                critical: 1
+                volume: 0.7
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: media_player.wohnzimmer_uhr
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
+        data:
+          message: "Adrian ist gleich da."
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: 'unavailable'
+            sequence:
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
+              - service: notify.keller_tv
+                data:
+                  message: "Adrian ist gleich da."
 
   - id: open_door_for_kai
     alias: 'Open the door for Kai if coming home'
@@ -327,22 +372,22 @@
         to: 'home'
     condition:
       - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_xx
+        entity_id: device_tracker.miwifi_e8_7f_95_73_88_96
         state: not_home
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: proximity.home_ka
-            attribute: dir_of_travel
-            state: 'away_from'
+      #- condition: not
+      #  conditions:
+      #    - condition: state
+      #      entity_id: proximity.home_ka
+      #      attribute: dir_of_travel
+      #      state: 'away_from'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_fabian.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_nessie.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_adri.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_adri_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_door_for_kai.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_kai_if_coming_home.attributes.last_triggered) | int > 180 }}"
     action:
       - service: switch.turn_on
         data:
@@ -350,7 +395,45 @@
       - service: telegram_bot.send_message
         data:
           target: !secret telegram_chat_kai
-          message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist.'
+          message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
+      - service: notify.mobile_app_fabian_phone
+        data:
+          message: "Kai ist gleich da"
+          data:
+            push:
+              sound:
+                name: "default"
+                critical: 1
+                volume: 0.7
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.7
+          entity_id: media_player.wohnzimmer_uhr
+      - service: tts.google_say
+        entity_id: 
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_speaker
+        data:
+          message: "Kai ist gleich da."
+      - service: media_player.volume_set
+        data:
+          volume_level: 0.3
+          entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: 'unavailable'
+            sequence:
+              - service: androidtv.adb_command
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
+              - service: notify.keller_tv
+                data:
+                  message: "Kai ist gleich da."
 
   # - id: notify_if_someone_joined_lan_play_server
   #   alias: Notify if someone joined lan play server
@@ -676,15 +759,76 @@
         entity_id: input_boolean.guest_mode
         state: 'off'
     action:
-      - service: switch.turn_off
-        data:
-          entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-      #- delay: '00:01:30'
-      #- service: select.select_option
-      #  data:
-      #    option: min
-      #  target:
-      #    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+                    state: 'min'
+            sequence:
+              - service: select.select_option
+                data:
+                  option: min
+                target:
+                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+      - delay: '00:01:00'
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+                    state: 'min'
+            sequence:
+              - service: select.select_option
+                data:
+                  option: min
+                target:
+                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+
+  - id: set_wifi_settings_at_morning
+    alias: 'Set wifi settings at morning'
+    initial_state: true
+    trigger:
+      - platform: time
+        at: '00:06:15'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+                    state: 'max'
+            sequence:
+              - service: select.select_option
+                data:
+                  option: max
+                target:
+                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+      - delay: '00:01:00'
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+                    state: 'max'
+            sequence:
+              - service: select.select_option
+                data:
+                  option: max
+                target:
+                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
   - id: remind_for_unavailable_device
     alias: 'Remind for unavailable device'
@@ -743,6 +887,9 @@
               state: 'home'
             - condition: state
               entity_id: person.samuel
+              state: 'home'
+            - condition: state
+              entity_id: device_tracker.mikas_iphone
               state: 'home'
     action:
       - service: input_boolean.turn_on
@@ -838,32 +985,6 @@
           target: !secret telegram_chat_nessie
           message: 'Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist.'
 
-#  - id: turn_on_bett_if_bett_usb_ports_turned on
-#    alias: 'Turn on bett if bett usb ports turned on'
-#    initial_state: on
-#    trigger:
-#      - platform: state
-#        entity_id: switch.bett_usb_ports
-#        from: 'off'
-#        to: 'on'
-#    action:
-#      - service: switch.turn_on
-#        data:
-#          entity_id: switch.bett
-
-#  - id: turn_off_bett_if_bett_usb_ports_turned_off
-#    alias: 'Turn off bett if bett usb ports turned off'
-#    initial_state: on
-#    trigger:
-#      - platform: state
-#        entity_id: switch.bett_usb_ports
-#        from: 'on'
-#        to: 'off'
-#    action:
-#      - service: switch.turn_off
-#        data:
-#          entity_id: switch.bett
-
   - id: remind_fabi_to_ventilate
     alias: 'Remind Fabi to ventilate'
     initial_state: on
@@ -874,7 +995,7 @@
         for:
           hours: 4
       - platform: state
-        entity_id: device_tracker.nsta0552_lan
+        entity_id: device_tracker.nsta0552
         to: 'home'
         for:
           hours: 4
@@ -896,7 +1017,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nsta0552_lan
+              entity_id: device_tracker.nsta0552
               state: 'home'
     action:
       - service: tts.google_say
@@ -933,18 +1054,12 @@
           - conditions:
               - condition: time
                 after: '16:00:00'
-              - condition: or
-                conditions:
-                  - condition: and
-                    conditions:
-                      - condition: numeric_state
-                        entity_id: sensor.dwd_illuminance
-                        below: 2000
-                  - condition: numeric_state
-                    entity_id: sensor.fabian_s_zuhause_solar_percentage
-                    below: 15
-                  - condition: time
-                    after: '14:00:00'
+              - condition: numeric_state
+                entity_id: sensor.dwd_illuminance
+                below: 2000
+              - condition: numeric_state
+                entity_id: sensor.fabian_s_zuhause_solar_percentage
+                below: 15
               - condition: or
                 conditions:
                   - condition: state
@@ -1007,7 +1122,7 @@
         for:
             minutes: 1
       - platform: state
-        entity_id: device_tracker.nsta0552_lan
+        entity_id: device_tracker.nsta0552
         from: 'home'
         to: 'not_home'
         for:
@@ -1024,7 +1139,7 @@
         for: 
           minutes: 1
       - condition: state
-        entity_id: device_tracker.nsta0552_lan
+        entity_id: device_tracker.nsta0552
         state: 'not_home'
         for: 
           seconds: 20
@@ -1185,7 +1300,7 @@
         for:
           minutes: 10
       - platform: state
-        entity_id: device_tracker.nsta0552_lan
+        entity_id: device_tracker.nsta0552
         from: 'home'
         to: 'not_home'
         for:
@@ -1218,18 +1333,14 @@
     action:
       - choose:
           - conditions:
-              - condition: or
-                conditions:
-                  - condition: and
-                    conditions:
-                      - condition: numeric_state
-                        entity_id: sensor.dwd_illuminance
-                        below: 2000
-                      - condition: time
-                        after: '15:00:00'
-                  - condition: numeric_state
-                    entity_id: sensor.fabian_s_zuhause_solar_percentage
-                    below: 15
+              - condition: numeric_state
+                entity_id: sensor.dwd_illuminance
+                below: 3000
+              - condition: time
+                after: '14:00:00'
+              - condition: numeric_state
+                entity_id: sensor.fabian_s_zuhause_solar_percentage
+                below: 15
             sequence:
               - service: light.turn_on
                 data:
@@ -1601,7 +1712,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nsta0552_lan
+                    entity_id: device_tracker.nsta0552
                     state: 'home'
               - condition: not
                 conditions:
@@ -1998,7 +2109,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nsta0552_lan
+                    entity_id: device_tracker.nsta0552
                     state: 'home'
               - condition: not
                 conditions:
@@ -2082,7 +2193,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nsta0552_lan
+                    entity_id: device_tracker.nsta0552
                     state: 'home'
             sequence:
               - service: notify.telegram_fabian
@@ -2173,7 +2284,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
                   - condition: state
-                    entity_id: device_tracker.nsta0552_lan
+                    entity_id: device_tracker.nsta0552
                     state: 'home'
               - condition: not
                 conditions:
@@ -2323,7 +2434,7 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: switch.bett_usb_ports
+          entity_id: switch.smart_power_strip_pro_usb_1
           state: 'on'
         #- condition: or
         #  conditions:
@@ -2352,20 +2463,20 @@
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.bett_usb_ports
+          entity_id: switch.smart_power_strip_pro_usb_1
 
   - id: turn_off_bett_after_x_hours
     alias: 'Turn off bett after x hours'
     initial_state: on
     trigger:
       - platform: state
-        entity_id: switch.bett_usb_ports
+        entity_id: switch.smart_power_strip_pro_usb_1
         from: 'off'
         to: 'on'
         for:
             minutes: 180
       - platform: state
-        entity_id: switch.bett_usb_ports
+        entity_id: switch.smart_power_strip_pro_usb_1
         from: 'off'
         to: 'on'
         for:
@@ -2374,12 +2485,12 @@
       condition: and
       conditions:
         - condition: state
-          entity_id: switch.bett_usb_ports
+          entity_id: switch.smart_power_strip_pro_usb_1
           state: 'on'
     action:
       - service: switch.turn_off
         data:
-          entity_id: switch.bett_usb_ports
+          entity_id: switch.smart_power_strip_pro_usb_1
 
   - id: turn_off_staubsauger_after_x_hours
     alias: 'Turn off staubsauger after x hours'
@@ -2561,9 +2672,6 @@
                       entity_id: device_tracker.google_maps_112056758146194246561
                       state: home
     action:
-      - service: switch.turn_on
-        data:
-          entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
       - choose:
           - conditions:
               - condition: and
@@ -2610,19 +2718,6 @@
       #    entity_id: 
       #      - light.yeelight_bslamp2_0x0000000013fea10f
       - delay: '00:20:00'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-                    state: 'max'
-            sequence:
-              - service: select.select_option
-                data:
-                  option: max
-                target:
-                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
       - service: switch.turn_on
         data:
           entity_id: switch.adaptive_lighting_sleeping_room
@@ -2632,7 +2727,7 @@
                 entity_id: device_tracker.fabian_pc
                 state: 'not_home'
               - condition: state
-                entity_id: 'device_tracker.nsta0552_lan'
+                entity_id: 'device_tracker.nsta0552'
                 state: 'not_home'
             sequence:
               - service: light.turn_off
@@ -2921,7 +3016,7 @@
         below: 1800
       - platform: numeric_state
         entity_id: sensor.fabian_s_zuhause_solar_percentage
-        below: 20
+        below: 18
       - platform: sun
         event: sunset
         offset: "-00:30:00"
@@ -2984,7 +3079,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.nsta0552_lan'
+              entity_id: 'device_tracker.nsta0552'
               state: 'home'
     action:
       - service: light.turn_on
@@ -3022,7 +3117,7 @@
               entity_id: 'device_tracker.fabian_pc'
               state: 'home'
             - condition: state
-              entity_id: 'device_tracker.nsta0552_lan'
+              entity_id: 'device_tracker.nsta0552'
               state: 'home'
         - condition: or
           conditions:
@@ -3581,10 +3676,6 @@
                 data:
                   entity_id: all
                   preset_mode: 'away'
-      - service: switch.turn_off
-        data:
-          entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-      - delay: '00:00:40'
       - choose:
           - conditions:
               - condition: not
@@ -3634,10 +3725,6 @@
                 data:
                   entity_id: all
                   preset_mode: 'home'
-      - service: switch.turn_on
-        data:
-          entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-      - delay: '00:00:40'
       - choose:
           - conditions:
               - condition: not
@@ -6699,7 +6786,7 @@
                     entity_id: device_tracker.fabian_pc
                     state: home
                   - condition: state
-                    entity_id: device_tracker.nsta0552_lan
+                    entity_id: device_tracker.nsta0552
                     state: home
             sequence:
               #- service: notify.browser
@@ -7904,7 +7991,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'home'
       - platform: state
-        entity_id: device_tracker.nsta0552_lan
+        entity_id: device_tracker.nsta0552
         to: 'home'
       - platform: state
         entity_id: device_tracker.vku_lb_20
@@ -7924,7 +8011,7 @@
               entity_id: device_tracker.fabian_pc
               state: 'home'
             - condition: state
-              entity_id: device_tracker.nsta0552_lan
+              entity_id: device_tracker.nsta0552
               state: 'home'
             - condition: not
               conditions:
@@ -7962,7 +8049,7 @@
         entity_id: device_tracker.schnuppes_pc
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.nsta0552_lan
+        entity_id: device_tracker.nsta0552
         to: 'not_home'
       - platform: state
         entity_id: switch.nessie_pc
@@ -8747,28 +8834,6 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 36000 }}"
     action:
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-                state: 'off'
-            sequence:
-              - service: switch.turn_off
-                data:
-                  entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-      #- choose:
-      #    - conditions:
-      #        - condition: not
-      #          conditions:
-      #            - condition: state
-      #              entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-      #              state: 'max'
-      #      sequence:
-      #        - service: select.select_option
-      #          data:
-      #            option: max
-      #          target:
-      #            entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -8802,28 +8867,6 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_nessie.attributes.last_triggered) | int > 10800 }}"
     action:
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-                state: 'off'
-            sequence:
-              - service: switch.turn_off
-                data:
-                  entity_id: switch.miwifi_28_d1_27_fc_ab_d8_wifi_5g
-      #- choose:
-      #    - conditions:
-      #        - condition: not
-      #          conditions:
-      #            - condition: state
-      #              entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-      #              state: 'max'
-      #      sequence:
-      #        - service: select.select_option
-      #          data:
-      #            option: max
-      #          target:
-      #            entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_nessie

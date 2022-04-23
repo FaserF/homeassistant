@@ -342,16 +342,16 @@ template:
             {% endif %}
 
 sensor:
-  - platform: rest
-    name: Switch LAN-Play Online
-    resource: http://192.168.31.2:11451/info
-    scan_interval: 600
-    method: GET
-    unit_of_measurement: people
-    json_attributes:
-      - version
-      - idle
-    value_template: "{{value_json.online}}"
+  #- platform: rest
+  #  name: Switch LAN-Play Online
+  #  resource: http://192.168.31.2:11451/info
+  #  scan_interval: 600
+  #  method: GET
+  #  unit_of_measurement: people
+  #  json_attributes:
+  #    - version
+  #    - idle
+  #  value_template: "{{value_json.online}}"
   - platform: imap_email_content
     server: imap.ionos.de
     port: 993
@@ -789,8 +789,6 @@ google_assistant:
       expose: false
     switch.bett:
       expose: false
-    switch.schreibtisch:
-      expose: false
     switch.kohleanzunder:
       expose: false
     switch.nessie_pc_shutdown:
@@ -820,15 +818,15 @@ google_assistant:
       name: Adblocker
     #Enabled Entitys
     ##Schlafzimmer
-    switch.fabian_strom:
-      name: Strom Schlafzimmer
+    switch.schreibtisch:
+      name: Strom Tisch
       expose: false
       room: Schlafzimmer
     input_boolean.fs_strom:
       name: Strom Schlafzimmer
       expose: true
       room: Schlafzimmer
-    switch.bett_usb_ports:
+    switch.smart_power_strip_pro_usb_1:
       name: Bett Steckdose
       expose: true
       room: Schlafzimmer
@@ -841,7 +839,7 @@ google_assistant:
       room: Schlafzimmer
     light.bett_gluhbirne:
       name: Bett Glühbirne
-      expose: false
+      expose: true
       room: Schlafzimmer
     light.leds_tisch:
       expose: true

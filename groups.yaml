@@ -28,8 +28,11 @@ Schlafzimmer:
     - light.yeelight_bslamp2_0x0000000013fea10f
     - light.prismatik
     #- climate.schlafzimmer
-    - switch.bett
-    - switch.bett_usb_ports
+    - switch.smart_power_strip_pro_socket_1
+    - switch.smart_power_strip_pro_socket_2
+    - switch.smart_power_strip_pro_socket_3
+    - switch.smart_power_strip_pro_socket_4
+    - switch.smart_power_strip_pro_usb_1
     - switch.fabian_strom
     - switch.fabian_pc_shutdown
     - switch.schreibtisch
