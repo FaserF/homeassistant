@@ -394,15 +394,7 @@ sensor:
         friendly_name: "Durchschn. Temp."
         unit_of_measurement: "°C"
         value_template: >-
-          {% if (is_state("switch.xiaomi_miio_cooker", "off")) -%}
-            {% if not(is_state("sensor.xiaomi_miio_cooker_temperature", "unknown")) -%}
-              {{ (float(states.sensor.xiaomi_miio_cooker_temperature.state) + float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 5 | round(2) }}
-            {% else %}
-              {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
-            {% endif %}
-          {% else %}
-            {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
-          {% endif %}
+          {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
   - platform: template
     sensors:
       washing_machine_state:

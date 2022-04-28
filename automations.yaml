@@ -225,6 +225,9 @@
         entity_id: person.fabian
         from: 'not_home'
         to: 'home'
+      - platform: numeric_state
+        entity_id: proximity.home_fabian
+        below: 3
     condition:
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
@@ -233,7 +236,7 @@
         conditions:
           - condition: numeric_state
             entity_id: proximity.home_fabian
-            below: 2
+            below: 3
           - condition: not
             conditions:
               - condition: state
@@ -241,7 +244,7 @@
                 attribute: dir_of_travel
                 state: 'away_from'
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 300 }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
     action:
@@ -261,6 +264,9 @@
         entity_id: person.nessie
         from: 'not_home'
         to: 'home'
+      - platform: numeric_state
+        entity_id: proximity.home_nessie
+        below: 2
     condition:
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
@@ -279,7 +285,7 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 300 }}"
     action:
       - service: switch.turn_on
         data:
@@ -299,7 +305,7 @@
         to: 'home'
     condition:
       - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_xx
+        entity_id: device_tracker.miwifi_14_c8_8b_0e_84_66
         state: not_home
       #- condition: not
       #  conditions:
@@ -1189,6 +1195,8 @@
               - condition: state
                 entity_id: 'input_boolean.climate_off'
                 state: 'off'
+              - condition: time
+                after: '17:30:00'
               - condition: not
                 conditions:
                   - condition: state
@@ -1202,6 +1210,31 @@
                   hvac_mode: heat
       - choose:
           - conditions:
+              - condition: numeric_state
+                entity_id: 'weather.dwd_weather_ebersberg_1h'
+                attribute: temperature
+                below: 17
+              - condition: state
+                entity_id: 'input_boolean.guest_mode'
+                state: 'off'
+              - condition: state
+                entity_id: 'input_boolean.climate_off'
+                state: 'off'
+              - condition: time
+                before: '17:31:00'
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: 'climate.gastezimmer'
+                    state: 'off'
+            sequence:
+              - service: climate.set_temperature
+                data:
+                  entity_id: climate.gastezimmer
+                  temperature: 20.0
+                  hvac_mode: heat
+      - choose:
+          - conditions:
               - condition: or
                 conditions:
                   - condition: and
@@ -1210,10 +1243,22 @@
                         entity_id: sensor.dwd_illuminance
                         below: 2000
                       - condition: time
-                        after: '15:00:00'
-                  - condition: numeric_state
-                    entity_id: sensor.fabian_s_zuhause_solar_percentage
-                    below: 20
+                        after: '16:00:00'
+                  - condition: and
+                    conditions:
+                      - condition: numeric_state
+                        entity_id: sensor.fabian_s_zuhause_solar_percentage
+                        below: 20
+                      - condition: time
+                        after: '16:00:00'
+                  - condition: and
+                    conditions:
+                      - condition: numeric_state
+                        entity_id: sensor.fabian_s_zuhause_solar_percentage
+                        below: 20
+                      - condition: numeric_state
+                        entity_id: sensor.dwd_illuminance
+                        below: 2000
             sequence:
               - service: light.turn_on
                 target:
@@ -2536,6 +2581,40 @@
           topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
           payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
 
+  - id: vacuum_cleaner_error
+    alias: 'Vacuum Cleaner Error'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.valetudo_dreamez10pro_error_description
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.valetudo_dreamez10pro_error_description
+          state: "Unknown"
+        - condition: state
+          entity_id: sensor.valetudo_dreamez10pro_error_description
+          state: 'unavailable'
+        - condition: state
+          entity_id: sensor.valetudo_dreamez10pro_error_description
+          state: ''
+    action:
+      - service: telegram_bot.send_message
+        data_template: 
+          message: >
+            James hat ein Problem: *{{ states.sensor.valetudo_dreamez10pro_error_description.state }}*
+
+            Die Reinigung wurde daher unterbrochen.
+          target: !secret telegram_chat_fabian
+      - service: telegram_bot.send_message
+        data_template: 
+          message: >
+            James hat ein Problem: *{{ states.sensor.valetudo_dreamez10pro_error_description.state }}*
+
+            Die Reinigung wurde daher unterbrochen.
+          target: !secret telegram_chat_nessie
+
   - id: james_room_cleaning
     alias: 'James Raum Reinigiung'
     initial_state: on
@@ -2580,7 +2659,7 @@
               - service: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["2"]}'
+                  payload: '{"segment_ids": ["7"]}'
           - conditions:
               - condition: state
                 entity_id: input_select.vacuum_cleaning_location
@@ -2607,11 +2686,6 @@
               - service: vacuum.start
                 data:
                   entity_id: vacuum.valetudo_dreamez10pro
-      - service: input_select.select_option
-        target:
-          entity_id: input_select.vacuum_cleaning_location
-        data:
-          option: Gesamt
 
   - id: turn_on_lights_in_morning
     alias: 'Turn on lights in morning'
@@ -3380,10 +3454,10 @@
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_5friends
-                  message: 'Der Kühlschrank für das Gruppentreffen heute wurde angeschaltet.'
+                  message: 'Anscheinend steht heute {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an, soll der Kühlschrank im Keller eingeschaltet werden?'
                   disable_notification: true
                   inline_keyboard:
-                    - 'Ausschalten:/fridgeoff'
+                    - 'Anschalten:/fridge'
       - choose:
           - conditions:
               - condition: state
@@ -3537,7 +3611,8 @@
           entity_id: switch.kuhlschrank
       - service: telegram_bot.send_message
         data_template:
-          target: "{{ trigger.event.data.user_id }}"
+          target: "{{ trigger.event.data.chat_id }}"
+          #target: "{{ trigger.event.data.user_id }}"
           message: 'Kühlschrank im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
   - id: turn_on_climates
@@ -6019,21 +6094,21 @@
                 data:
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-              - service: notify.keller_tv
-                data:
-                  message: "Bitte Kohle wenden."
+              #- service: notify.keller_tv
+              #  data:
+              #    message: "Bitte Kohle wenden."
       - delay: '00:06:00'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: media_player.keller_tv
-                    state: unavailable
-            sequence:
-              - service: notify.keller_tv
-                data:
-                  message: "Der Eisschlauch kann schon mal geholt werden."
+      #- choose:
+      #    - conditions:
+      #        - condition: not
+      #          conditions:
+      #            - condition: state
+      #              entity_id: media_player.keller_tv
+      #              state: unavailable
+      #      sequence:
+      #        - service: notify.keller_tv
+      #          data:
+      #            message: "Der Eisschlauch kann schon mal geholt werden."
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -6738,6 +6813,76 @@
         data_template:
           message: 'Der Reiskocher wurde automatisch angeschaltet im Programm {{ states.input_select.rice_cooker_program.state }}.'
 
+  - id: set_rice_cooker_menu_state
+    alias: 'Set ricecooker menu state'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.xiaomi_miio_cooker_menu
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.xiaomi_miio_cooker_menu
+          state: "Unknown"
+        - condition: state
+          entity_id: sensor.xiaomi_miio_cooker_menu
+          state: 'unavailable'
+        - condition: state
+          entity_id: sensor.xiaomi_miio_cooker_menu
+          state: ''
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.xiaomi_miio_cooker_menu
+                state: 'Fine Rice'
+            sequence:
+              - service: input_select.select_option
+                data:
+                  entity_id: input_select.rice_cooker_program
+                  option: 'Kochen 1h'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.xiaomi_miio_cooker_menu
+                state: 'Keep warm'
+            sequence:
+              - service: input_select.select_option
+                data:
+                  entity_id: input_select.rice_cooker_program
+                  option: 'Wärmen'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.xiaomi_miio_cooker_menu
+                state: 'Quick Rice'
+            sequence:
+              - service: input_select.select_option
+                data:
+                  entity_id: input_select.rice_cooker_program
+                  option: 'schnelles Kochen'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.xiaomi_miio_cooker_menu
+                state: 'Congee'
+            sequence:
+              - service: input_select.select_option
+                data:
+                  entity_id: input_select.rice_cooker_program
+                  option: 'Porridge'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.xiaomi_miio_cooker_menu
+                state: 'Unknown menu'
+            sequence:
+              - service: input_select.select_option
+                data:
+                  entity_id: input_select.rice_cooker_program
+                  option: 'Sonstiges'
+
   - id: remind_for_going_off
     alias: 'Remind for going off'
     initial_state: on
@@ -6905,10 +7050,14 @@
     alias: 'Telegram urgent message'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/urgent'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/urgent'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/urgent@smartlife_ha_bot'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -6977,6 +7126,10 @@
       - platform: event
         event_type: telegram_command
         event_data:
+          command: '/open@smartlife_ha_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
           command: '/alohomora'
     condition:
       - condition: not
@@ -6998,7 +7151,8 @@
                   entity_id: switch.schloss
               - service: telegram_bot.send_message
                 data_template:
-                  target: "{{ trigger.event.data.user_id }}"
+                  target: "{{ trigger.event.data.chat_id }}"
+                  #target: "{{ trigger.event.data.user_id }}"
                   message: 'Gartentor wurde geöffnet.'
       - choose:
           - conditions:
@@ -7020,10 +7174,14 @@
     alias: 'Telegram virtual bell'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/klingel'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/klingel'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/klingel@smartlife_ha_bot'
     action:
       - service: switch.turn_on
         data:
@@ -7062,7 +7220,8 @@
             ist da.
       - service: telegram_bot.send_message
         data_template:
-          target: "{{ trigger.event.data.user_id }}"
+          target: "{{ trigger.event.data.chat_id }}"
+          #target: "{{ trigger.event.data.user_id }}"
           message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
       - service: media_player.volume_set
         data:
@@ -7195,9 +7354,9 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
             sequence:
-              - service: notify.telegram_fabian
-                data:
-                  message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
+              #- service: notify.telegram_fabian
+              #  data:
+              #    message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
               - service: climate.set_hvac_mode
                 data:
                   entity_id: climate.schlafzimmer
@@ -7668,10 +7827,14 @@
     alias: Telegram Help
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/help'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/help'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/help@smartlife_ha_bot'
     action:
       - service: telegram_bot.send_message
         data_template:
@@ -8143,7 +8306,7 @@
     action:
       - service: telegram_bot.send_message
         data_template:
-          target: "{{ trigger.event.data.user_id }}"
+          target: "{{ trigger.event.data.chat_id }}"
           message: '{{ states.sensor.coal_lighter_finish_duration.attributes.friendly_name }} ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig.'
           disable_notification: true
 
@@ -8162,14 +8325,14 @@
       - service: switch.turn_off
         data:
           entity_id: switch.kuhlschrank
-      # - service: telegram_bot.answer_callback_query
-      #   data_template:
-      #     callback_query_id: '{{ trigger.event.data.id }}'
-      #     message: 'Okay, wird ausgeschaltet.'
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: "{{ trigger.event.data.chat_id }}"
+          message: 'Okay, wird ausgeschaltet.'
       - service: telegram_bot.send_message
         data_template:
-          target: !secret telegram_chat_5friends
-          message: 'Kühlschrank wurde wieder ausgeschaltet.'
+          target: "{{ trigger.event.data.chat_id }}"
+          message: 'Kühlschrank wurde ausgeschaltet.'
           disable_notification: true
 
   - id: remind_for_checking_google_maps_ha_cookie
