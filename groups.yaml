@@ -16,13 +16,13 @@ Wohnzimmer:
     - switch.fernseher
     - switch.staubsauger
     - light.deckenlampe
+    - vacuum.valetudo_dreamez10pro
 
 Schlafzimmer:
   name: Schlafzimmer
   icon: mdi:bed
   entities:
     - media_player.schlafzimmer_speaker
-    #- light.yeelight_stripe_0x00000000036d0c16 #Bett LEDs
     - light.leds_tisch
     - light.bett_gluhbirne
     - light.yeelight_bslamp2_0x0000000013fea10f
@@ -34,7 +34,6 @@ Schlafzimmer:
     - switch.smart_power_strip_pro_socket_4
     - switch.smart_power_strip_pro_usb_1
     - switch.fabian_strom
-    - switch.fabian_pc_shutdown
     - switch.schreibtisch
     - light.lichtschalter
 
@@ -47,7 +46,6 @@ Gästezimmer:
     - light.leds_gastezimmer
     #- climate.gastezimmer
     - switch.nessie_pc
-    - switch.nessie_pc_shutdown
 
 Keller:
   name: Keller
@@ -69,8 +67,10 @@ ignored_entities:
     - device_tracker.ipad
     - device_tracker.nessie_phone
     - device_tracker.fabian_phone
+    - media_player.keller_tv_group
     - media_player.keller_tv
     - media_player.keller_tv_cast
+    - media_player.wohnzimmer_tv_group
     - media_player.wohnzimmer_tv
     - media_player.wohnzimmer_tv_cast
     - media_player.chromecast
@@ -86,6 +86,8 @@ ignored_entities:
     - sensor.hacs
     - sensor.dwd_weather_warnings_advance_warning_level
     - sensor.dwd_weather_warnings_current_warning_level
+    - sensor.lk_ebersberg_weekincidence
+    - sensor.lk_munchen_weekincidence
     - weather.dwd_weather_ebersberg_halbing
     - sensor.kuche_mini_alarms
     - sensor.kuche_mini_timers
@@ -105,6 +107,7 @@ ignored_entities:
     - sensor.miwifi_9c_9d_7e_30_89_fb_uptime
     - switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
     - light.miwifi_9c_9d_7e_30_89_fb_led
+    - update.miwifi_9c_9d_7e_30_89_fb_firmware_update
     - sensor.xiaomi_miio_cooker_cooking_delayed
     - sensor.xiaomi_miio_cooker_duration
     - sensor.xiaomi_miio_cooker_favorite
@@ -145,6 +148,7 @@ ignored_entities:
     - sensor.ks_battery_state
     - sensor.samuel_iphone_battery_state
     - sensor.adri_iphone_battery_state
+    - sensor.iphone_se_battery_state
     - sensor.fabian_iphone7_battery_state
     - sensor.info_juzzo_de
     - sensor.valetudo_dreamez10pro_error_description
@@ -152,3 +156,4 @@ ignored_entities:
     - person.flo
     - person.isi
     - person.maxi
+    - person.samuel

@@ -32,6 +32,13 @@ homeassistant:
   media_dirs:
     media: "/media"
 
+default_config:
+input_boolean:
+config:
+system_health:
+api:
+mobile_app:
+
 zone:
   # This will override the default home zone
   - name: Home
@@ -69,12 +76,6 @@ zone:
     longitude: !secret longitude_work_nessie
     radius: 250
     icon: mdi:school
-
-# Enables configuration UI
-config:
-system_health:
-api:
-mobile_app:
 
 http:
   ssl_certificate: !secret ssl_certificate
@@ -288,7 +289,6 @@ climate:
 shell_command:
   #create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
-  updateha: "ha core update"
   randomfood: !secret randomfood
   foodyes: !secret foodyes
   jek_telegram: !secret telegram_jek_open_command
@@ -377,7 +377,7 @@ sensor:
     password: !secret juz_mail_pw
   - platform: command_line
     name: "Latest Tasmota"
-    command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c 2- | rev'
+    command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
     scan_interval: 86400
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
@@ -960,7 +960,6 @@ input_datetime:
     has_date: true
     has_time: true
 
-input_boolean: !include input_boolean.yaml
 frontend:
   themes: !include_dir_merge_named themes
 group: !include groups.yaml
