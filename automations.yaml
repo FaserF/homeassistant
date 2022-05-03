@@ -228,6 +228,8 @@
         entity_id: person.fabian
         from: 'not_home'
         to: 'home'
+        for:
+          seconds: 2
       - platform: numeric_state
         entity_id: proximity.home_fabian
         below: 2
