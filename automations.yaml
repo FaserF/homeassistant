@@ -230,7 +230,7 @@
         to: 'home'
       - platform: numeric_state
         entity_id: proximity.home_fabian
-        below: 3
+        below: 2
     condition:
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
@@ -239,7 +239,7 @@
         conditions:
           - condition: numeric_state
             entity_id: proximity.home_fabian
-            below: 3
+            below: 2
           - condition: not
             conditions:
               - condition: state
@@ -310,6 +310,14 @@
       - condition: state
         entity_id: device_tracker.miwifi_14_c8_8b_0e_84_66
         state: not_home
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: home
+          - condition: state
+            entity_id: person.nessie
+            state: home
       #- condition: not
       #  conditions:
       #    - condition: state
@@ -332,29 +340,38 @@
         data:
           target: !secret telegram_chat_adrian
           message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
-      - service: notify.mobile_app_fabian_phone
-        data:
-          message: "Adri ist gleich da"
-          data:
-            push:
-              sound:
-                name: "default"
-                critical: 1
-                volume: 0.7
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.7
-          entity_id: media_player.wohnzimmer_uhr
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_uhr
-          - media_player.kuche_speaker
-        data:
-          message: "Adrian ist gleich da."
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: time
+                    before: '22:00:00'
+                  - condition: time
+                    after: '10:00:00'
+            sequence:
+              - service: notify.mobile_app_fabian_iphone
+                data:
+                  message: "Adri ist gleich da"
+                  data:
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.7
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.7
+                  entity_id: media_player.wohnzimmer_uhr
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                data:
+                  message: "Adrian ist gleich da."
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_uhr
       - choose:
           - conditions:
               - condition: not
@@ -384,6 +401,14 @@
       - condition: state
         entity_id: device_tracker.miwifi_e8_7f_95_73_88_96
         state: not_home
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: home
+          - condition: state
+            entity_id: person.nessie
+            state: home
       #- condition: not
       #  conditions:
       #    - condition: state
@@ -406,29 +431,38 @@
         data:
           target: !secret telegram_chat_kai
           message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
-      - service: notify.mobile_app_fabian_phone
-        data:
-          message: "Kai ist gleich da"
-          data:
-            push:
-              sound:
-                name: "default"
-                critical: 1
-                volume: 0.7
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.7
-          entity_id: media_player.wohnzimmer_uhr
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_uhr
-          - media_player.kuche_speaker
-        data:
-          message: "Kai ist gleich da."
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: time
+                    before: '22:00:00'
+                  - condition: time
+                    after: '10:00:00'
+            sequence:
+              - service: notify.mobile_app_fabian_iphone
+                data:
+                  message: "Kai ist gleich da"
+                  data:
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.7
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.7
+                  entity_id: media_player.wohnzimmer_uhr
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                data:
+                  message: "Kai ist gleich da."
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_uhr
       - choose:
           - conditions:
               - condition: not
@@ -1742,7 +1776,7 @@
                         name: "default"
                         critical: 1
                         volume: 0.1
-              - service: notify.mobile_app_fabian_phone
+              - service: notify.mobile_app_fabian_iphone
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
                   data:
@@ -1776,7 +1810,7 @@
               - service: notify.telegram_fabian
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
-              - service: notify.mobile_app_fabian_phone
+              - service: notify.mobile_app_fabian_iphone
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
                   data:
@@ -3483,9 +3517,9 @@
                     attribute: temperature
                     above: 5
             sequence:
-              - service: switch.turn_on
-                data:
-                  entity_id: switch.kuhlschrank
+              #- service: switch.turn_on
+              #  data:
+              #    entity_id: switch.kuhlschrank
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_5friends
@@ -4277,9 +4311,11 @@
     trigger:
       - platform: state
         entity_id: update.home_assistant_core_update
+        from: 'off'
         to: 'on'
       - platform: state
         entity_id: update.home_assistant_operating_system_update
+        from: 'off'
         to: 'on'
     action:
       - service: telegram_bot.send_message
@@ -4297,12 +4333,16 @@
               Homeassistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }}
             {% endif %}
             ist nun verfügbar. 
-            Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
-            Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
+            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
+              Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
+            
+            {% endif %}
+            {% if states.update.home_assistant_operating_system_update.attributes.latest_version != states.update.home_assistant_operating_system_update.attributes.installed_version %} 
+              Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
+            {% endif %}
           target: !secret telegram_chat_fabian
           inline_keyboard:
-          - 'HA Update starten:/updateha'
-          - 'OS Update starten:/updateos'
+            - 'HA Update starten:/updateha, OS Update starten:/updateos'
 
   - id: hacs_update_available
     alias: 'HACS Update available'
@@ -7022,7 +7062,7 @@
               #  data:
               #    data:
               #      tag: 'notification-about-sensor'
-              - service: notify.mobile_app_fabian_phone
+              - service: notify.mobile_app_fabian_iphone
                 data_template:
                   title: "Zeit off zu gehen"
                   message: "Es ist 22 Uhr."
@@ -7057,7 +7097,7 @@
 #            {% set state = 'off' %}
 #            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
 #    action:
-#      - service: notify.mobile_app_fabian_phone
+#      - service: notify.mobile_app_fabian_iphone
 #        data_template:
 #          title: "Flugmodus"
 #          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -7074,7 +7114,7 @@
       event_data:
         command: '/lostfabian'
     action:
-      - service: notify.mobile_app_fabian_phone
+      - service: notify.mobile_app_fabian_iphone
         data:
           message: "This phone is marked as lost! +49176 66334870"
           data:
@@ -7151,7 +7191,7 @@
                 name: "default"
                 critical: 1
                 volume: 0.4
-      - service: notify.mobile_app_fabian_phone
+      - service: notify.mobile_app_fabian_iphone
         data:
           message: "Wichtige Nachricht, schau auf dein Handy!"
           data:
@@ -7259,7 +7299,7 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      - service: notify.mobile_app_fabian_phone
+      - service: notify.mobile_app_fabian_iphone
         data:
           message: "Es klingelt! Jemand ist da."
           data:

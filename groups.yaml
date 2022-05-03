@@ -153,6 +153,7 @@ ignored_entities:
     - sensor.info_juzzo_de
     - sensor.valetudo_dreamez10pro_error_description
     - sensor.fabian_watch3_battery_state
+    - sensor.mikas_iphone_battery_state
     - person.flo
     - person.isi
     - person.maxi
