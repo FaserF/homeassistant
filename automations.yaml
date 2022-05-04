@@ -4326,7 +4326,7 @@
             {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
               Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }}
             {% endif %}
-            {% if states.sensor.home_assistant_versions.state != states.sensor.current_version.state %} 
+            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
               {% if states.sensor.home_assistant_operating_system_newest_version.state != states.sensor.home_assistant_operating_system_version.state %}
               & 
               {% endif %}
@@ -4337,7 +4337,6 @@
             ist nun verfügbar. 
             {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
               Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
-            
             {% endif %}
             {% if states.update.home_assistant_operating_system_update.attributes.latest_version != states.update.home_assistant_operating_system_update.attributes.installed_version %} 
               Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
