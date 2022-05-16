@@ -229,10 +229,12 @@
         from: 'not_home'
         to: 'home'
         for:
-          seconds: 2
+          seconds: 3
       - platform: numeric_state
         entity_id: proximity.home_fabian
         below: 2
+        for:
+          seconds: 3
     condition:
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
@@ -333,7 +335,7 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_adri_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_kai_if_coming_home.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_kai_if_coming_home.attributes.last_triggered) | int > 300 }}"
     action:
       - service: switch.turn_on
         data:
@@ -422,7 +424,7 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_adri_if_coming_home.attributes.last_triggered) | int > 180 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_adri_if_coming_home.attributes.last_triggered) | int > 300 }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_kai_if_coming_home.attributes.last_triggered) | int > 180 }}"
     action:
@@ -1123,7 +1125,7 @@
                   entity_id: light.leds_tisch
                   brightness: 255
                   transition: 2
-              - delay: '00:03:00'
+              - delay: '00:04:00'
               - service: light.turn_on
                 data:
                   entity_id: light.prismatik
@@ -2657,8 +2659,7 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: automation.james_room_cleaning
-        to: 'on'
+        entity_id: input_button.james_room_cleaning
     action:
       - choose:
           - conditions:
@@ -2951,7 +2952,7 @@
             Es ist {{ now().hour }} Uhr {{ now().minute }} .
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
             {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
-      - delay: '00:00:15'
+      - delay: '00:00:12'
       - choose:
           - conditions:
               - condition: or
@@ -3040,7 +3041,7 @@
             Es ist 
             {{ now().hour }} Uhr {{ now().minute }} . 
             Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
-      - delay: '00:00:15'
+      - delay: '00:00:12'
       - choose:
           - conditions:
               - condition: or
@@ -3199,7 +3200,7 @@
           entity_id: sensor.fabian_s_zuhause_solar_percentage
           above: 20
     action:
-      - delay: '00:03:00'
+      - delay: '00:04:00'
       - service: light.turn_off
         data:
           entity_id: light.prismatik
@@ -3231,7 +3232,7 @@
           entity_id: light.leds_tisch
           brightness: 255
           transition: 2
-      - delay: '00:03:00'
+      - delay: '00:04:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
@@ -3277,7 +3278,7 @@
           entity_id: light.leds_tisch
           brightness: 255
           transition: 2
-      - delay: '00:03:00'
+      - delay: '00:04:00'
       - service: light.turn_on
         data:
           entity_id: light.prismatik
@@ -3457,8 +3458,6 @@
     alias: 'Turn on fridge for meetings'
     initial_state: True
     trigger:
-      #- platform: time
-      #  at: '15:30:00'
       - platform: template
         value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) | round(-1) }}"
     condition:
@@ -3555,6 +3554,10 @@
                     entity_id: calendar.fabianseitz98_gmail_com
                     attribute: location
                     state: none
+                  - condition: state
+                    entity_id: calendar.fabianseitz98_gmail_com
+                    attribute: location
+                    state: ''
               - condition: or
                 conditions:
                   - condition: state
@@ -3924,38 +3927,6 @@
           entity_id: all
           hvac_mode: auto
 
-#  - id: turn_on_vacuum_cleaner
-#    alias: Turn on vacuum cleaner
-#    initial_state: on
-#    trigger: 
-#      - platform: state
-#        entity_id: input_boolean.vacuum_cleaner
-#        to: 'on'
-#    action:
-#      - service: rest_command.assistant_relay
-#        data:
-#          command: "Putze die Wohnung"
-#          user: "fabian"
-
-  - id: turn_off_kuhlschrank_keller
-    alias: Turn off Kuhlschrank Keller
-    initial_state: on
-    trigger: 
-      - platform: state
-        entity_id: input_boolean.vacuum_cleaner
-        to: 'off'
-    action:
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.vacuum_cleaner
-      - service: input_boolean.turn_off
-        data:
-          entity_id: input_boolean.strom_keller
-      - service: rest_command.assistant_relay
-        data:
-          command: "Stoppe den Staubsaugroboter"
-          user: "fabian"
-
   - id: turn_on_guest_mode
     alias: Turn on Guest Mode mode
     initial_state: on
@@ -4313,12 +4284,19 @@
     trigger:
       - platform: state
         entity_id: update.home_assistant_core_update
-        from: 'off'
-        to: 'on'
+        attribute: latest_version
       - platform: state
         entity_id: update.home_assistant_operating_system_update
-        from: 'off'
-        to: 'on'
+        attribute: latest_version
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: update.home_assistant_core_update
+          state: 'on'
+        - condition: state
+          entity_id: update.home_assistant_operating_system_update
+          state: 'on'
     action:
       - service: telegram_bot.send_message
         data_template: 
@@ -5186,6 +5164,11 @@
     condition:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 360 }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: sensor.fritz_box_3490_external_ip
+            state: unavailable
     action:
       - service: notify.telegram_fabian
         data:
@@ -6703,6 +6686,10 @@
           data:
             inline_keyboard:
             - '30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb'
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.washing_machine_status
+          option: Running
       - service: automation.turn_on
         data:
           entity_id: 
@@ -6751,7 +6738,7 @@
         entity_id: sensor.keller_steckdose_energy_power
         below: 6
         for:
-          minutes: 1
+          minutes: 2
     condition:
       condition: and
       conditions:
@@ -6760,6 +6747,8 @@
           state: Running
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 900 }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_active_when_power_detected.attributes.last_triggered) | int > 1020 }}"
     action:
       - service: input_select.select_option
         data:
@@ -7110,10 +7099,12 @@
     alias: 'Find Fabians Phone by sound'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/lostfabian'
+      - platform: state
+        entity_id: input_button.find_fabian_s_phone_by_sound
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/lostfabian'
     action:
       - service: notify.mobile_app_fabian_iphone
         data:
@@ -7133,10 +7124,12 @@
     alias: 'Find Fabians ipad by sound'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/lostfabian'
+      - platform: state
+        entity_id: input_button.find_fabian_s_ipad_by_sound
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/lostfabian'
     action:
       - service: icloud.play_sound
         data:
@@ -7147,10 +7140,12 @@
     alias: 'Find Nessies Phone by sound'
     initial_state: on
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: '/lostnessie'
+      - platform: state
+        entity_id: input_button.find_nessie_s_phone_by_sound
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/lostnessie'
     action:
       - service: notify.mobile_app_nessie_iphone
         data:
@@ -7561,6 +7556,47 @@
                         name: "default"
                         critical: 1
                         volume: 0.1
+
+  - id: cleaner_counter
+    alias: 'Set Counter with Cleaner Runs and remind for emptying and refilling'
+    trigger:
+      - platform: state
+        entity_id: vacuum.valetudo_dreamez10pro
+        from: 'docked'
+        for:
+          minutes: 2
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.valetudo_dreamez10pro
+          state: unavailable
+    action:
+      - service: counter.increment
+        target:
+          entity_id: counter.cleaner_runs
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ states('counter.cleaner_runs')|float % 4 == 0 }}"
+            sequence:
+              - service: notify.telegram_nessie
+                data_template:
+                  message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+              - service: notify.telegram_fabian
+                data_template:
+                  message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ states('counter.cleaner_runs')|float % 24 == 0 }}"
+            sequence:
+              - service: notify.telegram_fabian
+                data_template:
+                  message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
+              - service: notify.telegram_fabian
+                data_template:
+                  message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
 
   - id: nessie_forgot_pill
     alias: 'Nessie forgot pill'
@@ -9191,15 +9227,21 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) == (as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - 86400) }}"
-      - platform: template
-        value_template: "{{ is_state_attr('calendar.juzzorneding_gmail_com', 'offset_reached', 'true') }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - 86400) | round(-1) }}"
+    condition:
+      condition: and
+      conditions:  
+        - condition: template
+          value_template: "{{ ((as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
     action:
-      - service: shell_command.juz_telegram
-      #- service: telegram_bot.send_message
-      #  data_template:
-      #    target: !secret telegram_chat_jek_group
-      #    message: 'Im JEK steht am {{ states.calendar.jugendtreffjek_gmail_com.attributes.start_time }} {{ states.calendar.jugendtreffjek_gmail_com.attributes.message }} an.'
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_chat_juz_group
+          message: >
+            Das JUZ hat am {{ states.calendar.juzzorneding_gmail_com.attributes.start_time }} für {{ states.calendar.juzzorneding_gmail_com.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
+            {% if states.calendar.juzzorneding_gmail_com.attributes.description is defined %}
+              Zusatzinfos: {{ states.calendar.juzzorneding_gmail_com.attributes.description }}
+            {% endif %}
 
   - id: send_juz_mails_to_telegram
     alias: 'send juz mails to telegram'

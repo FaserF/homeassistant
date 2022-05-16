@@ -114,6 +114,9 @@ recorder:
       - updater
       - scene
       - calendar
+      - input_select
+      - input_button
+      - counter
     entities:
       - sun.sun # Don't record sun data
       - sensor.last_boot # Comes from 'systemmonitor' sensor platform
@@ -196,14 +199,16 @@ map:
 sun:
 
 device_tracker:
-  #- platform: xiaomi
-  #  host: 192.168.31.1
-  #  password: !secret fritzbox
   - platform: google_maps
     username: !secret gmaps_mail
     max_gps_accuracy: 1000
     new_device_defaults:
       track_new_devices: False
+  - platform: google_maps
+    username: !secret vapid_email
+    max_gps_accuracy: 1000
+    new_device_defaults:
+      track_new_devices: True
 
 proximity:
   home_nessie:
@@ -291,9 +296,6 @@ shell_command:
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
   randomfood: !secret randomfood
   foodyes: !secret foodyes
-  jek_telegram: !secret telegram_jek_open_command
-  juz_telegram: !secret telegram_juz_open_command
-  restartha: "ha host reboot"
   hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
   #overtime_input: !secret overtime_input
@@ -305,16 +307,6 @@ shell_command:
 #    - BTC
 #  exchange_rate_currencies:
 #    - BTC
-
-counter:
-  pille:
-    name: Pille Tageszähler
-    initial: 1
-    step: 1
-    minimum: 1
-    maximum: 29
-    restore: true
-    icon: mdi:pill
 
 template:
   - sensor:
