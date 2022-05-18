@@ -69,6 +69,7 @@ ignored_entities:
     - device_tracker.fabian_phone
     - media_player.keller_tv_group
     - media_player.keller_tv
+    - media_player.keller_tv_2
     - media_player.keller_tv_cast
     - media_player.wohnzimmer_tv_group
     - media_player.wohnzimmer_tv
@@ -162,3 +163,9 @@ ignored_entities:
     - input_button.find_fabian_s_phone_by_sound
     - input_button.find_nessie_s_phone_by_sound
     - input_button.james_room_cleaning
+    - sensor.cpuload
+    - sensor.cpuloadsensor
+    - sensor.gpuload
+    - switch.hibernate
+    - switch.restart
+    - switch.shutdown

@@ -371,7 +371,7 @@
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                 data:
-                  message: "Adrian ist gleich da."
+                  message: "Adri ist gleich da."
               - service: media_player.volume_set
                 data:
                   volume_level: 0.3
@@ -391,7 +391,7 @@
               - service: notify.keller_tv
                 continue_on_error: true
                 data:
-                  message: "Adrian ist gleich da."
+                  message: "Adri ist gleich da."
 
   - id: open_door_for_kai
     alias: 'Open the door for Kai if coming home'
@@ -484,6 +484,100 @@
                 continue_on_error: true
                 data:
                   message: "Kai ist gleich da."
+
+  - id: open_door_for_flo
+    alias: 'Open the door for Flo if coming home'
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: person.flo
+        from: 'not_home'
+        to: 'home'
+    condition:
+      - condition: state
+        entity_id: device_tracker.miwifi_30_ab_6a_c1_fe_15
+        state: not_home
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: home
+          - condition: state
+            entity_id: person.nessie
+            state: home
+      #- condition: not
+      #  conditions:
+      #    - condition: state
+      #      entity_id: proximity.home_ka
+      #      attribute: dir_of_travel
+      #      state: 'away_from'
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_nessie_if_coming_home.attributes.last_triggered) | int > 180 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_adri_if_coming_home.attributes.last_triggered) | int > 180 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_kai_if_coming_home.attributes.last_triggered) | int > 180 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_flo_if_coming_home.attributes.last_triggered) | int > 300 }}"
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
+      - service: telegram_bot.send_message
+        data:
+          target: !secret telegram_chat_flo
+          message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: time
+                    before: '22:00:00'
+                  - condition: time
+                    after: '10:00:00'
+            sequence:
+              - service: notify.mobile_app_fabian_iphone
+                data:
+                  message: "Flo ist gleich da"
+                  data:
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.7
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.7
+                  entity_id: media_player.wohnzimmer_uhr
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                data:
+                  message: "Flo ist gleich da."
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.3
+                  entity_id: media_player.wohnzimmer_uhr
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.keller_tv
+                    state: 'unavailable'
+            sequence:
+              - service: androidtv.adb_command
+                continue_on_error: true
+                data:
+                  entity_id: media_player.keller_tv
+                  command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
+              - service: notify.keller_tv
+                continue_on_error: true
+                data:
+                  message: "Flo ist gleich da."
 
   # - id: notify_if_someone_joined_lan_play_server
   #   alias: Notify if someone joined lan play server
@@ -935,12 +1029,6 @@
               state: 'home'
             - condition: state
               entity_id: person.kai
-              state: 'home'
-            - condition: state
-              entity_id: person.samuel
-              state: 'home'
-            - condition: state
-              entity_id: device_tracker.mikas_iphone
               state: 'home'
     action:
       - service: input_boolean.turn_on
@@ -5861,10 +5949,14 @@
         entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
+        for:
+          minutes: 3
       - platform: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
+        for:
+          minutes: 3
     condition:
       - condition: or
         conditions:
@@ -5909,7 +6001,6 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 4200 }}"
     action:
-      - delay: 00:03:00
       - parallel:
           - service: media_player.volume_set
             data_template:
@@ -5990,10 +6081,14 @@
         entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         from: 'not_home'
         to: 'home'
+        for:
+          minutes: 3
       - platform: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         from: 'not_home'
         to: 'home'
+        for:
+          minutes: 3
     condition:
       - condition: numeric_state
         entity_id: 
@@ -6017,7 +6112,6 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 4200 }}"
     action:
-      - delay: 00:03:00
       - service: media_player.volume_set
         data:
           volume_level: 0.7
@@ -9227,20 +9321,20 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - 86400) | round(-1) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - 86400) | round(-1) }}"
     condition:
       condition: and
       conditions:  
         - condition: template
-          value_template: "{{ ((as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
+          value_template: "{{ ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) > 0) }}"
     action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_juz_group
           message: >
-            Das JUZ hat am {{ states.calendar.juzzorneding_gmail_com.attributes.start_time }} für {{ states.calendar.juzzorneding_gmail_com.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
-            {% if states.calendar.juzzorneding_gmail_com.attributes.description is defined %}
-              Zusatzinfos: {{ states.calendar.juzzorneding_gmail_com.attributes.description }}
+            Das JUZ hat am {{ states.calendar.juz_zorneding_public.attributes.start_time }} für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
+            {% if states.calendar.juz_zorneding_public.attributes.description is defined %}
+              Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}
             {% endif %}
 
   - id: send_juz_mails_to_telegram
