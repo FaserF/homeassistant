@@ -1126,7 +1126,7 @@
 
   - id: remind_fabi_to_ventilate
     alias: 'Remind Fabi to ventilate'
-    initial_state: on
+    initial_state: off
     trigger:
       - platform: state
         entity_id: device_tracker.fabian_pc
@@ -7665,6 +7665,9 @@
         - condition: state
           entity_id: vacuum.valetudo_dreamez10pro
           state: unavailable
+        - condition: state
+          entity_id: vacuum.valetudo_dreamez10pro
+          state: idle
     action:
       - service: counter.increment
         target:
