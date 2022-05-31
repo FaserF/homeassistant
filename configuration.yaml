@@ -12,20 +12,6 @@ homeassistant:
       allow_bypass_login: true
     #- type: legacy_api_password
     #  api_password: !secret http_password
-  # Name of the location where Home Assistant is running
-  #name: Smart Life
-  #URLs
-  #external_url: !secret baseurl
-  #internal_url: "https://192.168.178.2:8123"
-  # Location required to calculate the time the sun rises and sets
-  #latitude: !secret latitude
-  #longitude: !secret longitude
-  # Impacts weather/sunrise data (altitude above sea level in meters)
-  #elevation: !secret elevation
-  # metric for Metric, imperial for Imperialf
-  #unit_system: metricbinary_sensor.snapshots_stale
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  #time_zone: Europe/Berlin
   allowlist_external_dirs:
     - "/share/scripts"
     - "/media/netboot"
@@ -244,13 +230,10 @@ telegram_bot:
       - !secret telegram_chat_lars
       - !secret telegram_chat_5friends
       - !secret telegram_chat_afk
-      - !secret telegram_chat_triemagisch
+      - !secret telegram_chat_polygon
       - !secret telegram_chat_jutta
+      - !secret telegram_chat_juz_group
       - !secret telegram_chat_juz_mail
-  #- platform: broadcast
-  #  api_key: !secret telegram_bot_api_jek
-  #  allowed_chat_ids:
-  #    - !secret telegram_chat_jek_group
 
 notify:
   - name: telegram_fabian
@@ -259,11 +242,11 @@ notify:
   - name: telegram_nessie
     platform: telegram
     chat_id: !secret telegram_chat_nessie
-  - platform: html5
-    name: browser
-    vapid_pub_key: !secret vapid_pub_key
-    vapid_prv_key: !secret vapid_prv_key
-    vapid_email: !secret vapid_email
+  #- platform: html5
+  #  name: browser
+  #  vapid_pub_key: !secret vapid_pub_key
+  #  vapid_prv_key: !secret vapid_prv_key
+  #  vapid_email: !secret vapid_email
 
 media_source:
 
@@ -487,7 +470,11 @@ sensor:
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (13560) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% else %}
-              {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) + 9780 - as_timestamp(now()) > 0  %}
+                {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
+              {% else %}
+                0
+              {% endif %}
             {% endif %}
           {% else %}
             0
@@ -828,11 +815,8 @@ google_assistant:
     light.leds_tisch:
       expose: true
       room: Schlafzimmer
-    light.yeelight_stripe_0x00000000036d0c16:
-      expose: false
-      room: Schlafzimmer
     light.yeelight_bslamp2_0x0000000013fea10f:
-      name: Bett Licht
+      name: Bettlicht
       expose: true
       room: Schlafzimmer
     ##Gästezimmer
@@ -852,7 +836,6 @@ google_assistant:
       room: Gästezimmer
     ##Wohnzimmer
     light.deckenlampe:
-      name: Deckenlampe Licht
       expose: true
       room: Wohnzimmer
     light.leds_wohnzimmer_tv:
