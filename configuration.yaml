@@ -291,6 +291,24 @@ shell_command:
 #  exchange_rate_currencies:
 #    - BTC
 
+waste_collection_schedule:
+  sources:
+    - name: ics
+      args:
+        url: !secret waste_url
+      customize:
+        - type: Restabfall
+          alias: Restmüll
+          icon: mdi:trash-can
+        - type: BIO
+          alias: Bioabfall
+          icon: mdi:flower-outline
+        - type: Altpapier
+          alias: Papierabfall
+          icon: mdi:trash-can-outline
+        - type: Gelber Sack
+          icon: mdi:recycle
+
 template:
   - sensor:
       - name: "Unavailable Entities"
@@ -345,6 +363,8 @@ sensor:
       - !secret fabi_yahoo_mail
       - !secret gabi_mail
       - !secret bm_mail
+      - !secret jugendpflege_mail
+      - !secret asenbeck_mail
       - noreply@ionos.de
   - platform: imap
     server: imap.ionos.de
@@ -880,10 +900,12 @@ google_assistant:
       expose: true
       room: Küche
 
-google:
-  client_id: !secret google_calendar_client_id
-  client_secret: !secret google_calendar_client_secret
-  track_new_calendar: false
+binary_sensor:
+  - platform: workday
+    country: DE
+    province: BY
+    add_holidays:
+      - "2022-05-27"
 
 dialogflow:
 intent_script:

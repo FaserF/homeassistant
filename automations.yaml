@@ -2731,10 +2731,16 @@
       - service: switch.turn_on
         data:
           entity_id: switch.staubsauger
-      - service: mqtt.publish
-        data:
-          topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-          payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.workday_sensor
+                state: "on"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
 
   - id: vacuum_cleaner_error
     alias: 'Vacuum Cleaner Error'
@@ -2853,13 +2859,9 @@
           after: '05:00:00'
         - condition: time
           before: '09:00:00'
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - fri
+        - condition: state
+          entity_id: binary_sensor.workday_sensor
+          state: "on"
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_morning.attributes.last_triggered) | int > 1800 }}"
         - condition: or
@@ -3024,8 +3026,8 @@
         data:
           entity_id: automation.increase_lights_in_morning
 
-  - id: Remind for leaving wohnzimmer
-    alias: 'Remind for leaving wohnzimmer'
+  - id: Remind for leaving in the morning
+    alias: 'Remind for leaving in the morning'
     initial_state: True
     trigger:
       - platform: time
@@ -3036,13 +3038,9 @@
         - condition: state
           entity_id: 'input_boolean.leiser_modus'
           state: 'off'
-        - condition: time
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - fri
+        - condition: state
+          entity_id: binary_sensor.workday_sensor
+          state: "on"
         - condition: or
           conditions:
           - condition: state
@@ -3052,157 +3050,152 @@
             entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
             state: home
     action:
-      - service: tts.google_say
-        entity_id: 
-          - media_player.wohnzimmer_uhr
-          - media_player.kuche_speaker
-        data_template: 
-          message: >
-            Es ist {{ now().hour }} Uhr {{ now().minute }} .
-            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
-            {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
-      - delay: '00:00:12'
       - choose:
           - conditions:
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: binary_sensor.schlafzimmer_open_window
-                    state: 'on'
+                    entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                    state: home
                   - condition: state
-                    entity_id: binary_sensor.gastezimmer_open_window
-                    state: 'on'
-                  - condition: state
-                    entity_id: binary_sensor.wohnzimmer_open_window
-                    state: 'on'
-                  - condition: state
-                    entity_id: binary_sensor.bad_open_window
-                    state: 'on'
+                    entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                    state: home
             sequence:
-              - parallel:
-                  - service: tts.google_say
-                    entity_id: media_player.wohnzimmer_uhr
-                    data_template: 
-                      message: >
-                        Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                          Schlafzimmer 
-                        {% endif %}
-                        {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
-                          Gästezimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
-                          Wohnzimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.bad_open_window', 'on') %}
-                          Bad
-                        {% endif %}
-                        muss noch geschlossen werden.
-                  - service: tts.google_say
-                    entity_id: media_player.kuche_speaker
-                    data_template: 
-                      message: >
-                        Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                          Schlafzimmer 
-                        {% endif %}
-                        {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
-                          Gästezimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
-                          Wohnzimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.bad_open_window', 'on') %}
-                          Bad
-                        {% endif %}
-                        muss noch geschlossen werden.
-
-  - id: remind_for_leaving_schlafzimmer
-    alias: 'Remind for leaving schlafzimmer'
-    initial_state: True
-    trigger:
-      - platform: time
-        at: '06:55:00'
-    condition:
-      condition: and
-      conditions:
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
-        state: home
-      - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
-        state: home
-      - condition: state
-        entity_id: 'input_boolean.leiser_modus'
-        state: 'off'
-    action:
-      - service: tts.google_say
-        entity_id: 
-          - media_player.schlafzimmer_speaker
-          - media_player.kuche_speaker
-        data_template: 
-          message: >
-            Es ist 
-            {{ now().hour }} Uhr {{ now().minute }} . 
-            Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
-      - delay: '00:00:12'
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.wohnzimmer_uhr
+                  - media_player.kuche_speaker
+                data_template: 
+                  message: >
+                    Es ist {{ now().hour }} Uhr {{ now().minute }} .
+                    Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
+                    {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+              - delay: '00:00:12'
+              - choose:
+                  - conditions:
+                      - condition: or
+                        conditions:
+                          - condition: state
+                            entity_id: binary_sensor.schlafzimmer_open_window
+                            state: 'on'
+                          - condition: state
+                            entity_id: binary_sensor.gastezimmer_open_window
+                            state: 'on'
+                          - condition: state
+                            entity_id: binary_sensor.wohnzimmer_open_window
+                            state: 'on'
+                          - condition: state
+                            entity_id: binary_sensor.bad_open_window
+                            state: 'on'
+                    sequence:
+                      - parallel:
+                          - service: tts.google_say
+                            entity_id: media_player.wohnzimmer_uhr
+                            data_template: 
+                              message: >
+                                Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
+                                  Schlafzimmer 
+                                {% endif %}
+                                {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
+                                  Gästezimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
+                                  Wohnzimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.bad_open_window', 'on') %}
+                                  Bad
+                                {% endif %}
+                                muss noch geschlossen werden.
+                          - service: tts.google_say
+                            entity_id: media_player.kuche_speaker
+                            data_template: 
+                              message: >
+                                Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
+                                  Schlafzimmer 
+                                {% endif %}
+                                {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
+                                  Gästezimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
+                                  Wohnzimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.bad_open_window', 'on') %}
+                                  Bad
+                                {% endif %}
+                                muss noch geschlossen werden.
       - choose:
           - conditions:
-              - condition: or
+              - condition: and
                 conditions:
                   - condition: state
-                    entity_id: binary_sensor.schlafzimmer_open_window
-                    state: 'on'
+                    entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                    state: home
                   - condition: state
-                    entity_id: binary_sensor.gastezimmer_open_window
-                    state: 'on'
-                  - condition: state
-                    entity_id: binary_sensor.wohnzimmer_open_window
-                    state: 'on'
-                  - condition: state
-                    entity_id: binary_sensor.bad_open_window
-                    state: 'on'
+                    entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                    state: home
             sequence:
-              - parallel:
-                  - service: tts.google_say
-                    entity_id: media_player.schlafzimmer_speaker
-                    data_template: 
-                      message: >
-                        Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                          Schlafzimmer 
-                        {% endif %}
-                        {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
-                          Gästezimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
-                          Wohnzimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.bad_open_window', 'on') %}
-                          Bad
-                        {% endif %}
-                        muss noch geschlossen werden.
-                  - service: tts.google_say
-                    entity_id: media_player.kuche_speaker
-                    data_template: 
-                      message: >
-                        Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                          Schlafzimmer 
-                        {% endif %}
-                        {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
-                          Gästezimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
-                          Wohnzimmer
-                        {% endif %}
-                        {% if is_state('binary_sensor.bad_open_window', 'on') %}
-                          Bad
-                        {% endif %}
-                        muss noch geschlossen werden.
+              - service: tts.google_say
+                entity_id: 
+                  - media_player.schlafzimmer_speaker
+                  - media_player.kuche_speaker
+                data_template: 
+                  message: >
+                    Es ist 
+                    {{ now().hour }} Uhr {{ now().minute }} . 
+                    Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+              - delay: '00:00:12'
+              - choose:
+                  - conditions:
+                      - condition: or
+                        conditions:
+                          - condition: state
+                            entity_id: binary_sensor.schlafzimmer_open_window
+                            state: 'on'
+                          - condition: state
+                            entity_id: binary_sensor.gastezimmer_open_window
+                            state: 'on'
+                          - condition: state
+                            entity_id: binary_sensor.wohnzimmer_open_window
+                            state: 'on'
+                          - condition: state
+                            entity_id: binary_sensor.bad_open_window
+                            state: 'on'
+                    sequence:
+                      - parallel:
+                          - service: tts.google_say
+                            entity_id: media_player.schlafzimmer_speaker
+                            data_template: 
+                              message: >
+                                Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
+                                  Schlafzimmer 
+                                {% endif %}
+                                {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
+                                  Gästezimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
+                                  Wohnzimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.bad_open_window', 'on') %}
+                                  Bad
+                                {% endif %}
+                                muss noch geschlossen werden.
+                          - service: tts.google_say
+                            entity_id: media_player.kuche_speaker
+                            data_template: 
+                              message: >
+                                Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
+                                  Schlafzimmer 
+                                {% endif %}
+                                {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
+                                  Gästezimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.wohnzimmer_open_window', 'on') %}
+                                  Wohnzimmer
+                                {% endif %}
+                                {% if is_state('binary_sensor.bad_open_window', 'on') %}
+                                  Bad
+                                {% endif %}
+                                muss noch geschlossen werden.
 
   - id: turn_on_light_in_sleeping_room_if_tv_turned_off
     alias: 'Turn on light in sleeping room if tv turned off'
@@ -5970,17 +5963,6 @@
       - condition: state
         entity_id: 'input_boolean.leiser_modus'
         state: 'off'
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
-      - condition: time
-        before: '22:00:00'
-      - condition: time
-        after: '08:00:00'
       - condition: not
         conditions:
           - condition: state
@@ -5992,151 +5974,108 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity.attributes.last_triggered) | int > 4200 }}"
     action:
-      - parallel:
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.6
-              entity_id: media_player.schlafzimmer_speaker
-          - service: media_player.volume_set
-            data_template:
-              volume_level: 0.6
-              entity_id: media_player.wohnzimmer_uhr
-      - parallel:
-          - service: tts.google_say
-            entity_id: media_player.wohnzimmer_uhr
-            data_template: 
-              message: >
-                Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
-                {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-                Gästezimmer, 
-                {% endif %}
-                {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
-                Wohnzimmer,
-                {% endif %}
-                {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
-                Schlafzimmer,
-                {% endif %}
-                {% if (states.climate.bad.attributes.current_humidity) > 55 %}
-                Bad,
-                {% endif %}
-                Bitte lüften.
-          - service: tts.google_say
-            entity_id: media_player.kuche_speaker
-            data_template: 
-              message: >
-                Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
-                {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-                Gästezimmer, 
-                {% endif %}
-                {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
-                Wohnzimmer,
-                {% endif %}
-                {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
-                Schlafzimmer,
-                {% endif %}
-                {% if (states.climate.bad.attributes.current_humidity) > 55 %}
-                Bad,
-                {% endif %}
-                Bitte lüften.
-          - service: tts.google_say
-            entity_id: media_player.schlafzimmer_speaker
-            data_template: 
-              message: >
-                Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
-                {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-                Gästezimmer, 
-                {% endif %}
-                {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
-                Wohnzimmer,
-                {% endif %}
-                {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
-                Schlafzimmer,
-                {% endif %}
-                {% if (states.climate.bad.attributes.current_humidity) > 55 %}
-                Bad,
-                {% endif %}
-                Bitte lüften.
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: 
-          - media_player.wohnzimmer_uhr
-          - media_player.schlafzimmer_speaker
-          - media_player.kuche_speaker
-
-  - id: notify_for_high_humidity_when_coming_home_weekend    
-    alias: Notify for high humidity when coming home weekend
-    initial_state: true
-    trigger:
-      - platform: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
-        from: 'not_home'
-        to: 'home'
-        for:
-          minutes: 3
-      - platform: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
-        from: 'not_home'
-        to: 'home'
-        for:
-          minutes: 3
-    condition:
-      - condition: numeric_state
-        entity_id: 
-          - climate.gastezimmer
-          - climate.wohnzimmer
-          - climate.schlafzimmer
-          - climate.bad
-        attribute: current_humidity
-        above: 55
-      - condition: state
-        entity_id: 'input_boolean.leiser_modus'
-        state: 'off'
-      - condition: time
-        weekday:
-          - sat
-          - sun
-      - condition: time
-        before: '22:00:00'
-      - condition: time
-        after: '11:00:00'
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_high_humidity_when_coming_home_weekend.attributes.last_triggered) | int > 4200 }}"
-    action:
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.7
-          entity_id: 
-          - media_player.wohnzimmer_uhr
-          - media_player.schlafzimmer_speaker
-      - service: tts.google_say
-        entity_id: 
-        - media_player.wohnzimmer_uhr
-        - media_player.kuche_speaker
-        - media_player.schlafzimmer_speaker
-        data_template:
-          message: >
-            Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im
-            {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-            Gästezimmer, 
-            {% endif %}
-            {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
-            Wohnzimmer,
-            {% endif %}
-            {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
-            Schlafzimmer,
-            {% endif %}
-            {% if (states.climate.bad.attributes.current_humidity) > 55 %}
-            Bad
-            {% endif %}
-            Bitte lüften.
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.3
-          entity_id: 
-          - media_player.wohnzimmer_uhr
-          - media_player.schlafzimmer_speaker
-          - media_player.kuche_speaker
+      - choose:
+          # IF 5 friends are there
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: and
+                    conditions:
+                      #- condition: time
+                      #  weekday:
+                      #    - mon
+                      #    - tue
+                      #    - wed
+                      #    - thu
+                      #    - fri
+                      - condition: state
+                        entity_id: binary_sensor.workday_sensor
+                        state: "on"
+                      - condition: time
+                        before: '21:30:00'
+                      - condition: time
+                        after: '08:00:00'
+                  - condition: and
+                    conditions:
+                      - condition: state
+                        entity_id: binary_sensor.workday_sensor
+                        state: "off"
+                      - condition: time
+                        before: '22:00:00'
+                      - condition: time
+                        after: '11:00:00'
+            sequence:
+              - parallel:
+                  - service: media_player.volume_set
+                    data_template:
+                      volume_level: 0.6
+                      entity_id: media_player.schlafzimmer_speaker
+                  - service: media_player.volume_set
+                    data_template:
+                      volume_level: 0.6
+                      entity_id: media_player.wohnzimmer_uhr
+              - parallel:
+                  - service: tts.google_say
+                    entity_id: media_player.wohnzimmer_uhr
+                    data_template: 
+                      message: >
+                        Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
+                        {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
+                        Gästezimmer, 
+                        {% endif %}
+                        {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
+                        Wohnzimmer,
+                        {% endif %}
+                        {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
+                        Schlafzimmer,
+                        {% endif %}
+                        {% if (states.climate.bad.attributes.current_humidity) > 55 %}
+                        Bad,
+                        {% endif %}
+                        Bitte lüften.
+                  - service: tts.google_say
+                    entity_id: media_player.kuche_speaker
+                    data_template: 
+                      message: >
+                        Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
+                        {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
+                        Gästezimmer, 
+                        {% endif %}
+                        {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
+                        Wohnzimmer,
+                        {% endif %}
+                        {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
+                        Schlafzimmer,
+                        {% endif %}
+                        {% if (states.climate.bad.attributes.current_humidity) > 55 %}
+                        Bad,
+                        {% endif %}
+                        Bitte lüften.
+                  - service: tts.google_say
+                    entity_id: media_player.schlafzimmer_speaker
+                    data_template: 
+                      message: >
+                        Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
+                        {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
+                        Gästezimmer, 
+                        {% endif %}
+                        {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
+                        Wohnzimmer,
+                        {% endif %}
+                        {% if (states.climate.schlafzimmer.attributes.current_humidity) > 55 %}
+                        Schlafzimmer,
+                        {% endif %}
+                        {% if (states.climate.bad.attributes.current_humidity) > 55 %}
+                        Bad,
+                        {% endif %}
+                        Bitte lüften.
+              - service: media_player.volume_set
+                data:
+                  volume_level: 0.3
+                  entity_id: 
+                  - media_player.wohnzimmer_uhr
+                  - media_player.schlafzimmer_speaker
+                  - media_player.kuche_speaker
 
   - id: detect_if_coal_lighter_is_currently_active
     alias: Detect if coal lighter is currently active
@@ -9322,20 +9261,20 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juzzorneding.attributes.start_time) - 86400) | round(-1) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - 86400) | round(-1) }}"
     condition:
       condition: and
       conditions:  
         - condition: template
-          value_template: "{{ ((as_timestamp(states.calendar.juzzorneding.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juzzorneding.attributes.start_time) - as_timestamp(now())) > 0) }}"
+          value_template: "{{ ((as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juzzorneding_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
     action:
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_juz_group
           message: >
-            Das JUZ hat am {{ states.calendar.juzzorneding.attributes.start_time }} für {{ states.calendar.juzzorneding.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
-            {% if not is_state_attr('calendar.juzzorneding', 'description', '') %}
-              Zusatzinfos: {{ states.calendar.juzzorneding.attributes.description }}
+            Das JUZ hat am {{ states.calendar.juzzorneding_gmail_com.attributes.start_time }} für {{ states.calendar.juzzorneding_gmail_com.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
+            {% if not is_state_attr('calendar.juzzorneding_gmail_com', 'description', '') %}
+              Zusatzinfos: {{ states.calendar.juzzorneding_gmail_com.attributes.description }}
             {% endif %}
 
   - id: send_juz_mails_to_telegram
