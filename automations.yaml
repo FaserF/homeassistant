@@ -4379,6 +4379,33 @@
         data: 
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
 
+  - id: remind_for_waste_collection
+    alias: 'Remind for waste collection'
+    initial_state: on
+    trigger:
+      platform: time
+      at: '16:00:00'
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.bioabfall
+          state: "Morgen"
+        - condition: state
+          entity_id: sensor.altpapier
+          state: "Morgen"
+    action:
+      - service: telegram_bot.send_message
+        data_template: 
+          message: >
+            Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
+          target: !secret telegram_chat_fabian
+      - service: telegram_bot.send_message
+        data_template: 
+          message: >
+            Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
+          target: !secret telegram_chat_nessie
+
   - id: ha_update_available
     alias: 'HA Update Available'
     initial_state: on

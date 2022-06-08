@@ -89,6 +89,7 @@ views:
       - entity: sensor.lk_munchen_weekincidence
       - entity: sensor.average_house_humidity
       - entity: sensor.average_house_temp
+      - entity: sensor.gelber_sack
     cards:
       - entities:
           - entity: light.deckenlampe
@@ -163,46 +164,46 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.wohnzimmer_open_window
             name: Fenster
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.schlafzimmer_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
           - entity: binary_sensor.gastezimmer_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
           - entity: binary_sensor.bad_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - type: vertical-stack
         cards:
           - type: entities
@@ -232,16 +233,16 @@ views:
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: '6'
-            number_of_forecasts: '8'
+            forecastMaxColumn: "6"
+            number_of_forecasts: "8"
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: '6'
+            number_of_forecasts: "6"
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: '5'
+            forecastMaxColumn: "5"
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
@@ -261,6 +262,12 @@ views:
             entity: media_player.kuche_speaker
           - type: custom:mini-media-player
             entity: media_player.gastezimmer_mini
+      - type: entities
+        entities:
+          - entity: sensor.bioabfall
+          - entity: sensor.altpapier_2
+          - entity: sensor.gelber_sack
+          - entity: sensor.restmull
   - icon: mdi:television
     path: wohnzimmer
     title: Wohnzimmer
@@ -298,13 +305,13 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
-        entity: media_player.wohnzimmer_tv_group
+        entity: media_player.wohnzimmer_tv
         type: custom:mini-media-player
       - type: grid
         square: false
@@ -314,18 +321,18 @@ views:
             entities:
               - entity: vacuum.valetudo_dreamez10pro
               - entity: input_select.vacuum_cleaning_location
-              - entity: automation.james_raum_reinigiung
+              - entity: input_button.james_room_cleaning
               - entity: sensor.valetudo_dreamez10pro_current_statistics_area
               - entity: sensor.valetudo_dreamez10pro_current_statistics_time
               - entity: sensor.valetudo_dreamez10pro_error_description
               - entity: sensor.valetudo_dreamez10pro_main_brush
               - entity: sensor.valetudo_dreamez10pro_main_filter
-              - entity: sensor.valetudo_dreamez10pro_map_segments
               - entity: sensor.valetudo_dreamez10pro_right_brush
               - entity: sensor.valetudo_dreamez10pro_sensor_cleaning
               - entity: select.valetudo_dreamez10pro_water_grade
               - entity: sensor.valetudo_dreamez10pro_wi_fi_configuration
               - entity: sensor.valetudo_dreamez10pro_zone_presets
+              - entity: counter.cleaner_runs
           - type: custom:valetudo-map-card
             vacuum: valetudo_dreamez10pro
       - artwork: cover
@@ -446,12 +453,9 @@ views:
             secondary_info: last-changed
           - entity: device_tracker.nsta0552
             secondary_info: last-changed
-          - entity: sensor.steckdose_schlafzimmer_energy_today
           - entity: sensor.steckdose_schlafzimmer_energy_power
-          - entity: sensor.dell_9020_load
-          - entity: sensor.dell_9020_memory_used_2
-          - entity: sensor.dell_9020_cpu_speed
-          - entity: sensor.dell_9020_cpu_temperature
+          - entity: sensor.cpuloadsensor
+          - entity: sensor.gpuload
         show_header_toggle: true
         title: Fabian PC
         type: entities
@@ -460,10 +464,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.schlafzimmer_speaker
         type: custom:mini-media-player
@@ -499,9 +503,6 @@ views:
             secondary_info: last-changed
           - entity: sensor.nessie_pc_energy_power
           - entity: sensor.nessie_pc_energy_today
-          - entity: sensor.schnuppes_pc_load
-          - entity: sensor.schnuppes_pc_memory_used_2
-          - entity: sensor.schnuppes_pc_cpu_speed
         show_header_toggle: false
         title: Nessie PC
         type: entities
@@ -510,10 +511,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
@@ -660,10 +661,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - type: entities
         entities:
           - entity: sensor.kuche_speaker_timers
@@ -684,9 +685,9 @@ views:
           - entity: automation.pill_reminder
           - entity: sensor.info_juzzo_de
           - entity: sensor.info_juzzo_de_2
-          - entity: automation.find_fabians_phone_by_sound
-          - entity: automation.find_nessies_phone_by_sound
-          - entity: automation.find_fabians_ipad_by_sound
+          - entity: input_button.find_fabian_s_phone_by_sound
+          - entity: input_button.find_nessie_s_phone_by_sound
+          - entity: input_button.find_fabian_s_ipad_by_sound
   - path: router
     title: Frtizbox
     icon: mdi:router-wireless
@@ -765,9 +766,18 @@ views:
           - entity: person.maxi
             name: Maxi Phone
           - entity: person.samuel
+          - entity: person.papa
           - entity: person.isi
-          - entity: device_tracker.mikas_iphone
         title: Freunde & Bekannte
+      - type: map
+        entities:
+          - entity: person.fabian
+          - entity: person.nessie
+          - entity: person.kai
+          - entity: device_tracker.google_maps_103127589611220223167
+          - entity: device_tracker.google_maps_114935414809961191566
+          - entity: person.samuel
+        hours_to_show: 24
   - title: RaspberryPi
     path: raspberrypi
     icon: mdi:raspberry-pi
@@ -868,7 +878,7 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
