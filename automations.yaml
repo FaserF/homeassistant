@@ -2727,6 +2727,9 @@
       - condition: state
         entity_id: input_boolean.abwesend_modus
         state: "off"
+      - condition: state
+        entity_id: 'input_boolean.leiser_modus'
+        state: 'off'
     action:
       - service: switch.turn_on
         data:
@@ -8745,6 +8748,15 @@
               - condition: state
                 entity_id: person.adri
                 state: 'Kai-Adri'
+      - condition: not
+        conditions:
+          - condition: and
+            conditions:
+              - condition: time
+                after: '18:00:00'
+                before: '21:30:00'
+                weekday:
+                  - sun
     action:
       - service: notify.telegram_fabian
         data_template:

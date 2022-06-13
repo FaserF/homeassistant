@@ -150,7 +150,7 @@ logger:
     custom_components.xiaomi_miio_cooker:
       - "Got exception while fetching the state: Unable to discover the device 192.168.31.195"
     custom_components.miwifi.updater:
-      - "Error connecting to router (attempt #10 of 10): LuciConnectionException*"
+      - "connecting to router (attempt #10 of 10): LuciConnectionException*"
       - "Error connecting to router (attempt #$ of 10): LuciConnectionException*"
     homeassistant.helpers.entity:
       - "Update of * is taking over 10 seconds"
@@ -345,6 +345,15 @@ sensor:
   #    - version
   #    - idle
   #  value_template: "{{value_json.online}}"
+  - platform: rest
+    name: Foodsharing
+    resource: !secret foodsharing_url
+    scan_interval: 3600
+    method: GET
+    unit_of_measurement: baskets
+    json_attributes:
+      - baskets
+    value_template: "{{ value_json.baskets|count}}"
   - platform: imap_email_content
     server: imap.ionos.de
     port: 993
@@ -372,7 +381,7 @@ sensor:
     password: !secret juz_mail_pw
   #- platform: command_line
   #  name: "Latest Tasmota"
-  #  command: 'curl -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
+  #  command: l -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
   #  scan_interval: 86400
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
@@ -381,37 +390,37 @@ sensor:
     name: Restmüll
     details_format: upcoming
     count: 4
-    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
     date_template: '{{value.date.strftime("%d.%m.%Y")}}'
     types:
-      - 'Restabfall'
-      - 'Restmüll'
+      - "Restabfall"
+      - "Restmüll"
   - platform: waste_collection_schedule
     name: Altpapier
     details_format: upcoming
     count: 4
-    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
     date_template: '{{value.date.strftime("%d.%m.%Y")}}'
     types:
-      - 'Altpapier'
-      - 'Papierabfall'
+      - "Altpapier"
+      - "Papierabfall"
   - platform: waste_collection_schedule
     name: Gelber_Sack
     details_format: upcoming
     count: 4
-    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
     date_template: '{{value.date.strftime("%d.%m.%Y")}}'
     types:
-      - 'Gelber Sack'
+      - "Gelber Sack"
   - platform: waste_collection_schedule
     name: Bioabfall
     details_format: upcoming
     count: 4
-    value_template: '{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}'
+    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
     date_template: '{{value.date.strftime("%d.%m.%Y")}}'
     types:
-      - 'BIO'
-      - 'Bioabfall'
+      - "BIO"
+      - "Bioabfall"
   - platform: template
     sensors:
       average_house_humidity:
@@ -669,6 +678,15 @@ xiaomi_miio_cooker:
   model: chunmi.cooker.eh1
 
 rest_command:
+  login_foodsharing:
+    method: POST
+    url: https://foodsharing.de/api/user/login
+    content_type: "application/json; charset=utf-8"
+    payload: !secret foodsharing_payload
+  foodsharing:
+    content_type: "application/json; charset=utf-8"
+    url: !secret foodsharing_url
+    method: GET
   fabian_pc_system_bridge:
     method: POST
     url: http://192.168.178.16:9170/command
