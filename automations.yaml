@@ -45,7 +45,7 @@
           area_id: 
             - "{{ area_id('Wohnzimmer') }}"
             - "{{ area_id('Schlazimmer') }}"
-            - "{{ area_id('Küche') }}"
+            - "{{ area_id('Kueche') }}"
       - choose:
           - conditions:
               - condition: state
@@ -64,7 +64,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.schnuppes_pc
+                entity_id: device_tracker.rgb_pc
                 state: 'home'
             sequence:
               - service: notify.telegram_fabian
@@ -91,7 +91,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.schnuppes_pc
+                entity_id: device_tracker.rgb_pc
                 state: 'not_home'
             sequence:
               - service: input_boolean.turn_off
@@ -106,7 +106,7 @@
               - service: light.turn_off
                 data:
                   area_id: 
-                    - "{{ area_id('Gästezimmer') }}"
+                    - "{{ area_id('Gaestezimmer') }}"
               - service: media_player.turn_off
                 data:
                   entity_id: media_player.gastezimmer_mini
@@ -228,22 +228,29 @@
         entity_id: person.fabian
         from: 'not_home'
         to: 'home'
-        for:
-          seconds: 3
       - platform: numeric_state
         entity_id: proximity.home_fabian
         below: 2
-        for:
-          seconds: 3
     condition:
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
         state: not_home
+      - condition: not
+        conditions:
+          - condition: numeric_state
+            entity_id: proximity.home_fabian
+            below: 1
+          - condition: state
+            entity_id: person.fabian
+            state: Volleyball
+          - condition: state
+            entity_id: person.fabian
+            state: Einkaufen
       - condition: or
         conditions:
           - condition: numeric_state
             entity_id: proximity.home_fabian
-            below: 2
+            below: 3
           - condition: not
             conditions:
               - condition: state
@@ -278,11 +285,22 @@
       - condition: state
         entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
         state: not_home
+      - condition: not
+        conditions:
+          - condition: numeric_state
+            entity_id: proximity.home_nessie
+            below: 1
+          - condition: state
+            entity_id: person.nessie
+            state: Volleyball
+          - condition: state
+            entity_id: person.nessie
+            state: Einkaufen
       - condition: or
         conditions:
           - condition: numeric_state
             entity_id: proximity.home_nessie
-            below: 2
+            below: 3
           - condition: not
             conditions:
               - condition: state
@@ -297,10 +315,6 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      - service: telegram_bot.send_message
-        data:
-          target: !secret telegram_chat_nessie
-          message: 'Gartentor wurde automatisch geöffnet, da du gleich daheim bist.'
 
   - id: open_door_for_adri
     alias: 'Open the door for Adri if coming home'
@@ -738,7 +752,7 @@
                   area_id: 
                     - "{{ area_id('Wohnzimmer') }}"
                     - "{{ area_id('Schlafzimmer') }}"
-                    - "{{ area_id('Gästezimmer') }}"
+                    - "{{ area_id('Gaestezimmer') }}"
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_fabian
@@ -1458,7 +1472,7 @@
       - service: light.turn_off
         data:
           area_id: 
-            - "{{ area_id('Gästezimmer') }}"
+            - "{{ area_id('Gaestezimmer') }}"
       - service: media_player.volume_set
         data:
           volume_level: 0.4
@@ -1954,7 +1968,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.schnuppes_pc
+                    entity_id: device_tracker.rgb_pc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.vku_lb_20
@@ -2134,7 +2148,7 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.schnuppes_pc
+                    entity_id: device_tracker.rgb_pc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.vku_lb_20
@@ -2342,7 +2356,7 @@
           - conditions:
               - condition: state
                 entity_id: 
-                  - device_tracker.schnuppes_pc
+                  - device_tracker.rgb_pc
                   - device_tracker.vku_lb_20
                 match: any
                 state: 'home'
@@ -2922,22 +2936,33 @@
               - service: automation.trigger
                 entity_id: automation.increase_lights_in_morning
       - delay: '00:00:30'
-      - service: automation.trigger
-        entity_id: automation.notify_for_high_humidity
-      - service: light.turn_on
-        data_template:
-          entity_id: light.bett_gluhbirne
-          brightness: 100
-          rgb_color: > 
-            {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
-            [255,255,255] 
-            {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
-            [0,0,255] 
-            {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
-            [0,255,0]
-            {% else %}
-            [0,0,0]
-            {% endif %}
+      - choose:
+          - conditions:
+              - condition: and
+                conditions:
+                  - condition: state
+                    entity_id: input_boolean.leiser_modus
+                    state: off
+                  - condition: state
+                    entity_id: input_boolean.gast_modus
+                    state: off
+            sequence:
+              - service: automation.trigger
+                entity_id: automation.notify_for_high_humidity
+      #- service: light.turn_on
+      #  data_template:
+      #    entity_id: light.bett_gluhbirne
+      #    brightness: 100
+      #    rgb_color: > 
+      #      {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
+      #      [255,255,255] 
+      #      {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
+      #      [0,0,255] 
+      #      {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
+      #      [0,255,0]
+      #      {% else %}
+      #      [0,0,0]
+      #      {% endif %}
       #- delay: '00:05:00'
       #- service: light.turn_off
       #  data:
@@ -3055,6 +3080,9 @@
     action:
       - choose:
           - conditions:
+              - condition: state
+                entity_id: 'input_boolean.gast_modus'
+                state: 'off'
               - condition: or
                 conditions:
                   - condition: state
@@ -3138,9 +3166,7 @@
                     state: home
             sequence:
               - service: tts.google_say
-                entity_id: 
-                  - media_player.schlafzimmer_speaker
-                  - media_player.kuche_speaker
+                entity_id: media_player.schlafzimmer_speaker
                 data_template: 
                   message: >
                     Es ist 
@@ -3418,7 +3444,7 @@
         - condition: or
           conditions: 
             - condition: state
-              entity_id: 'device_tracker.schnuppes_pc'
+              entity_id: 'device_tracker.rgb_pc'
               state: 'home'
             - condition: and
               conditions:
@@ -3432,7 +3458,7 @@
       - service: light.turn_on
         data:
           area_id: 
-            - "{{ area_id('Gästezimmer') }}"
+            - "{{ area_id('Gaestezimmer') }}"
           transition: 2
 
   - id: turn_off_lights_in_rooms_when_bright_outside
@@ -3454,7 +3480,7 @@
           area_id: 
             - "{{ area_id('Wohnzimmer') }}"
             - "{{ area_id('Schlafzimmer') }}"
-            - "{{ area_id('Gästezimmer') }}"
+            - "{{ area_id('Gaestezimmer') }}"
 
   - id: turn_off_climates_on_warm_days
     alias: 'Turn off Climates on warm days'
@@ -3847,6 +3873,7 @@
             {%- else -%}
               Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
             {%- endif -%}
+
   - id: notify_on_HA_restart
     alias: 'Notify on HA restart'
     initial_state: True
@@ -3867,6 +3894,7 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
+      - service: rest_command.login_foodsharing
 
 #  - id: restart_homeassistant_every_sunday
 #    alias: 'Restart Homeassistant every sunday'
@@ -4208,7 +4236,7 @@
               - condition: and
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.schnuppes_pc
+                    entity_id: device_tracker.rgb_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -4225,7 +4253,7 @@
               - condition: and
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.schnuppes_pc
+                    entity_id: device_tracker.rgb_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -4242,7 +4270,7 @@
               - condition: and
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.schnuppes_pc
+                    entity_id: device_tracker.rgb_pc
                     state: 'home'
                   - condition: numeric_state
                     entity_id: sensor.nessie_pc_energy_power
@@ -4259,7 +4287,7 @@
               - condition: and
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.schnuppes_pc
+                    entity_id: device_tracker.rgb_pc
                     state: 'home'
                   - condition: state
                     entity_id: device_tracker.vku_lb_20
@@ -5439,7 +5467,7 @@
   #     - condition: template
   #       value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
   #     - condition: state
-  #       entity_id: device_tracker.schnuppes_pc
+  #       entity_id: device_tracker.rgb_pc
   #       state: home
   #   action:
   #     - service: notify.telegram_nessie
@@ -6011,13 +6039,6 @@
                 conditions:
                   - condition: and
                     conditions:
-                      #- condition: time
-                      #  weekday:
-                      #    - mon
-                      #    - tue
-                      #    - wed
-                      #    - thu
-                      #    - fri
                       - condition: state
                         entity_id: binary_sensor.workday_sensor
                         state: "on"
@@ -7063,13 +7084,13 @@
             - thu
             - sun
         - condition: state
-          entity_id: device_tracker.schnuppes_pc
+          entity_id: device_tracker.rgb_pc
           state: home
     action:
       - choose:
           - conditions:
               - condition: state
-                entity_id: device_tracker.schnuppes_pc
+                entity_id: device_tracker.rgb_pc
                 state: home
             sequence:
               #- service: notify.browser
@@ -8358,7 +8379,7 @@
         entity_id: device_tracker.fabian_pc
         to: 'home'
       - platform: state
-        entity_id: device_tracker.schnuppes_pc
+        entity_id: device_tracker.rgb_pc
         to: 'home'
       - platform: state
         entity_id: device_tracker.nsta0552
@@ -8416,7 +8437,7 @@
         entity_id: device_tracker.fabian_pc
         to: 'not_home'
       - platform: state
-        entity_id: device_tracker.schnuppes_pc
+        entity_id: device_tracker.rgb_pc
         to: 'not_home'
       - platform: state
         entity_id: device_tracker.nsta0552
@@ -8642,20 +8663,12 @@
         - condition: state
           entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
           state: home
-        - condition: numeric_state
-          entity_id: proximity.home_fabian
-          below: 89
-        - condition: template
-          value_template: "{{ (as_timestamp(now())-as_timestamp(states.device_tracker.google_maps_112056758146194246561.attributes.last_seen)) < 11600 }}"
         - condition: time
           after: '06:30:00'
           before: '07:10:00'
-          weekday:
-            - mon
-            - tue
-            - wed
-            - thu
-            - fri
+        - condition: state
+          entity_id: binary_sensor.workday_sensor
+          state: "on"
     action:
       - service: notify.telegram_fabian
         data:
@@ -8685,6 +8698,9 @@
             - tue
             - wed
             - thu
+        - condition: state
+          entity_id: binary_sensor.workday_sensor
+          state: "on"
         - condition: numeric_state
           entity_id: proximity.home_fabian
           below: 89
@@ -8713,6 +8729,9 @@
         entity_id: 'sensor.leuchtenbergring_to_zorneding'
         attribute: delay
         above: 3
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
     action:
       - service: notify.telegram_nessie
         data:
@@ -9014,17 +9033,17 @@
     condition:
       - condition: time
         after: '14:00:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3600 }}"
       - condition: numeric_state
         entity_id: proximity.home_nessie
         below: 35
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        above: 10
     action:
       - choose:
           - conditions:
@@ -9059,12 +9078,9 @@
     condition:
       - condition: time
         after: '14:00:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_nessie_fabian_on_way_home_from_gil.attributes.last_triggered) | int > 3600 }}"
       - condition: numeric_state
@@ -9086,12 +9102,9 @@
     condition:
       - condition: time
         after: '14:00:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: numeric_state
         entity_id: proximity.home_nessie
         below: 35
@@ -9111,12 +9124,9 @@
     condition:
       - condition: time
         after: '14:00:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: numeric_state
         entity_id: proximity.home_nessie
         below: 35
@@ -9136,12 +9146,9 @@
     condition:
       - condition: time
         after: '13:15:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: numeric_state
         entity_id: proximity.home_fabian
         below: 35
@@ -9181,12 +9188,9 @@
     condition:
       - condition: time
         after: '13:15:00'
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: numeric_state
         entity_id: proximity.home_fabian
         below: 35

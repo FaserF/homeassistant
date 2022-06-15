@@ -177,6 +177,9 @@ logger:
   #default: error
   #logs:
   #  custom_components.miwifi: debug
+  logs:
+    homeassistant.components.rest_command: debug
+    homeassistant.components.rest: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -351,8 +354,11 @@ sensor:
     scan_interval: 3600
     method: GET
     unit_of_measurement: baskets
+    json_attributes_path: "$.baskets[0]"
     json_attributes:
-      - baskets
+      - description
+      - lat
+      - lon
     value_template: "{{ value_json.baskets|count}}"
   - platform: imap_email_content
     server: imap.ionos.de
@@ -683,10 +689,6 @@ rest_command:
     url: https://foodsharing.de/api/user/login
     content_type: "application/json; charset=utf-8"
     payload: !secret foodsharing_payload
-  foodsharing:
-    content_type: "application/json; charset=utf-8"
-    url: !secret foodsharing_url
-    method: GET
   fabian_pc_system_bridge:
     method: POST
     url: http://192.168.178.16:9170/command
