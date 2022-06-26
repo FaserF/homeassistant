@@ -44,7 +44,7 @@
         data:
           area_id: 
             - "{{ area_id('Wohnzimmer') }}"
-            - "{{ area_id('Schlazimmer') }}"
+            - "{{ area_id('Schlafzimmer') }}"
             - "{{ area_id('Kueche') }}"
       - choose:
           - conditions:
@@ -105,8 +105,7 @@
             sequence:
               - service: light.turn_off
                 data:
-                  area_id: 
-                    - "{{ area_id('Gaestezimmer') }}"
+                  area_id: "{{ area_id('Gaestezimmer') }}"
               - service: media_player.turn_off
                 data:
                   entity_id: media_player.gastezimmer_mini
@@ -2323,8 +2322,11 @@
                 conditions:
                   - condition: state
                     entity_id: 
-                      - device_tracker.fabian_pc
                       - device_tracker.nsta0552
+                    state: 'home'
+                  - condition: state
+                    entity_id: 
+                      - device_tracker.fabian_pc
                     state: 'home'
               - condition: not
                 conditions:
@@ -2938,14 +2940,12 @@
       - delay: '00:00:30'
       - choose:
           - conditions:
-              - condition: and
-                conditions:
-                  - condition: state
-                    entity_id: input_boolean.leiser_modus
-                    state: off
-                  - condition: state
-                    entity_id: input_boolean.gast_modus
-                    state: off
+              - condition: state
+                entity_id: input_boolean.leiser_modus
+                state: 'off'
+              - condition: state
+                entity_id: input_boolean.gast_modus
+                state: 'off'
             sequence:
               - service: automation.trigger
                 entity_id: automation.notify_for_high_humidity
@@ -3894,36 +3894,6 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'Homeassistant wurde soeben gestartet.'
-      - service: rest_command.login_foodsharing
-
-#  - id: restart_homeassistant_every_sunday
-#    alias: 'Restart Homeassistant every sunday'
-#    initial_state: on
-#    trigger:
-#      platform: time
-#      at: '03:00:00'
-#    condition:
-#      - condition: time
-#        weekday: sun
-#    action:
-#      - service: shell_command.restartha
-
-  #- id: lets_encrypt_Renewal
-  #  alias: "Let's Encrypt Renewal"
-  #  trigger:
-  #    platform: time
-  #    at: '00:02:00'
-  #  action:
-  #  - service: hassio.addon_stop
-  #    data:
-  #      addon: a0d7b954_nginxproxymanager
-  #  - service: hassio.addon_restart
-  #    data:
-  #      addon: core_letsencrypt
-  #  - delay: '00:10:00'
-  #  - service: hassio.addon_start
-  #    data:
-  #      addon: a0d7b954_nginxproxymanager
 
   - id: run_bash_script_with_addon_bash_script_executer_every_hour
     alias: "Run Bash Script with Addon Bash Script Executer every hour"
@@ -4437,6 +4407,40 @@
             Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
           target: !secret telegram_chat_nessie
 
+  - id: foodsharing_basket_available
+    alias: 'Foodsharing Basket Available'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.foodsharing_48_076690
+        attribute: baskets
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.foodsharing_48_076690
+          above: '0'
+    action:
+      - service: telegram_bot.send_message
+        data_template: 
+          message: >
+            {% if is_state('sensor.foodsharing_48_076690', '1') %}
+            Es ist {{ states.sensor.foodsharing_48_076690.state }} Foodsharing Korb verfügbar. 
+            {% else %}
+            Es sind {{ states.sensor.foodsharing_48_076690.state }} Foodsharing Körbe verfügbar. 
+            {% endif %}
+
+            Neuester: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['description'] }}
+
+            ------------
+            
+            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['available until'] }}
+            
+            Bild: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['picture'] }}
+            
+            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['id'] }}
+          target: !secret telegram_foodsharing
+
   - id: ha_update_available
     alias: 'HA Update Available'
     initial_state: on
@@ -4814,6 +4818,17 @@
         data_template:
           target: !secret telegram_chat_fabian
           message: 'ACHTUNG! RaspberryPi RAM Auslastung sehr hoch: {{ states.sensor.memory_use_percent.state }}'
+
+  - id: turn_on_schloss_on_button_press
+    alias: Turn on Schloss on button press
+    initial_state: on
+    trigger: 
+      - platform: state
+        entity_id: input_button.schloss
+    action:
+      - service: switch.turn_on
+        data:
+          entity_id: switch.schloss
 
   - id: turn_schloss_off_after_turning_on
     alias: Turn Schloss off after turning on
@@ -6274,23 +6289,23 @@
                 data:
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-              - service: notify.keller_tv
-                continue_on_error: true
-                data:
-                  message: "Bitte Kohle wenden."
+              #- service: notify.keller_tv
+              #  continue_on_error: true
+              #  data:
+              #    message: "Bitte Kohle wenden."
       - delay: '00:06:00'
-      - choose:
-          - conditions:
-              - condition: not
-                conditions:
-                  - condition: state
-                    entity_id: media_player.keller_tv
-                    state: unavailable
-            sequence:
-              - service: notify.keller_tv
-                continue_on_error: true
-                data:
-                  message: "Der Eisschlauch kann schon mal geholt werden."
+      #- choose:
+      #    - conditions:
+      #        - condition: not
+      #          conditions:
+      #            - condition: state
+      #              entity_id: media_player.keller_tv
+      #              state: unavailable
+      #      sequence:
+      #        - service: notify.keller_tv
+      #          continue_on_error: true
+      #          data:
+      #            message: "Der Eisschlauch kann schon mal geholt werden."
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -9299,6 +9314,61 @@
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
             Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
+  - id: remind_for_volleyball
+    alias: 'remind for volleyball'
+    initial_state: True
+    trigger:
+      - platform: template
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyball.attributes.start_time) - 86400) | round(-1) }}"
+    condition:
+      condition: and
+      conditions:  
+        - condition: template
+          value_template: "{{ ((as_timestamp(states.calendar.volleyball.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.volleyball.attributes.start_time) - as_timestamp(now())) > 0) }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_volleyball
+          message: >
+            Erinnerung: Es findet am {{ states.calendar.volleyballtraining.attributes.start_time }} {{ states.calendar.volleyballtraining.attributes.message }} statt.
+            {% if not is_state_attr('calendar.volleyballtraining', 'description', '') %}
+              Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
+            {% endif %}
+      - service: shell_command.volleyball_poll_telegram
+        data_template:
+          training: '{{ states.calendar.volleyballtraining.attributes.message }}'
+          poll_until: {{ (as_timestamp(now()) | int + (86400) }}
+
+  - id: remind_for_volleyball_on_warm_sundays
+    alias: 'Remind for Volleyball on warm Sundays'
+    initial_state: True
+    trigger:
+      - platform: time
+        at: '15:00:00'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          weekday:
+            - sat
+        - condition: template
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
+        - condition: template
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= '20' }}"
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: '{{ now().month <= 10 and now().month >= 4 }}'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: !secret telegram_volleyball
+          message: 'Morgen ist das Wetter gut: Sonnig bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Beachvolleyball?'
+      - service: shell_command.volleyball_poll_telegram
+        data_template:
+          training: 'Beachvolleyball'
+          poll_until: {{ (as_timestamp(now()) | int + (86400) }}
+
   - id: remind_for_juz
     alias: 'remind for juz'
     initial_state: True
@@ -9319,6 +9389,7 @@
             {% if not is_state_attr('calendar.juzzorneding_gmail_com', 'description', '') %}
               Zusatzinfos: {{ states.calendar.juzzorneding_gmail_com.attributes.description }}
             {% endif %}
+      - service: shell_command.juz_poll_telegram
 
   - id: send_juz_mails_to_telegram
     alias: 'send juz mails to telegram'
