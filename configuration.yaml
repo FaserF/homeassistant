@@ -281,8 +281,13 @@ shell_command:
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
   randomfood: !secret randomfood
   foodyes: !secret foodyes
-  juz_poll_telegram: !secret juz_poll_telegram
-  volleyball_poll_telegram: !secret volleyball_poll_telegram
+  #poll_telegram: !secret poll_telegram
+  poll_telegram: >
+    curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "{{ chat_id }}", "question": "{{ question }}", "options":{{ options }}, "disable_notification": true, "is_anonymous": false}' https://api.telegram.org/bot{{ telegram_bot_api }}/sendPoll
+  unpin_all_telegram: >
+    curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "{{ chat_id }}"}' https://api.telegram.org/bot{{ telegram_bot_api }}/unpinAllChatMessages
+  pin_telegram: >
+    curl -X POST -H 'Content-Type: application/json' -d '{"message_id": "{{ message_id }}", "chat_id": "{{ chat_id }}", "disable_notification": true}' https://api.telegram.org/bot{{ telegram_bot_api }}/pinChatMessage
   hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
   #overtime_input: !secret overtime_input

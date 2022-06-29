@@ -2765,13 +2765,16 @@
     alias: 'Vacuum Cleaner Error'
     initial_state: on
     trigger:
+      #- platform: state
+      #  entity_id: sensor.valetudo_dreamez10pro_error_description
+      #  not_from:
+      #    - "unavailable"
+      #    - "unknown"
+      #    - ""
+      #    - "Unknown"
       - platform: state
-        entity_id: sensor.valetudo_dreamez10pro_error_description
-        not_from:
-          - "unavailable"
-          - "unknown"
-          - ""
-          - "Unknown"
+        entity_id: vacuum.valetudo_dreamez10pro
+        to: 'error'
     action:
       - service: telegram_bot.send_message
         data_template: 
@@ -4413,13 +4416,16 @@
     trigger:
       - platform: state
         entity_id: sensor.foodsharing_48_076690
-        attribute: baskets
+      #- platform: template
+      #  value_template: "{{ states.sensor.foodsharing_48_076690.attributes.baskets[-1]['id'] }}"
     condition:
       condition: and
       conditions:
         - condition: numeric_state
           entity_id: sensor.foodsharing_48_076690
           above: '0'
+        - condition: template
+          value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
     action:
       - service: telegram_bot.send_message
         data_template: 
@@ -4436,7 +4442,9 @@
             
             Verfügbar bis: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['available until'] }}
             
+            {% if not state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['picture'] == '' %}
             Bild: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['picture'] }}
+            {% endif %}
             
             Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['id'] }}
           target: !secret telegram_foodsharing
@@ -9319,13 +9327,17 @@
     initial_state: True
     trigger:
       - platform: template
-        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyball.attributes.start_time) - 86400) | round(-1) }}"
+        value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 86400) | round(-1) }}"
     condition:
       condition: and
       conditions:  
         - condition: template
-          value_template: "{{ ((as_timestamp(states.calendar.volleyball.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.volleyball.attributes.start_time) - as_timestamp(now())) > 0) }}"
+          value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
     action:
+      - service: shell_command.unpin_all_telegram
+        data_template:
+          telegram_bot_api: !secret telegram_bot_api
+          chat_id: !secret telegram_volleyball
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_volleyball
@@ -9334,10 +9346,12 @@
             {% if not is_state_attr('calendar.volleyballtraining', 'description', '') %}
               Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
             {% endif %}
-      - service: shell_command.volleyball_poll_telegram
+      - service: shell_command.poll_telegram
         data_template:
-          training: '{{ states.calendar.volleyballtraining.attributes.message }}'
-          poll_until: {{ (as_timestamp(now()) | int + (86400) }}
+          telegram_bot_api: !secret telegram_bot_api
+          question: 'Ich komme zum {{ states.calendar.volleyballtraining.attributes.message }} ?'
+          chat_id: !secret telegram_volleyball
+          options: '["Ja", "Nein", "Wahrscheinlich"]'
 
   - id: remind_for_volleyball_on_warm_sundays
     alias: 'Remind for Volleyball on warm Sundays'
@@ -9360,14 +9374,20 @@
             - condition: template
               value_template: '{{ now().month <= 10 and now().month >= 4 }}'
     action:
-      - service: telegram_bot.send_message
+      - service: shell_command.unpin_all_telegram
         data_template:
-          target: !secret telegram_volleyball
-          message: 'Morgen ist das Wetter gut: Sonnig bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Beachvolleyball?'
-      - service: shell_command.volleyball_poll_telegram
+          telegram_bot_api: !secret telegram_bot_api
+          chat_id: !secret telegram_volleyball
+      #- service: telegram_bot.send_message
+      #  data_template:
+      #    target: !secret telegram_volleyball
+      #    message: 'Morgen ist das Wetter gut: Sonnig bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Beachvolleyball?'
+      - service: shell_command.poll_telegram
         data_template:
-          training: 'Beachvolleyball'
-          poll_until: {{ (as_timestamp(now()) | int + (86400) }}
+          telegram_bot_api: !secret telegram_bot_api
+          question: 'Morgen ist das Wetter gut: Sonnig bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball?'
+          chat_id: !secret telegram_volleyball
+          options: '["Ja", "Nein", "Wahrscheinlich"]'
 
   - id: remind_for_juz
     alias: 'remind for juz'
@@ -9389,7 +9409,12 @@
             {% if not is_state_attr('calendar.juzzorneding_gmail_com', 'description', '') %}
               Zusatzinfos: {{ states.calendar.juzzorneding_gmail_com.attributes.description }}
             {% endif %}
-      - service: shell_command.juz_poll_telegram
+      - service: shell_command.poll_telegram
+        data_template:
+          telegram_bot_api: !secret telegram_bot_api
+          question: 'Ich komme zum {{ states.calendar.juzzorneding_gmail_com.attributes.message }} ?'
+          chat_id: !secret telegram_chat_juz_group
+          options: '["Ja", "Nein", "Wahrscheinlich"]'
 
   - id: send_juz_mails_to_telegram
     alias: 'send juz mails to telegram'
