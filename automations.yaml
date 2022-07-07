@@ -231,9 +231,11 @@
         entity_id: proximity.home_fabian
         below: 2
     condition:
-      - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
-        state: not_home
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+            state: home
       - condition: not
         conditions:
           - condition: numeric_state
@@ -281,9 +283,11 @@
         entity_id: proximity.home_nessie
         below: 2
     condition:
-      - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
-        state: not_home
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+            state: home
       - condition: not
         conditions:
           - condition: numeric_state
@@ -324,9 +328,11 @@
         from: 'not_home'
         to: 'home'
     condition:
-      - condition: state
-        entity_id: device_tracker.miwifi_14_c8_8b_0e_84_66
-        state: not_home
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: device_tracker.miwifi_14_c8_8b_0e_84_66
+            state: home
       - condition: numeric_state
         entity_id: person.adri
         attribute: gps_accuracy
@@ -422,9 +428,11 @@
         from: 'not_home'
         to: 'home'
     condition:
-      - condition: state
-        entity_id: device_tracker.miwifi_e8_7f_95_73_88_96
-        state: not_home
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: device_tracker.miwifi_e8_7f_95_73_88_96
+            state: home
       - condition: numeric_state
         entity_id: person.kai
         attribute: gps_accuracy
@@ -521,9 +529,11 @@
         from: 'not_home'
         to: 'home'
     condition:
-      - condition: state
-        entity_id: device_tracker.miwifi_30_ab_6a_c1_fe_15
-        state: not_home
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: device_tracker.miwifi_30_ab_6a_c1_fe_15
+            state: home
       - condition: numeric_state
         entity_id: person.flo
         attribute: gps_accuracy
@@ -2756,10 +2766,52 @@
                 entity_id: binary_sensor.workday_sensor
                 state: "on"
             sequence:
-              - service: mqtt.publish
-                data:
-                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
+              - choose:
+                  - conditions:
+                      - condition: not
+                        conditions:
+                          - condition: state
+                            entity_id: person.fabian
+                            state: "home"
+                          - condition: state
+                            entity_id: person.nessie
+                            state: "home"
+                    sequence:
+                      #if Fabi & Nessie not at home clean all rooms
+                      - service: mqtt.publish
+                        data:
+                          topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                          payload: '{"segment_ids": ["6", "5", "3", "4"], "customOrder": true}'
+                  - conditions:
+                      - condition: not
+                        conditions:
+                          - condition: state
+                            entity_id: person.fabian
+                            state: "home"
+                    sequence:
+                      #else if only fabi is not at home clean all rooms except guest room
+                      - service: mqtt.publish
+                        data:
+                          topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                          payload: '{"segment_ids": ["6", "5", "3", "4"], "customOrder": true}'
+                  - conditions:
+                      - condition: not
+                        conditions:
+                          - condition: state
+                            entity_id: person.nessie
+                            state: "home"
+                    sequence:
+                      #else if only nessie is not at home clean all rooms except sleeping room
+                      - service: mqtt.publish
+                        data:
+                          topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                          payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
+                default:
+                  #default if fabi & nessie at home: clean only living room, floor & kitchen
+                  - service: mqtt.publish
+                    data:
+                      topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                      payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
 
   - id: vacuum_cleaner_error
     alias: 'Vacuum Cleaner Error'
@@ -2779,14 +2831,14 @@
       - service: telegram_bot.send_message
         data_template: 
           message: >
-            James hat ein Problem: *{{ states.sensor.valetudo_dreamez10pro_error_description.state }}*
+            James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
             Die Reinigung wurde daher unterbrochen.
           target: !secret telegram_chat_fabian
       - service: telegram_bot.send_message
         data_template: 
           message: >
-            James hat ein Problem: *{{ states.sensor.valetudo_dreamez10pro_error_description.state }}*
+            James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
             Die Reinigung wurde daher unterbrochen.
           target: !secret telegram_chat_nessie
@@ -3360,6 +3412,14 @@
             - condition: state
               entity_id: 'device_tracker.nsta0552'
               state: 'home'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'person.fabian'
+              state: 'home'
+            - condition: state
+              entity_id: 'person.nessie'
+              state: 'home'
     action:
       - service: light.turn_on
         data:
@@ -3397,6 +3457,14 @@
               state: 'home'
             - condition: state
               entity_id: 'device_tracker.nsta0552'
+              state: 'home'
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'person.fabian'
+              state: 'home'
+            - condition: state
+              entity_id: 'person.nessie'
               state: 'home'
         - condition: or
           conditions:
@@ -3445,18 +3513,26 @@
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_guest_room_when_dark_outside.attributes.last_triggered) | int > 1800 }}"
         - condition: or
+          conditions:
+            - condition: state
+              entity_id: 'person.fabian'
+              state: 'home'
+            - condition: state
+              entity_id: 'person.nessie'
+              state: 'home'
+        - condition: or
           conditions: 
             - condition: state
               entity_id: 'device_tracker.rgb_pc'
               state: 'home'
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: 'device_tracker.vku_lb_20'
-                  state: 'home'
-                - condition: state
-                  entity_id: 'switch.nessie_pc'
-                  state: 'on'
+            #- condition: and
+            #  conditions:
+            #    - condition: state
+            #      entity_id: 'device_tracker.vku_lb_20'
+            #      state: 'home'
+            #    - condition: state
+            #      entity_id: 'switch.nessie_pc'
+            #      state: 'on'
     action:
       - service: light.turn_on
         data:
@@ -3501,7 +3577,7 @@
         - condition: template
           value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
         - condition: template
-          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= '14' }}"
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= 14 }}"
         #- condition: state
         #  entity_id: 'weather.dwd_weather_ebersberg_1h'
         #  state: 'sunny'
@@ -4430,24 +4506,53 @@
       - service: telegram_bot.send_message
         data_template: 
           message: >
-            {% if is_state('sensor.foodsharing_48_076690', '1') %}
-            Es ist {{ states.sensor.foodsharing_48_076690.state }} Foodsharing Korb verfügbar. 
-            {% else %}
-            Es sind {{ states.sensor.foodsharing_48_076690.state }} Foodsharing Körbe verfügbar. 
-            {% endif %}
-
-            Neuester: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['description'] }}
+            Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['description'] }}
 
             ------------
             
-            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['available until'] }}
+            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['available until'] }}
             
-            {% if not state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['picture'] == '' %}
-            Bild: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['picture'] }}
+            Adresse: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['adress'] }}
+
+            {% if not state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['picture'] == '' %}
+            Bild: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['picture'] }}
             {% endif %}
             
-            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_076690', 'baskets')[-1]['id'] }}
+            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['id'] }}
           target: !secret telegram_foodsharing
+
+  - id: foodsharing_basket_available_muc_east
+    alias: 'Foodsharing Basket Available MUC East'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.foodsharing_48_117214
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.foodsharing_48_117214
+          above: '0'
+        - condition: template
+          value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
+    action:
+      - service: telegram_bot.send_message
+        data_template: 
+          message: >
+            Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['description'] }}
+
+            ------------
+            
+            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['available until'] }}
+            
+            Adresse: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['adress'] }}
+
+            {% if not state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['picture'] == '' %}
+            Bild: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['picture'] }}
+            {% endif %}
+            
+            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['id'] }}
+          target: !secret telegram_foodsharing_muc
 
   - id: ha_update_available
     alias: 'HA Update Available'
@@ -7893,7 +7998,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: notify.telegram_nessie
         data:
@@ -7918,7 +8023,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: notify.telegram_nessie
         data:
@@ -7943,7 +8048,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: notify.telegram_nessie
         data:
@@ -7968,7 +8073,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: input_boolean.turn_off
         data:
@@ -7995,7 +8100,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   - id: telegram_shutdown_npc
@@ -8014,7 +8119,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: input_boolean.turn_off
         data:
@@ -8041,7 +8146,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   - id: telegram_reboot_ha
@@ -9365,10 +9470,14 @@
         - condition: time
           weekday:
             - sat
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
+            - condition: template
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'partlycloudy' }}"
         - condition: template
-          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
-        - condition: template
-          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= '20' }}"
+          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] | int >= 20 }}"
         - condition: or
           conditions:
             - condition: template
@@ -9456,7 +9565,7 @@
                   target: !secret telegram_chat_juz_mail
                   disable_notification: True
                   message: >
-                    Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene (vermutlich) *SPAM* Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %}.
+                    Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %} von einem unbekannten Absender.
           - conditions:
               - condition: state
                 entity_id: sensor.info_juzzo_de

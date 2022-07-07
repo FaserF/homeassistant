@@ -235,6 +235,7 @@ telegram_bot:
       - !secret telegram_chat_juz_group
       - !secret telegram_chat_juz_mail
       - !secret telegram_foodsharing
+      - !secret telegram_foodsharing_muc
       - !secret telegram_volleyball
 
 notify:
@@ -963,7 +964,6 @@ tts:
   - platform: google_translate
     service_name: google_say
     language: "de"
-    base_url: !secret baseurl
 
 input_select:
   washing_machine_status:
