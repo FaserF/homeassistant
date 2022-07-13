@@ -100,6 +100,8 @@ ignored_entities:
     - sensor.kuche_speaker_alarms
     - sensor.kuche_speaker_timers
     - sensor.mydealz
+    - sensor.fabian_ipadpro_battery_state_2
+    - sensor.fabian_ipadpro_battery_state
     - sensor.playlists_sensor
     - sensor.wohnzimmer_uhr_alarms
     - sensor.wohnzimmer_uhr_timers

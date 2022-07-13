@@ -379,7 +379,7 @@
                     entity_id: input_boolean.leiser_modus
                     state: 'off'
             sequence:
-              - service: notify.mobile_app_fabian_iphone
+              - service: notify.mobile_app_iphone
                 data:
                   message: "Adri ist gleich da"
                   data:
@@ -479,7 +479,7 @@
                     entity_id: input_boolean.leiser_modus
                     state: 'off'
             sequence:
-              - service: notify.mobile_app_fabian_iphone
+              - service: notify.mobile_app_iphone
                 data:
                   message: "Kai ist gleich da"
                   data:
@@ -582,7 +582,7 @@
                     entity_id: input_boolean.leiser_modus
                     state: 'off'
             sequence:
-              - service: notify.mobile_app_fabian_iphone
+              - service: notify.mobile_app_iphone
                 data:
                   message: "Flo ist gleich da"
                   data:
@@ -1912,7 +1912,7 @@
                         name: "default"
                         critical: 1
                         volume: 0.1
-              - service: notify.mobile_app_fabian_iphone
+              - service: notify.mobile_app_iphone
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
                   data:
@@ -1946,7 +1946,7 @@
               - service: notify.telegram_fabian
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
-              - service: notify.mobile_app_fabian_iphone
+              - service: notify.mobile_app_iphone
                 data:
                   message: "Das Fenster im Bad kann wieder geschlossen werden."
                   data:
@@ -2781,7 +2781,7 @@
                       - service: mqtt.publish
                         data:
                           topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                          payload: '{"segment_ids": ["6", "5", "3", "4"], "customOrder": true}'
+                          payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
                   - conditions:
                       - condition: not
                         conditions:
@@ -2793,7 +2793,7 @@
                       - service: mqtt.publish
                         data:
                           topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                          payload: '{"segment_ids": ["6", "5", "3", "4"], "customOrder": true}'
+                          payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
                   - conditions:
                       - condition: not
                         conditions:
@@ -2805,13 +2805,13 @@
                       - service: mqtt.publish
                         data:
                           topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                          payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
+                          payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
                 default:
                   #default if fabi & nessie at home: clean only living room, floor & kitchen
                   - service: mqtt.publish
                     data:
                       topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                      payload: '{"segment_ids": ["6", "5", "4"], "customOrder": true}'
+                      payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
 
   - id: vacuum_cleaner_error
     alias: 'Vacuum Cleaner Error'
@@ -2895,7 +2895,7 @@
               - service: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["1"]}'
+                  payload: '{"segment_ids": ["5"]}'
           - conditions:
               - condition: state
                 entity_id: input_select.vacuum_cleaning_location
@@ -2904,7 +2904,7 @@
               - service: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["5"]}'
+                  payload: '{"segment_ids": ["8"]}'
           - conditions:
               - condition: state
                 entity_id: input_select.vacuum_cleaning_location
@@ -3915,7 +3915,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: input_boolean.turn_off
         data:
@@ -4491,14 +4491,14 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.foodsharing_48_076690
+        entity_id: sensor.foodsharing_48_082236
       #- platform: template
-      #  value_template: "{{ states.sensor.foodsharing_48_076690.attributes.baskets[-1]['id'] }}"
+      #  value_template: "{{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}"
     condition:
       condition: and
       conditions:
         - condition: numeric_state
-          entity_id: sensor.foodsharing_48_076690
+          entity_id: sensor.foodsharing_48_082236
           above: '0'
         - condition: template
           value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
@@ -4506,32 +4506,152 @@
       - service: telegram_bot.send_message
         data_template: 
           message: >
-            Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['description'] }}
+            Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
 
             ------------
             
-            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['available until'] }}
+            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
             
-            Adresse: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['adress'] }}
-
-            {% if not state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['picture'] == '' %}
-            Bild: {{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['picture'] }}
+            {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
+            Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
             {% endif %}
             
-            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_076690', 'baskets')[0]['id'] }}
+            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
+            
+            
+            {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
+            Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
+            {% endif %}
+
+            Google Maps Link: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }}
           target: !secret telegram_foodsharing
+
+  - id: foodsharing_basket_available_zorneding
+    alias: 'Foodsharing Basket Available Zorneding'
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: sensor.foodsharing_48_082236
+      #- platform: template
+      #  value_template: "{{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.foodsharing_48_082236
+          above: '0'
+        - condition: template
+          value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
+        - condition: template
+          value_template: "{{'Zorneding' in state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}"
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: person.nessie
+                state: "home"
+            sequence:
+              - service: notify.mobile_app_nessie_iphone
+                data_template:
+                  title: "Foodsharing Korb in Zorneding"
+                  message: >
+                    {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
+
+                    ------------
+                    
+                    Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
+                    
+                    {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
+                    Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
+                    {% endif %}
+                    
+                    Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
+                    
+                    
+                    {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
+                    Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
+                    {% endif %}
+
+                    Google Maps Link: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }}
+                  data:
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.1
+      - choose:
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: person.fabian
+                    state: "home"
+                  - condition: numeric_state
+                    entity_id: proximity.home_fabian
+                    below: 5
+            sequence:
+              - service: notify.mobile_app_iphone
+                data_template:
+                  title: "Neuer Foodsharing Korb in Zorneding"
+                  message: >
+                    {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
+
+                    ------------
+                    
+                    Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
+                    
+                    {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
+                    Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
+                    {% endif %}
+                    
+                    Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
+                    
+                    
+                    {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
+                    Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
+                    {% endif %}
+
+                    Google Maps Link: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }}
+                  data:
+                    push:
+                      sound:
+                        name: "default"
+                        critical: 1
+                        volume: 0.1
+              - service: telegram_bot.send_message
+                data_template: 
+                  message: >
+                    Neuer Foodsharing Korb in Zorneding: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
+
+                    ------------
+                    
+                    Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
+                    
+                    {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
+                    Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
+                    {% endif %}
+                    
+                    Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
+                    
+
+                    {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
+                    Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
+                    {% endif %}
+
+                    Google Maps Link: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }}
+                  target: !secret telegram_chat_fabian
 
   - id: foodsharing_basket_available_muc_east
     alias: 'Foodsharing Basket Available MUC East'
     initial_state: on
     trigger:
       - platform: state
-        entity_id: sensor.foodsharing_48_117214
+        entity_id: sensor.foodsharing_48_117971
     condition:
       condition: and
       conditions:
         - condition: numeric_state
-          entity_id: sensor.foodsharing_48_117214
+          entity_id: sensor.foodsharing_48_117971
           above: '0'
         - condition: template
           value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
@@ -4539,19 +4659,24 @@
       - service: telegram_bot.send_message
         data_template: 
           message: >
-            Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['description'] }}
+            Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['description'] }}
 
             ------------
+                    
+            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['available until'] }}
             
-            Verfügbar bis: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['available until'] }}
-            
-            Adresse: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['adress'] }}
-
-            {% if not state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['picture'] == '' %}
-            Bild: {{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['picture'] }}
+            {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] == 'unavailable' %}
+            Bild: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] }}
             {% endif %}
             
-            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_117214', 'baskets')[0]['id'] }}
+            Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['id'] }}
+            
+
+            {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] == 'unavailable' %}
+            Adresse: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] }}
+            {% endif %}
+            
+            Google Maps Link: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['maps'] }}
           target: !secret telegram_foodsharing_muc
 
   - id: ha_update_available
@@ -5602,21 +5727,21 @@
   #       data: 
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-  - id: update_tasmota
-    alias: Update Tasmota
-    initial_state: on
-    trigger: 
-      - platform: numeric_state
-        entity_id: sensor.latest_tasmota
-        above: 0
-    action:
-      - service: notify.telegram_fabian
-        data:
-          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
-      - service: mqtt.publish
-        data:
-          topic: cmnd/tasmotas/Upgrade
-          payload: 1
+  #- id: update_tasmota
+  #  alias: Update Tasmota
+  #  initial_state: on
+  #  trigger: 
+  #    - platform: numeric_state
+  #      entity_id: sensor.latest_tasmota
+  #      above: 0
+  #  action:
+  #    - service: notify.telegram_fabian
+  #      data:
+  #        message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
+  #    - service: mqtt.publish
+  #      data:
+  #        topic: cmnd/tasmotas/Upgrade
+  #        payload: 1
 
   - id: deckenlampe_button_hold
     alias: Deckenlampe Button Hold
@@ -7025,7 +7150,7 @@
           entity_id: switch.waschmaschine
       - service: automation.turn_off
         data:
-          entity_id: automation.set_washing_machine_finished_when_power_drops
+          entity_id: automation.set_washing_machine_clean_when_power_drops
 
   - id: set_washing_machine_idle_after_timeout
     alias: Set washing machine idle after timeout
@@ -7255,7 +7380,7 @@
               #  data:
               #    data:
               #      tag: 'notification-about-sensor'
-              - service: notify.mobile_app_fabian_iphone
+              - service: notify.mobile_app_iphone
                 data_template:
                   title: "Zeit off zu gehen"
                   message: "Es ist 22 Uhr."
@@ -7290,7 +7415,7 @@
 #            {% set state = 'off' %}
 #            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
 #    action:
-#      - service: notify.mobile_app_fabian_iphone
+#      - service: notify.mobile_app_iphone
 #        data_template:
 #          title: "Flugmodus"
 #          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -7309,7 +7434,7 @@
         event_data:
           command: '/lostfabian'
     action:
-      - service: notify.mobile_app_fabian_iphone
+      - service: notify.mobile_app_iphone
         data:
           message: "This phone is marked as lost! +49176 66334870"
           data:
@@ -7390,7 +7515,7 @@
                 name: "default"
                 critical: 1
                 volume: 0.4
-      - service: notify.mobile_app_fabian_iphone
+      - service: notify.mobile_app_iphone
         data:
           message: "Wichtige Nachricht, schau auf dein Handy!"
           data:
@@ -7498,7 +7623,7 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      - service: notify.mobile_app_fabian_iphone
+      - service: notify.mobile_app_iphone
         data:
           message: "Es klingelt! Jemand ist da."
           data:
@@ -7617,7 +7742,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   - id: telegram_reset_pill_counter
@@ -7636,7 +7761,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: counter.configure
         data:
@@ -7922,7 +8047,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - delay: '00:60:00'
       - service: notify.telegram_nessie
@@ -7948,7 +8073,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: notify.telegram_nessie
         data:
@@ -7973,7 +8098,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: notify.telegram_nessie
         data:
@@ -8364,7 +8489,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
       - service: shell_command.randomfood
         data_template:
@@ -8394,7 +8519,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   - id: telegram_answer_cancel_light_turn_off
@@ -8413,7 +8538,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   - id: turn_off_everything_in_keller_if_tv_is_unavailable
@@ -8725,7 +8850,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   - id: telegram_ha_os_update
@@ -8747,7 +8872,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: '{{ trigger.event.data.user_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
           inline_keyboard: []
 
   # - id: notify_nessie_on_train_delay_home_work
@@ -9438,6 +9563,8 @@
       conditions:  
         - condition: template
           value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
+        - condition: template
+          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 86400 }}"
     action:
       - service: shell_command.unpin_all_telegram
         data_template:
@@ -9451,19 +9578,21 @@
             {% if not is_state_attr('calendar.volleyballtraining', 'description', '') %}
               Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
             {% endif %}
-      - service: shell_command.poll_telegram
+      - service: telegram_bot.send_poll
         data_template:
-          telegram_bot_api: !secret telegram_bot_api
+          target: !secret telegram_volleyball
           question: 'Ich komme zum {{ states.calendar.volleyballtraining.attributes.message }} ?'
-          chat_id: !secret telegram_volleyball
           options: '["Ja", "Nein", "Wahrscheinlich"]'
+          is_anonymous: false
+          allows_multiple_answers: false
+          disable_notification: true
 
   - id: remind_for_volleyball_on_warm_sundays
     alias: 'Remind for Volleyball on warm Sundays'
     initial_state: True
     trigger:
       - platform: time
-        at: '15:00:00'
+        at: '12:30:00'
     condition:
       condition: and
       conditions:
@@ -9487,16 +9616,14 @@
         data_template:
           telegram_bot_api: !secret telegram_bot_api
           chat_id: !secret telegram_volleyball
-      #- service: telegram_bot.send_message
-      #  data_template:
-      #    target: !secret telegram_volleyball
-      #    message: 'Morgen ist das Wetter gut: Sonnig bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Beachvolleyball?'
-      - service: shell_command.poll_telegram
+      - service: telegram_bot.send_poll
         data_template:
-          telegram_bot_api: !secret telegram_bot_api
+          target: !secret telegram_volleyball
           question: 'Morgen ist das Wetter gut: Sonnig bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball?'
-          chat_id: !secret telegram_volleyball
           options: '["Ja", "Nein", "Wahrscheinlich"]'
+          is_anonymous: false
+          allows_multiple_answers: false
+          disable_notification: true
 
   - id: remind_for_juz
     alias: 'remind for juz'
@@ -9518,12 +9645,14 @@
             {% if not is_state_attr('calendar.juzzorneding_gmail_com', 'description', '') %}
               Zusatzinfos: {{ states.calendar.juzzorneding_gmail_com.attributes.description }}
             {% endif %}
-      - service: shell_command.poll_telegram
+      - service: telegram_bot.send_poll
         data_template:
-          telegram_bot_api: !secret telegram_bot_api
+          target: !secret telegram_chat_juz_group
           question: 'Ich komme zum {{ states.calendar.juzzorneding_gmail_com.attributes.message }} ?'
-          chat_id: !secret telegram_chat_juz_group
           options: '["Ja", "Nein", "Wahrscheinlich"]'
+          is_anonymous: false
+          allows_multiple_answers: false
+          disable_notification: true
 
   - id: send_juz_mails_to_telegram
     alias: 'send juz mails to telegram'

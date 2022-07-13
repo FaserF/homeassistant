@@ -282,9 +282,6 @@ shell_command:
   #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
   randomfood: !secret randomfood
   foodyes: !secret foodyes
-  #poll_telegram: !secret poll_telegram
-  poll_telegram: >
-    curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "{{ chat_id }}", "question": "{{ question }}", "options":{{ options }}, "disable_notification": true, "is_anonymous": false}' https://api.telegram.org/bot{{ telegram_bot_api }}/sendPoll
   unpin_all_telegram: >
     curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "{{ chat_id }}"}' https://api.telegram.org/bot{{ telegram_bot_api }}/unpinAllChatMessages
   pin_telegram: >
