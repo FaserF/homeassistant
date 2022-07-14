@@ -631,7 +631,7 @@
 #       above: 0
 #   condition:
 #     - condition: template
-#       value_template: {{ as_timestamp(now()) - as_timestamp(states.automation.notify_if_someone_joined_lan_play_server.attributes.last_triggered) | int > 300 }}
+#       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_if_someone_joined_lan_play_server.attributes.last_triggered) | int > 300 }}"
 #   action:
 #     - service: telegram_bot.send_message
 #       data_template:
@@ -2896,7 +2896,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5"]}'
+                payload: '{"segment_ids": ["1"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -2905,7 +2905,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["8"]}'
+                payload: '{"segment_ids": ["5"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -5603,7 +5603,7 @@
         - media_player.kuche_speaker
         - media_player.gastezimmer_mini
       data:
-        message: "Die Fritzbox hat keine Internet Verbindung" #und wird nun neugestartet.'
+        message: "Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet."
     - service: fritz.reboot
       data:
         host: 192.168.178.1
@@ -6606,134 +6606,6 @@
               data:
                 message: "Die Kohle sollte fertig sein!"
 
-# - id: detect_if_oven_is_currently_active
-#   alias: Detect if oven is currently active
-#   initial_state: on
-#   mode: single
-#   trigger:
-#     - platform: numeric_state
-#       entity_id: sensor.keller_steckdose_energy_power
-#       above: 1400
-#       below: 1500
-#       for:
-#         seconds: 35
-#   condition:
-#     condition: and
-#     conditions:
-#       - condition: template
-#         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_oven_is_currently_active.attributes.last_triggered) | int > 1020 }}"
-#       - condition: state
-#         entity_id: switch.kohleanzunder
-#         state: 'on'
-#   action:
-#     - service: automation.turn_off
-#       data:
-#         entity_id:
-#           - automation.detect_if_washing_machine_is_currently_active
-#           - automation.detect_if_coal_lighter_is_currently_active
-#           - automation.detect_if_pizzamaker_is_currently_active
-#     - choose:
-#         - conditions:
-#             - condition: or
-#               conditions:
-#                 - condition: state
-#                   entity_id: person.flo
-#                   state: home
-#                 - condition: state
-#                   entity_id: person.maxi
-#                   state: home
-#           sequence:
-#             - service: telegram_bot.send_message
-#               data_template:
-#                 target: !secret telegram_chat_5friends
-#                 message: 'Der Ofen wurde eingeschaltet.'
-#                 inline_keyboard:
-#                   - "Dauer:/remaining_time"
-#         - conditions:
-#             - condition: or
-#               conditions:
-#                 - condition: state
-#                   entity_id: person.kai
-#                   state: home
-#                 - condition: state
-#                   entity_id: person.adri
-#                   state: home
-#             - condition: not
-#               conditions:
-#                 - condition: state
-#                   entity_id: person.flo
-#                   state: home
-#                 - condition: state
-#                   entity_id: person.maxi
-#                   state: home
-#           sequence:
-#             - service: telegram_bot.send_message
-#               data_template:
-#                 target: !secret telegram_chat_afk
-#                 message: 'Der Ofen wurde eingeschaltet.'
-#                 inline_keyboard:
-#                   - "Dauer:/remaining_time"
-#       default:
-#         - service: telegram_bot.send_message
-#           data_template:
-#             target: !secret telegram_chat_fabian
-#             message: 'Der Ofen wurde eingeschaltet.'
-#             inline_keyboard:
-#               - "Dauer:/remaining_time"
-#     - delay: '00:13:00'
-#     - choose:
-#         - conditions:
-#             - condition: or
-#               conditions:
-#                 - condition: state
-#                   entity_id: person.flo
-#                   state: home
-#                 - condition: state
-#                   entity_id: person.maxi
-#                   state: home
-#           sequence:
-#             - service: telegram_bot.send_message
-#               data_template:
-#                 target: !secret telegram_chat_5friends
-#                 message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-#         - conditions:
-#             - condition: or
-#               conditions:
-#                 - condition: state
-#                   entity_id: person.kai
-#                   state: home
-#                 - condition: state
-#                   entity_id: person.adri
-#                   state: home
-#           sequence:
-#             - service: telegram_bot.send_message
-#               data_template:
-#                 target: !secret telegram_chat_afk
-#                 message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-#       default:
-#         - service: telegram_bot.send_message
-#           data_template:
-#             target: !secret telegram_chat_fabian
-#             message: 'Das Gericht im Ofen sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
-#     - service: automation.turn_on
-#       data:
-#         entity_id:
-#           - automation.detect_if_washing_machine_is_currently_active
-#           - automation.detect_if_coal_lighter_is_currently_active
-#           - automation.detect_if_pizzamaker_is_currently_active
-#     - service: androidtv.adb_command
-#       data:
-#         entity_id: media_player.keller_tv
-#         command: "pm clear com.tcl.videoplayer"
-#     - service: androidtv.adb_command
-#       data:
-#         entity_id: media_player.keller_tv
-#         command: "am start -a android.intent.action.VIEW -d /sdcard/raab_mib.mp4 -t video/mp4"
-#     - delay: '00:05:00'
-#     - service: switch.turn_off
-#       data:
-#         entity_id: switch.kohleanzunder
-
 - id: detect_if_pizzamaker_is_currently_active
   alias: Detect if pizzamaker is currently active
   initial_state: on
@@ -7705,6 +7577,7 @@
                     Jemand
                   {% endif %}
                   ist da.
+
 - id: telegram_pill_marked_done
   alias: "Telegram pill marked done"
   initial_state: on
@@ -8303,7 +8176,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: { { trigger.event.data.user_id } }
+        target: "{{ trigger.event.data.user_id }}"
         message: >
           Hier sind ein paar Befehle:
 
@@ -8321,7 +8194,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: { { trigger.event.data.user_id } }
+        target: "{{ trigger.event.data.user_id }}"
         message: >
           Hier sind ein paar Befehle:
 
