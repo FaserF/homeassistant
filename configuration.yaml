@@ -462,31 +462,31 @@ sensor:
         value_template: >
           {% if (is_state("switch.waschmaschine", "on")) -%}
             {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 9780 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 9780 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered) ) < 2400 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (2400) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (2400) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 5220 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (5220) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) ) | timestamp_custom("%H:%M", true) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered) ) < 12660 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (13560) ) | timestamp_custom("%H:%M", true) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (12660) ) | timestamp_custom("%H:%M", true) }}
@@ -503,31 +503,31 @@ sensor:
         value_template: >
           {% if (is_state("switch.waschmaschine", "on")) -%}
             {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered) ) < 3200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (2400) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (2400) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered) ) < 7200 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (5220) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (5220) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% endif %}
             {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered) ) < 14400 %}
-              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) < 600  %}
+              {% if as_timestamp(states.switch.waschmaschine.last_changed) - as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) > 600  %}
                 {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (13560) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
               {% else %}
                 {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (13560) | int - as_timestamp(now()) ) | timestamp_custom("%H:%M", false) }}
@@ -856,6 +856,10 @@ google_assistant:
       name: Strom Tisch
       expose: false
       room: Schlafzimmer
+    light.regal:
+      name: Regal
+      expose: true
+      room: Schlafzimmer
     input_boolean.fabian_pc_strom:
       name: Strom Schlafzimmer
       expose: true
@@ -915,12 +919,17 @@ google_assistant:
       name: Strom Fernseher
       expose: True
       room: Wohnzimmer
+      aliases:
+        - Fernseher
+        - TV
     switch.staubsauger:
       expose: True
       room: Wohnzimmer
     vacuum.valetudo_dreamez10pro:
       expose: True
       room: Wohnzimmer
+      aliases:
+        - Staubsaugroboter
     ##Keller
     switch.waschmaschine:
       expose: true
@@ -948,13 +957,106 @@ binary_sensor:
     country: DE
     province: BY
     add_holidays:
-      - "2022-05-27"
+      - "2023-05-19"
 
 dialogflow:
 intent_script:
   washing_machine_finish_duration:
     speech:
       text: Die Waschmaschine braucht noch ungefähr {{ states('sensor.washing_machine_finish_duration') }} Stunden.
+  rice_cooker_finish_duration:
+    speech:
+      text: Der Reiskocher braucht noch ungefähr {{ states('sensor.xiaomi_miio_cooker_remaining') }} Minuten.
+  find_james:
+    speech:
+      text: James gibt nun einen Ton von sich.
+    action:
+      service: vacuum.locate
+      target:
+        entity_id: vacuum.valetudo_dreamez10pro
+  LocateIntent:
+    speech:
+      text: >
+        {%- for state in states.person -%}
+          {%- if state.name.lower() == User.lower() -%}
+            {{ state.name }} ist bei {{ state.state }} 
+          {%- endif -%}
+        {%- else -%}
+          Leider kenne ich den Standort der Person {{ User }} nicht.
+        {%- endfor -%}
+  find_iPhone:
+    speech:
+      text: >
+        {%- if User.lower() == "fabian" or User.lower() == "fabi" or User.lower() == "nessie" or User.lower() == "vanessa"  -%}
+          Ich lasse jetzt das Handy von {{ User }} klingeln
+        {%- else -%}
+          Leider kann ich das Handy von {{ User }} nicht suchen.
+        {%- endif -%}
+    action:
+      - service: automation.trigger
+        entity_id: automation.find_phone_fabian
+      #{%- if User.lower() == "fabian" or User.lower() == "fabi" -%}
+      #  - service: automation.trigger
+      #    entity_id: automation.find_phone_fabian
+      #{%- elif User.lower() == "nessie" or User.lower() == "vanessa" -%}
+      #  - service: automation.trigger
+      #    entity_id: automation.find_phone_nessie
+      #{%- else -%}
+      #  Leider kann ich das iPhone von {{ User }} nicht suchen.
+      #{%- endif -%}
+  vacuum_room_cleaning:
+    speech:
+      text: Starte manuelle Raumreinigung in {{ Room }}.
+    action:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ ((Room)) == 'Wohnzimmer' }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["6"]}'
+          - conditions:
+              - condition: template
+                value_template: "{{ ((Room)) == 'Küche' }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["4"]}'
+          - conditions:
+              - condition: template
+                value_template: "{{ ((Room)) == 'Schlafzimmer' }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["3"]}'
+          - conditions:
+              - condition: template
+                value_template: "{{ ((Room)) == 'Gästezimmer' }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["7"]}'
+          - conditions:
+              - condition: template
+                value_template: "{{ ((Room)) == 'Bad' }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["1"]}'
+          - conditions:
+              - condition: template
+                value_template: "{{ ((Room)) == 'Flur' }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                  payload: '{"segment_ids": ["5"]}'
 
 # Text to speech
 tts:

@@ -115,6 +115,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
+          - entity: light.regal
           - entity: light.lampe_gastezimmer
             group: true
             toggle: true
@@ -441,13 +442,13 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
+          - entity: light.regal
           - entity: switch.smart_power_strip_pro_usb_1
         show_header_toggle: true
         title: Licht & Strom
         type: entities
       - entities:
           - entity: input_boolean.fabian_pc_strom
-          - entity: switch.schreibtisch
           - entity: light.prismatik
           - entity: device_tracker.fabian_pc
             secondary_info: last-changed

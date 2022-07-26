@@ -102,29 +102,6 @@
               - condition: state
                 entity_id: input_boolean.gast_modus
                 state: 'off'
-            sequence:
-              - service: light.turn_off
-                data:
-                  area_id: "{{ area_id('Gaestezimmer') }}"
-              - service: media_player.turn_off
-                data:
-                  entity_id: media_player.gastezimmer_mini
-              - service: select.select_option
-                data:
-                  option: min
-                target:
-                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-              - delay: '00:00:40'
-              - service: select.select_option
-                data:
-                  option: min
-                target:
-                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: input_boolean.gast_modus
-                state: 'off'
               - condition: not
                 conditions:
                   - condition: state
@@ -171,6 +148,29 @@
                 data: 
                   entity_id: climate.bad
                   hvac_mode: auto
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.gast_modus
+                state: 'off'
+            sequence:
+              - service: light.turn_off
+                data:
+                  area_id: "{{ area_id('Gaestezimmer') }}"
+              - service: media_player.turn_off
+                data:
+                  entity_id: media_player.gastezimmer_mini
+              #- service: select.select_option
+              #  data:
+              #    option: min
+              #  target:
+              #    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+              #- delay: '00:00:40'
+              #- service: select.select_option
+              #  data:
+              #    option: min
+              #  target:
+              #    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
   - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
     alias: 'Turn on 5ghz wifi and ssh off if coming home'
@@ -931,13 +931,9 @@
       - platform: time
         at: '00:00:00'
     condition:
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - fri
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: "on"
       - condition: state
         entity_id: switch.fernseher_keller
         state: 'off'
@@ -5708,7 +5704,7 @@
   #   action:
   #     - service: notify.telegram_fabian
   #       data:
-  #         message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ state.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
+  #         message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ states.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
 
   # - id: internet_speed_test_poor_fabian
   #   alias: Internet Speed Test Poor Nessie
@@ -7208,6 +7204,52 @@
                   entity_id: input_select.rice_cooker_program
                   option: 'Sonstiges'
 
+  - id: kitchen_timer_reminder
+    alias: Kitchen Timer Reminder
+    initial_state: on
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.kuche_speaker_timers
+        below: 5
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: switch.fernseher
+          state: 'on'
+        - condition: state
+          entity_id: switch.fernseher_keller
+          state: 'on'
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: person.fabian
+                state: home
+            sequence:
+              - service: notify.telegram_fabian
+                data:
+                  message: "Der Timer in der Küche ist in {{ states.sensor.kuche_speaker_timers.state }} Minuten fertig."
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: person.nessie
+                state: home
+            sequence:
+              - service: notify.telegram_nessie
+                data:
+                  message: "Der Timer in der Küche ist in {{ states.sensor.kuche_speaker_timers.state }} Minuten fertig."
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.fernseher
+                state: 'on'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.wohnzimmer_uhr
+                data:
+                  message: "Der Timer in der Küche ist in {{ states.sensor.kuche_speaker_timers.state }} Minuten fertig."
+
   - id: remind_for_going_off
     alias: 'Remind for going off'
     initial_state: on
@@ -7773,7 +7815,7 @@
                         critical: 1
                         volume: 0.1
 
-  - id: cleaner_counter
+  - id: vacuum_cleaner_counter
     alias: 'Set Counter with Cleaner Runs and remind for emptying and refilling'
     trigger:
       - platform: state
@@ -7793,11 +7835,17 @@
     action:
       - service: counter.increment
         target:
-          entity_id: counter.cleaner_runs
+          entity_id: counter.vacuum_runs
+      - service: counter.decrement
+        target:
+          entity_id: counter.vacuum_water_level
       - choose:
           - conditions:
-              - condition: template
-                value_template: "{{ states('counter.cleaner_runs')|float % 4 == 0 }}"
+              - condition: numeric_state
+                entity_id: counter.vacuum_water_level
+                below: 1
+              #- condition: template
+              #  value_template: "{{ states('counter.vacuum_runs')|float % 4 == 0 }}"
             sequence:
               - service: notify.telegram_nessie
                 data_template:
@@ -7808,14 +7856,43 @@
       - choose:
           - conditions:
               - condition: template
-                value_template: "{{ states('counter.cleaner_runs')|float % 24 == 0 }}"
+                value_template: "{{ states('counter.vacuum_runs')|float % 24 == 0 }}"
             sequence:
-              - service: notify.telegram_fabian
+              - service: notify.telegram_nessie
                 data_template:
                   message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
               - service: notify.telegram_fabian
                 data_template:
                   message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
+
+  - id: vacuum_water_refilled
+    alias: 'Vacuum Water refilled'
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.valetudo_dreamez10pro_water_tank_attachment
+        from: 'off'
+        to: 'on'
+        for:
+          seconds: 5
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.valetudo_dreamez10pro
+          state: unavailable
+        - condition: numeric_state
+          entity_id: counter.vacuum_water_level
+          above: 90
+    action:
+      - service: counter.reset
+        target:
+          entity_id: counter.vacuum_water_level
+      - service: notify.telegram_nessie
+        data_template:
+          message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
+      - service: notify.telegram_fabian
+        data_template:
+          message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
 
   - id: nessie_forgot_pill
     alias: 'Nessie forgot pill'
@@ -7889,7 +7966,7 @@
               state: none
         - condition: numeric_state
           entity_id: counter.pille
-          below: '22'
+          below: 22
         - condition: template
           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_pill_marked_done.attributes.last_triggered) | int > 14760 }}"
     action:
@@ -8496,6 +8573,7 @@
             & Gästezimmer
             {% endif %}
             . Ausschalten?
+
   - id: set_climate_living_room_if_in_keller
     alias: Set climate living room if in keller
     initial_state: on
@@ -8916,7 +8994,7 @@
             conditions:
               - condition: time
                 after: '18:00:00'
-                before: '21:30:00'
+                before: '22:30:00'
                 weekday:
                   - sun
     action:
