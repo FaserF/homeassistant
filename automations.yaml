@@ -231,6 +231,10 @@
         entity_id: proximity.home_fabian
         below: 2
     condition:
+      - condition: numeric_state
+        entity_id: person.fabian
+        attribute: gps_accuracy
+        below: 500
       - condition: not
         conditions:
           - condition: state
@@ -238,9 +242,6 @@
             state: home
       - condition: not
         conditions:
-          - condition: numeric_state
-            entity_id: proximity.home_fabian
-            below: 1
           - condition: state
             entity_id: person.fabian
             state: Volleyball
@@ -283,6 +284,10 @@
         entity_id: proximity.home_nessie
         below: 2
     condition:
+      - condition: numeric_state
+        entity_id: person.nessie
+        attribute: gps_accuracy
+        below: 500
       - condition: not
         conditions:
           - condition: state
@@ -290,9 +295,6 @@
             state: home
       - condition: not
         conditions:
-          - condition: numeric_state
-            entity_id: proximity.home_nessie
-            below: 1
           - condition: state
             entity_id: person.nessie
             state: Volleyball
@@ -3012,6 +3014,24 @@
               - condition: state
                 entity_id: input_boolean.gast_modus
                 state: 'off'
+              - condition: or
+                conditions:
+                  - condition: numeric_state
+                    entity_id: climate.gastezimmer
+                    attribute: current_humidity
+                    above: 60
+                  - condition: numeric_state
+                    entity_id: climate.wohnzimmer
+                    attribute: current_humidity
+                    above: 60
+                  - condition: numeric_state
+                    entity_id: climate.schlafzimmer
+                    attribute: current_humidity
+                    above: 60
+                  - condition: numeric_state
+                    entity_id: climate.bad
+                    attribute: current_humidity
+                    above: 60
             sequence:
               - service: automation.trigger
                 entity_id: automation.notify_for_high_humidity
