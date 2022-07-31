@@ -776,7 +776,7 @@ switch:
 
 google_assistant:
   project_id: !secret google_assistant_id
-  service_account: !include Homeassistant SmartLife-f9d43c517637.json
+  service_account: !include Homeassistant-SmartLife-f9d43c517637.json
   report_state: true
   exposed_domains:
     - switch
