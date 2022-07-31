@@ -979,7 +979,7 @@ intent_script:
       text: >
         {%- for state in states.person -%}
           {%- if state.name.lower() == User.lower() -%}
-            {{ state.name }} ist bei {{ state.state }} 
+            {{ state.name }} ist bei {{ state.state }}
           {%- endif -%}
         {%- else -%}
           Leider kenne ich den Standort der Person {{ User }} nicht.

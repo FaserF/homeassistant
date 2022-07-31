@@ -26,23 +26,23 @@
     action:
       - service: light.turn_off
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Wohnzimmer') }}"
             - "{{ area_id('Schlafzimmer') }}"
             - "{{ area_id('Keller') }}"
       - service: switch.turn_off
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Wohnzimmer') }}"
             - "{{ area_id('Keller') }}"
       - service: switch.turn_off
         data:
-          entity_id: 
+          entity_id:
             - switch.smart_power_strip_pro_usb_1
             - switch.schreibtisch
       - service: media_player.turn_off
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Wohnzimmer') }}"
             - "{{ area_id('Schlafzimmer') }}"
             - "{{ area_id('Kueche') }}"
@@ -109,7 +109,7 @@
                     state: 'off'
             sequence:
               - service: climate.set_hvac_mode
-                data: 
+                data:
                   entity_id: climate.gastezimmer
                   hvac_mode: auto
       - choose:
@@ -121,7 +121,7 @@
                     state: 'off'
             sequence:
               - service: climate.set_hvac_mode
-                data: 
+                data:
                   entity_id: climate.wohnzimmer
                   hvac_mode: auto
       - choose:
@@ -133,7 +133,7 @@
                     state: 'off'
             sequence:
               - service: climate.set_hvac_mode
-                data: 
+                data:
                   entity_id: climate.schlafzimmer
                   hvac_mode: auto
       - choose:
@@ -145,7 +145,7 @@
                     state: 'off'
             sequence:
               - service: climate.set_hvac_mode
-                data: 
+                data:
                   entity_id: climate.bad
                   hvac_mode: auto
       - choose:
@@ -216,7 +216,7 @@
                 target:
                   entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
       #- service: switch.turn_off
-      #  data: 
+      #  data:
       #    entity_id: switch.fritzbox_3490_portforward_ssh
 
   - id: open_door_for_fabian
@@ -395,7 +395,7 @@
                   volume_level: 0.7
                   entity_id: media_player.wohnzimmer_uhr
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                 data:
@@ -495,7 +495,7 @@
                   volume_level: 0.7
                   entity_id: media_player.wohnzimmer_uhr
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                 data:
@@ -598,7 +598,7 @@
                   volume_level: 0.7
                   entity_id: media_player.wohnzimmer_uhr
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                 data:
@@ -760,7 +760,7 @@
             sequence:
               - service: light.turn_off
                 data:
-                  area_id: 
+                  area_id:
                     - "{{ area_id('Wohnzimmer') }}"
                     - "{{ area_id('Schlafzimmer') }}"
                     - "{{ area_id('Gaestezimmer') }}"
@@ -831,7 +831,7 @@
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
     action:
       - service: switch.turn_off
-        entity_id: 
+        entity_id:
           - switch.fernseher
           - switch.kuhlschrank
       - service: media_player.turn_off
@@ -856,7 +856,7 @@
             sequence:
               - service: climate.set_hvac_mode
                 data:
-                  entity_id: 
+                  entity_id:
                     - climate.wohnzimmer
                     - climate.schlafzimmer
                     - climate.bad
@@ -869,7 +869,7 @@
             sequence:
               - service: climate.set_hvac_mode
                 data:
-                  entity_id: 
+                  entity_id:
                     - climate.wohnzimmer
                     - climate.schlafzimmer
                     - climate.bad
@@ -1035,7 +1035,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            {% if is_state("sensor.unavailable_entities", "1")%} 
+            {% if is_state("sensor.unavailable_entities", "1")%}
             Es ist eine Entität nicht verfügbar.
             {% else %}
             Es sind {{ states.sensor.unavailable_entities.state }} Entitäten nicht erreichbar.
@@ -1317,12 +1317,12 @@
       - condition: state
         entity_id: device_tracker.fabian_pc
         state: 'not_home'
-        for: 
+        for:
           minutes: 1
       - condition: state
         entity_id: device_tracker.nsta0552
         state: 'not_home'
-        for: 
+        for:
           seconds: 20
       - condition: numeric_state
         entity_id: sensor.steckdose_schlafzimmer_energy_power
@@ -1478,7 +1478,7 @@
                   hvac_mode: 'auto'
       - service: light.turn_off
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Gaestezimmer') }}"
       - service: media_player.volume_set
         data:
@@ -1565,7 +1565,7 @@
             sequence:
               - service: light.turn_on
                 data:
-                  entity_id: 
+                  entity_id:
                     - light.leds_wohnzimmer_tv
                     - light.leds_wohnzimmer
                     - light.yeelight_color_0x00000000036dc050
@@ -1646,7 +1646,7 @@
           sequence:
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
-              data: 
+              data:
                 message: Es wurde vergessen das Fenster im Bad zu schließen.
       - choose:
           - conditions:
@@ -1663,11 +1663,11 @@
                     state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
-                data: 
+                data:
                   message: Es wurde eventuell vermutlich vergessen das Fenster im Bad zu schließen.
         default:
           - service: notify.telegram_fabian
@@ -1719,7 +1719,7 @@
           sequence:
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
-              data: 
+              data:
                 message: Es wurde eventuell vergessen das Fenster im Schlafzimmer zu schließen.
       - choose:
           - conditions:
@@ -1736,10 +1736,10 @@
                     state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
-                data: 
+                data:
                   message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
         default:
           - service: notify.telegram_fabian
@@ -1791,7 +1791,7 @@
           sequence:
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
-              data: 
+              data:
                 message: Es wurde eventuell vergessen das Fenster im Wohnzimmer zu schließen.
       - choose:
           - conditions:
@@ -1805,10 +1805,10 @@
                     state: 'home'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
-                data: 
+                data:
                   message: Es wurde eventuell vergessen das Fenster im Wohnzimmer zu schließen.
         default:
           - service: notify.telegram_fabian
@@ -1858,11 +1858,11 @@
                     state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
-                data: 
+                data:
                   message: Es wurde eventuell vergessen das Fenster im Gästezimmer zu schließen.
         default:
           - service: notify.telegram_fabian
@@ -1964,7 +1964,7 @@
                   entity_id: media_player.schlafzimmer_speaker
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer_speaker
-                data: 
+                data:
                   message: Das Fenster im Bad kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2012,7 +2012,7 @@
                   entity_id: media_player.gastezimmer_mini
               - service: tts.google_say
                 entity_id: media_player.gastezimmer_mini
-                data: 
+                data:
                   message: Das Fenster im Bad kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2070,7 +2070,7 @@
                   entity_id: media_player.kuche_speaker
               - service: tts.google_say
                 entity_id: media_player.kuche_speaker
-                data: 
+                data:
                   message: Das Fenster im Bad kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2183,7 +2183,7 @@
                   entity_id: media_player.gastezimmer_mini
               - service: tts.google_say
                 entity_id: media_player.gastezimmer_mini
-                data: 
+                data:
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2241,7 +2241,7 @@
                   entity_id: media_player.kuche_speaker
               - service: tts.google_say
                 entity_id: media_player.kuche_speaker
-                data: 
+                data:
                   message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2329,11 +2329,11 @@
               - condition: or
                 conditions:
                   - condition: state
-                    entity_id: 
+                    entity_id:
                       - device_tracker.nsta0552
                     state: 'home'
                   - condition: state
-                    entity_id: 
+                    entity_id:
                       - device_tracker.fabian_pc
                     state: 'home'
               - condition: not
@@ -2356,7 +2356,7 @@
                   entity_id: media_player.schlafzimmer_speaker
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer_speaker
-                data: 
+                data:
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2365,7 +2365,7 @@
       - choose:
           - conditions:
               - condition: state
-                entity_id: 
+                entity_id:
                   - device_tracker.rgb_pc
                   - device_tracker.vku_lb_20
                 match: any
@@ -2393,7 +2393,7 @@
                   entity_id: media_player.gastezimmer_mini
               - service: tts.google_say
                 entity_id: media_player.gastezimmer_mini
-                data: 
+                data:
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2457,7 +2457,7 @@
                   entity_id: media_player.kuche_speaker
               - service: tts.google_say
                 entity_id: media_player.kuche_speaker
-                data: 
+                data:
                   message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2529,7 +2529,7 @@
                   entity_id: media_player.schlafzimmer_speaker
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer_speaker
-                data: 
+                data:
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2587,7 +2587,7 @@
                   entity_id: media_player.kuche_speaker
               - service: tts.google_say
                 entity_id: media_player.kuche_speaker
-                data: 
+                data:
                   message: Das Fenster im Gästezimmer kann wieder geschlossen werden.
               - service: media_player.volume_set
                 data_template:
@@ -2637,19 +2637,19 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: 
+        entity_id:
           - sensor.fabian_ipadpro_battery_state
           - sensor.fabian_phone_battery_state
           - sensor.nessie_iphone_battery_state_2
         to: 'discharging'
       - platform: state
-        entity_id: 
+        entity_id:
           - sensor.fabian_ipadpro_battery_state
           - sensor.fabian_phone_battery_state
           - sensor.nessie_iphone_battery_state_2
         to: 'Not Charging'
       - platform: numeric_state
-        entity_id: 
+        entity_id:
           - sensor.fabian_ipadpro_battery_level
           - sensor.fabian_iphone_battery_state
           - sensor.nessie_iphone_battery_state
@@ -2842,14 +2842,14 @@
     action:
       - delay: "00:00:30"
       - service: telegram_bot.send_message
-        data_template: 
+        data_template:
           message: >
             James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
             Die Reinigung wurde daher unterbrochen.
           target: !secret telegram_chat_fabian
       - service: telegram_bot.send_message
-        data_template: 
+        data_template:
           message: >
             James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
@@ -2998,7 +2998,7 @@
                   entity_id: switch.adaptive_lighting_sleeping_room
               - service: light.turn_on
                 data:
-                  entity_id: 
+                  entity_id:
                     - light.leds_tisch
                     - light.yeelight_bslamp2_0x0000000013fea10f
                   brightness: 2
@@ -3039,11 +3039,11 @@
       #  data_template:
       #    entity_id: light.bett_gluhbirne
       #    brightness: 100
-      #    rgb_color: > 
+      #    rgb_color: >
       #      {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
-      #      [255,255,255] 
+      #      [255,255,255]
       #      {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
-      #      [0,0,255] 
+      #      [0,0,255]
       #      {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
       #      [0,255,0]
       #      {% else %}
@@ -3052,7 +3052,7 @@
       #- delay: '00:05:00'
       #- service: light.turn_off
       #  data:
-      #    entity_id: 
+      #    entity_id:
       #      - light.yeelight_bslamp2_0x0000000013fea10f
       - delay: '00:20:00'
       - service: switch.turn_on
@@ -3069,7 +3069,7 @@
             sequence:
               - service: light.turn_off
                 data:
-                  entity_id: 
+                  entity_id:
                     - light.leds_tisch
 
   - id: increase_lights_in_morning
@@ -3182,13 +3182,13 @@
                     state: home
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
-                data_template: 
+                data_template:
                   message: >
                     Es ist {{ now().hour }} Uhr {{ now().minute }} .
-                    Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich 
+                    Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich
                     {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
               - delay: '00:00:12'
               - choose:
@@ -3211,10 +3211,10 @@
                       - parallel:
                           - service: tts.google_say
                             entity_id: media_player.wohnzimmer_uhr
-                            data_template: 
+                            data_template:
                               message: >
                                 Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                                  Schlafzimmer 
+                                  Schlafzimmer
                                 {% endif %}
                                 {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
                                   Gästezimmer
@@ -3228,10 +3228,10 @@
                                 muss noch geschlossen werden.
                           - service: tts.google_say
                             entity_id: media_player.kuche_speaker
-                            data_template: 
+                            data_template:
                               message: >
                                 Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                                  Schlafzimmer 
+                                  Schlafzimmer
                                 {% endif %}
                                 {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
                                   Gästezimmer
@@ -3256,10 +3256,10 @@
             sequence:
               - service: tts.google_say
                 entity_id: media_player.schlafzimmer_speaker
-                data_template: 
+                data_template:
                   message: >
-                    Es ist 
-                    {{ now().hour }} Uhr {{ now().minute }} . 
+                    Es ist
+                    {{ now().hour }} Uhr {{ now().minute }} .
                     Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
               - delay: '00:00:12'
               - choose:
@@ -3282,10 +3282,10 @@
                       - parallel:
                           - service: tts.google_say
                             entity_id: media_player.schlafzimmer_speaker
-                            data_template: 
+                            data_template:
                               message: >
                                 Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                                  Schlafzimmer 
+                                  Schlafzimmer
                                 {% endif %}
                                 {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
                                   Gästezimmer
@@ -3299,10 +3299,10 @@
                                 muss noch geschlossen werden.
                           - service: tts.google_say
                             entity_id: media_player.kuche_speaker
-                            data_template: 
+                            data_template:
                               message: >
                                 Das Fenster im {% if is_state('binary_sensor.schlafzimmer_open_window', 'on') %}
-                                  Schlafzimmer 
+                                  Schlafzimmer
                                 {% endif %}
                                 {% if is_state('binary_sensor.gastezimmer_open_window', 'on') %}
                                   Gästezimmer
@@ -3364,13 +3364,13 @@
                   color_temp: 279
       - service: light.turn_off
         data:
-          entity_id: 
+          entity_id:
             - light.leds_tisch
             - light.regal
       - delay: '00:04:00'
       - service: light.turn_off
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Wohnzimmer') }}"
 
   - id: turn_on_lights_in_livingroom_when_dark_outside
@@ -3395,12 +3395,12 @@
     action:
       - service: light.turn_on
         data:
-          entity_id: 
+          entity_id:
             - light.leds_wohnzimmer_tv
             - light.leds_wohnzimmer
             - light.yeelight_color_0x00000000036dc050
           transition: 2
-  
+
   - id: turn_off_prismatik_during_the_day
     alias: 'Turn off Prismatik during the day'
     initial_state: on
@@ -3534,7 +3534,7 @@
       condition: and
       conditions:
         - condition: or
-          conditions: 
+          conditions:
             - condition: and
               conditions:
                 - condition: numeric_state
@@ -3571,7 +3571,7 @@
     action:
       - service: light.turn_on
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Gaestezimmer') }}"
           transition: 2
 
@@ -3591,7 +3591,7 @@
     action:
       - service: light.turn_off
         data:
-          area_id: 
+          area_id:
             - "{{ area_id('Wohnzimmer') }}"
             - "{{ area_id('Schlafzimmer') }}"
             - "{{ area_id('Gaestezimmer') }}"
@@ -3707,7 +3707,7 @@
         value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 10800) | round(-1) }}"
     condition:
       condition: and
-      conditions:  
+      conditions:
         - condition: template
           value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 43200) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
     action:
@@ -3850,7 +3850,7 @@
         value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - 43200) | round(-1) }}"
     condition:
       condition: and
-      conditions:  
+      conditions:
         - condition: template
           value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 58000) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
         - condition: template
@@ -4023,7 +4023,7 @@
   - id: turn_on_away_mode
     alias: Turn on Away Mode
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.abwesend_modus
         to: 'on'
@@ -4072,7 +4072,7 @@
   - id: turn_off_away_mode
     alias: Turn off Away Mode
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.abwesend_modus
         to: 'off'
@@ -4121,7 +4121,7 @@
   - id: turn_on_climate_off_mode
     alias: Turn on Climate Off mode
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.thermostate_aus
         to: 'on'
@@ -4133,7 +4133,7 @@
   - id: turn_off_climate_off_mode
     alias: Turn off Climate Off mode
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.thermostate_aus
         to: 'off'
@@ -4146,7 +4146,7 @@
   - id: turn_on_guest_mode
     alias: Turn on Guest Mode mode
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.gast_modus
         to: 'on'
@@ -4159,7 +4159,7 @@
     alias: Turn on FS Strom
     initial_state: on
     mode: single
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.fabian_pc_strom
         to: 'on'
@@ -4177,7 +4177,7 @@
   - id: turn_off_fs_strom
     alias: Turn off FS Strom
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.fabian_pc_strom
         to: 'off'
@@ -4289,7 +4289,7 @@
   - id: turn_on_vk_strom
     alias: Turn on VK Strom
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.nessie_pc_strom
         to: 'on'
@@ -4307,7 +4307,7 @@
   - id: turn_off_vk_strom
     alias: Turn off VK Strom
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_boolean.nessie_pc_strom
         to: 'off'
@@ -4459,9 +4459,9 @@
   - id: warn_for_state_change_if_in_away_mode
     alias: Warn for state change if in away mode
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
-        entity_id: 
+        entity_id:
           - group.wohnzimmer
           - group.schlafzimmer
           - group.gastezimmer
@@ -4485,13 +4485,13 @@
           target: !secret telegram_chat_nessie
           message: 'ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!'
       - service: tts.google_say
-        entity_id: 
+        entity_id:
           - media_player.wohnzimmer_uhr
           - media_player.kuche_speaker
           - media_player.gastezimmer_mini
           - media_player.kuche_speaker
           - media_player.schlafzimmer_speaker
-        data: 
+        data:
           message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
 
   - id: remind_for_waste_collection
@@ -4511,12 +4511,12 @@
           state: "Morgen"
     action:
       - service: telegram_bot.send_message
-        data_template: 
+        data_template:
           message: >
             Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
           target: !secret telegram_chat_fabian
       - service: telegram_bot.send_message
-        data_template: 
+        data_template:
           message: >
             Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
           target: !secret telegram_chat_nessie
@@ -4679,7 +4679,7 @@
             Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['description'] }}
 
             ------------
-                    
+
             Verfügbar bis: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['available until'] }}
 
             {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] == 'unavailable' %}
@@ -4717,24 +4717,24 @@
           state: 'on'
     action:
       - service: telegram_bot.send_message
-        data_template: 
+        data_template:
           message: >
-            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
+            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %}
               Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }}
             {% endif %}
-            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
+            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %}
               {% if states.sensor.home_assistant_operating_system_newest_version.state != states.sensor.home_assistant_operating_system_version.state %}
-              & 
+              &
               {% endif %}
             {% endif %}
-            {% if states.update.home_assistant_operating_system_update.attributes.latest_version != states.update.home_assistant_operating_system_update.attributes.installed_version %} 
+            {% if states.update.home_assistant_operating_system_update.attributes.latest_version != states.update.home_assistant_operating_system_update.attributes.installed_version %}
               Homeassistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }}
             {% endif %}
-            ist nun verfügbar. 
-            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %} 
+            ist nun verfügbar.
+            {% if states.update.home_assistant_core_update.attributes.latest_version != states.update.home_assistant_core_update.attributes.installed_version %}
               Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
             {% endif %}
-            {% if states.update.home_assistant_operating_system_update.attributes.latest_version != states.update.home_assistant_operating_system_update.attributes.installed_version %} 
+            {% if states.update.home_assistant_operating_system_update.attributes.latest_version != states.update.home_assistant_operating_system_update.attributes.installed_version %}
               Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
             {% endif %}
           target: !secret telegram_chat_fabian
@@ -4759,7 +4759,7 @@
           target: !secret telegram_chat_fabian
           disable_notification: true
           message: >
-            {% if is_state("sensor.hacs", "1")%} 
+            {% if is_state("sensor.hacs", "1")%}
             Es gibt ein verfügbares HACS Update.
             {% else %}
             Es gibt {{ states.sensor.hacs.state }} verfügbare HACS Updates.
@@ -4789,10 +4789,10 @@
   #         volume_level: 0.4
   #         entity_id: media_player.wohnzimmer_uhr
   #     - service: tts.google_say
-  #       entity_id: 
+  #       entity_id:
   #       - media_player.wohnzimmer_uhr
   #       - media_player.schlafzimmer_speaker
-  #       data_template: 
+  #       data_template:
   #         message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
   #     - service: media_player.media_pause
   #       data:
@@ -4829,7 +4829,7 @@
   #         volume_level: 0.7
   #         entity_id: media_player.wohnzimmer_uhr
   #     - service: tts.google_say
-  #       entity_id: 
+  #       entity_id:
   #       - media_player.wohnzimmer_uhr
   #       - media_player.schlafzimmer_speaker
   #       data:
@@ -5018,7 +5018,7 @@
                     ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
                     *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
-                    
+
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
       - choose:
           - conditions:
@@ -5033,7 +5033,7 @@
                     ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.region_name }}.
                     *{{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_headline }}*
                     {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
-                    
+
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
   - id: raspberryppi_temp_warning
     alias: 'RaspberryPi Temp Warning'
@@ -5077,7 +5077,7 @@
   - id: turn_on_schloss_on_button_press
     alias: Turn on Schloss on button press
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: input_button.schloss
     action:
@@ -5088,7 +5088,7 @@
   - id: turn_schloss_off_after_turning_on
     alias: Turn Schloss off after turning on
     initial_state: on
-    trigger: 
+    trigger:
       - platform: state
         entity_id: switch.schloss
         to: 'on'
@@ -5142,7 +5142,7 @@
     mode: single
     trigger:
       - platform: state
-        entity_id: 
+        entity_id:
           - media_player.wohnzimmer_uhr
           - media_player.kuche_speaker
           - media_player.schlafzimmer_speaker
@@ -5466,13 +5466,13 @@
     initial_state: on
     trigger:
       - platform: state
-        entity_id: 
+        entity_id:
           - binary_sensor.bad_battery_state
           - binary_sensor.schlafzimmer_battery_state
         from: 'off'
         to: 'on'
       - platform: state
-        entity_id: 
+        entity_id:
           - climate.wohnzimmer
           - climate.gastezimmer
         to: 'unavailable'
@@ -5490,10 +5490,10 @@
     action:
       - service: notify.telegram_fabian
         data_template:
-          message: > 
+          message: >
             Die Batterie im Thermostat
             {% if is_state('climate.wohnzimmer', 'unavailable') %}
-            Gästezimmer 
+            Gästezimmer
             {% endif %}
             {% if is_state('climate.gastezimmer', 'unavailable') %}
             Wohnzimmer
@@ -5513,10 +5513,10 @@
             leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
       - service: notify.telegram_nessie
         data_template:
-          message: > 
+          message: >
             Die Batterie im Thermostat
             {% if is_state('climate.wohnzimmer', 'unavailable') %}
-            Gästezimmer 
+            Gästezimmer
             {% endif %}
             {% if is_state('climate.gastezimmer', 'unavailable') %}
             Wohnzimmer
@@ -5536,17 +5536,17 @@
             leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
   - id: cast_ha_to_tv_if_idle
     alias: Cast HA to TV if idleing
-    trigger: 
+    trigger:
       - platform: state
         entity_id: media_player.wohnzimmer_tv
-        to: 
+        to:
           - 'idle'
           - 'standby'
         for:
           minutes: 3
     action:
       service: cast.show_lovelace_view
-      data: 
+      data:
         entity_id: media_player.wohnzimmer_tv_cast
         view_path: cast
 
@@ -5631,7 +5631,7 @@
       #    command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
       #    user: "homeassistant"
       - service: tts.google_say
-        entity_id: 
+        entity_id:
         - media_player.schlafzimmer_speaker
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
@@ -5682,7 +5682,7 @@
               #    command: Die Internetverbindung ist wiederhergestellt.
               #    user: "homeassistant"
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.schlafzimmer_speaker
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
@@ -5713,7 +5713,7 @@
 
   # - id: internet_speed_test_poor_fabian
   #   alias: Internet Speed Test Poor Fabian
-  # 
+  #
   #   initial_state: on
   #   trigger:
   #     - platform: template
@@ -5728,7 +5728,7 @@
 
   # - id: internet_speed_test_poor_fabian
   #   alias: Internet Speed Test Poor Nessie
-  # 
+  #
   #   initial_state: on
   #   trigger:
   #     - platform: template
@@ -5741,7 +5741,7 @@
   #       state: home
   #   action:
   #     - service: notify.telegram_nessie
-  #       data: 
+  #       data:
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
   #- id: update_tasmota
@@ -5763,17 +5763,17 @@
   - id: deckenlampe_button_hold
     alias: Deckenlampe Button Hold
     initial_state: on
-    trigger: 
+    trigger:
       - platform: device
         domain: tasmota
         device_id: d75263b1d81c803aac073abd2257aa2d
         type: button_long_press
         subtype: button_1
         discovery_id: 68C63A87B4BF_button_1_HOLD
-      - platform: event         
-        event_type: ios.action_fired         
-        event_data:           
-          actionName: 'Light Livingroom'   
+      - platform: event
+        event_type: ios.action_fired
+        event_data:
+          actionName: 'Light Livingroom'
     action:
       - choose:
           - conditions:
@@ -5846,7 +5846,7 @@
   - id: deckenlampe_button_double_press
     alias: Deckenlampe Button double press
     initial_state: on
-    trigger: 
+    trigger:
       - platform: device
         domain: tasmota
         device_id: d75263b1d81c803aac073abd2257aa2d
@@ -5876,17 +5876,17 @@
   - id: lichtschalter_button_hold
     alias: Lichtschalter Button Hold
     initial_state: on
-    trigger: 
+    trigger:
       - platform: device
         domain: tasmota
         device_id: 564e0bea23153d99c590e8fe2ef83464
         type: button_long_press
         subtype: button_1
         discovery_id: 68C63AA72808_button_1_HOLD
-      - platform: event         
-        event_type: ios.action_fired         
-        event_data:           
-          actionName: 'Light Sleepingroom'  
+      - platform: event
+        event_type: ios.action_fired
+        event_data:
+          actionName: 'Light Sleepingroom'
     action:
       - choose:
           - conditions:
@@ -5927,13 +5927,13 @@
             sequence:
               - service: light.turn_on
                 data:
-                  entity_id: 
+                  entity_id:
                     - light.leds_tisch
                   brightness: 255
                   transition: 2
               - service: light.turn_on
                 data:
-                  entity_id: 
+                  entity_id:
                     - light.bett_gluhbirne
                     - light.yeelight_bslamp2_0x0000000013fea10f
                   brightness: 255
@@ -5968,13 +5968,13 @@
             sequence:
               - service: light.turn_off
                 data:
-                  area_id: 
+                  area_id:
                     - "{{ area_id('Schlafzimmer') }}"
 
   - id: lichtschalter_button_double_press
     alias: Lichtschalter Button double press
     initial_state: on
-    trigger: 
+    trigger:
       - platform: device
         domain: tasmota
         device_id: 564e0bea23153d99c590e8fe2ef83464
@@ -6032,7 +6032,7 @@
     alias: Notify for high humidity
     trigger:
       - platform: numeric_state
-        entity_id: 
+        entity_id:
           - climate.gastezimmer
           - climate.wohnzimmer
           - climate.schlafzimmer
@@ -6103,7 +6103,7 @@
                       message: >
                         Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                         Wohnzimmer,
@@ -6132,7 +6132,7 @@
                       message: >
                         Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                         Wohnzimmer,
@@ -6159,7 +6159,7 @@
                       message: >
                         Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                         Wohnzimmer,
@@ -6190,7 +6190,7 @@
                       message: >
                         Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                         Wohnzimmer,
@@ -6216,7 +6216,7 @@
                   message: >
                     Die Luftfeuchtigkeit ist zu hoch im Raum
                     {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-                    Gästezimmer, 
+                    Gästezimmer,
                     {% endif %}
                     {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                     Wohnzimmer,
@@ -6231,7 +6231,7 @@
       - service: media_player.volume_set
         data:
           volume_level: 0.3
-          entity_id: 
+          entity_id:
           - media_player.wohnzimmer_uhr
           - media_player.schlafzimmer_speaker
           - media_player.kuche_speaker
@@ -6240,7 +6240,7 @@
     alias: Notify for extreme high humidity
     trigger:
       - platform: numeric_state
-        entity_id: 
+        entity_id:
           - climate.gastezimmer
           - climate.wohnzimmer
           - climate.schlafzimmer
@@ -6353,11 +6353,11 @@
               - parallel:
                   - service: tts.google_say
                     entity_id: media_player.wohnzimmer_uhr
-                    data_template: 
+                    data_template:
                       message: >
                         Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
                         Wohnzimmer,
@@ -6371,11 +6371,11 @@
                         Bitte lüften.
                   - service: tts.google_say
                     entity_id: media_player.kuche_speaker
-                    data_template: 
+                    data_template:
                       message: >
                         Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
                         Wohnzimmer,
@@ -6389,11 +6389,11 @@
                         Bitte lüften.
                   - service: tts.google_say
                     entity_id: media_player.schlafzimmer_speaker
-                    data_template: 
+                    data_template:
                       message: >
                         Willkommen zurück. Die Luftfeuchtigkeit ist zu hoch im Raum
                         {% if (states.climate.gastezimmer.attributes.current_humidity) > 55 %}
-                        Gästezimmer, 
+                        Gästezimmer,
                         {% endif %}
                         {% if (states.climate.wohnzimmer.attributes.current_humidity) > 55 %}
                         Wohnzimmer,
@@ -6408,7 +6408,7 @@
               - service: media_player.volume_set
                 data:
                   volume_level: 0.3
-                  entity_id: 
+                  entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.schlafzimmer_speaker
                   - media_player.kuche_speaker
@@ -6444,7 +6444,7 @@
     action:
       - service: automation.turn_off
         data:
-          entity_id: 
+          entity_id:
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
       - choose:
@@ -6629,7 +6629,7 @@
               message: 'Die Kohle sollte fertig sein! Strom wurde ausgeschaltet.'
       - service: automation.turn_on
         data:
-          entity_id: 
+          entity_id:
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
       - choose:
@@ -6677,7 +6677,7 @@
     action:
       - service: automation.turn_off
         data:
-          entity_id: 
+          entity_id:
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_coal_lighter_is_currently_active
       - choose:
@@ -6765,7 +6765,7 @@
               message: 'Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet.'
       - service: automation.turn_on
         data:
-          entity_id: 
+          entity_id:
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_coal_lighter_is_currently_active
       - service: androidtv.adb_command
@@ -6788,7 +6788,7 @@
       - platform: state
         entity_id: switch.kohleanzunder
         to: 'on'
-        for: 
+        for:
           minutes: 22
     condition:
       condition: and
@@ -6855,7 +6855,7 @@
       - platform: state
         entity_id: switch.waschmaschine
         to: 'on'
-        for: 
+        for:
           hours: 6
     condition:
       condition: and
@@ -6892,7 +6892,7 @@
       - platform: state
         entity_id: switch.waschmaschine
         to: 'on'
-        for: 
+        for:
           minutes: 8
     condition:
       condition: and
@@ -6924,16 +6924,16 @@
           option: Running
       - service: automation.turn_on
         data:
-          entity_id: 
+          entity_id:
             - automation.set_washing_machine_active_when_power_detected
             - automation.set_washing_machine_clean_when_power_drops
       - service: automation.turn_off
         data:
-          entity_id: 
+          entity_id:
             - automation.detect_if_coal_lighter_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
             - automation.detect_if_washing_machine_is_currently_active
- 
+
   - id: set_washing_machine_active_when_power_detected
     alias: Set washing machine active when power detected
     initial_state: off
@@ -6960,8 +6960,8 @@
         data:
           entity_id: input_select.washing_machine_status
           option: Running
-  
-  # When the power drops, move the state of the washing machine to Clean  
+
+  # When the power drops, move the state of the washing machine to Clean
   - id: set_washing_machine_clean_when_power_drops
     alias: Set washing machine clean when power drops
     initial_state: off
@@ -7039,12 +7039,12 @@
                   message: 'Die Waschmaschine ist fertig.'
       - service: automation.turn_on
         data:
-          entity_id: 
+          entity_id:
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_coal_lighter_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
       #- service: tts.google_say
-      #  entity_id: 
+      #  entity_id:
       #  - media_player.wohnzimmer_uhr
       #  - media_player.schlafzimmer_speaker
       #  data_template:
@@ -7324,7 +7324,7 @@
               #- service: notify.browser
               #  data_template:
               #    message: "Es ist 22 Uhr - Zeit off zu gehen."
-              #    target: 
+              #    target:
               #      - Fabian-PC
               #      - Fabian-Hackbook
               #  data:
@@ -7437,7 +7437,7 @@
       - service: icloud.play_sound
         data:
           account: !secret vapid_email
-          device_name: Nessie-iPhone 
+          device_name: Nessie-iPhone
 
   - id: telegram_urgent_message
     alias: 'Telegram urgent message'
@@ -7479,7 +7479,7 @@
           volume_level: 0.7
           entity_id: media_player.wohnzimmer_uhr
       - service: tts.google_say
-        entity_id: 
+        entity_id:
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
         - media_player.schlafzimmer_speaker
@@ -7488,19 +7488,19 @@
           message: >
             Wichtige Nachricht von
             {% if (is_state("trigger.event.data.user_id", "649657901")) -%}
-            Fabian 
+            Fabian
             {% elif (is_state("trigger.event.data.user_id", "654536464")) -%}
-            Nessie 
+            Nessie
             {% elif (is_state("trigger.event.data.user_id", "665446537")) -%}
-            Kai 
+            Kai
             {% elif (is_state("trigger.event.data.user_id", "159366362")) -%}
-            Adri 
+            Adri
             {% elif (is_state("trigger.event.data.user_id", "668937527")) -%}
-            Flo 
+            Flo
             {% elif (is_state("trigger.event.data.user_id", "610791756")) -%}
-            Maxi 
+            Maxi
             {% else %}
-            jemandem 
+            jemandem
             {% endif %}
             Schau auf dein Handy!
       - service: media_player.volume_set
@@ -7587,14 +7587,14 @@
           volume_level: 0.7
           entity_id: media_player.wohnzimmer_uhr
       - service: tts.google_say
-        entity_id: 
+        entity_id:
           - media_player.wohnzimmer_uhr
           - media_player.kuche_speaker
         data_template:
           message: >
             Ding Dong, es klingelt.
             {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
-              Fabian 
+              Fabian
             {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
               Nessie
             {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
@@ -7632,7 +7632,7 @@
                   message: >
                     Ding Dong, es klingelt.
                     {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
-                      Fabian 
+                      Fabian
                     {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
                       Nessie
                     {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
@@ -7661,7 +7661,7 @@
                   message: >
                     Ding Dong, es klingelt.
                     {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
-                      Fabian 
+                      Fabian
                     {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
                       Nessie
                     {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
@@ -8307,9 +8307,9 @@
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.user_id }}"
-          message: > 
+          message: >
             Hier sind ein paar Befehle:
-          
+
             /admin - Übersicht der Admin Befehle
             /food - zufälliger Essensvorschlag
 
@@ -8327,7 +8327,7 @@
           target: "{{ trigger.event.data.user_id }}"
           message: >
             Hier sind ein paar Befehle:
-          
+
             /rebootha - Neustart Homeassistant Container
             /reboot - Neustart Homeassistant Core
             /status - Homeassistant Status
@@ -8456,7 +8456,7 @@
       - service: telegram_bot.edit_replymarkup
         data_template:
           message_id: '{{ trigger.event.data.message.message_id }}'
-          chat_id: !secret telegram_chat_fabian 
+          chat_id: !secret telegram_chat_fabian
           inline_keyboard: []
       - service: shell_command.foodyes
 
@@ -8787,7 +8787,7 @@
       event_type: telegram_callback
       event_data:
         data: '/fridgeoff'
-    condition: 
+    condition:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_turn_off_fridge.attributes.last_triggered) | int > 4600 }}"
     action:
@@ -9292,13 +9292,13 @@
                 entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
                 state: home
               - condition: state
-                entity_id: 
+                entity_id:
                   - input_boolean.leiser_modus
                   - input_boolean.gast_modus
                 state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                   - media_player.gastezimmer_mini
@@ -9408,7 +9408,7 @@
                 state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
@@ -9448,7 +9448,7 @@
                 state: 'off'
             sequence:
               - service: tts.google_say
-                entity_id: 
+                entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_speaker
                   - media_player.schlafzimmer_speaker
@@ -9476,7 +9476,7 @@
             {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
             *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
             {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
-            
+
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
             Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
@@ -9506,7 +9506,7 @@
             {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
             *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
             {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
-            
+
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
             Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
@@ -9536,7 +9536,7 @@
             {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
             *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
             {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
-            
+
             Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
             Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
@@ -9705,7 +9705,7 @@
               target: !secret telegram_chat_juz_mail
               message: >
                 Es gibt * {{ states.sensor.info_juzzo_de_2.state }} * ungelesene Email{% if not is_state('sensor.info_juzzo_de_2', '1') %}s{% endif %}.
-                Neueste Mail vom {{ state_attr('sensor.info_juzzo_de','date') }}: 
+                Neueste Mail vom {{ state_attr('sensor.info_juzzo_de','date') }}:
                 Absender: {{ state_attr('sensor.info_juzzo_de','from') }}
                 Titel: {{ state_attr('sensor.info_juzzo_de','subject') }}
           - service: telegram_bot.send_message
