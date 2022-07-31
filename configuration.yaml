@@ -948,7 +948,7 @@ google_assistant:
     switch.strom_keller:
       expose: true
       room: Keller
-    ##Küche
+    ## Küche
     switch.xiaomi_miio_cooker:
       expose: true
       room: Küche
@@ -996,15 +996,15 @@ intent_script:
     action:
       - service: automation.trigger
         entity_id: automation.find_phone_fabian
-      #{%- if User.lower() == "fabian" or User.lower() == "fabi" -%}
-      #  - service: automation.trigger
-      #    entity_id: automation.find_phone_fabian
-      #{%- elif User.lower() == "nessie" or User.lower() == "vanessa" -%}
-      #  - service: automation.trigger
-      #    entity_id: automation.find_phone_nessie
-      #{%- else -%}
-      #  Leider kann ich das iPhone von {{ User }} nicht suchen.
-      #{%- endif -%}
+      # {%- if User.lower() == "fabian" or User.lower() == "fabi" -%}
+      #   - service: automation.trigger
+      #     entity_id: automation.find_phone_fabian
+      # {%- elif User.lower() == "nessie" or User.lower() == "vanessa" -%}
+      #   - service: automation.trigger
+      #     entity_id: automation.find_phone_nessie
+      # {%- else -%}
+      #   Leider kann ich das iPhone von {{ User }} nicht suchen.
+      # {%- endif -%}
   vacuum_room_cleaning:
     speech:
       text: Starte manuelle Raumreinigung in {{ Room }}.

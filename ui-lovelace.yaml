@@ -324,17 +324,18 @@ views:
               - entity: vacuum.valetudo_dreamez10pro
               - entity: input_select.vacuum_cleaning_location
               - entity: input_button.james_room_cleaning
+              - entity: select.valetudo_dreamez10pro_water_grade
+              - entity: counter.vacuum_water_level
+              - entity: counter.vacuum_runs
+              - entity: sensor.valetudo_dreamez10pro_error_description
               - entity: sensor.valetudo_dreamez10pro_current_statistics_area
               - entity: sensor.valetudo_dreamez10pro_current_statistics_time
-              - entity: sensor.valetudo_dreamez10pro_error_description
               - entity: sensor.valetudo_dreamez10pro_main_brush
               - entity: sensor.valetudo_dreamez10pro_main_filter
               - entity: sensor.valetudo_dreamez10pro_right_brush
               - entity: sensor.valetudo_dreamez10pro_sensor_cleaning
-              - entity: select.valetudo_dreamez10pro_water_grade
               - entity: sensor.valetudo_dreamez10pro_wi_fi_configuration
               - entity: sensor.valetudo_dreamez10pro_zone_presets
-              - entity: counter.cleaner_runs
           - type: custom:valetudo-map-card
             vacuum: valetudo_dreamez10pro
       - artwork: cover
@@ -882,3 +883,18 @@ views:
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
         step_size: '1'
+
+        ---
+        animated_background:
+          default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
+            entity: weather.dwd_weather_ebersberg_1h
+              state_url:
+                  sunny:
+                        - https://home.eidolf.de/local/weather/hlhff0h8md4ev0kju5be.hd.mp4
+                              - https://home.eidolf.de/local/weather/zjqsoc6ecqhntpl5vacs.hd.mp4
+                                    - https://home.eidolf.de/local/weather/jvw1avupguhfbo11betq.hd.mp4
+                                          - https://home.eidolf.de/local/weather/8cmeusxf3pkanai43djs.hd.mp4
+                                          …            unit: '%'
+                                                    - entity: sensor.gastezimmer_heating
+                                                                name: Heizleistung
+                                                                        step_size: '1'
