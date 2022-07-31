@@ -49,7 +49,7 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             DISABLE_LINTERS: REPOSITORY_SEMGREP
             DISABLE_ERRORS_LINTERS: REPOSITORY_DEVSKIM,SPELL_CSPELL
-            FILTER_REGEX_EXCLUDE: (.github/workflows/)
+            FILTER_REGEX_EXCLUDE: (.github/workflows/),(Homeassistant-Smartlife-Dummy.json),(ui-lovelace.yaml)
 
         # Upload MegaLinter artifacts
         - name: Archive production artifacts

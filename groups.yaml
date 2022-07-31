@@ -13,7 +13,7 @@ Wohnzimmer:
     - light.yeelight_color_0x00000000036dc050 #Stehlampe
     - light.leds_wohnzimmer
     - light.leds_wohnzimmer_tv
-    #- climate.wohnzimmer
+    # - climate.wohnzimmer
     - switch.fernseher
     - switch.staubsauger
     - light.deckenlampe
@@ -28,7 +28,7 @@ Schlafzimmer:
     - light.bett_gluhbirne
     - light.yeelight_bslamp2_0x0000000013fea10f
     - light.prismatik
-    #- climate.schlafzimmer
+    # - climate.schlafzimmer
     - switch.smart_power_strip_pro_socket_1
     - switch.smart_power_strip_pro_socket_2
     - switch.smart_power_strip_pro_socket_3
@@ -45,7 +45,7 @@ Gästezimmer:
     - media_player.gastezimmer_mini
     - light.lampe_gastezimmer
     - light.leds_gastezimmer
-    #- climate.gastezimmer
+    # - climate.gastezimmer
     - switch.nessie_pc
 
 Keller:

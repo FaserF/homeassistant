@@ -45,6 +45,10 @@ jobs:
             mv Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
             mkdir -p ./share/scripts
             mkdir -p ./media/netboot
+            ln -s /share ./share
+            ln -s /media ./media
+            ln -s /share/scripts ./share/scripts
+            ln -s /media/netboot ./media/netboot
       - name: 🚀 Run Home Assistant Configuration Check
         uses: frenck/action-home-assistant@v1.3
         with:
