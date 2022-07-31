@@ -1,6 +1,7 @@
-  - id: turn_off_everything_except_guest_room_if_nobody_is_at_home
+---
+- id: turn_off_everything_except_guest_room_if_nobody_is_at_home
     alias: 'Turn off everything except guest room if nobody is at home'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.fabian
@@ -160,17 +161,17 @@
               - service: media_player.turn_off
                 data:
                   entity_id: media_player.gastezimmer_mini
-              #- service: select.select_option
-              #  data:
-              #    option: min
-              #  target:
-              #    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-              #- delay: '00:00:40'
-              #- service: select.select_option
-              #  data:
-              #    option: min
-              #  target:
-              #    entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+              # - service: select.select_option
+              #   data:
+              #     option: min
+              #   target:
+              #     entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+              # - delay: '00:00:40'
+              # - service: select.select_option
+              #   data:
+              #     option: min
+              #   target:
+              #     entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
   - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
     alias: 'Turn on 5ghz wifi and ssh off if coming home'
@@ -215,9 +216,9 @@
                   option: max
                 target:
                   entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-      #- service: switch.turn_off
-      #  data:
-      #    entity_id: switch.fritzbox_3490_portforward_ssh
+      # - service: switch.turn_off
+      #   data:
+      #     entity_id: switch.fritzbox_3490_portforward_ssh
 
   - id: open_door_for_fabian
     alias: 'Open the door for Fabian if coming home'
@@ -347,12 +348,12 @@
           - condition: state
             entity_id: person.nessie
             state: home
-      #- condition: not
-      #  conditions:
-      #    - condition: state
-      #      entity_id: proximity.home_ka
-      #      attribute: dir_of_travel
-      #      state: 'away_from'
+      # - condition: not
+      #   conditions:
+      #     - condition: state
+      #       entity_id: proximity.home_ka
+      #       attribute: dir_of_travel
+      #       state: 'away_from'
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
@@ -447,12 +448,12 @@
           - condition: state
             entity_id: person.nessie
             state: home
-      #- condition: not
-      #  conditions:
-      #    - condition: state
-      #      entity_id: proximity.home_ka
-      #      attribute: dir_of_travel
-      #      state: 'away_from'
+      # - condition: not
+      #   conditions:
+      #     - condition: state
+      #       entity_id: proximity.home_ka
+      #       attribute: dir_of_travel
+      #       state: 'away_from'
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
@@ -548,12 +549,12 @@
           - condition: state
             entity_id: person.nessie
             state: home
-      #- condition: not
-      #  conditions:
-      #    - condition: state
-      #      entity_id: proximity.home_ka
-      #      attribute: dir_of_travel
-      #      state: 'away_from'
+      # - condition: not
+      #   conditions:
+      #     - condition: state
+      #       entity_id: proximity.home_ka
+      #       attribute: dir_of_travel
+      #       state: 'away_from'
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
       - condition: template
@@ -568,10 +569,10 @@
       - service: switch.turn_on
         data:
           entity_id: switch.schloss
-      #- service: telegram_bot.send_message
-      #  data:
-      #    target: !secret telegram_chat_flo
-      #    message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
+      # - service: telegram_bot.send_message
+      #   data:
+      #     target: !secret telegram_chat_flo
+      #     message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
       - choose:
           - conditions:
               - condition: and
@@ -642,7 +643,7 @@
 
 #  - id: turn_on_ventilator_if_coming_home
 #    alias: 'Turn on ventilator if coming home'
-#    initial_state: on
+#    initial_state: true
 #    trigger:
 #      - platform: state
 #        entity_id: person.fabian
@@ -1019,7 +1020,7 @@
 
   - id: remind_for_unavailable_device
     alias: 'Remind for unavailable device'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.unavailable_entities
@@ -1046,7 +1047,7 @@
 
   - id: activate_guest_mode_if_guest_is_here
     alias: 'Activate guest mode if guest is here'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.isi
@@ -1087,7 +1088,7 @@
 
   - id: deactivate_guest_mode_if_no_guest_is_here
     alias: 'Deactivate guest mode if no guest is here'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.isi
@@ -1119,7 +1120,7 @@
 
   - id: reactivate_adguard_protection
     alias: 'Reactivate Adguard Protection'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.adguard_protection
@@ -1140,7 +1141,7 @@
 
   - id: deactivate_silent_mode_after_12_hours
     alias: 'Deactivate silent mode after 12 hours'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.leiser_modus
@@ -1212,7 +1213,7 @@
 
   - id: turn_on_light_and_climate_if_fpc_starts
     alias: 'Turn on light and climate if fpc starts'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.fabian_strom
@@ -1294,7 +1295,7 @@
 
   - id: turn_off_tleds_and_climate_if_fpc_stops
     alias: 'Turn off tleds and climate if fpc stops'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.fabian_pc
@@ -1350,7 +1351,7 @@
 
   - id: turn_on_light_and_climate_if_npc_started
     alias: 'Turn on light and climate if npc started'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.nessie_pc
@@ -1452,7 +1453,7 @@
 
   - id: turn_off_lights_and_climate_if_npc_stopped
     alias: 'Turn off lights and climate if npc stopped'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.nessie_pc_energy_power
@@ -1487,7 +1488,7 @@
 
   - id: turn_off_strom_if_npc_stops
     alias: 'Turn off strom if npc stops'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.vku_lb_20
@@ -1513,7 +1514,7 @@
 
   - id: turn_off_strom_if_fpc_stops
     alias: 'Turn off strom if fpc stops'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.steckdose_schlafzimmer_energy_power
@@ -1545,7 +1546,7 @@
 
   - id: turn_on_light_climate_if_tv_starts
     alias: 'Turn on light and climate if tv starts'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.miwifi_34_51_80_d0_44_29
@@ -1588,7 +1589,7 @@
 
   - id: turn_off_climate_if_tv_stops
     alias: 'Turn off climate if tv stops'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.miwifi_34_51_80_d0_44_29
@@ -1606,7 +1607,7 @@
 
   - id: remind_for_open_window_bathroom
     alias: 'Remind for open window bathroom'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.bad_open_window
@@ -1679,7 +1680,7 @@
 
   - id: remind_for_open_window_sleeping_room
     alias: 'Remind for open window sleeping room'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.schlafzimmer_open_window
@@ -1751,7 +1752,7 @@
 
   - id: remind_for_open_window_living_room
     alias: 'Remind for open window living room'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.wohnzimmer_open_window
@@ -1820,7 +1821,7 @@
 
   - id: remind_for_open_window_guest_room
     alias: 'Remind for open window guest room'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.gastezimmer_open_window
@@ -1874,7 +1875,7 @@
 
   - id: remind_for_open_window_after_5_minutes_in_bathroom
     alias: 'Remind for open window after 5 minutes in bathroom'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.bad_open_window
@@ -2117,7 +2118,7 @@
 
   - id: remind_for_open_window_after_5_minutes_in_sleeping_room
     alias: 'Remind for open window after 5 minutes in sleeping room'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.schlafzimmer_open_window
@@ -2288,7 +2289,7 @@
 
   - id: remind_for_open_window_after_5_minutes_in_living room
     alias: 'Remind for open window after 5 minutes in living room'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.wohnzimmer_open_window
@@ -2466,7 +2467,7 @@
 
   - id: remind_for_open_window_after_5_minutes_in_guest_room
     alias: 'Remind for open window after 5 minutes in guest room'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.gastezimmer_open_window
@@ -2634,7 +2635,7 @@
 
   - id: turn_off_bett_if_no_device_is_charging
     alias: 'Turn off bett if no device is charging'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id:
@@ -2660,14 +2661,14 @@
         - condition: state
           entity_id: switch.smart_power_strip_pro_usb_1
           state: 'on'
-        #- condition: or
-        #  conditions:
-        #    - condition: state
-        #      entity_id: sensor.fabian_ipadpro_battery_state
-        #      state: 'discharging'
-        #    - condition: numeric_state
-        #      entity_id: sensor.fabian_ipadpro_battery_level
-        #      above: 90
+        # - condition: or
+        #   conditions:
+        #     - condition: state
+        #       entity_id: sensor.fabian_ipadpro_battery_state
+        #       state: 'discharging'
+        #     - condition: numeric_state
+        #       entity_id: sensor.fabian_ipadpro_battery_level
+        #       above: 90
         - condition: or
           conditions:
             - condition: state
@@ -2691,7 +2692,7 @@
 
   - id: turn_off_bett_after_x_hours
     alias: 'Turn off bett after x hours'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.smart_power_strip_pro_usb_1
@@ -2718,7 +2719,7 @@
 
   - id: turn_off_staubsauger_after_x_hours
     alias: 'Turn off staubsauger after x hours'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.staubsauger
@@ -2739,7 +2740,7 @@
 
   - id: turn_on_staubsauger_weekly
     alias: 'Turn on staubsauger weekly'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: time
       at: '13:00:00'
@@ -2775,7 +2776,7 @@
                             entity_id: person.nessie
                             state: "home"
                     sequence:
-                      #if Fabi & Nessie not at home clean all rooms
+                      # if Fabi & Nessie not at home clean all rooms
                       - service: mqtt.publish
                         data:
                           topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
@@ -2787,7 +2788,7 @@
                             entity_id: person.fabian
                             state: "home"
                     sequence:
-                      #else if only fabi is not at home clean all rooms except guest room
+                      # else if only fabi is not at home clean all rooms except guest room
                       - service: mqtt.publish
                         data:
                           topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
@@ -2807,19 +2808,19 @@
                                     entity_id: input_boolean.gast_modus
                                     state: "on"
                             sequence:
-                              #else if only nessie is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
+                              # else if only nessie is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
                               - service: mqtt.publish
                                 data:
                                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                                   payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
                         default:
-                          #else if only nessie is not at home clean all rooms except sleeping room
+                          # else if only nessie is not at home clean all rooms except sleeping room
                           - service: mqtt.publish
                             data:
                               topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                               payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
                 default:
-                  #default if fabi & nessie at home: clean only living room, floor & kitchen
+                  # default if fabi & nessie at home: clean only living room, floor & kitchen
                   - service: mqtt.publish
                     data:
                       topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
@@ -2827,15 +2828,15 @@
 
   - id: vacuum_cleaner_error
     alias: 'Vacuum Cleaner Error'
-    initial_state: on
+    initial_state: true
     trigger:
-      #- platform: state
-      #  entity_id: sensor.valetudo_dreamez10pro_error_description
-      #  not_from:
-      #    - "unavailable"
-      #    - "unknown"
-      #    - ""
-      #    - "Unknown"
+      # - platform: state
+      #   entity_id: sensor.valetudo_dreamez10pro_error_description
+      #   not_from:
+      #     - "unavailable"
+      #     - "unknown"
+      #     - ""
+      #     - "Unknown"
       - platform: state
         entity_id: vacuum.valetudo_dreamez10pro
         to: 'error'
@@ -2858,7 +2859,7 @@
 
   - id: james_room_cleaning
     alias: 'James Raum Reinigiung'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_button.james_room_cleaning
@@ -2929,7 +2930,7 @@
 
   - id: turn_on_lights_in_morning
     alias: 'Turn on lights in morning'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
@@ -3035,25 +3036,25 @@
             sequence:
               - service: automation.trigger
                 entity_id: automation.notify_for_high_humidity
-      #- service: light.turn_on
-      #  data_template:
-      #    entity_id: light.bett_gluhbirne
-      #    brightness: 100
-      #    rgb_color: >
-      #      {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
-      #      [255,255,255]
-      #      {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
-      #      [0,0,255]
-      #      {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
-      #      [0,255,0]
-      #      {% else %}
-      #      [0,0,0]
-      #      {% endif %}
-      #- delay: '00:05:00'
-      #- service: light.turn_off
-      #  data:
-      #    entity_id:
-      #      - light.yeelight_bslamp2_0x0000000013fea10f
+      # - service: light.turn_on
+      #   data_template:
+      #     entity_id: light.bett_gluhbirne
+      #     brightness: 100
+      #     rgb_color: >
+      #       {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
+      #       [255,255,255]
+      #       {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
+      #       [0,0,255]
+      #       {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
+      #       [0,255,0]
+      #       {% else %}
+      #       [0,0,0]
+      #       {% endif %}
+      # - delay: '00:05:00'
+      # - service: light.turn_off
+      #   data:
+      #     entity_id:
+      #       - light.yeelight_bslamp2_0x0000000013fea10f
       - delay: '00:20:00'
       - service: switch.turn_on
         data:
@@ -3317,7 +3318,7 @@
 
   - id: turn_on_light_in_sleeping_room_if_tv_turned_off
     alias: 'Turn on light in sleeping room if tv turned off'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.miwifi_34_51_80_d0_44_29
@@ -3375,7 +3376,7 @@
 
   - id: turn_on_lights_in_livingroom_when_dark_outside
     alias: 'Turn on lights in livingroom when dark outside'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.dwd_illuminance
@@ -3403,7 +3404,7 @@
 
   - id: turn_off_prismatik_during_the_day
     alias: 'Turn off Prismatik during the day'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.fabian_pc
@@ -3428,7 +3429,7 @@
 
   - id: turn_on_lights_in_sleeping_room_when_sun_set
     alias: 'Turn on lights in sleeping room when sun set'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: sun
       event: sunset
@@ -3522,7 +3523,7 @@
 
   - id: turn_on_lights_in_guest_room_when_dark_outside
     alias: 'Turn on lights in guest room when dark outside'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.dwd_illuminance
@@ -3560,14 +3561,14 @@
             - condition: state
               entity_id: "device_tracker.rgb_pc"
               state: "home"
-            #- condition: and
-            #  conditions:
-            #    - condition: state
-            #      entity_id: 'device_tracker.vku_lb_20'
-            #      state: 'home'
-            #    - condition: state
-            #      entity_id: 'switch.nessie_pc'
-            #      state: 'on'
+            # - condition: and
+            #   conditions:
+            #     - condition: state
+            #       entity_id: 'device_tracker.vku_lb_20'
+            #       state: 'home'
+            #     - condition: state
+            #       entity_id: 'switch.nessie_pc'
+            #       state: 'on'
     action:
       - service: light.turn_on
         data:
@@ -3577,7 +3578,7 @@
 
   - id: turn_off_lights_in_rooms_when_bright_outside
     alias: 'Turn off lights in rooms when bright outside'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.dwd_illuminance
@@ -3613,9 +3614,9 @@
           value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
         - condition: template
           value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= 14 }}"
-        #- condition: state
-        #  entity_id: 'weather.dwd_weather_ebersberg_1h'
-        #  state: 'sunny'
+        # - condition: state
+        #   entity_id: 'weather.dwd_weather_ebersberg_1h'
+        #   state: 'sunny'
         - condition: state
           entity_id: 'input_boolean.thermostate_aus'
           state: 'off'
@@ -3763,9 +3764,9 @@
                     attribute: temperature
                     above: 5
             sequence:
-              #- service: switch.turn_on
-              #  data:
-              #    entity_id: switch.kuhlschrank
+              # - service: switch.turn_on
+              #   data:
+              #     entity_id: switch.kuhlschrank
               - service: telegram_bot.send_message
                 data_template:
                   target: !secret telegram_chat_5friends
@@ -3910,7 +3911,7 @@
 
   - id: turn_on_strom_kühlschrank
     alias: 'Turn on Strom Kühlschrank'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_command
@@ -3931,12 +3932,12 @@
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.chat_id }}"
-          #target: "{{ trigger.event.data.user_id }}"
+          # target: "{{ trigger.event.data.user_id }}"
           message: 'Kühlschrank im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!'
 
   - id: turn_on_climates
     alias: 'Turn on Climates'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_command
@@ -3960,8 +3961,8 @@
     alias: 'Remind for DST change - Winter/Sommerzeit'
     initial_state: True
     trigger:
-      #- platform: time
-      #  at: '15:30:00'
+      # - platform: time
+      #   at: '15:30:00'
       - platform: template
         value_template: "{{ now().timetuple().tm_isdst }}"
     action:
@@ -4022,7 +4023,7 @@
 
   - id: turn_on_away_mode
     alias: Turn on Away Mode
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.abwesend_modus
@@ -4071,7 +4072,7 @@
 
   - id: turn_off_away_mode
     alias: Turn off Away Mode
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.abwesend_modus
@@ -4120,7 +4121,7 @@
 
   - id: turn_on_climate_off_mode
     alias: Turn on Climate Off mode
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.thermostate_aus
@@ -4132,7 +4133,7 @@
 
   - id: turn_off_climate_off_mode
     alias: Turn off Climate Off mode
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.thermostate_aus
@@ -4145,7 +4146,7 @@
 
   - id: turn_on_guest_mode
     alias: Turn on Guest Mode mode
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.gast_modus
@@ -4157,7 +4158,7 @@
 
   - id: turn_on_fs_strom
     alias: Turn on FS Strom
-    initial_state: on
+    initial_state: true
     mode: single
     trigger:
       - platform: state
@@ -4176,7 +4177,7 @@
 
   - id: turn_off_fs_strom
     alias: Turn off FS Strom
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.fabian_pc_strom
@@ -4288,7 +4289,7 @@
 
   - id: turn_on_vk_strom
     alias: Turn on VK Strom
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.nessie_pc_strom
@@ -4306,7 +4307,7 @@
 
   - id: turn_off_vk_strom
     alias: Turn off VK Strom
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_boolean.nessie_pc_strom
@@ -4409,7 +4410,7 @@
 
   - id: remind_for_away_mode
     alias: 'Remind for away mode'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.fabian
@@ -4458,7 +4459,7 @@
 
   - id: warn_for_state_change_if_in_away_mode
     alias: Warn for state change if in away mode
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id:
@@ -4496,7 +4497,7 @@
 
   - id: remind_for_waste_collection
     alias: 'Remind for waste collection'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: time
       at: '16:00:00'
@@ -4523,7 +4524,7 @@
 
   - id: foodsharing_basket_available
     alias: "Foodsharing Basket Available"
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.foodsharing_48_082236
@@ -4563,12 +4564,12 @@
 
   - id: foodsharing_basket_available_zorneding
     alias: "Foodsharing Basket Available Zorneding"
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.foodsharing_48_082236
-      #- platform: template
-      #  value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
+      # - platform: template
+      #   value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
     condition:
       condition: and
       conditions:
@@ -4660,7 +4661,7 @@
 
   - id: foodsharing_basket_available_muc_east
     alias: "Foodsharing Basket Available MUC East"
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.foodsharing_48_117971
@@ -4698,7 +4699,7 @@
 
   - id: ha_update_available
     alias: 'HA Update Available'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: update.home_assistant_core_update
@@ -4743,7 +4744,7 @@
 
   - id: hacs_update_available
     alias: 'HACS Update available'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.hacs
@@ -4774,7 +4775,7 @@
             {% endif %}
   # - id: incoming_call_fabian
   #   alias: 'Incoming Call Fabian'
-  #   initial_state: on
+  #   initial_state: true
   #   trigger:
   #     - platform: state
   #       entity_id: automation.incoming_call_fabian
@@ -4814,7 +4815,7 @@
 
   # - id: incoming_call_nessie
   #   alias: 'Incoming Call Nessie'
-  #   initial_state: on
+  #   initial_state: true
   #   trigger:
   #     - platform: state
   #       entity_id: automation.incoming_call_nessie
@@ -4852,7 +4853,7 @@
 #not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
 #  - id: coinbase_balance_high
 #    alias: 'Coinbase balance high'
-#    initial_state: on
+#    initial_state: true
 #    trigger:
 #      - platform: template
 #        value_template: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] |replace(“EUR”,"")|replace(“ ”,"")|float| int > 220 }}
@@ -4874,7 +4875,7 @@
 
   - id: dwd_weather_warnings
     alias: 'DWD Weather Warnings'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.dwd_weather_warnings_current_warning_level
@@ -5037,7 +5038,7 @@
                     Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
   - id: raspberryppi_temp_warning
     alias: 'RaspberryPi Temp Warning'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.processor_temperature
@@ -5058,7 +5059,7 @@
 
   - id: raspberrypi_ram_load_warning
     alias: 'RaspberryPi RAM Load Warning'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.memory_use_percent
@@ -5076,7 +5077,7 @@
 
   - id: turn_on_schloss_on_button_press
     alias: Turn on Schloss on button press
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_button.schloss
@@ -5087,7 +5088,7 @@
 
   - id: turn_schloss_off_after_turning_on
     alias: Turn Schloss off after turning on
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.schloss
@@ -5100,7 +5101,7 @@
 
   - id: nessie_phone_battery_low
     alias: Nessie Phone Battery low
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.nessie_iphone_battery_state
@@ -5119,7 +5120,7 @@
 
   - id: fabi_phone_battery_low
     alias: Fabi Phone Battery low
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.fabian_iphone_battery_state
@@ -5463,7 +5464,7 @@
 
   - id: low_battery_thermostats
     alias: Low battery thermostats
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id:
@@ -5552,7 +5553,7 @@
 
   - id: fritzbox_public_ip_change
     alias: Fritzbox Public IP Change
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.fritz_box_3490_external_ip
@@ -5576,11 +5577,11 @@
 
 #  - id: turn_on_fritzbox_wifi_if_miwifi_is_off
 #    alias: Turn on Fritzbox Wifi if Miwifi is off
-#    initial_state: on
+#    initial_state: true
 #    trigger:
-#      #- platform: state
-#      #  entity_id: sbinary_sensor.xiaomi_abd8_wan_state
-#      #  state: "not_connected"
+#      - platform: state
+#        entity_id: sbinary_sensor.xiaomi_abd8_wan_state
+#        state: "not_connected"
 #      - platform: template
 #        value_template: "{{ if not is_state('sbinary_sensor.xiaomi_abd8_wan_state', 'connected'}}"
 #    condition:
@@ -5598,7 +5599,7 @@
 
   - id: fritzbox_no_internet_access
     alias: Fritzbox no Internet access
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: binary_sensor.fritz_box_3490_connection
@@ -5626,10 +5627,10 @@
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
     action:
-      #- service: rest_command.assistant_broadcast
-      #  data:
-      #    command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
-      #    user: "homeassistant"
+      # - service: rest_command.assistant_broadcast
+      #   data:
+      #     command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
+      #     user: "homeassistant"
       - service: tts.google_say
         entity_id:
         - media_player.schlafzimmer_speaker
@@ -5677,10 +5678,10 @@
                     entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
                     state: home
             sequence:
-              #- service: rest_command.assistant_broadcast
-              #  data:
-              #    command: Die Internetverbindung ist wiederhergestellt.
-              #    user: "homeassistant"
+              # - service: rest_command.assistant_broadcast
+              #   data:
+              #     command: Die Internetverbindung ist wiederhergestellt.
+              #     user: "homeassistant"
               - service: tts.google_say
                 entity_id:
                   - media_player.schlafzimmer_speaker
@@ -5714,7 +5715,7 @@
   # - id: internet_speed_test_poor_fabian
   #   alias: Internet Speed Test Poor Fabian
   #
-  #   initial_state: on
+  #   initial_state: true
   #   trigger:
   #     - platform: template
   #       value_template: "{{ states('sensor.speedtest_download')|float < 40 }}"
@@ -5729,7 +5730,7 @@
   # - id: internet_speed_test_poor_fabian
   #   alias: Internet Speed Test Poor Nessie
   #
-  #   initial_state: on
+  #   initial_state: true
   #   trigger:
   #     - platform: template
   #       value_template: "{{ states('sensor.speedtest_download')|float < 30 }}"
@@ -5744,25 +5745,25 @@
   #       data:
   #         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-  #- id: update_tasmota
-  #  alias: Update Tasmota
-  #  initial_state: on
-  #  trigger:
-  #    - platform: numeric_state
-  #      entity_id: sensor.latest_tasmota
-  #      above: 0
-  #  action:
-  #    - service: notify.telegram_fabian
-  #      data:
-  #        message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
-  #    - service: mqtt.publish
-  #      data:
-  #        topic: cmnd/tasmotas/Upgrade
-  #        payload: 1
+  # - id: update_tasmota
+  #   alias: Update Tasmota
+  #   initial_state: true
+  #   trigger:
+  #     - platform: numeric_state
+  #       entity_id: sensor.latest_tasmota
+  #       above: 0
+  #   action:
+  #     - service: notify.telegram_fabian
+  #       data:
+  #         message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
+  #     - service: mqtt.publish
+  #       data:
+  #         topic: cmnd/tasmotas/Upgrade
+  #         payload: 1
 
   - id: deckenlampe_button_hold
     alias: Deckenlampe Button Hold
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: device
         domain: tasmota
@@ -5802,11 +5803,11 @@
                     entity_id: light.leds_wohnzimmer_tv
                     state: 'unavailable'
             sequence:
-              #- service: light.turn_off
-              #  data:
-              #    area_id: "{{ area_id('Wohnzimmer') }}"
-              #    transition: 2
-              #    brightness: 255
+              # - service: light.turn_off
+              #   data:
+              #     area_id: "{{ area_id('Wohnzimmer') }}"
+              #     transition: 2
+              #     brightness: 255
               - service: light.turn_on
                 data:
                   entity_id: light.yeelight_color_0x00000000036dc050
@@ -5845,7 +5846,7 @@
 
   - id: deckenlampe_button_double_press
     alias: Deckenlampe Button double press
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: device
         domain: tasmota
@@ -5875,7 +5876,7 @@
 
   - id: lichtschalter_button_hold
     alias: Lichtschalter Button Hold
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: device
         domain: tasmota
@@ -5973,7 +5974,7 @@
 
   - id: lichtschalter_button_double_press
     alias: Lichtschalter Button double press
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: device
         domain: tasmota
@@ -6415,7 +6416,7 @@
 
   - id: detect_if_coal_lighter_is_currently_active
     alias: Detect if coal lighter is currently active
-    initial_state: on
+    initial_state: true
     mode: single
     trigger:
       - platform: numeric_state
@@ -6559,23 +6560,23 @@
                 data:
                   entity_id: media_player.keller_tv
                   command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-              #- service: notify.keller_tv
-              #  continue_on_error: true
-              #  data:
-              #    message: "Bitte Kohle wenden."
+              # - service: notify.keller_tv
+              #   continue_on_error: true
+              #   data:
+              #     message: "Bitte Kohle wenden."
       - delay: '00:06:00'
-      #- choose:
-      #    - conditions:
-      #        - condition: not
-      #          conditions:
-      #            - condition: state
-      #              entity_id: media_player.keller_tv
-      #              state: unavailable
-      #      sequence:
-      #        - service: notify.keller_tv
-      #          continue_on_error: true
-      #          data:
-      #            message: "Der Eisschlauch kann schon mal geholt werden."
+      # - choose:
+      #     - conditions:
+      #         - condition: not
+      #           conditions:
+      #             - condition: state
+      #               entity_id: media_player.keller_tv
+      #               state: unavailable
+      #       sequence:
+      #         - service: notify.keller_tv
+      #           continue_on_error: true
+      #           data:
+      #             message: "Der Eisschlauch kann schon mal geholt werden."
       - service: telegram_bot.send_message
         data_template:
           target: !secret telegram_chat_fabian
@@ -6657,7 +6658,7 @@
 
   - id: detect_if_pizzamaker_is_currently_active
     alias: Detect if pizzamaker is currently active
-    initial_state: on
+    initial_state: true
     mode: single
     trigger:
       - platform: numeric_state
@@ -6783,7 +6784,7 @@
 
   - id: check_if_coal_lighter_has_been_forgotten
     alias: Check if coal_lighter has been forgotten
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.kohleanzunder
@@ -6850,7 +6851,7 @@
 
   - id: check_if_washing_machine_has_been_forgotten
     alias: Check if washing machine has been forgotten
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: switch.waschmaschine
@@ -6875,7 +6876,7 @@
 
   - id: detect_if_washing_machine_is_currently_active
     alias: Detect if Washing machine is currently active
-    initial_state: on
+    initial_state: true
     mode: single
     trigger:
       - platform: numeric_state
@@ -6953,8 +6954,8 @@
         - condition: state
           entity_id: sensor.washing_machine_state
           state: Finishing
-        #- condition: template
-        #  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
+        # - condition: template
+        #   value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
     action:
       - service: input_select.select_option
         data:
@@ -7043,12 +7044,6 @@
             - automation.detect_if_washing_machine_is_currently_active
             - automation.detect_if_coal_lighter_is_currently_active
             - automation.detect_if_pizzamaker_is_currently_active
-      #- service: tts.google_say
-      #  entity_id:
-      #  - media_player.wohnzimmer_uhr
-      #  - media_player.schlafzimmer_speaker
-      #  data_template:
-      #    message: '{% if (is_state("input_boolean.leiser_modus", "off")) -%} Die Waschmaschine ist fertig. {%- endif %} '
       - service: switch.turn_off
         data:
           entity_id: switch.waschmaschine
@@ -7058,7 +7053,7 @@
 
   - id: set_washing_machine_idle_after_timeout
     alias: Set washing machine idle after timeout
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_select.washing_machine_status
@@ -7073,7 +7068,7 @@
 
   - id: resume_music_in_keller_after_shisha_video
     alias: Resume music in keller after shisha video
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: media_player.keller_tv
@@ -7086,7 +7081,7 @@
 
   - id: remind_for_finished_rice_cooker
     alias: Remind for finished rice cooker
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.xiaomi_miio_cooker_remaining
@@ -7163,7 +7158,7 @@
 
   - id: set_rice_cooker_menu_state
     alias: 'Set ricecooker menu state'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.xiaomi_miio_cooker_menu
@@ -7226,7 +7221,7 @@
 
   - id: kitchen_timer_reminder
     alias: Kitchen Timer Reminder
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: sensor.kuche_speaker_timers
@@ -7272,7 +7267,7 @@
 
   - id: remind_for_going_off
     alias: 'Remind for going off'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: time
       at: '22:05:00'
@@ -7296,13 +7291,13 @@
                 entity_id: device_tracker.rgb_pc
                 state: home
             sequence:
-              #- service: notify.browser
-              #  data_template:
-              #    message: "Es ist 22 Uhr - Zeit off zu gehen."
-              #    target: Nessie-PC
-              #  data:
-              #    data:
-              #      tag: 'notification-about-sensor'
+              # - service: notify.browser
+              #   data_template:
+              #     message: "Es ist 22 Uhr - Zeit off zu gehen."
+              #     target: Nessie-PC
+              #   data:
+              #     data:
+              #       tag: 'notification-about-sensor'
               - service: notify.mobile_app_nessie_phone
                 data_template:
                   title: "Zeit off zu gehen"
@@ -7321,15 +7316,15 @@
                     entity_id: device_tracker.nsta0552
                     state: home
             sequence:
-              #- service: notify.browser
-              #  data_template:
-              #    message: "Es ist 22 Uhr - Zeit off zu gehen."
-              #    target:
-              #      - Fabian-PC
-              #      - Fabian-Hackbook
-              #  data:
-              #    data:
-              #      tag: 'notification-about-sensor'
+              # - service: notify.browser
+              #   data_template:
+              #     message: "Es ist 22 Uhr - Zeit off zu gehen."
+              #     target:
+              #       - Fabian-PC
+              #       - Fabian-Hackbook
+              #   data:
+              #     data:
+              #       tag: 'notification-about-sensor'
               - service: notify.mobile_app_iphone
                 data_template:
                   title: "Zeit off zu gehen"
@@ -7340,7 +7335,7 @@
 
 #  - id: turn_on_airplane_mode_fabi
 #    alias: 'Turn on Airplane Mode Fabi'
-#    initial_state: on
+#    initial_state: true
 #    trigger:
 #      - platform: time
 #        at: '23:30:00'
@@ -7375,7 +7370,7 @@
 
   - id: find_phone_fabian
     alias: 'Find Fabians Phone by sound'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_button.find_fabian_s_phone_by_sound
@@ -7400,7 +7395,7 @@
 
   - id: find_ipad_fabian
     alias: 'Find Fabians ipad by sound'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_button.find_fabian_s_ipad_by_sound
@@ -7416,7 +7411,7 @@
 
   - id: find_phone_nessie
     alias: 'Find Nessies Phone by sound'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: input_button.find_nessie_s_phone_by_sound
@@ -7441,7 +7436,7 @@
 
   - id: telegram_urgent_message
     alias: 'Telegram urgent message'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_command
@@ -7483,7 +7478,6 @@
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
         - media_player.schlafzimmer_speaker
-        #- media_player.gastezimmer_mini
         data_template:
           message: >
             Wichtige Nachricht von
@@ -7503,6 +7497,35 @@
             jemandem
             {% endif %}
             Schau auf dein Handy!
+      - choose:
+          - conditions:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: input_boolean.gast_modus
+                    state: 'on'
+            sequence:
+              - service: tts.google_say
+                entity_id: media_player.gastezimmer_mini
+                data_template:
+                  message: >
+                    Wichtige Nachricht von
+                    {% if (is_state("trigger.event.data.user_id", "649657901")) -%}
+                    Fabian
+                    {% elif (is_state("trigger.event.data.user_id", "654536464")) -%}
+                    Nessie
+                    {% elif (is_state("trigger.event.data.user_id", "665446537")) -%}
+                    Kai
+                    {% elif (is_state("trigger.event.data.user_id", "159366362")) -%}
+                    Adri
+                    {% elif (is_state("trigger.event.data.user_id", "668937527")) -%}
+                    Flo
+                    {% elif (is_state("trigger.event.data.user_id", "610791756")) -%}
+                    Maxi
+                    {% else %}
+                    jemandem
+                    {% endif %}
+                    Schau auf dein Handy!
       - service: media_player.volume_set
         data:
           volume_level: 0.3
@@ -7510,7 +7533,7 @@
 
   - id: telegram_open_door
     alias: 'Telegram open door'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_command
@@ -7539,7 +7562,7 @@
               - service: telegram_bot.send_message
                 data_template:
                   target: "{{ trigger.event.data.chat_id }}"
-                  #target: "{{ trigger.event.data.user_id }}"
+                  # target: "{{ trigger.event.data.user_id }}"
                   message: 'Gartentor wurde geöffnet.'
       - choose:
           - conditions:
@@ -7559,7 +7582,7 @@
 
   - id: telegram_virtual_bell
     alias: 'Telegram virtual bell'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_command
@@ -7608,7 +7631,7 @@
       - service: telegram_bot.send_message
         data_template:
           target: "{{ trigger.event.data.chat_id }}"
-          #target: "{{ trigger.event.data.user_id }}"
+          # target: "{{ trigger.event.data.user_id }}"
           message: 'Klingel in Wohnung aktiviert. Gartentor wurde geöffnet.'
       - service: media_player.volume_set
         data:
@@ -7675,7 +7698,7 @@
 
   - id: telegram_pill_marked_done
     alias: 'Telegram pill marked done'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_callback
@@ -7698,7 +7721,7 @@
 
   - id: telegram_reset_pill_counter
     alias: 'Telegram reset pill counter'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -7721,7 +7744,7 @@
 
   - id: check_termostat_sleepingroom
     alias: 'check thermostats'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: time
       at: '19:40:00'
@@ -7743,9 +7766,9 @@
                     entity_id: device_tracker.fabian_pc
                     state: 'home'
             sequence:
-              #- service: notify.telegram_fabian
-              #  data:
-              #    message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
+              # - service: notify.telegram_fabian
+              #   data:
+              #     message: "Das Thermostat im Schlafzimmer war noch auf {{ states.climate.schlafzimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
               - service: climate.set_hvac_mode
                 data:
                   entity_id: climate.schlafzimmer
@@ -7864,8 +7887,8 @@
               - condition: numeric_state
                 entity_id: counter.vacuum_water_level
                 below: 1
-              #- condition: template
-              #  value_template: "{{ states('counter.vacuum_runs')|float % 4 == 0 }}"
+              # - condition: template
+              #   value_template: "{{ states('counter.vacuum_runs')|float % 4 == 0 }}"
             sequence:
               - service: notify.telegram_nessie
                 data_template:
@@ -7916,7 +7939,7 @@
 
   - id: nessie_forgot_pill
     alias: 'Nessie forgot pill'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: time
         at: '23:00:00'
@@ -7967,7 +7990,7 @@
 
   - id: nessie_forgot_pill_weekend
     alias: 'Nessie forgot pill weekend'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: time
         at: '00:00:00'
@@ -8015,7 +8038,7 @@
 
   - id: telegram_pill_1h
     alias: 'Telegram pill 1h'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_callback
@@ -8045,7 +8068,7 @@
 
   - id: telegram_washing_mashine_set_program_30_degrees_pflegeleicht
     alias: 'Telegram Washing mashine set program 30 degrees pflegeleicht'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8070,7 +8093,7 @@
 
   - id: telegram_washing_mashine_set_program_20_degrees_feinwasche
     alias: 'Telegram Washing mashine set program 20 degrees feinwasche'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8095,7 +8118,7 @@
 
   - id: telegram_washing_mashine_set_program_60_degrees_koch_bunt
     alias: 'Telegram Washing mashine set program 60 degrees koch bunt'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8120,7 +8143,7 @@
 
   - id: telegram_washing_mashine_set_program_40_degrees_pflegeleicht
     alias: 'Telegram Washing mashine set program 40 degrees pflegeleicht'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8145,7 +8168,7 @@
 
   - id: telegram_washing_mashine_set_program_40_degrees_koch_bunt
     alias: 'Telegram Washing mashine set program 40 degrees Koch Bunt'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8170,7 +8193,7 @@
 
   - id: telegram_shutdown_fpc
     alias: 'Telegram shutdown fpc'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8192,7 +8215,7 @@
 
   - id: telegram_hibernate_fpc
     alias: 'Telegram hibernate fpc'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8216,7 +8239,7 @@
 
   - id: telegram_shutdown_npc
     alias: 'Telegram shutdown npc'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8238,7 +8261,7 @@
 
   - id: telegram_hibernate_npc
     alias: 'Telegram hibernate npc'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8262,7 +8285,7 @@
 
   - id: telegram_reboot_ha
     alias: Telegram Reboot HA
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8277,7 +8300,7 @@
 
   - id: telegram_reboot
     alias: Telegram Reboot
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8293,7 +8316,7 @@
 
   - id: telegram_help
     alias: Telegram Help
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_command
@@ -8315,7 +8338,7 @@
 
   - id: telegram_admin
     alias: Telegram Admin
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8335,7 +8358,7 @@
 
   - id: telegram_status
     alias: Telegram Status
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8372,7 +8395,7 @@
 
   - id: telegram_essen
     alias: Telegram Essen
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8393,7 +8416,7 @@
 
   - id: telegram_essen_vegetarisch
     alias: Telegram Essen Vegetarisch
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8415,7 +8438,7 @@
 
   - id: telegram_essen_fleisch
     alias: Telegram Essen Fleisch
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8437,7 +8460,7 @@
 
   - id: telegram_food_yes
     alias: 'Telegram food yes'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8462,7 +8485,7 @@
 
   - id: telegram_food_no
     alias: 'Telegram food no'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8492,7 +8515,7 @@
 
   - id: telegram_answer_no
     alias: 'Telegram answer no'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8511,7 +8534,7 @@
 
   - id: telegram_answer_cancel_light_turn_off
     alias: 'Telegram answer cancel light turn off'
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8530,7 +8553,7 @@
 
   - id: turn_off_everything_in_keller_if_tv_is_unavailable
     alias: Turn off everything in keller if tv is unavailable
-    initial_state: on
+    initial_state: true
     trigger:
       platform: state
       entity_id: media_player.keller_tv
@@ -8556,7 +8579,7 @@
 
   - id: remind_for_light_keller
     alias: Remind for light keller
-    initial_state: on
+    initial_state: true
     trigger:
       platform: state
       entity_id: media_player.keller_tv
@@ -8596,7 +8619,7 @@
 
   - id: set_climate_living_room_if_in_keller
     alias: Set climate living room if in keller
-    initial_state: on
+    initial_state: true
     trigger:
       platform: state
       entity_id: media_player.keller_tv
@@ -8614,7 +8637,7 @@
 
   - id: set_climate_living_room_if_nessie_and_fabi_at_pc
     alias: Set climate living room if nessie and fabi at PC
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.fabian_pc
@@ -8701,7 +8724,7 @@
 
   - id: remind_for_guest_mode
     alias: remind for guest mode
-    initial_state: on
+    initial_state: true
     trigger:
       platform: state
       entity_id: media_player.keller_tv
@@ -8738,7 +8761,7 @@
 
   - id: set_climate_living_room_if_keller_left
     alias: Set climate living room if keller left
-    initial_state: on
+    initial_state: true
     trigger:
       platform: state
       entity_id: media_player.keller_tv
@@ -8762,7 +8785,7 @@
 
   - id: telegram_remaining_time_coal_lighter
     alias: Telegram Remaining Time Coal Lighter
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: event
         event_type: telegram_callback
@@ -8781,7 +8804,7 @@
 
   - id: telegram_turn_off_fridge
     alias: Telegram Turn off fridge
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_callback
@@ -8806,7 +8829,7 @@
 
   - id: remind_for_checking_google_maps_ha_cookie
     alias: "Remind for checking google maps ha cookie"
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: device_tracker.google_maps_112174659110860535869
@@ -8821,7 +8844,7 @@
 
   - id: telegram_ha_update
     alias: Telegram HA Update
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8843,7 +8866,7 @@
 
   - id: telegram_ha_os_update
     alias: Telegram HA OS Update
-    initial_state: on
+    initial_state: true
     trigger:
       platform: event
       event_type: telegram_command
@@ -8865,7 +8888,7 @@
 
   # - id: notify_nessie_on_train_delay_home_work
   #   alias: "Notify Nessie on Train delay Home -> Work"
-  #   initial_state: on
+  #   initial_state: true
   #   trigger:
   #     - platform: template
   #       value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 3 }}"
@@ -8892,7 +8915,7 @@
 
   - id: notify_fabian_on_sbahn_delay_home_work
     alias: "Notify Fabi on sbahn delay Home -> Work"
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: 'sensor.zorneding_to_leuchtenbergring'
@@ -8922,7 +8945,7 @@
 
   - id: notify_fabian_on_sbahn_delay_work_home
     alias: "Notify on Sbahn delay Work -> Home"
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: numeric_state
         entity_id: 'sensor.starnberg_nord_to_zorneding'
@@ -8958,7 +8981,7 @@
 
   - id: notify_on_sbahn_delay_work_nessie_home
     alias: 'Notify on Sbahn delay Work Nessie -> Home'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id:
@@ -8980,7 +9003,7 @@
 
   - id: notify_kai_adri_come_to_visit
     alias: 'Notify Kai Adri come to visit'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_ka
@@ -9025,7 +9048,7 @@
 
   - id: notify_nessie_fabian_on_way_home
     alias: 'Notify Nessie Fabian on way home'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_fabian
@@ -9063,7 +9086,7 @@
 
   - id: notify_nessie_fabian_on_way_home_longer_distance
     alias: 'Notify Nessie Fabian on way home longer distance'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_fabian
@@ -9101,7 +9124,7 @@
 
   - id: notify_nessie_fabian_on_way_home_long_distance
     alias: 'Notify Nessie Fabian on way home long distance'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_fabian
@@ -9136,7 +9159,7 @@
 
   - id: notify_fabian_nessie_on_way_home
     alias: 'Notify Fabian Nessie on way home'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_nessie
@@ -9182,7 +9205,7 @@
 
   - id: notify_fabian_nessie_on_way_home_longer_distance
     alias: 'Notify Fabian Nessie on way home longer distance'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_nessie
@@ -9225,7 +9248,7 @@
 
   - id: notify_fabian_nessie_on_way_home_long_distance
     alias: 'Notify Fabian Nessie on way home long distance'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: proximity.home_nessie
@@ -9265,7 +9288,7 @@
 
   - id: notify_nessie_fabian_on_way_home_from_sta
     alias: 'Notify Nessie Fabian on way home from STA'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.fabian
@@ -9310,7 +9333,7 @@
 
   - id: notify_nessie_fabian_on_way_home_from_gil
     alias: 'Notify Nessie Fabian on way home from GIL'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.fabian
@@ -9334,7 +9357,7 @@
 
   - id: notify_nessie_fabian_on_way_home_from_muc
     alias: 'Notify Nessie Fabian on way home from MUC'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.fabian
@@ -9356,7 +9379,7 @@
 
   - id: notify_nessie_fabian_on_way_home_from_whm
     alias: 'Notify Nessie Fabian on way home from WHM'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.fabian
@@ -9378,7 +9401,7 @@
 
   - id: notify_fabian_nessie_on_way_home_from_work
     alias: 'Notify Fabian Nessie on way home from work'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.nessie
@@ -9420,7 +9443,7 @@
 
   - id: notify_fabian_nessie_on_way_home_from_berufsschule
     alias: 'Notify Fabian Nessie on way home from Berufsschule'
-    initial_state: on
+    initial_state: true
     trigger:
       - platform: state
         entity_id: person.nessie

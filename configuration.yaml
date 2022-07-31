@@ -1,3 +1,4 @@
+---
 homeassistant:
   auth_providers:
     - type: homeassistant
@@ -10,8 +11,8 @@ homeassistant:
         - fd00::/8
         - 172.30.33.0/24
       allow_bypass_login: true
-    #- type: legacy_api_password
-    #  api_password: !secret http_password
+    # - type: legacy_api_password
+    #   api_password: !secret http_password
   allowlist_external_dirs:
     - "/share/scripts"
     - "/media/netboot"
@@ -69,14 +70,14 @@ http:
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 4
-  #server_port: !secret port
+  # server_port: !secret port
   trusted_proxies:
     - 127.0.0.1
     - 192.168.0.0/16
-    - 172.30.0.0/18 #NGINX Proxy Manager
-    - 172.30.33.0/24 #NGINX Proxy Manager
+    - 172.30.0.0/18 # NGINX Proxy Manager
+    - 172.30.33.0/24 # NGINX Proxy Manager
     - 172.30.33.7
-    - 103.21.244.0/22 #Here and below -> Cloudflare
+    - 103.21.244.0/22 # Here and below -> Cloudflare
     - 103.22.200.0/22
     - 103.31.4.0/22
     - 104.16.0.0/12
@@ -245,20 +246,20 @@ notify:
   - name: telegram_nessie
     platform: telegram
     chat_id: !secret telegram_chat_nessie
-  #- platform: html5
-  #  name: browser
-  #  vapid_pub_key: !secret vapid_pub_key
-  #  vapid_prv_key: !secret vapid_prv_key
-  #  vapid_email: !secret vapid_email
+  # - platform: html5
+  #   name: browser
+  #   vapid_pub_key: !secret vapid_pub_key
+  #   vapid_prv_key: !secret vapid_prv_key
+  #   vapid_email: !secret vapid_email
 
 media_source:
 
-#media_player:
-#  - platform: mpd
-#    host: 127.0.0.1
+# media_player:
+#   - platform: mpd
+#     host: 127.0.0.1
 
-#speedtestdotnet:
-#  server_id: 21514
+# speedtestdotnet:
+#   server_id: 21514
 
 climate:
   - platform: generic_thermostat
@@ -278,8 +279,8 @@ climate:
     initial_hvac_mode: "cool"
 
 shell_command:
-  #create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
-  #ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
+  # create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
+  # ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
   randomfood: !secret randomfood
   foodyes: !secret foodyes
   unpin_all_telegram: >
@@ -288,15 +289,15 @@ shell_command:
     curl -X POST -H 'Content-Type: application/json' -d '{"message_id": "{{ message_id }}", "chat_id": "{{ chat_id }}", "disable_notification": true}' https://api.telegram.org/bot{{ telegram_bot_api }}/pinChatMessage
   hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
-  #overtime_input: !secret overtime_input
+  # overtime_input: !secret overtime_input
 
-#coinbase:
-#  api_key: !secret coinbase_key
-#  api_secret: !secret coinbase_secret
-#  account_balance_currencies:
-#    - BTC
-#  exchange_rate_currencies:
-#    - BTC
+# coinbase:
+#   api_key: !secret coinbase_key
+#   api_secret: !secret coinbase_secret
+#   account_balance_currencies:
+#     - BTC
+#   exchange_rate_currencies:
+#     - BTC
 
 waste_collection_schedule:
   sources:
@@ -342,16 +343,16 @@ template:
             {% endif %}
 
 sensor:
-  #- platform: rest
-  #  name: Switch LAN-Play Online
-  #  resource: http://192.168.31.2:11451/info
-  #  scan_interval: 600
-  #  method: GET
-  #  unit_of_measurement: people
-  #  json_attributes:
-  #    - version
-  #    - idle
-  #  value_template: "{{value_json.online}}"
+  # - platform: rest
+  #   name: Switch LAN-Play Online
+  #   resource: http://192.168.31.2:11451/info
+  #   scan_interval: 600
+  #   method: GET
+  #   unit_of_measurement: people
+  #   json_attributes:
+  #     - version
+  #     - idle
+  #   value_template: "{{value_json.online}}"
   - platform: imap_email_content
     server: imap.ionos.de
     port: 993
@@ -377,13 +378,13 @@ sensor:
     server: imap.ionos.de
     username: !secret juz_mail
     password: !secret juz_mail_pw
-  #- platform: command_line
-  #  name: "Latest Tasmota"
-  #  command: l -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
-  #  scan_interval: 86400
+  # - platform: command_line
+  #   name: "Latest Tasmota"
+  #   command: l -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
+  #   scan_interval: 86400
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
-  #Waste sensors
+  # Waste sensors
   - platform: waste_collection_schedule
     name: Restmüll
     details_format: upcoming
@@ -607,36 +608,36 @@ sensor:
         value_template: "unbekannter"
   - platform: dwd_weather_warnings
     region_name: !secret dwd_cell_id
-  #- platform: spotcast
-  #  sp_dc: !secret sp_dc
-  #  sp_key: !secret sp_key
-  # - platform: email
-  #   email: !secret vapid_email
-  #   password: !secret email_pw
-  # - platform: feedparser
-  #   name: Corona News
-  #   feed_url: "https://www.rki.de/SiteGlobals/Functions/RSSFeed/RSSGenerator_nCoV.xml"
-  #   date_format: "%a, %d %b %H:%M:%S %Z"
-  #   inclusions:
-  #     - title
-  #     - description
-  #     - link
-  #     - pubDate
-  #   exclusions:
-  #     - language
-  #     - image
-  # - platform: feedparser
-  #   name: Mydealz
-  #   feed_url: !secret mydealz_rss
-  #   date_format: "%a, %d %b %H:%M:%S %Z"
-  #   inclusions:
-  #     - title
-  #     - link
-  #     - pubDate
-  #   exclusions:
-  #     - language
-  #     - description
-  #     - image
+  # - platform: spotcast
+  #   sp_dc: !secret sp_dc
+  #   sp_key: !secret sp_key
+  #  - platform: email
+  #    email: !secret vapid_email
+  #    password: !secret email_pw
+  #  - platform: feedparser
+  #    name: Corona News
+  #    feed_url: "https://www.rki.de/SiteGlobals/Functions/RSSFeed/RSSGenerator_nCoV.xml"
+  #    date_format: "%a, %d %b %H:%M:%S %Z"
+  #    inclusions:
+  #      - title
+  #      - description
+  #      - link
+  #      - pubDate
+  #    exclusions:
+  #      - language
+  #      - image
+  #  - platform: feedparser
+  #    name: Mydealz
+  #    feed_url: !secret mydealz_rss
+  #    date_format: "%a, %d %b %H:%M:%S %Z"
+  #    inclusions:
+  #      - title
+  #      - link
+  #      - pubDate
+  #    exclusions:
+  #      - language
+  #      - description
+  #      - image
 
 light:
   - platform: prismatik
@@ -655,7 +656,7 @@ adaptive_lighting:
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
       - light.bett_gluhbirne
-      #- light.leds_tisch
+      # - light.leds_tisch
     min_brightness: 25
   - name: "guest_room"
     lights:
@@ -664,10 +665,10 @@ adaptive_lighting:
     min_brightness: 80
     min_color_temp: 4000
 
-#no_ip:
-#  domain: !secret domain_noip
-#  username: !secret noip_username
-#  password: !secret noip_pw
+# no_ip:
+#   domain: !secret domain_noip
+#   username: !secret noip_username
+#   password: !secret noip_pw
 
 xiaomi_miio_cooker:
   name: Xiaomi Rice Cooker
@@ -711,22 +712,22 @@ switch:
   - platform: rpi_gpio
     ports:
       18: RPI Cooling Fan
-  #- platform: rest
-  #  name: Fabian PC Shutdown
-  #  method: POST
-  #  resource: http://192.168.178.16:9170/command
-  #  headers:
-  #    Content-Type: 'application/json; charset=utf-8'
-  #    api-key: !secret system_bridge_fabian
-  #  payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
-  #- platform: rest
-  #  name: Nessie PC Shutdown
-  #  method: POST
-  #  resource: http://192.168.178.15:9170/command
-  #  headers:
-  #    Content-Type: 'application/json; charset=utf-8'
-  #    api-key: !secret system_bridge_nessie
-  #  payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
+  # - platform: rest
+  #   name: Fabian PC Shutdown
+  #   method: POST
+  #   resource: http://192.168.178.16:9170/command
+  #   headers:
+  #     Content-Type: 'application/json; charset=utf-8'
+  #     api-key: !secret system_bridge_fabian
+  #   payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
+  # - platform: rest
+  #   name: Nessie PC Shutdown
+  #   method: POST
+  #   resource: http://192.168.178.15:9170/command
+  #   headers:
+  #     Content-Type: 'application/json; charset=utf-8'
+  #     api-key: !secret system_bridge_nessie
+  #   payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
   - platform: template
     switches:
       xiaomi_miio_cooker:
@@ -757,21 +758,21 @@ switch:
               {% endif %}
         turn_off:
           service: xiaomi_miio_cooker.stop
-  #- platform: sonoff_lan_mode_r3
-  #name: Bett
-  #device_id: 100016e326
-  #api_key: 1bed0f5f-3848-4ab3-9b89-fb43faade84b
-  #icon: mdi:power-plug
   # - platform: sonoff_lan_mode_r3
-  #   name: Waschmaschine
-  #   device_id: 1000915e4d
-  #   api_key: 11604ccd-1f58-47f2-acd1-816861348b1a
-  #   icon: mdi:washing-machine
-  # - platform: sonoff_lan_mode_r3
-  #   name: Sonoff Steckdose
-  #   device_id: 1000134649
-  #   api_key: b7bbed8a-33b2-4260-ae2e-89a00fbd85c2
-  #   icon: mdi:power-plug
+  # name: Bett
+  # device_id: 100016e326
+  # api_key: 1bed0f5f-3848-4ab3-9b89-fb43faade84b
+  # icon: mdi:power-plug
+  #  - platform: sonoff_lan_mode_r3
+  #    name: Waschmaschine
+  #    device_id: 1000915e4d
+  #    api_key: 11604ccd-1f58-47f2-acd1-816861348b1a
+  #    icon: mdi:washing-machine
+  #  - platform: sonoff_lan_mode_r3
+  #    name: Sonoff Steckdose
+  #    device_id: 1000134649
+  #    api_key: b7bbed8a-33b2-4260-ae2e-89a00fbd85c2
+  #    icon: mdi:power-plug
 
 google_assistant:
   project_id: !secret google_assistant_id
@@ -784,7 +785,7 @@ google_assistant:
     - vacuum
   expose_by_default: false
   entity_config:
-    #Disabled Entitys
+    # Disabled Entitys
     input_boolean.silent_mode:
       expose: false
     input_boolean.guest_mode:
@@ -850,8 +851,8 @@ google_assistant:
     switch.adguard_filtering:
       expose: false
       name: Adblocker
-    #Enabled Entitys
-    ##Schlafzimmer
+    # Enabled Entitys
+    ## Schlafzimmer
     switch.schreibtisch:
       name: Strom Tisch
       expose: false
@@ -886,7 +887,7 @@ google_assistant:
       name: Bettlicht
       expose: true
       room: Schlafzimmer
-    ##Gästezimmer
+    ## Gästezimmer
     light.lampe_gastezimmer:
       name: Nachtlampe
       expose: true
@@ -901,7 +902,7 @@ google_assistant:
       name: Nessie PC
       expose: true
       room: Gästezimmer
-    ##Wohnzimmer
+    ## Wohnzimmer
     light.deckenlampe:
       expose: true
       room: Wohnzimmer
@@ -930,7 +931,7 @@ google_assistant:
       room: Wohnzimmer
       aliases:
         - Staubsaugroboter
-    ##Keller
+    ## Keller
     switch.waschmaschine:
       expose: true
       room: Keller
