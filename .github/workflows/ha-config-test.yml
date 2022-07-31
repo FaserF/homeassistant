@@ -36,6 +36,9 @@ jobs:
     steps:
       - name: ⤵️ Check out configuration from GitHub
         uses: actions/checkout@v3.0.2
+      - name: Rename Dummy files to productive files
+        run: |
+            mv Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
       - name: 🚀 Run Home Assistant Configuration Check
         uses: frenck/action-home-assistant@v1.3
         with:
