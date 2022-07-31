@@ -1,4 +1,3 @@
-// Dummy File for HA Config Validator GitHub Action
 {
     "type": "service_account",
     "project_id": "project-id",

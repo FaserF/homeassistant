@@ -43,8 +43,8 @@ jobs:
       - name: Rename Dummy files to productive files
         run: |
             mv Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
-            mkdir /share/scripts
-            mkdir /media/netboot
+            mkdir -p /share/scripts
+            mkdir -p /media/netboot
       - name: 🚀 Run Home Assistant Configuration Check
         uses: frenck/action-home-assistant@v1.3
         with:
