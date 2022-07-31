@@ -47,7 +47,7 @@ jobs:
           # https://megalinter.github.io/configuration/
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }} # Validates all source when push on main, else just the git diff with main. Override with true if you always want to lint all sources
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISABLE_LINTERS: REPOSITORY_SEMGREP
+          DISABLE_LINTERS: semgrep
           DISABLE_ERRORS_LINTERS: SPELL_CSPELL,REPOSITORY_DEVSKIM
 
       # Upload MegaLinter artifacts
