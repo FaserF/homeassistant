@@ -1,5 +1,5 @@
 ---
-- id: turn_off_everything_except_guest_room_if_nobody_is_at_home
+  - id: turn_off_everything_except_guest_room_if_nobody_is_at_home
     alias: 'Turn off everything except guest room if nobody is at home'
     initial_state: true
     trigger:
