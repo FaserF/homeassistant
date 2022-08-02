@@ -1,7 +1,7 @@
 ---
-  - platform: rpi_gpio
-    ports:
-      18: RPI Cooling Fan
+- platform: rpi_gpio
+  ports:
+    18: RPI Cooling Fan
 #  - platform: sonoff_lan_mode_r3
 #    name: Bett
 #    device_id: 100016e326

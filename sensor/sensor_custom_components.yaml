@@ -1,41 +1,41 @@
-  - platform: dwd_illuminance
-    entity_id: weather.dwd_weather_ebersberg_1h
-  # Waste sensors
-  - platform: waste_collection_schedule
-    name: Restmüll
-    details_format: upcoming
-    count: 4
-    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
-    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
-    types:
-      - "Restabfall"
-      - "Restmüll"
-  - platform: waste_collection_schedule
-    name: Altpapier
-    details_format: upcoming
-    count: 4
-    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
-    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
-    types:
-      - "Altpapier"
-      - "Papierabfall"
-  - platform: waste_collection_schedule
-    name: Gelber_Sack
-    details_format: upcoming
-    count: 4
-    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
-    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
-    types:
-      - "Gelber Sack"
-  - platform: waste_collection_schedule
-    name: Bioabfall
-    details_format: upcoming
-    count: 4
-    value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
-    date_template: '{{value.date.strftime("%d.%m.%Y")}}'
-    types:
-      - "BIO"
-      - "Bioabfall"
+- platform: dwd_illuminance
+  entity_id: weather.dwd_weather_ebersberg_1h
+# Waste sensors
+- platform: waste_collection_schedule
+  name: Restmüll
+  details_format: upcoming
+  count: 4
+  value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
+  date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+  types:
+    - "Restabfall"
+    - "Restmüll"
+- platform: waste_collection_schedule
+  name: Altpapier
+  details_format: upcoming
+  count: 4
+  value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
+  date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+  types:
+    - "Altpapier"
+    - "Papierabfall"
+- platform: waste_collection_schedule
+  name: Gelber_Sack
+  details_format: upcoming
+  count: 4
+  value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
+  date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+  types:
+    - "Gelber Sack"
+- platform: waste_collection_schedule
+  name: Bioabfall
+  details_format: upcoming
+  count: 4
+  value_template: "{% if value.daysTo == 0 %}Heute{% elif value.daysTo == 1 %}Morgen{% else %}in {{value.daysTo}} Tagen{% endif %}"
+  date_template: '{{value.date.strftime("%d.%m.%Y")}}'
+  types:
+    - "BIO"
+    - "Bioabfall"
 #   - platform: spotcast
 #     sp_dc: !secret sp_dc
 #     sp_key: !secret sp_key
