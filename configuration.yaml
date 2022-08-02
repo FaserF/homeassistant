@@ -320,7 +320,7 @@ template:
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
 
-sensor: !include sensor.yaml
+sensor: !include_dir_named sensor/
 
 light:
   - platform: prismatik
@@ -365,7 +365,7 @@ rest_command:
 #    content_type: "application/json"
 #    payload: '{"command":"{{ command }}", "user":"{{ user }}", "converse":true}'
 
-switch: !include switch.yaml
+switch: !include_dir_named switch/
 
 google_assistant:
   project_id: !secret google_assistant_id
