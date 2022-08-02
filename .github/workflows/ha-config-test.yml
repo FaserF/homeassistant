@@ -40,18 +40,12 @@ jobs:
     steps:
       - name: ⤵️ Check out configuration from GitHub
         uses: actions/checkout@v3.0.2
-      - name: Rename Dummy files to productive files
+      - name: Rename Dummy files for action usage
         run: |
-            mv dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
-            mv dummy_files/custom_components_dummy.yaml custom_components.yaml
-            mv dummy_files/switch_dummy.yaml switch.yaml
-            mv dummy_files/sensor_dummy.yaml sensor.yaml
-            mkdir -p ./share/scripts
-            mkdir -p ./media/netboot
-            ln -s /share ./share
-            ln -s /media ./media
-            ln -s /share/scripts ./share/scripts
-            ln -s /media/netboot ./media/netboot
+            mv -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
+            mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
+            mv -f dummy_files/switch_dummy.yaml switch.yaml
+            mv -f dummy_files/sensor_dummy.yaml sensor.yaml
       - name: 🚀 Run Home Assistant Configuration Check
         uses: frenck/action-home-assistant@v1.3
         with:
