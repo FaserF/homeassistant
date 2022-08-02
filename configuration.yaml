@@ -341,16 +341,16 @@ template:
             {% endif %}
 
 sensor:
-#   - platform: rest
-#     name: Switch LAN-Play Online
-#     resource: http://192.168.31.2:11451/info
-#     scan_interval: 600
-#     method: GET
-#     unit_of_measurement: people
-#     json_attributes:
-#       - version
-#       - idle
-#     value_template: "{{value_json.online}}"
+  #   - platform: rest
+  #     name: Switch LAN-Play Online
+  #     resource: http://192.168.31.2:11451/info
+  #     scan_interval: 600
+  #     method: GET
+  #     unit_of_measurement: people
+  #     json_attributes:
+  #       - version
+  #       - idle
+  #     value_template: "{{value_json.online}}"
   - platform: imap_email_content
     server: imap.ionos.de
     port: 993
@@ -376,10 +376,10 @@ sensor:
     server: imap.ionos.de
     username: !secret juz_mail
     password: !secret juz_mail_pw
-#   - platform: command_line
-#     name: "Latest Tasmota"
-#     command: l -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
-#     scan_interval: 86400
+  #   - platform: command_line
+  #     name: "Latest Tasmota"
+  #     command: l -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'
+  #     scan_interval: 86400
   - platform: dwd_illuminance
     entity_id: weather.dwd_weather_ebersberg_1h
   # Waste sensors
@@ -654,7 +654,7 @@ adaptive_lighting:
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
       - light.bett_gluhbirne
-#      - light.leds_tisch
+    #      - light.leds_tisch
     min_brightness: 25
   - name: "guest_room"
     lights:
@@ -710,22 +710,22 @@ switch:
   - platform: rpi_gpio
     ports:
       18: RPI Cooling Fan
-#  - platform: rest
-#    name: Fabian PC Shutdown
-#    method: POST
-#    resource: http://192.168.178.16:9170/command
-#    headers:
-#      Content-Type: 'application/json; charset=utf-8'
-#      api-key: !secret system_bridge_fabian
-#    payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
-#  - platform: rest
-#    name: Nessie PC Shutdown
-#    method: POST
-#    resource: http://192.168.178.15:9170/command
-#    headers:
-#      Content-Type: 'application/json; charset=utf-8'
-#      api-key: !secret system_bridge_nessie
-#    payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
+  #  - platform: rest
+  #    name: Fabian PC Shutdown
+  #    method: POST
+  #    resource: http://192.168.178.16:9170/command
+  #    headers:
+  #      Content-Type: 'application/json; charset=utf-8'
+  #      api-key: !secret system_bridge_fabian
+  #    payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
+  #  - platform: rest
+  #    name: Nessie PC Shutdown
+  #    method: POST
+  #    resource: http://192.168.178.15:9170/command
+  #    headers:
+  #      Content-Type: 'application/json; charset=utf-8'
+  #      api-key: !secret system_bridge_nessie
+  #    payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
   - platform: template
     switches:
       xiaomi_miio_cooker:
