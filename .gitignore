@@ -8,6 +8,7 @@
 !*.md
 
 # Ignore folders.
+megalinter-reports/
 .storage
 .cloud
 .google.token
