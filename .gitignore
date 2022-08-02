@@ -8,6 +8,8 @@
 !*.md
 !dummy_files/
 !dummy_files/Homeassistant-SmartLife-Dummy.json
+!switch/
+!sensor/
 
 # Ignore folders.
 megalinter-reports/

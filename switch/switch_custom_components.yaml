@@ -1,0 +1,19 @@
+---
+  - platform: rpi_gpio
+    ports:
+      18: RPI Cooling Fan
+#  - platform: sonoff_lan_mode_r3
+#    name: Bett
+#    device_id: 100016e326
+#    api_key: !secret sonoff_lan_mode_r3_bett
+#    icon: mdi:power-plug
+#  - platform: sonoff_lan_mode_r3
+#    name: Waschmaschine
+#    device_id: 1000915e4d
+#    api_key: !secret sonoff_lan_mode_r3_waschmaschine
+#    icon: mdi:washing-machine
+#  - platform: sonoff_lan_mode_r3
+#    name: Sonoff Steckdose
+#    device_id: 1000134649
+#    api_key: !secret sonoff_lan_mode_r3_steckdose
+#    icon: mdi:power-plug
