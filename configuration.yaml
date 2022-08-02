@@ -322,11 +322,11 @@ template:
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
 
-sensor: !include_dir_list sensor
+sensor: !include_dir_merge_list sensor
 
-switch: !include_dir_list switch
+switch: !include_dir_merge_list switch
 
-light: !include_dir_list light
+light: !include_dir_merge_list light
 
 # no_ip:
 #   domain: !secret domain_noip
