@@ -322,15 +322,11 @@ template:
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
 
-sensor: !include_dir_named sensor
+sensor: !include_dir_list sensor
 
-switch: !include_dir_named switch
+switch: !include_dir_list switch
 
-light:
-  - platform: prismatik
-    host: 192.168.178.16
-    name: "Prismatik"
-    profile_name: homeassistant
+light: !include_dir_list light
 
 # no_ip:
 #   domain: !secret domain_noip
@@ -703,7 +699,7 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 
-## Custom Components
+## Custom Components - has to be the end of the file due to GitHub Actions being unable to handle custom components stuff and will be removed there
 
 #  - platform: sonoff_lan_mode_r3
 #    name: Bett
