@@ -1,0 +1,60 @@
+---
+#  - platform: sonoff_lan_mode_r3
+#    name: Bett
+#    device_id: 100016e326
+#    api_key: !secret sonoff_lan_mode_r3_bett
+#    icon: mdi:power-plug
+#  - platform: sonoff_lan_mode_r3
+#    name: Waschmaschine
+#    device_id: 1000915e4d
+#    api_key: !secret sonoff_lan_mode_r3_waschmaschine
+#    icon: mdi:washing-machine
+#  - platform: sonoff_lan_mode_r3
+#    name: Sonoff Steckdose
+#    device_id: 1000134649
+#    api_key: !secret sonoff_lan_mode_r3_steckdose
+#    icon: mdi:power-plug
+
+waste_collection_schedule:
+  sources:
+    - name: ics
+      args:
+        url: !secret waste_url
+      customize:
+        - type: Restabfall
+          alias: Restmüll
+          icon: mdi:trash-can
+        - type: BIO
+          alias: Bioabfall
+          icon: mdi:flower-outline
+        - type: Altpapier
+          alias: Papierabfall
+          icon: mdi:trash-can-outline
+        - type: Gelber Sack
+          icon: mdi:recycle
+
+adaptive_lighting:
+  - name: "living_room"
+    lights:
+      - light.leds_wohnzimmer
+      - light.yeelight_color_0x00000000036dc050
+    min_brightness: 60
+    min_color_temp: 3700
+  - name: "sleeping_room"
+    lights:
+      - light.yeelight_bslamp2_0x0000000013fea10f
+      - light.bett_gluhbirne
+    #      - light.leds_tisch
+    min_brightness: 25
+  - name: "guest_room"
+    lights:
+      - light.lampe_gastezimmer
+      - light.leds_gastezimmer
+    min_brightness: 80
+    min_color_temp: 4000
+
+xiaomi_miio_cooker:
+  name: Xiaomi Rice Cooker
+  host: 192.168.31.195
+  token: !secret rice_cooker_token
+  model: chunmi.cooker.eh1

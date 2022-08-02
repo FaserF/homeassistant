@@ -6,6 +6,7 @@
 !.gitignore
 !README.MD
 !*.md
+!dummy_files/
 
 # Ignore folders.
 megalinter-reports/
