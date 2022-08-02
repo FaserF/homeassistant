@@ -1,0 +1,885 @@
+---
+animated_background:
+  default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
+  entity: weather.dwd_weather_ebersberg_1h
+  state_url:
+    sunny:
+      - https://home.eidolf.de/local/weather/hlhff0h8md4ev0kju5be.hd.mp4
+      - https://home.eidolf.de/local/weather/zjqsoc6ecqhntpl5vacs.hd.mp4
+      - https://home.eidolf.de/local/weather/jvw1avupguhfbo11betq.hd.mp4
+      - https://home.eidolf.de/local/weather/8cmeusxf3pkanai43djs.hd.mp4
+      - https://home.eidolf.de/local/weather/guwb10mfddctfvwioaex.hd.mp4
+    partlycloudy:
+      - https://home.eidolf.de/local/weather/13e0s6coh6ayapvdyqnv.hd.mp4
+      - https://home.eidolf.de/local/weather/aorl3skmssy7udwopk22.hd.mp4
+      - https://home.eidolf.de/local/weather/qed6wvf2igukiioykg3r.hd.mp4
+      - https://home.eidolf.de/local/weather/3rd72eezaj6d23ahlo7y.hd.mp4
+      - https://home.eidolf.de/local/weather/9m11gd43m6qn3y93ntzp.hd.mp4
+      - https://home.eidolf.de/local/weather/hrkw2m8eofib9sk7t1v2.hd.mp4
+    cloudy:
+      - https://home.eidolf.de/local/weather/13e0s6coh6ayapvdyqnv.hd.mp4
+      - https://home.eidolf.de/local/weather/aorl3skmssy7udwopk22.hd.mp4
+      - https://home.eidolf.de/local/weather/qed6wvf2igukiioykg3r.hd.mp4
+      - https://home.eidolf.de/local/weather/3rd72eezaj6d23ahlo7y.hd.mp4
+      - https://home.eidolf.de/local/weather/9m11gd43m6qn3y93ntzp.hd.mp4
+      - https://home.eidolf.de/local/weather/hrkw2m8eofib9sk7t1v2.hd.mp4
+    mostlycloudy:
+      - https://home.eidolf.de/local/weather/e95h5cqyvhnrk4ytqt4q.hd.mp4
+      - https://home.eidolf.de/local/weather/l2bjw34wnusyf5q2qq3p.hd.mp4
+      - https://home.eidolf.de/local/weather/rrgta099ulami3zb9fd2.hd.mp4
+    clear-night:
+      - https://home.eidolf.de/local/weather/x9dr8caygivq5secll7i.hd.mp4
+      - https://home.eidolf.de/local/weather/v26zyfd6yf0r33s46vpe.hd.mp4
+      - https://home.eidolf.de/local/weather/ypy8bw9fgw1zv2b4htp2.hd.mp4
+      - https://home.eidolf.de/local/weather/rosz2gi676xhkiw1ut6i.hd.mp4
+    fog:
+      - https://home.eidolf.de/local/weather/vwqzlk4turo2449be9uf.hd.mp4
+      - https://home.eidolf.de/local/weather/5363uhabodwwrzgnq6vx.hd.mp4
+      - >-
+        https://home.eidolf.de/local/weather/Fog-190408_01_Alaska_Landscapes1_09.mp4
+      - https://home.eidolf.de/local/weather/Fog-190915_A_01_Timelapse_02.mp4
+      - >-
+        https://home.eidolf.de/local/weather/Fog-Dron_footage_over_a_winter_foggy_mountain.mp4
+    rainy:
+      - https://home.eidolf.de/local/weather/f0w23bd0enxur5ff0bxz.hd.mp4
+      - https://home.eidolf.de/local/weather/Rain-Raindrops_Videvo.mp4
+      - https://home.eidolf.de/local/weather/Regen-1.mp4
+    pouring:
+      - https://home.eidolf.de/local/weather/heavy_rain_in_the_forest.mp4
+    snowy:
+      - >-
+        https://home.eidolf.de/local/weather/Snow-2016WinterPrecip_LoopableBackground_1080.mp4
+      - https://home.eidolf.de/local/weather/Snow-Day_SnowCoveredTrees.mp4
+      - >-
+        https://home.eidolf.de/local/weather/Snow-Reaviling_Sjusjoen_Ski_Senter.mp4
+      - https://home.eidolf.de/local/weather/Snow-Tree-1080p.mp4
+      - >-
+        https://home.eidolf.de/local/weather/Snow-2016FewerColdNights_LoopableBackground_1080.mp4
+    snowy-rainy:
+      - https://home.eidolf.de/local/weather/Schneeregen_01.mp4
+      - https://home.eidolf.de/local/weather/Schneeregen_02.mp4
+    lightning-rainy:
+      - https://home.eidolf.de/local/weather/Blitz-1.mp4
+      - https://home.eidolf.de/local/weather/Blitz-2.mp4
+      - https://home.eidolf.de/local/weather/Blitz-3.mp4
+      - https://home.eidolf.de/local/weather/Blitz-4.mp4
+      - https://home.eidolf.de/local/weather/Blitz-5.mp4
+path: default_view
+title: Smart Life Home
+views:
+  - theme: Backend-selected
+    icon: mdi:home-variant
+    title: Home
+    path: home
+    badges:
+      - entity: person.fabian
+      - entity: person.nessie
+      - entity: sensor.fabian_iphone_battery_state
+      - entity: sensor.nessie_iphone_battery_state
+      - entity: sensor.fabian_ipadpro_battery_level
+      - entity: sensor.washing_machine_finish_duration
+      - entity: sensor.nessie_pc_energy_power
+      - entity: sensor.steckdose_schlafzimmer_energy_power
+      - entity: sensor.keller_steckdose_energy_power
+      - entity: sensor.steckerleiste_keller_energy_power
+      - entity: sensor.zorneding_to_leuchtenbergring
+      - entity: sensor.fabian_s_zuhause_solar_percentage
+      - entity: sensor.dwd_illuminance
+      - entity: counter.pille
+      - entity: sensor.lk_ebersberg_weekincidence
+      - entity: sensor.lk_munchen_weekincidence
+      - entity: sensor.average_house_humidity
+      - entity: sensor.average_house_temp
+      - entity: sensor.foodsharing_48_082236
+    cards:
+      - entities:
+          - entity: light.deckenlampe
+          - entity: light.leds_wohnzimmer_tv
+          - entity: light.leds_wohnzimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.yeelight_color_0x00000000036dc050
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.lichtschalter
+          - entity: light.leds_tisch
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.bett_gluhbirne
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.regal
+          - entity: light.lampe_gastezimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.leds_gastezimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.keller_bulb
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - entity: vacuum.valetudo_dreamez10pro
+          - entity: switch.fernseher
+            secondary_info: last-changed
+          - entity: switch.staubsauger
+          - entity: input_boolean.fabian_pc_strom
+            secondary_info: last-changed
+          - entity: switch.schreibtisch
+          - entity: switch.smart_power_strip_pro_usb_1
+          - entity: input_boolean.nessie_pc_strom
+            secondary_info: last-changed
+          - entity: switch.waschmaschine
+          - entity: switch.kuhlschrank
+          - entity: switch.fernseher_keller
+          - entity: switch.strom_keller
+          - entity: switch.keller_usb_ports
+          - entity: switch.kohleanzunder
+          - entity: input_button.schloss
+        show_header_toggle: true
+        title: Strom
+        type: entities
+      - entities:
+          - entity: input_boolean.leiser_modus
+          - entity: input_boolean.gast_modus
+          - entity: input_boolean.abwesend_modus
+          - entity: input_boolean.thermostate_aus
+        show_header_toggle: false
+        title: Weiteres
+        type: entities
+      - entity: climate.wohnzimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.wohnzimmer_heating
+            name: Heizleistung
+          - entity: binary_sensor.wohnzimmer_open_window
+            name: Fenster
+        step_layout: column
+        step_size: '1'
+      - entity: climate.schlafzimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.schlafzimmer_heating
+            name: Heizleistung
+          - entity: binary_sensor.schlafzimmer_open_window
+            name: Fenster
+        step_size: '1'
+      - entity: climate.gastezimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.gastezimmer_heating
+            name: Heizleistung
+          - entity: binary_sensor.gastezimmer_open_window
+            name: Fenster
+        step_size: '1'
+      - entity: climate.bad
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.bad_heating
+            name: Heizleistung
+          - entity: binary_sensor.bad_open_window
+            name: Fenster
+        step_size: '1'
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Reiskocher
+            state_color: false
+            entities:
+              - entity: switch.xiaomi_miio_cooker
+              - entity: input_select.rice_cooker_program
+              - entity: input_datetime.cooker_start_time
+              - entity: sensor.xiaomi_miio_cooker_remaining
+              - entity: sensor.xiaomi_miio_cooker_mode
+                secondary_info: last-changed
+              - entity: sensor.xiaomi_miio_cooker_stage_name
+                secondary_info: last-changed
+              - entity: sensor.xiaomi_miio_cooker_stage_description
+              - entity: sensor.xiaomi_miio_cooker_rice_id
+              - entity: sensor.xiaomi_miio_cooker_state
+                secondary_info: last-changed
+              - entity: sensor.xiaomi_miio_cooker_taste
+              - entity: sensor.xiaomi_miio_cooker_taste_phase
+              - entity: sensor.xiaomi_miio_cooker_cooking_delayed
+              - entity: sensor.xiaomi_miio_cooker_temperature
+            show_header_toggle: false
+      - type: vertical-stack
+        cards:
+          - type: custom:weather-card
+            entity: weather.dwd_weather_ebersberg_1h
+            hourly_forecast: true
+            graph: false
+            forecastMaxColumn: '6'
+            number_of_forecasts: '8'
+          - type: custom:weather-card
+            entity: weather.dwd_weather_ebersberg
+            number_of_forecasts: '6'
+            hourly_forecast: false
+            current: false
+            details: false
+            forecast: true
+            forecastMaxColumn: '5'
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            source: full
+            entity: media_player.wohnzimmer_tv_group
+          - type: custom:mini-media-player
+            entity: media_player.wohnzimmer_uhr
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            entity: media_player.keller_tv_group
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            entity: media_player.schlafzimmer_speaker
+          - type: custom:mini-media-player
+            entity: media_player.kuche_speaker
+          - type: custom:mini-media-player
+            entity: media_player.gastezimmer_mini
+      - type: entities
+        entities:
+          - entity: sensor.bioabfall
+          - entity: sensor.altpapier
+          - entity: sensor.gelber_sack
+          - entity: sensor.restmull
+  - icon: mdi:television
+    path: wohnzimmer
+    title: Wohnzimmer
+    badges: []
+    cards:
+      - type: area
+        area: 7c05afe47efd44f5a0a064769ad6e105
+      - entities:
+          - entity: switch.adaptive_lighting_living_room
+            name: Adaptives Licht
+          - entity: light.deckenlampe
+          - entity: light.leds_wohnzimmer_tv
+          - entity: light.leds_wohnzimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.yeelight_color_0x00000000036dc050
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+        show_header_toggle: false
+        title: Licht
+        type: entities
+      - entities:
+          - entity: switch.fernseher
+          - entity: switch.staubsauger
+          - entity: automation.restart_bluetooth_on_tv
+          - entity: device_tracker.miwifi_34_51_80_d0_44_29
+          - entity: sensor.wohnzimmer_uhr_timers
+        show_header_toggle: true
+        title: Weiteres
+        type: entities
+      - entity: climate.wohnzimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.wohnzimmer_heating
+            name: Heizleistung
+        step_layout: column
+        step_size: '1'
+      - artwork: cover
+        entity: media_player.wohnzimmer_tv
+        type: custom:mini-media-player
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: entities
+            entities:
+              - entity: vacuum.valetudo_dreamez10pro
+              - entity: input_select.vacuum_cleaning_location
+              - entity: input_button.james_room_cleaning
+              - entity: select.valetudo_dreamez10pro_water_grade
+              - entity: counter.vacuum_water_level
+              - entity: counter.vacuum_runs
+              - entity: sensor.valetudo_dreamez10pro_error_description
+              - entity: sensor.valetudo_dreamez10pro_current_statistics_area
+              - entity: sensor.valetudo_dreamez10pro_current_statistics_time
+              - entity: sensor.valetudo_dreamez10pro_main_brush
+              - entity: sensor.valetudo_dreamez10pro_main_filter
+              - entity: sensor.valetudo_dreamez10pro_right_brush
+              - entity: sensor.valetudo_dreamez10pro_sensor_cleaning
+              - entity: sensor.valetudo_dreamez10pro_wi_fi_configuration
+              - entity: sensor.valetudo_dreamez10pro_zone_presets
+          - type: custom:valetudo-map-card
+            vacuum: valetudo_dreamez10pro
+      - artwork: cover
+        entity: media_player.wohnzimmer_uhr
+        type: custom:mini-media-player
+      - buttons:
+          top:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 19
+          bottom:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 20
+          ok:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 66
+          lefttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 21
+          rightttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 22
+          volumedown:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 25
+          volumeup:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 24
+          back:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 4
+          assistant:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.apps.tv.launcherx/.home.HomeActivity
+          mute:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 164
+          youtube:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.youtube.tvunplugged/com.google.android.apps.youtube.tvunplugged.activity.MainActivity
+          netflix:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                *com.netflix.ninja/.MainActivity
+          home:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 3
+          power:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.wohnzimmer_tv
+              command: input keyevent 26
+        name: Wohnzimmer TV
+        remote_template: ccwgtv
+        type: custom:generic-remote-control-card
+  - icon: mdi:bed-empty
+    path: schlafzimmer
+    title: Schlafzimmer
+    badges: []
+    cards:
+      - type: area
+        area: 33e9a108bf1948e5848f156e0851d50c
+      - entities:
+          - entity: switch.adaptive_lighting_sleeping_room
+            name: Adaptives Licht
+          - entity: light.lichtschalter
+          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.leds_tisch
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.bett_gluhbirne
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.regal
+          - entity: switch.smart_power_strip_pro_usb_1
+        show_header_toggle: true
+        title: Licht & Strom
+        type: entities
+      - entities:
+          - entity: input_boolean.fabian_pc_strom
+          - entity: light.prismatik
+          - entity: device_tracker.fabian_pc
+            secondary_info: last-changed
+          - entity: device_tracker.nsta0552
+            secondary_info: last-changed
+          - entity: sensor.steckdose_schlafzimmer_energy_power
+          - entity: sensor.cpuloadsensor
+          - entity: sensor.gpuload
+        show_header_toggle: true
+        title: Fabian PC
+        type: entities
+      - entity: climate.schlafzimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.schlafzimmer_heating
+            name: Heizleistung
+        step_size: '1'
+      - artwork: cover
+        entity: media_player.schlafzimmer_speaker
+        type: custom:mini-media-player
+      - artwork: cover
+        entity: media_player.ytube_music_player
+        type: custom:mini-media-player
+  - icon: mdi:desktop-tower
+    path: gastezimmer
+    title: Gästezimmer
+    badges: []
+    cards:
+      - type: area
+        area: b67ac5462e454381aa87f812161d8578
+      - entities:
+          - entity: switch.adaptive_lighting_guest_room
+            name: Adaptives Licht
+          - entity: light.lampe_gastezimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.leds_gastezimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: number.leds_gastezimmer_effect_speed
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - entity: input_boolean.nessie_pc_strom
+          - entity: device_tracker.rgb_pc
+          - entity: device_tracker.vku_lb_20
+            secondary_info: last-changed
+          - entity: sensor.nessie_pc_energy_power
+          - entity: sensor.nessie_pc_energy_today
+        show_header_toggle: false
+        title: Nessie PC
+        type: entities
+      - entity: climate.gastezimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.gastezimmer_heating
+            name: Heizleistung
+        step_size: '1'
+      - artwork: cover
+        entity: media_player.gastezimmer_mini
+        type: custom:mini-media-player
+  - icon: mdi:washing-machine
+    path: keller
+    title: Keller
+    badges:
+      - entity: sensor.steckerleiste_keller_energy_power
+      - entity: sensor.steckerleiste_keller_energy_today
+    cards:
+      - type: area
+        area: fd6f6d3c931e48348d9437fc4d103fb4
+      - entities:
+          - entity: light.keller_bulb
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+        show_header_toggle: true
+        title: Licht
+        type: entities
+      - entities:
+          - entity: switch.kuhlschrank
+          - entity: switch.fernseher_keller
+          - entity: switch.strom_keller
+          - entity: switch.keller_usb_ports
+        show_header_toggle: true
+        title: Mehrfachsteckdose
+        type: entities
+      - entities:
+          - entity: switch.waschmaschine
+          - entity: sensor.keller_steckdose_energy_power
+          - entity: sensor.washing_machine_state
+          - entity: sensor.washing_machine_mode
+          - entity: sensor.washing_machine_finish_time
+          - entity: sensor.washing_machine_finish_duration
+          - entity: input_select.washing_machine_status
+        show_header_toggle: false
+        title: Waschmaschine
+        type: entities
+      - entities:
+          - entity: switch.kohleanzunder
+          - entity: sensor.coal_lighter_finish_duration
+        show_header_toggle: false
+        title: Kohleanzünder
+        type: entities
+      - artwork: cover
+        entity: media_player.keller_tv_group
+        type: custom:mini-media-player
+      - buttons:
+          top:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 19
+          bottom:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 20
+          ok:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 66
+          lefttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 21
+          rightttt:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 22
+          volumedown:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 25
+          volumeup:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 24
+          back:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 4
+          assistant:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.apps.tv.launcherx/.home.HomeActivity
+          mute:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 164
+          youtube:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                com.google.android.youtube.tvunplugged/com.google.android.apps.youtube.tvunplugged.activity.MainActivity
+          netflix:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: >-
+                am start -a android.intent.action.VIEW -d -n
+                *com.netflix.ninja/.MainActivity
+          home:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 3
+          power:
+            call: androidtv.adb_command
+            data:
+              entity_id: media_player.keller_tv
+              command: input keyevent 26
+        name: Keller TV
+        remote_template: ccwgtv
+        type: custom:generic-remote-control-card
+  - theme: Backend-selected
+    title: other
+    path: other
+    icon: mdi:perspective-more
+    visible:
+      - user: b3f36b2d84254a458f3e592a2eb7b130
+      - user: 223709d150e743c993e7a9215f63d8a8
+      - user: 427eee202b4c4ffbad381db4991972dc
+    badges: []
+    cards:
+      - artwork: cover
+        entity: media_player.alle_nests
+        type: custom:mini-media-player
+      - entity: climate.bad
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.bad_heating
+            name: Heizleistung
+        step_size: '1'
+      - type: entities
+        entities:
+          - entity: sensor.kuche_speaker_timers
+          - entity: sensor.wohnzimmer_uhr_timers
+          - entity: sensor.schlafzimmer_speaker_timers
+          - entity: sensor.gastezimmer_mini_timers
+        title: Google Nest Timers
+      - type: entities
+        entities:
+          - entity: switch.gastezimmer_mini_do_not_disturb
+          - entity: switch.schlafzimmer_speaker_do_not_disturb
+          - entity: switch.wohnzimmer_uhr_do_not_disturb
+          - entity: switch.kuche_speaker_do_not_disturb
+        title: Google Nest DND
+        show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: automation.pill_reminder
+          - entity: sensor.info_juzzo_de
+          - entity: sensor.info_juzzo_de_2
+          - entity: input_button.find_fabian_s_phone_by_sound
+          - entity: input_button.find_nessie_s_phone_by_sound
+          - entity: input_button.find_fabian_s_ipad_by_sound
+  - path: router
+    title: Frtizbox
+    icon: mdi:router-wireless
+    visible:
+      - user: b3f36b2d84254a458f3e592a2eb7b130
+      - user: 427eee202b4c4ffbad381db4991972dc
+    badges: []
+    cards:
+      - entity: switch.adguard_protection
+        hold_action:
+          action: more-info
+        show_icon: true
+        show_name: true
+        tap_action:
+          action: toggle
+        type: button
+      - entity: switch.adguard_filtering
+        hold_action:
+          action: more-info
+        show_icon: true
+        show_name: true
+        tap_action:
+          action: toggle
+        type: button
+      - entity: sensor.adguard_dns_queries
+        max: 100
+        min: 0
+        type: gauge
+      - entities:
+          - entity: button.miwifi_28_d1_27_fc_ab_d8_reboot
+          - entity: light.miwifi_28_d1_27_fc_ab_d8_led
+          - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_uptime
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_2_4g
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_5g
+          - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+          - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_wan_download_speed
+          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_wan_upload_speed
+        title: Xiaomi AX3600 Verwaltung
+        type: entities
+        show_header_toggle: false
+        state_color: true
+      - entities:
+          - entity: button.miwifi_9c_9d_7e_30_89_fb_reboot
+          - entity: light.miwifi_9c_9d_7e_30_89_fb_led
+          - entity: switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
+          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_uptime
+          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_memory_usage
+          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_devices
+          - entity: update.miwifi_9c_9d_7e_30_89_fb_firmware_update
+        title: Xiaomi AX1800 Verwaltung
+        type: entities
+        show_header_toggle: false
+        state_color: true
+      - entities:
+          - entity: button.fritz_box_3490_reboot
+          - entity: sensor.fritz_box_3490_device_uptime
+          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_2_4ghz
+          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
+          - entity: sensor.fritz_box_3490_connection_uptime
+          - entity: binary_sensor.fritz_box_3490_connection
+          - entity: button.fritz_box_3490_reconnect
+          - entity: update.fritz_box_3490_fritz_os
+        title: FritzBox 3490 Verwaltung
+        type: entities
+        show_header_toggle: false
+        state_color: false
+      - type: entities
+        entities:
+          - entity: person.adri
+          - entity: person.kai
+          - entity: person.flo
+          - entity: person.maxi
+            name: Maxi Phone
+          - entity: person.samuel
+          - entity: person.papa
+          - entity: person.isi
+        title: Freunde & Bekannte
+      - type: map
+        entities:
+          - entity: person.fabian
+          - entity: person.nessie
+          - entity: person.kai
+          - entity: device_tracker.google_maps_103127589611220223167
+          - entity: device_tracker.google_maps_114935414809961191566
+          - entity: person.samuel
+        hours_to_show: 24
+  - title: RaspberryPi
+    path: raspberrypi
+    icon: mdi:raspberry-pi
+    badges: []
+    cards:
+      - entity: climate.rpi_cooling_fan_controller
+        type: custom:simple-thermostat
+      - type: entities
+        entities:
+          - entity: switch.rpi_cooling_fan
+          - entity: sensor.processor_temperature
+          - entity: sensor.memory_use_percent
+          - entity: sensor.disk_use_percent
+          - entity: sensor.unavailable_entities
+      - type: sensor
+        entity: sensor.processor_temperature
+        graph: line
+        icon: mdi:cpu-64-bit
+      - type: sensor
+        entity: sensor.memory_use_percent
+        graph: line
+  - title: Cast
+    path: cast
+    icon: mdi:cast
+    visible: []
+    badges:
+      - entity: sensor.zorneding_to_leuchtenbergring
+      - entity: sensor.washing_machine_finish_time
+      - entity: sensor.washing_machine_state
+    cards:
+      - type: map
+        entities:
+          - entity: device_tracker.google_maps_112056758146194246561
+          - entity: device_tracker.google_maps_112174659110860535869
+        geo_location_sources:
+          - device_tracker.google_maps_112174659110860535869
+          - device_tracker.google_maps_112056758146194246561
+      - type: weather-forecast
+        entity: weather.dwd_weather_ebersberg
+      - type: entities
+        entities:
+          - binary_sensor.bad_open_window
+          - binary_sensor.gastezimmer_open_window
+          - binary_sensor.schlafzimmer_open_window
+  - panel: false
+    path: extension
+    title: Browser Extension View
+    visible: []
+    icon: mdi:google-chrome
+    badges: []
+    cards:
+      - entities:
+          - entity: light.lichtschalter
+          - entity: input_boolean.fabian_pc_strom
+          - entity: light.leds_tisch
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.yeelight_stripe_0x00000000036d0c16
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.bett_gluhbirne
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+        show_header_toggle: true
+        title: Schlafzimmer
+        type: entities
+  - title: Browser Extension View Nessie
+    path: extensionn
+    icon: mdi:google-chrome
+    visible: []
+    badges: []
+    cards:
+      - entities:
+          - entity: light.lichtschalter
+          - entity: input_boolean.nessie_pc_strom
+          - entity: light.lampe_gastezimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+          - entity: light.leds_gastezimmer
+            group: true
+            toggle: true
+            type: custom:slider-entity-row
+        show_header_toggle: true
+        title: Schlafzimmer
+        type: entities
+      - entity: climate.gastezimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.gastezimmer_heating
+            name: Heizleistung
+        step_size: '1'

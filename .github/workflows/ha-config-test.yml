@@ -1,0 +1,57 @@
+---
+name: Home Assistant CI
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+  pull_request:
+    branches: [master, main]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  #yamllint:
+  #  name: 🧹 yamllint
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: ⤵️ Check out configuration from GitHub
+  #      uses: actions/checkout@v3.0.2
+  #    - name: 🚀 Run yamllint
+  #      uses: frenck/action-yamllint@v1.2.0
+  #      continue-on-error: true
+
+  #remarklint:
+  #  runs-on: ubuntu-18.04
+  #  steps:
+  #    - name: ⤵️ Check out configuration from GitHub
+  #      uses: actions/checkout@v3.0.2
+  #    - name: Running Remark lint
+  #      uses: "docker://pipelinecomponents/remark-lint:latest"
+  #      continue-on-error: true
+  #      with:
+  #        args: "remark --no-stdout --color --frail --use preset-lint-recommended ."
+
+  home-assistant:
+    name: "Home Assistant Core ${{ matrix.version }} Configuration Check"
+    #needs: [yamllint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out configuration from GitHub
+        uses: actions/checkout@v3.0.2
+      - name: Rename Dummy files to productive files
+        run: |
+            mv Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
+            mkdir -p ./share/scripts
+            mkdir -p ./media/netboot
+            ln -s /share ./share
+            ln -s /media ./media
+            ln -s /share/scripts ./share/scripts
+            ln -s /media/netboot ./media/netboot
+      - name: 🚀 Run Home Assistant Configuration Check
+        uses: frenck/action-home-assistant@v1.3
+        with:
+          path: "."
+          secrets: ./secrets.fake.yaml
+          version: "beta"
