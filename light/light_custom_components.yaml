@@ -1,5 +1,5 @@
 ---
-  - platform: prismatik
-    host: 192.168.178.16
-    name: "Prismatik"
-    profile_name: homeassistant
+- platform: prismatik
+  host: 192.168.178.16
+  name: "Prismatik"
+  profile_name: homeassistant
