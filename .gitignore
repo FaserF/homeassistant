@@ -7,6 +7,7 @@
 !README.MD
 !*.md
 !dummy_files/
+!dummy_files/Homeassistant-SmartLife-Dummy.json
 
 # Ignore folders.
 megalinter-reports/
