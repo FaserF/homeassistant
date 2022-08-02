@@ -45,7 +45,7 @@ jobs:
             mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
             mv -f dummy_files/switch_dummy.yaml switch.yaml
             mv -f dummy_files/sensor_dummy.yaml sensor.yaml
-            mv -f dummy_files/google_assistant_dummy.json Homeassistant-SmartLife-f9d43c517637.json
+            mv -f "dummy_files/google_assistant_dummy.json" "Homeassistant-SmartLife-f9d43c517637.json"
       - name: 🚀 Run Home Assistant Configuration Check
         uses: frenck/action-home-assistant@v1.3
         with:
