@@ -141,6 +141,13 @@ logbook:
 
 logger:
   filters:
+    homeassistant:
+      # This can happen during restart having Ingress tabs open.
+      # I really don't care about it.
+      - "Error doing job: Task exception was never retrieved"
+    homeassistant.loader:
+      # Really? Cool... I know... I installed them...
+      - "We found a custom integration"
     custom_components.prismatik.prismatik:
       - "Could not connect to Prismatik at*"
       - "Could not connect to Prismatik at 192.168.178.16:3636"
@@ -159,9 +166,6 @@ logger:
       - "Ignoring * update because timestamp is older than last timestamp"
     homeassistant.components.light:
       - "Setup of light platform prismatik is taking over 10 seconds."
-    homeassistant.loader:
-      - "You are using a custom integration*"
-      - "We found a custom integration * which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant"
     homeassistant.helpers.service:
       - "Unable to find referenced entities$"
     homeassistant.config_entries:
@@ -172,8 +176,6 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
-  logs:
-    custom_components.foodsharing: debug
 
 # Enables a map showing the location of tracked devices
 map:
