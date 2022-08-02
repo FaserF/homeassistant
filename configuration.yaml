@@ -322,7 +322,9 @@ template:
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
 
-sensor: !include_dir_named sensor/
+sensor: !include_dir_named sensor
+
+switch: !include_dir_named switch
 
 light:
   - platform: prismatik
@@ -366,8 +368,6 @@ rest_command:
 #    method: POST
 #    content_type: "application/json"
 #    payload: '{"command":"{{ command }}", "user":"{{ user }}", "converse":true}'
-
-switch: !include_dir_named switch/
 
 google_assistant:
   project_id: !secret google_assistant_id
@@ -702,4 +702,4 @@ frontend:
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-custom_components: !include custom_components.yaml
+!include custom_components.yaml
