@@ -11,11 +11,9 @@ homeassistant:
         - fd00::/8
         - 172.30.33.0/24
       allow_bypass_login: true
-  allowlist_external_dirs:
-    - "/share/scripts"
-    - "/media/netboot"
-  media_dirs:
-    media: "/media"
+  # allowlist_external_dirs:
+  #  - "/share/scripts"
+  #  - "/media/netboot"
 
 default_config:
 input_boolean:
