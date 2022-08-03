@@ -696,7 +696,7 @@ input_datetime:
 frontend:
   themes: !include_dir_merge_named themes
 group: !include groups.yaml
-automation: !include automations.yaml
+automation: !include_dir_merge_list automation
 script: !include scripts.yaml
 
 ## Custom Components - has to be the end of the file due to GitHub Actions being unable to handle custom components stuff and will be removed there

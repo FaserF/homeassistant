@@ -1,0 +1,269 @@
+---
+- id: turn_on_staubsauger_weekly
+  alias: "Turn on staubsauger weekly"
+  initial_state: true
+  trigger:
+    platform: time
+    at: "13:00:00"
+  condition:
+    - condition: time
+      weekday:
+        - tue
+        - fri
+    - condition: state
+      entity_id: input_boolean.abwesend_modus
+      state: "off"
+    - condition: state
+      entity_id: input_boolean.leiser_modus
+      state: "off"
+  action:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.staubsauger
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: binary_sensor.workday_sensor
+              state: "on"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                        - condition: state
+                          entity_id: person.nessie
+                          state: "home"
+                  sequence:
+                    # if Fabi & Nessie not at home clean all rooms
+                    - service: mqtt.publish
+                      data:
+                        topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                        payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
+                - conditions:
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                  sequence:
+                    # else if only fabi is not at home clean all rooms except guest room
+                    - service: mqtt.publish
+                      data:
+                        topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                        payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
+                - conditions:
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: person.nessie
+                          state: "home"
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - condition: not
+                              conditions:
+                                - condition: state
+                                  entity_id: input_boolean.gast_modus
+                                  state: "on"
+                          sequence:
+                            # else if only nessie is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
+                            - service: mqtt.publish
+                              data:
+                                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                                payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+                      default:
+                        # else if only nessie is not at home clean all rooms except sleeping room
+                        - service: mqtt.publish
+                          data:
+                            topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                            payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+              default:
+                # default if fabi & nessie at home: clean only living room, floor & kitchen
+                - service: mqtt.publish
+                  data:
+                    topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                    payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+
+- id: vacuum_cleaner_error
+  alias: "Vacuum Cleaner Error"
+  initial_state: true
+  trigger:
+    # - platform: state
+    #   entity_id: sensor.valetudo_dreamez10pro_error_description
+    #   not_from:
+    #     - "unavailable"
+    #     - "unknown"
+    #     - ""
+    #     - "Unknown"
+    - platform: state
+      entity_id: vacuum.valetudo_dreamez10pro
+      to: "error"
+  action:
+    - delay: "00:00:30"
+    - service: telegram_bot.send_message
+      data_template:
+        message: >
+          James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
+
+          Die Reinigung wurde daher unterbrochen.
+        target: !secret telegram_chat_fabian
+    - service: telegram_bot.send_message
+      data_template:
+        message: >
+          James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
+
+          Die Reinigung wurde daher unterbrochen.
+        target: !secret telegram_chat_nessie
+
+- id: james_room_cleaning
+  alias: "James Raum Reinigiung"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: input_button.james_room_cleaning
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Wohnzimmer"
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["6"]}'
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Küche"
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["4"]}'
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Schlafzimmer"
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["3"]}'
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Gästezimmer"
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["7"]}'
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Bad"
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["1"]}'
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Flur"
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["5"]}'
+        - conditions:
+            - condition: state
+              entity_id: input_select.vacuum_cleaning_location
+              state: "Gesamt"
+          sequence:
+            - service: vacuum.start
+              data:
+                entity_id: vacuum.valetudo_dreamez10pro
+
+- id: vacuum_cleaner_counter
+  alias: "Set Counter with Cleaner Runs and remind for emptying and refilling"
+  trigger:
+    - platform: state
+      entity_id: vacuum.valetudo_dreamez10pro
+      from: "docked"
+      for:
+        minutes: 2
+  condition:
+    condition: not
+    conditions:
+      - condition: state
+        entity_id: vacuum.valetudo_dreamez10pro
+        state: unavailable
+      - condition: state
+        entity_id: vacuum.valetudo_dreamez10pro
+        state: idle
+  action:
+    - service: counter.increment
+      target:
+        entity_id: counter.vacuum_runs
+    - service: counter.decrement
+      target:
+        entity_id: counter.vacuum_water_level
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: counter.vacuum_water_level
+              below: 1
+            # - condition: template
+            #   value_template: "{{ states('counter.vacuum_runs')|float % 4 == 0 }}"
+          sequence:
+            - service: notify.telegram_nessie
+              data_template:
+                message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ states('counter.vacuum_runs')|float % 24 == 0 }}"
+          sequence:
+            - service: notify.telegram_nessie
+              data_template:
+                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
+
+- id: vacuum_water_refilled
+  alias: "Vacuum Water refilled"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.valetudo_dreamez10pro_water_tank_attachment
+      from: "off"
+      to: "on"
+      for:
+        seconds: 5
+  condition:
+    condition: not
+    conditions:
+      - condition: state
+        entity_id: vacuum.valetudo_dreamez10pro
+        state: unavailable
+      - condition: numeric_state
+        entity_id: counter.vacuum_water_level
+        above: 90
+  action:
+    - service: counter.reset
+      target:
+        entity_id: counter.vacuum_water_level
+    - service: notify.telegram_nessie
+      data_template:
+        message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
+    - service: notify.telegram_fabian
+      data_template:
+        message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
