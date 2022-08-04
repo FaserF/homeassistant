@@ -47,6 +47,7 @@ jobs:
             rm -r switch/switch_custom_components.yaml
             rm -r sensor/sensor_custom_components.yaml
             rm -r light/light_custom_components.yaml
+            rm -r device_tracker/device_tracker_custom_components.yaml
             sed -n '/## Custom Components/q;p' < configuration.yaml > configuration.yaml
 
       - name: 🚀 Run Home Assistant Configuration Check

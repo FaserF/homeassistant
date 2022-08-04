@@ -39,7 +39,7 @@
     - service: switch.turn_off
       data:
         entity_id:
-          - switch.smart_power_strip_pro_usb_1
+          - switch.bett_usb_ports
           - switch.schreibtisch
     - service: media_player.turn_off
       data:
@@ -53,7 +53,7 @@
               entity_id: device_tracker.fabian_pc
               state: "home"
             - condition: numeric_state
-              entity_id: sensor.steckdose_schlafzimmer_energy_power
+              entity_id: sensor.schlafzimmer_power
               above: 20
           sequence:
             - service: notify.telegram_fabian
@@ -1310,7 +1310,7 @@
       for:
         minutes: 1
     - platform: numeric_state
-      entity_id: sensor.steckdose_schlafzimmer_energy_power
+      entity_id: sensor.schlafzimmer_power
       below: 20
   condition:
     condition: and
@@ -1326,7 +1326,7 @@
         for:
           seconds: 20
       - condition: numeric_state
-        entity_id: sensor.steckdose_schlafzimmer_energy_power
+        entity_id: sensor.schlafzimmer_power
         below: 20
   action:
     - service: light.turn_off
@@ -1517,7 +1517,7 @@
   initial_state: true
   trigger:
     - platform: numeric_state
-      entity_id: sensor.steckdose_schlafzimmer_energy_power
+      entity_id: sensor.schlafzimmer_power
       below: 25
       for:
         minutes: 10
@@ -1537,7 +1537,7 @@
     condition: and
     conditions:
       - condition: numeric_state
-        entity_id: sensor.steckdose_schlafzimmer_energy_power
+        entity_id: sensor.schlafzimmer_power
         below: 25
   action:
     - service: switch.turn_off
@@ -2659,7 +2659,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: switch.smart_power_strip_pro_usb_1
+        entity_id: switch.bett_usb_ports
         state: "on"
       # - condition: or
       #   conditions:
@@ -2688,20 +2688,20 @@
   action:
     - service: switch.turn_off
       data:
-        entity_id: switch.smart_power_strip_pro_usb_1
+        entity_id: switch.bett_usb_ports
 
 - id: turn_off_bett_after_x_hours
   alias: "Turn off bett after x hours"
   initial_state: true
   trigger:
     - platform: state
-      entity_id: switch.smart_power_strip_pro_usb_1
+      entity_id: switch.bett_usb_ports
       from: "off"
       to: "on"
       for:
         minutes: 180
     - platform: state
-      entity_id: switch.smart_power_strip_pro_usb_1
+      entity_id: switch.bett_usb_ports
       from: "off"
       to: "on"
       for:
@@ -2710,12 +2710,12 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: switch.smart_power_strip_pro_usb_1
+        entity_id: switch.bett_usb_ports
         state: "on"
   action:
     - service: switch.turn_off
       data:
-        entity_id: switch.smart_power_strip_pro_usb_1
+        entity_id: switch.bett_usb_ports
 
 - id: turn_off_staubsauger_after_x_hours
   alias: "Turn off staubsauger after x hours"
@@ -3959,7 +3959,7 @@
                   entity_id: device_tracker.fabian_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckdose_schlafzimmer_energy_power
+                  entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
             - service: system_bridge.send_command
@@ -3979,7 +3979,7 @@
                   entity_id: device_tracker.fabian_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckdose_schlafzimmer_energy_power
+                  entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
             - service: system_bridge.send_command
@@ -3999,7 +3999,7 @@
                   entity_id: device_tracker.fabian_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckdose_schlafzimmer_energy_power
+                  entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
             - service: system_bridge.send_command
@@ -4019,7 +4019,7 @@
                   entity_id: device_tracker.fabian_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckdose_schlafzimmer_energy_power
+                  entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
             - service: notify.telegram_fabian
@@ -4033,7 +4033,7 @@
             - condition: and
               conditions:
                 - condition: numeric_state
-                  entity_id: sensor.steckdose_schlafzimmer_energy_power
+                  entity_id: sensor.schlafzimmer_power
                   below: 21
           sequence:
             - service: switch.turn_off
@@ -4504,6 +4504,31 @@
         inline_keyboard:
           - "HA Update starten:/updateha, OS Update starten:/updateos"
 
+- id: automatic_ha_updates
+  alias: "Automatic HA Update"
+  initial_state: true
+  trigger:
+    platform: time
+    at: "05:00:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        weekday:
+          - sun
+      - condition: state
+        entity_id: update.home_assistant_core_update
+        state: "on"
+  action:
+    - service: telegram_bot.send_message
+      data_template:
+        message: >
+          Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert.
+        target: !secret telegram_chat_fabian
+    - service: update.install
+        data:
+          entity_id: update.home_assistant_core_update
+
 - id: hacs_update_available
   alias: "HACS Update available"
   initial_state: true
@@ -4535,6 +4560,7 @@
           {% if states.sensor.hacs.state >= '3' %}
           - {{state_attr('sensor.hacs', 'repositories')[2]['display_name']}} von Version {{state_attr('sensor.hacs', 'repositories')[2]['installed_version']}} zu Version {{state_attr('sensor.hacs', 'repositories')[2]['available_version']}}
           {% endif %}
+
 # - id: incoming_call_fabian
 #   alias: 'Incoming Call Fabian'
 #   initial_state: true
@@ -4612,7 +4638,7 @@
 #       data:
 #         entity_id: media_player.schlafzimmer_speaker
 
-#not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
+# not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
 #  - id: coinbase_balance_high
 #    alias: 'Coinbase balance high'
 #    initial_state: true
@@ -4626,7 +4652,7 @@
 #    condition:
 #      condition: and
 #      conditions:
-#Maximal einmal am Tag schreiben
+# Maximal einmal am Tag schreiben
 #        - condition: template
 #          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.coinbase_balance_high.attributes.last_triggered) | int > 86400 }}"
 #    action:
@@ -4645,7 +4671,7 @@
   condition:
     condition: and
     conditions:
-      #Maximal zwei mal am Tag schreiben
+      # Maximal zwei mal am Tag schreiben
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.dwd_weather_warnings.attributes.last_triggered) | int > 43200 }}"
   action:
@@ -7614,6 +7640,12 @@
   trigger:
     - platform: state
       entity_id: device_tracker.google_maps_112174659110860535869
+      attribute: source_type
+      to: null
+      for:
+        minutes: 30
+    - platform: state
+      entity_id: device_tracker.google_maps_112056758146194246561
       attribute: source_type
       to: null
       for:

@@ -12,6 +12,7 @@
 !sensor/
 !light/
 !automation/
+!device_tracker/
 
 # Ignore folders.
 megalinter-reports/
@@ -27,3 +28,4 @@ secrets.yaml
 known_devices.yaml
 google_calendars.yaml
 Homeassistant-SmartLife-f9d43c517637.json
+config_ic3.yaml
