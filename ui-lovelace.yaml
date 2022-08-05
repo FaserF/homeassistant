@@ -1,3 +1,4 @@
+---
 animated_background:
   default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
   entity: weather.dwd_weather_ebersberg_1h
@@ -164,46 +165,46 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.wohnzimmer_open_window
             name: Fenster
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - entity: climate.schlafzimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.schlafzimmer_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - entity: climate.gastezimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
           - entity: binary_sensor.gastezimmer_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
           - entity: binary_sensor.bad_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - type: vertical-stack
         cards:
           - type: entities
@@ -233,16 +234,16 @@ views:
             entity: weather.dwd_weather_ebersberg_1h
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: '6'
-            number_of_forecasts: '8'
+            forecastMaxColumn: "6"
+            number_of_forecasts: "8"
           - type: custom:weather-card
             entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: '6'
+            number_of_forecasts: "6"
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: '5'
+            forecastMaxColumn: "5"
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
@@ -305,11 +306,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.wohnzimmer_tv
         type: custom:mini-media-player
@@ -465,10 +466,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.schlafzimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.schlafzimmer_speaker
         type: custom:mini-media-player
@@ -512,10 +513,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.gastezimmer_mini
         type: custom:mini-media-player
@@ -662,10 +663,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - type: entities
         entities:
           - entity: sensor.kuche_speaker_timers
@@ -877,7 +878,7 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.gastezimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"

@@ -92,12 +92,12 @@
   initial_state: true
   trigger:
     # - platform: state
-    #   entity_id: sensor.valetudo_dreamez10pro_error_description
-    #   not_from:
-    #     - "unavailable"
-    #     - "unknown"
-    #     - ""
-    #     - "Unknown"
+    # entity_id: sensor.valetudo_dreamez10pro_error_description
+    # not_from:
+    # - "unavailable"
+    # - "unknown"
+    # - ""
+    # - "Unknown"
     - platform: state
       entity_id: vacuum.valetudo_dreamez10pro
       to: "error"
@@ -267,3 +267,24 @@
     - service: notify.telegram_fabian
       data_template:
         message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
+
+- id: turn_off_staubsauger_after_x_hours
+  alias: "Turn off staubsauger after x hours"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: switch.staubsauger
+      from: "off"
+      to: "on"
+      for:
+        minutes: 150
+    - platform: state
+      entity_id: switch.staubsauger
+      from: "off"
+      to: "on"
+      for:
+        minutes: 360
+  action:
+    - service: switch.turn_off
+      data:
+        entity_id: switch.staubsauger

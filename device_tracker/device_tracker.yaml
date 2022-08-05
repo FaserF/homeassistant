@@ -1,3 +1,4 @@
+---
 - platform: google_maps
   username: !secret gmaps_mail
   max_gps_accuracy: 1000

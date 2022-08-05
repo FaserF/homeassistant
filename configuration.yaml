@@ -12,8 +12,8 @@ homeassistant:
         - 172.30.33.0/24
       allow_bypass_login: true
   # allowlist_external_dirs:
-  #  - "/share/scripts"
-  #  - "/media/netboot"
+  # - "/share/scripts"
+  # - "/media/netboot"
 
 default_config:
 input_boolean:
@@ -244,20 +244,20 @@ notify:
   - name: telegram_nessie
     platform: telegram
     chat_id: !secret telegram_chat_nessie
-#   - platform: html5
-#     name: browser
-#     vapid_pub_key: !secret vapid_pub_key
-#     vapid_prv_key: !secret vapid_prv_key
-#     vapid_email: !secret vapid_email
+  # - platform: html5
+  # name: browser
+  # vapid_pub_key: !secret vapid_pub_key
+  # vapid_prv_key: !secret vapid_prv_key
+  # vapid_email: !secret vapid_email
 
 media_source:
 
 # media_player:
-#   - platform: mpd
-#     host: 127.0.0.1
+# - platform: mpd
+# host: 127.0.0.1
 
 # speedtestdotnet:
-#   server_id: 21514
+# server_id: 21514
 
 climate:
   - platform: generic_thermostat
@@ -329,9 +329,9 @@ switch: !include_dir_merge_list switch
 light: !include_dir_merge_list light
 
 # no_ip:
-#   domain: !secret domain_noip
-#   username: !secret noip_username
-#   password: !secret noip_pw
+# domain: !secret domain_noip
+# username: !secret noip_username
+# password: !secret noip_pw
 
 rest_command:
   fabian_pc_system_bridge:
@@ -348,26 +348,26 @@ rest_command:
       api-key: !secret system_bridge_nessie
     content_type: "application/json; charset=utf-8"
     payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
-  assistant_relay:
-    method: POST
-    url: http://192.168.31.2:3000/api/assistant
-    content_type: "application/json"
-    payload: '{"command":"{{ command }}", "user":"{{ user }}"}'
-#  assistant_broadcast:
-#    url: http://192.168.31.2:3000/api/assistant
-#    method: POST
-#    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"{{ user }}", "broadcast":true}'
+  # assistant_relay:
+  # method: POST
+  # url: http://192.168.31.2:3000/api/assistant
+  # content_type: "application/json"
+  # payload: '{"command":"{{ command }}", "user":"{{ user }}"}'
+  # assistant_broadcast:
+  # url: http://192.168.31.2:3000/api/assistant
+  # method: POST
+  # content_type: "application/json"
+  # payload: '{"command":"{{ command }}", "user":"{{ user }}", "broadcast":true}'
 
-#  assistant_converse:
-#    url: http://192.168.31.2:3000/api/assistant
-#    method: POST
-#    content_type: "application/json"
-#    payload: '{"command":"{{ command }}", "user":"{{ user }}", "converse":true}'
+  # assistant_converse:
+  # url: http://192.168.31.2:3000/api/assistant
+  # method: POST
+  # content_type: "application/json"
+  # payload: '{"command":"{{ command }}", "user":"{{ user }}", "converse":true}'
 
 google_assistant:
   project_id: !secret google_assistant_id
-  service_account: !include Homeassistant-SmartLife-f9d43c517637.json
+  service_account: !include Homeassistant_google_assistant.json
   report_state: true
   exposed_domains:
     - switch
@@ -444,10 +444,6 @@ google_assistant:
       name: Adblocker
     # Enabled Entitys
     ## Schlafzimmer
-    switch.schreibtisch:
-      name: Strom Tisch
-      expose: false
-      room: Schlafzimmer
     light.regal:
       name: Regal
       expose: true
@@ -456,11 +452,8 @@ google_assistant:
       name: Strom Schlafzimmer
       expose: true
       room: Schlafzimmer
-    switch.smart_power_strip_pro_usb_1:
+    switch.bett_usb_ports:
       name: Bett Steckdose
-      expose: true
-      room: Schlafzimmer
-    switch.regal_leds:
       expose: true
       room: Schlafzimmer
     light.lichtschalter:
@@ -587,15 +580,9 @@ intent_script:
     action:
       - service: automation.trigger
         entity_id: automation.find_phone_fabian
-      # {%- if User.lower() == "fabian" or User.lower() == "fabi" -%}
-      #   - service: automation.trigger
-      #     entity_id: automation.find_phone_fabian
-      # {%- elif User.lower() == "nessie" or User.lower() == "vanessa" -%}
-      #   - service: automation.trigger
-      #     entity_id: automation.find_phone_nessie
-      # {%- else -%}
-      #   Leider kann ich das iPhone von {{ User }} nicht suchen.
-      # {%- endif -%}
+      # - service: automation.trigger
+      # entity_id: >
+      # {%- if User.lower() == "fabian" or User.lower() == "fabi" -%}automation.find_phone_fabian{%- elif User.lower() == "nessie" or User.lower() == "vanessa" -%}automation.find_phone_nessie{%- endif -%}
   vacuum_room_cleaning:
     speech:
       text: Starte manuelle Raumreinigung in {{ Room }}.
@@ -701,21 +688,21 @@ script: !include scripts.yaml
 
 ## Custom Components - has to be the end of the file due to GitHub Actions being unable to handle custom components stuff and will be removed there
 
-#  - platform: sonoff_lan_mode_r3
-#    name: Bett
-#    device_id: 100016e326
-#    api_key: !secret sonoff_lan_mode_r3_bett
-#    icon: mdi:power-plug
-#  - platform: sonoff_lan_mode_r3
-#    name: Waschmaschine
-#    device_id: 1000915e4d
-#    api_key: !secret sonoff_lan_mode_r3_waschmaschine
-#    icon: mdi:washing-machine
-#  - platform: sonoff_lan_mode_r3
-#    name: Sonoff Steckdose
-#    device_id: 1000134649
-#    api_key: !secret sonoff_lan_mode_r3_steckdose
-#    icon: mdi:power-plug
+# - platform: sonoff_lan_mode_r3
+# name: Bett
+# device_id: 100016e326
+# api_key: !secret sonoff_lan_mode_r3_bett
+# icon: mdi:power-plug
+# - platform: sonoff_lan_mode_r3
+# name: Waschmaschine
+# device_id: 1000915e4d
+# api_key: !secret sonoff_lan_mode_r3_waschmaschine
+# icon: mdi:washing-machine
+# - platform: sonoff_lan_mode_r3
+# name: Sonoff Steckdose
+# device_id: 1000134649
+# api_key: !secret sonoff_lan_mode_r3_steckdose
+# icon: mdi:power-plug
 
 waste_collection_schedule:
   sources:
@@ -746,7 +733,7 @@ adaptive_lighting:
     lights:
       - light.yeelight_bslamp2_0x0000000013fea10f
       - light.bett_gluhbirne
-    #      - light.leds_tisch
+      # - light.leds_tisch
     min_brightness: 25
   - name: "guest_room"
     lights:

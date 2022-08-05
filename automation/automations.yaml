@@ -162,16 +162,16 @@
               data:
                 entity_id: media_player.gastezimmer_mini
             # - service: select.select_option
-            #   data:
-            #     option: min
-            #   target:
-            #     entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+            # data:
+            # option: min
+            # target:
+            # entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
             # - delay: '00:00:40'
             # - service: select.select_option
-            #   data:
-            #     option: min
-            #   target:
-            #     entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+            # data:
+            # option: min
+            # target:
+            # entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
 - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
   alias: "Turn on 5ghz wifi and ssh off if coming home"
@@ -217,8 +217,8 @@
               target:
                 entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
     # - service: switch.turn_off
-    #   data:
-    #     entity_id: switch.fritzbox_3490_portforward_ssh
+    # data:
+    # entity_id: switch.fritzbox_3490_portforward_ssh
 
 - id: open_door_for_fabian
   alias: "Open the door for Fabian if coming home"
@@ -1442,7 +1442,7 @@
               data:
                 transition: 2
                 brightness: 255
-                #color_mode: white
+                # color_mode: white
             - service: light.turn_on
               target:
                 entity_id: light.leds_gastezimmer
@@ -2717,27 +2717,6 @@
       data:
         entity_id: switch.bett_usb_ports
 
-- id: turn_off_staubsauger_after_x_hours
-  alias: "Turn off staubsauger after x hours"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: switch.staubsauger
-      from: "off"
-      to: "on"
-      for:
-        minutes: 150
-    - platform: state
-      entity_id: switch.staubsauger
-      from: "off"
-      to: "on"
-      for:
-        minutes: 360
-  action:
-    - service: switch.turn_off
-      data:
-        entity_id: switch.staubsauger
-
 - id: turn_on_lights_in_morning
   alias: "Turn on lights in morning"
   initial_state: true
@@ -3372,13 +3351,13 @@
             entity_id: "device_tracker.rgb_pc"
             state: "home"
           # - condition: and
-          #   conditions:
-          #     - condition: state
-          #       entity_id: 'device_tracker.vku_lb_20'
-          #       state: 'home'
-          #     - condition: state
-          #       entity_id: 'switch.nessie_pc'
-          #       state: 'on'
+          # conditions:
+          # - condition: state
+          # entity_id: 'device_tracker.vku_lb_20'
+          #  state: 'home'
+          # - condition: state
+          # entity_id: 'switch.nessie_pc'
+          # state: 'on'
   action:
     - service: light.turn_on
       data:
@@ -3568,15 +3547,12 @@
                   entity_id: "switch.kuhlschrank"
                   state: "off"
                 - condition: template
-                  value_template: "{{ now().month <= 10 and now().month >= 4 }}" #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+                  value_template: "{{ now().month <= 10 and now().month >= 4 }}" # Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
                 - condition: numeric_state
                   entity_id: weather.dwd_weather_ebersberg_1h
                   attribute: temperature
                   above: 5
           sequence:
-            # - service: switch.turn_on
-            #   data:
-            #     entity_id: switch.kuhlschrank
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
@@ -3590,7 +3566,7 @@
               entity_id: "switch.kuhlschrank"
               state: "off"
             - condition: template
-              value_template: "{{ now().month <= 10 and now().month >= 4 }}" #Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+              value_template: "{{ now().month <= 10 and now().month >= 4 }}" # Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
             - condition: state
               entity_id: input_boolean.abwesend_modus
               state: "off"
@@ -3665,7 +3641,7 @@
       - condition: template
         value_template: "{{ ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) < 58000) and ((as_timestamp(states.calendar.fabianseitz98_gmail_com.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
-        value_template: "{{ now().month <= 4 or now().month >= 10 }}" #Im Sommer ist der Keller warm genug, da muss nicht die Wärme vom Flur genutzt werden.
+        value_template: "{{ now().month <= 4 or now().month >= 10 }}" # Im Sommer ist der Keller warm genug, da muss nicht die Wärme vom Flur genutzt werden.
   action:
     - choose:
         - conditions:
@@ -3724,7 +3700,7 @@
   initial_state: true
   trigger:
     # - platform: time
-    #   at: '15:30:00'
+    # at: '15:30:00'
     - platform: template
       value_template: "{{ now().timetuple().tm_isdst }}"
   action:
@@ -3771,6 +3747,9 @@
       data_template:
         target: !secret telegram_chat_fabian
         message: "Homeassistant wurde soeben gestartet."
+    - service: button.press
+      target:
+        entity_id: button.synchronize_devices
 
 - id: run_bash_script_with_addon_bash_script_executer_every_hour
   alias: "Run Bash Script with Addon Bash Script Executer every hour"
@@ -4290,8 +4269,8 @@
   trigger:
     - platform: state
       entity_id: sensor.foodsharing_48_082236
-    #- platform: template
-    #  value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
+    # - platform: template
+    # value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
   condition:
     condition: and
     conditions:
@@ -4331,7 +4310,7 @@
     - platform: state
       entity_id: sensor.foodsharing_48_082236
     # - platform: template
-    #   value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
+    # value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
   condition:
     condition: and
     conditions:
@@ -4526,8 +4505,8 @@
           Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert.
         target: !secret telegram_chat_fabian
     - service: update.install
-        data:
-          entity_id: update.home_assistant_core_update
+      data:
+        entity_id: update.home_assistant_core_update
 
 - id: hacs_update_available
   alias: "HACS Update available"
@@ -8343,7 +8322,7 @@
         options:
           - "Ja"
           - "Nein"
-          - "Wahrscheinlich"
+          - "Vielleicht"
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
@@ -8384,7 +8363,7 @@
         options:
           - "Ja"
           - "Nein"
-          - "Wahrscheinlich"
+          - "Vielleicht"
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
@@ -8416,7 +8395,7 @@
         options:
           - "Ja"
           - "Nein"
-          - "Wahrscheinlich"
+          - "Vielleicht"
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true

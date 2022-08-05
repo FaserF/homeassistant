@@ -43,7 +43,7 @@ jobs:
       - name: Rename Dummy files for action usage
         run: |
             mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
-            mv -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant-SmartLife-f9d43c517637.json
+            mv -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant_google_assistant.json
             rm -r switch/switch_custom_components.yaml
             rm -r sensor/sensor_custom_components.yaml
             rm -r light/light_custom_components.yaml
