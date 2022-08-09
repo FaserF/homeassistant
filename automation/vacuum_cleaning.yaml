@@ -230,7 +230,7 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ states('counter.vacuum_runs')|float % 24 == 0 }}"
+              value_template: "{{ states('counter.vacuum_runs')|float % 30 == 0 }}"
           sequence:
             - service: notify.telegram_nessie
               data_template:
