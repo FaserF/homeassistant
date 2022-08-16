@@ -9,31 +9,31 @@
 #       - version
 #       - idle
 #     value_template: "{{value_json.online}}"
-- platform: imap_email_content
-  server: imap.ionos.de
-  port: 993
-  username: !secret juz_mail
-  password: !secret juz_mail_pw
-  senders:
-    - !secret vapid_email
-    - !secret juz_mail
-    - !secret gerhard_mail
-    - !secret fv_mail
-    - !secret moser_mail
-    - !secret grothe_mail
-    - !secret gl_mail
-    - !secret simon_mail
-    - !secret maxi_mail
-    - !secret fabi_yahoo_mail
-    - !secret gabi_mail
-    - !secret bm_mail
-    - !secret jugendpflege_mail
-    - !secret asenbeck_mail
-    - noreply@ionos.de
-- platform: imap
-  server: imap.ionos.de
-  username: !secret juz_mail
-  password: !secret juz_mail_pw
+# - platform: imap_email_content
+#   server: imap.ionos.de
+#   port: 993
+#   username: !secret juz_mail
+#   password: !secret juz_mail_pw
+#   senders:
+#     - !secret vapid_email
+#     - !secret juz_mail
+#     - !secret gerhard_mail
+#     - !secret fv_mail
+#     - !secret moser_mail
+#     - !secret grothe_mail
+#     - !secret gl_mail
+#     - !secret simon_mail
+#     - !secret maxi_mail
+#     - !secret fabi_yahoo_mail
+#     - !secret gabi_mail
+#     - !secret bm_mail
+#     - !secret jugendpflege_mail
+#     - !secret asenbeck_mail
+#     - noreply@ionos.de
+# - platform: imap
+#   server: imap.ionos.de
+#   username: !secret juz_mail
+#   password: !secret juz_mail_pw
 #   - platform: command_line
 #     name: "Latest Tasmota"
 #     command: l -s https://github.com/arendst/Tasmota/releases/latest | cut -d''"'' -f2 | rev | cut -d''/'' -f1 | cut -c 1- | cut -c -2 | rev'

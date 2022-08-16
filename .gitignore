@@ -29,3 +29,4 @@ known_devices.yaml
 google_calendars.yaml
 Homeassistant_google_assistant.json
 config_ic3.yaml
+o365*.yaml

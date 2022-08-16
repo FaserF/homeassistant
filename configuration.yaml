@@ -176,6 +176,8 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
+  logs:
+    custom_components.o365: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -236,6 +238,31 @@ telegram_bot:
       - !secret telegram_foodsharing
       - !secret telegram_foodsharing_muc
       - !secret telegram_volleyball
+
+o365:
+  accounts:
+    - account_name: 5Freunde
+      client_id: !secret O365_client_id
+      client_secret: !secret O365_client_secret
+      alt_auth_method: False
+      enable_update: True
+      track_new_calendar: False
+      email_sensor:
+        - name: 5freunde
+          max_items: 2
+          is_unread: False
+          download_attachments: False
+    - account_name: JUZ
+      client_id: !secret O365_client_id
+      client_secret: !secret O365_client_secret
+      alt_auth_method: False
+      enable_update: True
+      track_new_calendar: False
+      email_sensor:
+        - name: juz
+          max_items: 4
+          is_unread: False
+          download_attachments: False
 
 notify:
   - name: telegram_fabian
