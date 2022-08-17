@@ -79,7 +79,7 @@ views:
       - entity: sensor.fabian_ipadpro_battery_level
       - entity: sensor.washing_machine_finish_duration
       - entity: sensor.nessie_pc_energy_power
-      - entity: sensor.steckdose_schlafzimmer_energy_power
+      - entity: sensor.schlafzimmer_power
       - entity: sensor.keller_steckdose_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
@@ -455,9 +455,10 @@ views:
             secondary_info: last-changed
           - entity: device_tracker.nsta0552
             secondary_info: last-changed
-          - entity: sensor.steckdose_schlafzimmer_energy_power
+          - entity: sensor.schlafzimmer_power
           - entity: sensor.cpuloadsensor
           - entity: sensor.gpuload
+          - entity: automation.turn_on_lights_in_sleeping_room_when_sun_set
         show_header_toggle: true
         title: Fabian PC
         type: entities
@@ -685,11 +686,11 @@ views:
       - type: entities
         entities:
           - entity: automation.pill_reminder
-          - entity: sensor.info_juzzo_de
-          - entity: sensor.info_juzzo_de_2
           - entity: input_button.find_fabian_s_phone_by_sound
           - entity: input_button.find_nessie_s_phone_by_sound
           - entity: input_button.find_fabian_s_ipad_by_sound
+          - entity: sensor.juz
+          - entity: sensor.5freunde
   - path: router
     title: Frtizbox
     icon: mdi:router-wireless
@@ -780,6 +781,7 @@ views:
           - entity: device_tracker.google_maps_114935414809961191566
           - entity: person.samuel
         hours_to_show: 24
+        dark_mode: true
   - title: RaspberryPi
     path: raspberrypi
     icon: mdi:raspberry-pi

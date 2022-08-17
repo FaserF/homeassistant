@@ -1187,7 +1187,7 @@
       - condition: numeric_state
         entity_id: climate.schlafzimmer
         attribute: current_humidity
-        above: 50
+        above: 55
       - condition: time
         before: "22:00:00"
       - condition: state
@@ -3195,7 +3195,6 @@
   trigger:
     - platform: state
       entity_id: device_tracker.fabian_pc
-      from: "not_home"
       to: "home"
       for:
         minutes: 2
@@ -3216,7 +3215,6 @@
 
 - id: turn_on_lights_in_sleeping_room_when_sun_set
   alias: "Turn on lights in sleeping room when sun set"
-  initial_state: true
   trigger:
     platform: sun
     event: sunset
@@ -4241,14 +4239,19 @@
     platform: time
     at: "16:00:00"
   condition:
-    condition: or
+    condition: and
     conditions:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: sensor.bioabfall
+            state: "Morgen"
+          - condition: state
+            entity_id: sensor.altpapier
+            state: "Morgen"
       - condition: state
-        entity_id: sensor.bioabfall
-        state: "Morgen"
-      - condition: state
-        entity_id: sensor.altpapier
-        state: "Morgen"
+        entity_id: "input_boolean.abwesend_modus"
+        state: "off"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -4499,6 +4502,9 @@
                   {% if states.update.ytube_music_player_update.state == "on" %}
                   {{ states.update.ytube_music_player_update.attributes.friendly_name }} Changelog: {{ states.update.ytube_music_player_update.attributes.release_url }} - von Version {{state_attr('update.ytube_music_player_update', 'installed_version')}} zu Version {{state_attr('update.ytube_music_player_update', 'latest_version')}}.
                   {% endif %}
+                  {% if states.update.office_365_integration_update.state == "on" %}
+                  {{ states.update.office_365_integration_update.attributes.friendly_name }} Changelog: {{ states.update.office_365_integration_update.attributes.release_url }} - von Version {{state_attr('update.office_365_integration_update', 'installed_version')}} zu Version {{state_attr('update.office_365_integration_update', 'latest_version')}}.
+                  {% endif %}
             - choose:
                 - conditions:
                     - condition: state
@@ -4572,6 +4578,14 @@
                     - service: update.install
                       data:
                         entity_id: update.ytube_music_player_update
+                - conditions:
+                    - condition: state
+                      entity_id: update.office_365_integration_update
+                      state: "on"
+                  sequence:
+                    - service: update.install
+                      data:
+                        entity_id: update.office_365_integration_update
               default:
                 - service: update.install
                   data:
@@ -4592,7 +4606,6 @@
             - service: update.install
               data:
                 entity_id: update.home_assistant_core_update
-    - choose:
         - conditions:
             - condition: state
               entity_id: update.home_assistant_operating_system_update
@@ -5758,7 +5771,7 @@
                       entity_id: light.regal
                       state: "off"
                     - condition: state
-                      entity_id: light.leds_tisch
+                      entity_id: light.regal
                       state: "unavailable"
           sequence:
             - service: light.turn_on
@@ -8501,7 +8514,7 @@
       data_template:
         target: !secret telegram_chat_juz_mail
         message: >
-          Inhalt: {{state_attr('sensor.juz', 'data')[0]['body']}}
+          Inhalt: {{state_attr('sensor.juz', 'data')[0]['body'] | truncate(450)}}
 
 - id: send_5freunde_mails_to_telegram
   alias: "send 5freunde mails to telegram"
@@ -8533,4 +8546,4 @@
       data_template:
         target: !secret telegram_chat_5friends
         message: >
-          Inhalt: {{state_attr('sensor.5freunde', 'data')[0]['body']}}
+          Inhalt: {{state_attr('sensor.5freunde', 'data')[0]['body'] | truncate(400)}}

@@ -218,8 +218,6 @@
             - condition: numeric_state
               entity_id: counter.vacuum_water_level
               below: 1
-            # - condition: template
-            #   value_template: "{{ states('counter.vacuum_runs')|float % 4 == 0 }}"
           sequence:
             - service: notify.telegram_nessie
               data_template:
@@ -234,10 +232,10 @@
           sequence:
             - service: notify.telegram_nessie
               data_template:
-                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
+                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
             - service: notify.telegram_fabian
               data_template:
-                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein..."
+                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
 
 - id: vacuum_water_refilled
   alias: "Vacuum Water refilled"
@@ -261,12 +259,30 @@
     - service: counter.reset
       target:
         entity_id: counter.vacuum_water_level
-    - service: notify.telegram_nessie
-      data_template:
-        message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
-    - service: notify.telegram_fabian
-      data_template:
-        message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: counter.vacuum_water_level
+              below: 1
+            - condition: state
+              entity_id: person.nessie
+              state: "not_home"
+          sequence:
+            - service: notify.telegram_nessie
+              data_template:
+                message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: counter.vacuum_water_level
+              below: 1
+            - condition: state
+              entity_id: person.fabian
+              state: "not_home"
+          sequence:
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
 
 - id: turn_off_staubsauger_after_x_hours
   alias: "Turn off staubsauger after x hours"
@@ -274,7 +290,6 @@
   trigger:
     - platform: state
       entity_id: switch.staubsauger
-      from: "off"
       to: "on"
       for:
         minutes: 150
