@@ -172,3 +172,5 @@ ignored_entities:
     - switch.hibernate
     - switch.restart
     - switch.shutdown
+    - media_player.android_tv_192_168_178_12
+    - binary_sensor.miwifi_9c_9d_7e_30_89_fb_state

@@ -99,7 +99,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_color_0x00000000036dc050
+          - entity: light.yeelight_color_0x36dc050
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -108,7 +108,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+          - entity: light.yeelight_bslamp2_0x13fea10f
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -285,7 +285,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_color_0x00000000036dc050
+          - entity: light.yeelight_color_0x36dc050
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -431,7 +431,7 @@ views:
           - entity: switch.adaptive_lighting_sleeping_room
             name: Adaptives Licht
           - entity: light.lichtschalter
-          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+          - entity: light.yeelight_bslamp2_0x13fea10f
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -844,7 +844,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_bslamp2_0x0000000013fea10f
+          - entity: light.yeelight_bslamp2_0x13fea10f
             group: true
             toggle: true
             type: custom:slider-entity-row

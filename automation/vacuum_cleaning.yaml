@@ -6,86 +6,106 @@
     platform: time
     at: "13:00:00"
   condition:
-    - condition: time
-      weekday:
-        - tue
-        - fri
     - condition: state
       entity_id: input_boolean.abwesend_modus
       state: "off"
     - condition: state
       entity_id: input_boolean.leiser_modus
       state: "off"
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Mon") and (states.input_select.wochentagsreinigung.state=="Montag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Tue") and (states.input_select.wochentagsreinigung.state=="Dienstag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Wed") and (states.input_select.wochentagsreinigung.state=="Mittwoch")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Thu") and (states.input_select.wochentagsreinigung.state=="Donnerstag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Fri") and (states.input_select.wochentagsreinigung.state=="Freitag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Sat") and (states.input_select.wochentagsreinigung.state=="Samstag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Sun") and (states.input_select.wochentagsreinigung.state=="Sonntag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Mon") and (states.input_select.zweite_wochentagsreinigung.state=="Montag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Tue") and (states.input_select.zweite_wochentagsreinigung.state=="Dienstag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Wed") and (states.input_select.zweite_wochentagsreinigung.state=="Mittwoch")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Thu") and (states.input_select.zweite_wochentagsreinigung.state=="Donnerstag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Fri") and (states.input_select.zweite_wochentagsreinigung.state=="Freitag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Sat") and (states.input_select.zweite_wochentagsreinigung.state=="Samstag")}}'
+        - condition: template
+          value_template: '{{ (now().strftime("%a") == "Sun") and (states.input_select.zweite_wochentagsreinigung.state=="Sonntag")}}'
   action:
     - service: switch.turn_on
       data:
         entity_id: switch.staubsauger
     - choose:
         - conditions:
-            - condition: state
-              entity_id: binary_sensor.workday_sensor
-              state: "on"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
+          sequence:
+            # if Fabi & Nessie not at home clean all rooms
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            # else if only fabi is not at home clean all rooms except guest room
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
           sequence:
             - choose:
                 - conditions:
                     - condition: not
                       conditions:
                         - condition: state
-                          entity_id: person.fabian
-                          state: "home"
-                        - condition: state
-                          entity_id: person.nessie
-                          state: "home"
+                          entity_id: input_boolean.gast_modus
+                          state: "on"
                   sequence:
-                    # if Fabi & Nessie not at home clean all rooms
+                    # else if only nessie is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
                     - service: mqtt.publish
                       data:
                         topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                        payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
-                - conditions:
-                    - condition: not
-                      conditions:
-                        - condition: state
-                          entity_id: person.fabian
-                          state: "home"
-                  sequence:
-                    # else if only fabi is not at home clean all rooms except guest room
-                    - service: mqtt.publish
-                      data:
-                        topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                        payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
-                - conditions:
-                    - condition: not
-                      conditions:
-                        - condition: state
-                          entity_id: person.nessie
-                          state: "home"
-                  sequence:
-                    - choose:
-                        - conditions:
-                            - condition: not
-                              conditions:
-                                - condition: state
-                                  entity_id: input_boolean.gast_modus
-                                  state: "on"
-                          sequence:
-                            # else if only nessie is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
-                            - service: mqtt.publish
-                              data:
-                                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                                payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
-                      default:
-                        # else if only nessie is not at home clean all rooms except sleeping room
-                        - service: mqtt.publish
-                          data:
-                            topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                            payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+                        payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
               default:
-                # default if fabi & nessie at home: clean only living room, floor & kitchen
+                # else if only nessie is not at home clean all rooms except sleeping room
                 - service: mqtt.publish
                   data:
                     topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                     payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+      default:
+        # default if fabi & nessie at home: clean only living room, floor & kitchen
+        - service: mqtt.publish
+          data:
+            topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+            payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
 
 - id: vacuum_cleaner_error
   alias: "Vacuum Cleaner Error"
@@ -261,24 +281,22 @@
         entity_id: counter.vacuum_water_level
     - choose:
         - conditions:
-            - condition: numeric_state
-              entity_id: counter.vacuum_water_level
-              below: 1
-            - condition: state
-              entity_id: person.nessie
-              state: "not_home"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
           sequence:
             - service: notify.telegram_nessie
               data_template:
                 message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
     - choose:
         - conditions:
-            - condition: numeric_state
-              entity_id: counter.vacuum_water_level
-              below: 1
-            - condition: state
-              entity_id: person.fabian
-              state: "not_home"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
           sequence:
             - service: notify.telegram_fabian
               data_template:

@@ -239,16 +239,14 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
-          state: home
-    - condition: not
-      conditions:
-        - condition: state
           entity_id: person.fabian
           state: Volleyball
         - condition: state
           entity_id: person.fabian
           state: Einkaufen
+        - condition: state
+          entity_id: device_tracker.fabian_iphone_2
+          state: home
     - condition: or
       conditions:
         - condition: numeric_state
@@ -292,7 +290,7 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+          entity_id: device_tracker.nessie_iphone_2
           state: home
     - condition: not
       conditions:
@@ -334,7 +332,7 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.miwifi_14_c8_8b_0e_84_66
+          entity_id: device_tracker.iphone
           state: home
     - condition: numeric_state
       entity_id: person.adri
@@ -434,7 +432,7 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.miwifi_e8_7f_95_73_88_96
+          entity_id: device_tracker.ks_2
           state: home
     - condition: numeric_state
       entity_id: person.kai
@@ -535,7 +533,7 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.miwifi_30_ab_6a_c1_fe_15
+          entity_id: device_tracker.galaxy_s_22
           state: home
     - condition: numeric_state
       entity_id: person.flo
@@ -1226,7 +1224,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+            entity_id: device_tracker.wohnzimmer_tv
             state: "not_home"
           - condition: state
             entity_id: switch.fernseher
@@ -1245,7 +1243,7 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+                  entity_id: device_tracker.wohnzimmer_tv
                   state: "not_home"
                 - condition: state
                   entity_id: switch.fernseher
@@ -1274,7 +1272,7 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+                  entity_id: device_tracker.wohnzimmer_tv
                   state: "not_home"
                 - condition: state
                   entity_id: switch.fernseher
@@ -1549,7 +1547,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+      entity_id: device_tracker.wohnzimmer_tv
       from: "not_home"
       to: "home"
   action:
@@ -1569,7 +1567,7 @@
                 entity_id:
                   - light.leds_wohnzimmer_tv
                   - light.leds_wohnzimmer
-                  - light.yeelight_color_0x00000000036dc050
+                  - light.yeelight_color_0x36dc050
                 transition: 2
     - choose:
         - conditions:
@@ -1592,7 +1590,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+      entity_id: device_tracker.wohnzimmer_tv
       from: "home"
       to: "not_home"
   condition:
@@ -2720,11 +2718,11 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+      entity_id: device_tracker.fabian_iphone_2
       from: "not_home"
       to: "home"
     - platform: state
-      entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+      entity_id: device_tracker.nessie_iphone_2
       from: "not_home"
       to: "home"
   condition:
@@ -2744,30 +2742,30 @@
           - condition: and
             conditions:
               - condition: state
-                entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                entity_id: device_tracker.fabian_iphone_2
                 state: home
               - condition: state
-                entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                entity_id: device_tracker.nessie_iphone_2
                 state: home
           - condition: and
             conditions:
               - condition: state
-                entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                entity_id: device_tracker.nessie_iphone_2
                 state: home
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_112174659110860535869
+                    entity_id: person.fabian
                     state: home
           - condition: and
             conditions:
               - condition: state
-                entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                entity_id: device_tracker.fabian_iphone_2
                 state: home
               - condition: not
                 conditions:
                   - condition: state
-                    entity_id: device_tracker.google_maps_112056758146194246561
+                    entity_id: person.nessie
                     state: home
   action:
     - choose:
@@ -2788,7 +2786,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.yeelight_bslamp2_0x0000000013fea10f
+                  - light.yeelight_bslamp2_0x13fea10f
                 brightness: 2
             - delay: "00:02:30"
             - service: automation.trigger
@@ -2841,7 +2839,7 @@
     # - service: light.turn_off
     #   data:
     #     entity_id:
-    #       - light.yeelight_bslamp2_0x0000000013fea10f
+    #       - light.yeelight_bslamp2_0x13fea10f
     - delay: "00:20:00"
     - service: switch.turn_on
       data:
@@ -2874,7 +2872,7 @@
       - condition: not
         conditions:
           - condition: state
-            entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+            entity_id: light.yeelight_bslamp2_0x13fea10f
             state: "off"
           - condition: state
             entity_id: light.leds_tisch
@@ -2914,19 +2912,19 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+              entity_id: light.yeelight_bslamp2_0x13fea10f
               state: "on"
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                  entity_id: light.yeelight_bslamp2_0x13fea10f
                   attribute: brightness
                   state: "255"
           sequence:
             - service: light.turn_on
-              entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+              entity_id: light.yeelight_bslamp2_0x13fea10f
               data_template:
-                brightness: "{{states.light.yeelight_bslamp2_0x0000000013fea10f.attributes.brightness + 5}}"
+                brightness: "{{states.light.yeelight_bslamp2_0x13fea10f.attributes.brightness + 5}}"
     - service: automation.trigger
       data:
         entity_id: automation.increase_lights_in_morning
@@ -2949,10 +2947,10 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+            entity_id: device_tracker.nessie_iphone_2
             state: home
           - condition: state
-            entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+            entity_id: device_tracker.fabian_iphone_2
             state: home
   action:
     - choose:
@@ -2963,10 +2961,10 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                  entity_id: device_tracker.nessie_iphone_2
                   state: home
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                  entity_id: device_tracker.fabian_iphone_2
                   state: home
           sequence:
             - service: tts.google_say
@@ -3036,10 +3034,10 @@
             - condition: and
               conditions:
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                  entity_id: device_tracker.nessie_iphone_2
                   state: home
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                  entity_id: device_tracker.fabian_iphone_2
                   state: home
           sequence:
             - service: tts.google_say
@@ -3108,7 +3106,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+      entity_id: device_tracker.wohnzimmer_tv
       from: "home"
       to: "not_home"
       for:
@@ -3142,12 +3140,12 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                  entity_id: light.yeelight_bslamp2_0x13fea10f
                   state: unavailable
           sequence:
             - service: light.turn_on
               data:
-                entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                entity_id: light.yeelight_bslamp2_0x13fea10f
                 brightness: 255
                 color_temp: 279
     - service: light.turn_off
@@ -3176,7 +3174,7 @@
       offset: "-00:30:00"
   condition:
     - condition: state
-      entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+      entity_id: device_tracker.wohnzimmer_tv
       state: home
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_livingroom_when_dark_outside.attributes.last_triggered) | int > 1800 }}"
@@ -3186,7 +3184,7 @@
         entity_id:
           - light.leds_wohnzimmer_tv
           - light.leds_wohnzimmer
-          - light.yeelight_color_0x00000000036dc050
+          - light.yeelight_color_0x36dc050
         transition: 2
 
 - id: turn_off_prismatik_during_the_day
@@ -3223,7 +3221,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: "device_tracker.miwifi_34_51_80_d0_44_29"
+        entity_id: "device_tracker.wohnzimmer_tv"
         state: "not_home"
       - condition: or
         conditions:
@@ -3290,7 +3288,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+            entity_id: device_tracker.wohnzimmer_tv
             state: "not_home"
           - condition: state
             entity_id: switch.fernseher
@@ -3743,9 +3741,9 @@
       data_template:
         target: !secret telegram_chat_fabian
         message: "Homeassistant wurde soeben gestartet."
-    - service: button.press
-      target:
-        entity_id: button.synchronize_devices
+    # - service: button.press
+    # target:
+    # entity_id: button.synchronize_devices
 
 - id: run_bash_script_with_addon_bash_script_executer_every_hour
   alias: "Run Bash Script with Addon Bash Script Executer every hour"
@@ -4590,6 +4588,36 @@
                 - service: update.install
                   data:
                     entity_id: all
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: update.adguard_home_update
+              state: "on"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: >
+                  Adguard Home Update {{ states.update.adguard_home_update.attributes.latest_version }} wird nun installiert.
+                  Changelog: {{ states.update.adguard_home_update.attributes.release_summary }}
+            - service: update.install
+              data:
+                entity_id: update.adguard_home_update
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: update.fritz_box_3490_fritz_os
+              state: "on"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: >
+                  FritzBox Firmware Update {{ states.update.fritz_box_3490_fritz_os.attributes.latest_version }} wird nun installiert.
+                  Changelog: {{ states.update.fritz_box_3490_fritz_os.attributes.release_url }}
+            - service: update.install
+              data:
+                entity_id: update.fritz_box_3490_fritz_os
     - delay: "00:02:00"
     - choose:
         - conditions:
@@ -5467,10 +5495,10 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+            entity_id: person.nessie
             state: home
           - condition: state
-            entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+            entity_id: person.fabian
             state: home
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
@@ -5520,10 +5548,10 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                  entity_id: person.nessie
                   state: home
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                  entity_id: person.fabian
                   state: home
           sequence:
             # - service: rest_command.assistant_broadcast
@@ -5543,10 +5571,10 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+                  entity_id: person.nessie
                   state: home
                 - condition: state
-                  entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+                  entity_id: person.fabian
                   state: home
           sequence:
             - service: telegram_bot.send_message
@@ -5637,10 +5665,10 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: light.yeelight_color_0x00000000036dc050
+                  entity_id: light.yeelight_color_0x36dc050
                   state: "off"
                 - condition: state
-                  entity_id: light.yeelight_color_0x00000000036dc050
+                  entity_id: light.yeelight_color_0x36dc050
                   state: "unavailable"
             - condition: or
               conditions:
@@ -5658,7 +5686,7 @@
             #     brightness: 255
             - service: light.turn_on
               data:
-                entity_id: light.yeelight_color_0x00000000036dc050
+                entity_id: light.yeelight_color_0x36dc050
                 transition: 2
                 brightness: 255
                 color_temp: 225
@@ -5678,7 +5706,7 @@
                   for:
                     seconds: 1
                 - condition: state
-                  entity_id: light.yeelight_color_0x00000000036dc050
+                  entity_id: light.yeelight_color_0x36dc050
                   state: "on"
                   for:
                     seconds: 1
@@ -5752,10 +5780,10 @@
                 - condition: or
                   conditions:
                     - condition: state
-                      entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                      entity_id: light.yeelight_bslamp2_0x13fea10f
                       state: "off"
                     - condition: state
-                      entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                      entity_id: light.yeelight_bslamp2_0x13fea10f
                       state: "unavailable"
                 - condition: or
                   conditions:
@@ -5784,7 +5812,7 @@
               data:
                 entity_id:
                   - light.bett_gluhbirne
-                  - light.yeelight_bslamp2_0x0000000013fea10f
+                  - light.yeelight_bslamp2_0x13fea10f
                 brightness: 255
                 color_temp: 225
                 transition: 2
@@ -5810,7 +5838,7 @@
                   for:
                     seconds: 1
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x0000000013fea10f
+                  entity_id: light.yeelight_bslamp2_0x13fea10f
                   state: "on"
                   for:
                     seconds: 1
@@ -5861,7 +5889,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: device_tracker.miwifi_34_51_80_d0_44_29
+        entity_id: device_tracker.wohnzimmer_tv
         state: "home"
   action:
     - service: androidtv.adb_command
@@ -5911,10 +5939,10 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+            entity_id: person.nessie
             state: home
           - condition: state
-            entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+            entity_id: person.fabian
             state: home
       - condition: or
         conditions:
@@ -6100,10 +6128,10 @@
     - condition: time
       after: "06:00:00"
     - condition: state
-      entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+      entity_id: person.nessie
       state: not_home
     - condition: state
-      entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+      entity_id: person.fabian
       state: not_home
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
@@ -6130,13 +6158,13 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+      entity_id: person.fabian
       from: "not_home"
       to: "home"
       for:
         minutes: 3
     - platform: state
-      entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+      entity_id: person.nessie
       from: "not_home"
       to: "home"
       for:
@@ -7208,7 +7236,7 @@
 #            - thu
 #            - sun
 #        - condition: state
-#          entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+#          entity_id: device_tracker.fabian_iphone_2
 #          state: home
 #        - condition: template
 #          value_template: >
@@ -7754,7 +7782,7 @@
     condition: and
     conditions:
       - condition: state
-        entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+        entity_id: device_tracker.fabian_iphone_2
         state: home
       - condition: time
         after: "06:30:00"
@@ -8141,7 +8169,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+              entity_id: device_tracker.nessie_iphone_2
               state: home
             - condition: state
               entity_id:
@@ -8253,7 +8281,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+              entity_id: person.fabian
               state: home
             - condition: state
               entity_id: input_boolean.leiser_modus
@@ -8293,7 +8321,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.miwifi_a0_fb_c5_10_d2_75
+              entity_id: person.fabian
               state: home
             - condition: state
               entity_id: input_boolean.leiser_modus
@@ -8315,8 +8343,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id:
-        - device_tracker.miwifi_a0_fb_c5_10_d2_75
+      entity_id: device_tracker.fabian_iphone_2
       from: "not_home"
       to: "home"
   condition:
@@ -8346,7 +8373,7 @@
   trigger:
     - platform: state
       entity_id:
-        - device_tracker.miwifi_a0_fb_c5_c5_d7_ad
+        - device_tracker.nessie_iphone_2
       from: "not_home"
       to: "home"
   condition:

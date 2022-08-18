@@ -152,7 +152,7 @@ logger:
       - "Could not connect to Prismatik at*"
       - "Could not connect to Prismatik at 192.168.178.16:3636"
     custom_components.xiaomi_miio_cooker:
-      - "Got exception while fetching the state: Unable to discover the device 192.168.31.195"
+      - "Got exception while fetching the state: Unable to discover the device 192.168.178.220"
     custom_components.miwifi.updater:
       - "connecting to router (attempt #10 of 10): LuciConnectionException*"
       - "Error connecting to router (attempt #$ of 10): LuciConnectionException*"
@@ -242,7 +242,7 @@ o365:
     - account_name: 5Freunde
       client_id: !secret O365_client_id
       client_secret: !secret O365_client_secret
-      alt_auth_method: False
+      alt_auth_method: True
       enable_update: True
       track_new_calendar: False
       email_sensor:
@@ -253,7 +253,7 @@ o365:
     - account_name: JUZ
       client_id: !secret O365_client_id
       client_secret: !secret O365_client_secret
-      alt_auth_method: False
+      alt_auth_method: True
       enable_update: True
       track_new_calendar: False
       email_sensor:
@@ -492,7 +492,7 @@ google_assistant:
     light.leds_tisch:
       expose: true
       room: Schlafzimmer
-    light.yeelight_bslamp2_0x0000000013fea10f:
+    light.yeelight_bslamp2_0x13fea10f:
       name: Bettlicht
       expose: true
       room: Schlafzimmer
@@ -522,7 +522,7 @@ google_assistant:
     light.leds_wohnzimmer:
       expose: true
       room: Wohnzimmer
-    light.yeelight_color_0x00000000036dc050:
+    light.yeelight_color_0x36dc050:
       expose: true
       room: Wohnzimmer
     switch.fernseher:
@@ -751,12 +751,12 @@ adaptive_lighting:
   - name: "living_room"
     lights:
       - light.leds_wohnzimmer
-      - light.yeelight_color_0x00000000036dc050
+      - light.yeelight_color_0x36dc050
     min_brightness: 60
     min_color_temp: 3700
   - name: "sleeping_room"
     lights:
-      - light.yeelight_bslamp2_0x0000000013fea10f
+      - light.yeelight_bslamp2_0x13fea10f
       - light.bett_gluhbirne
       # - light.leds_tisch
     min_brightness: 25
@@ -769,6 +769,6 @@ adaptive_lighting:
 
 xiaomi_miio_cooker:
   name: Xiaomi Rice Cooker
-  host: 192.168.31.195
+  host: 192.168.178.220
   token: !secret rice_cooker_token
   model: chunmi.cooker.eh1
