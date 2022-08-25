@@ -4643,7 +4643,9 @@
                   Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert.
 
                   Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
-            - service: shell_command.git_push
+            - service: hassio.addon_restart
+              data:
+                addon: a0d7b954-ssh
             - service: update.install
               data:
                 entity_id: update.home_assistant_core_update
