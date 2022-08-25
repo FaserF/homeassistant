@@ -817,28 +817,57 @@
   trigger:
     platform: time
     at: "04:50:00"
-  condition:
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: switch.fernseher
-          state: "on"
-        - condition: state
-          entity_id: switch.kuhlschrank
-          state: "on"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
   action:
-    - service: switch.turn_off
-      entity_id:
-        - switch.fernseher
-        - switch.kuhlschrank
-    - service: media_player.turn_off
-      entity_id: media_player.keller_tv
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_fabian
-        message: "Fernseher & Kühlschrank wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: switch.fernseher
+                  state: "on"
+                - condition: state
+                  entity_id: switch.kuhlschrank
+                  state: "on"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
+          sequence:
+            - service: switch.turn_off
+              entity_id:
+                - switch.fernseher
+                - switch.kuhlschrank
+            - service: media_player.turn_off
+              entity_id: media_player.keller_tv
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: "Fernseher & Kühlschrank wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.zorneding_to_leuchtenbergring.last_updated) | int > 43.200 }}"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: update.home_assistant_core_update
+                      state: "on"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: >
+                          Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert um HA neuzustarten, da DB API Verbindung verloren wurde.
+
+                          Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
+                    - service: update.install
+                      data:
+                        entity_id: update.home_assistant_core_update
+              default:
+                - service: telegram_bot.send_message
+                  data_template:
+                    target: !secret telegram_chat_fabian
+                    message: "Starte Homeassistant neu, da DB API Verbindung verloren wurde."
+                - service: homeassistant.restart
 
 - id: set_climate_at_night
   alias: "Set climate at night"
@@ -4444,7 +4473,7 @@
     - platform: time
       at: "04:00:00"
     - platform: time
-      at: "05:00:00"
+      at: "05:10:00"
   condition:
     condition: and
     conditions:
@@ -4502,6 +4531,9 @@
                   {% endif %}
                   {% if states.update.office_365_integration_update.state == "on" %}
                   {{ states.update.office_365_integration_update.attributes.friendly_name }} Changelog: {{ states.update.office_365_integration_update.attributes.release_url }} - von Version {{state_attr('update.office_365_integration_update', 'installed_version')}} zu Version {{state_attr('update.office_365_integration_update', 'latest_version')}}.
+                  {% endif %}
+                  {% if states.update.toogoodtogo_update.state == "on" %}
+                  {{ states.update.toogoodtogo_update.attributes.friendly_name }} Changelog: {{ states.update.toogoodtogo_update.attributes.release_url }} - von Version {{state_attr('update.toogoodtogo_update', 'installed_version')}} zu Version {{state_attr('update.toogoodtogo_update', 'latest_version')}}.
                   {% endif %}
             - choose:
                 - conditions:
@@ -4584,6 +4616,14 @@
                     - service: update.install
                       data:
                         entity_id: update.office_365_integration_update
+                - conditions:
+                    - condition: state
+                      entity_id: update.toogoodtogo_update
+                      state: "on"
+                  sequence:
+                    - service: update.install
+                      data:
+                        entity_id: update.toogoodtogo_update
               default:
                 - service: update.install
                   data:
@@ -4599,6 +4639,7 @@
                 target: !secret telegram_chat_fabian
                 message: >
                   Adguard Home Update {{ states.update.adguard_home_update.attributes.latest_version }} wird nun installiert.
+
                   Changelog: {{ states.update.adguard_home_update.attributes.release_summary }}
             - service: update.install
               data:
@@ -4614,6 +4655,7 @@
                 target: !secret telegram_chat_fabian
                 message: >
                   FritzBox Firmware Update {{ states.update.fritz_box_3490_fritz_os.attributes.latest_version }} wird nun installiert.
+
                   Changelog: {{ states.update.fritz_box_3490_fritz_os.attributes.release_url }}
             - service: update.install
               data:
@@ -4630,6 +4672,7 @@
                 target: !secret telegram_chat_fabian
                 message: >
                   Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert.
+
                   Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
             - service: update.install
               data:
@@ -4644,6 +4687,7 @@
                 target: !secret telegram_chat_fabian
                 message: >
                   Home Assistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }} wird nun installiert.
+
                   Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
             - service: update.install
               data:
@@ -5338,6 +5382,21 @@
                 entity_id: media_player.keller_tv_cast
                 is_volume_muted: false
 
+- id: turn_off_devices_after_power_loss
+  alias: Turn off devices after power loss
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id:
+        - light.bett_gluhbirne
+      from: "unavailable"
+      to: "on"
+  action:
+    - service: light.turn_on
+      data:
+        entity_id:
+          - light.bett_gluhbirne
+
 - id: low_battery_thermostats
   alias: Low battery thermostats
   initial_state: true
@@ -5411,6 +5470,7 @@
           KOMPLETT
           {% endif %}
           leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
+
 - id: cast_ha_to_tv_if_idle
   alias: Cast HA to TV if idleing
   trigger:
@@ -7828,7 +7888,7 @@
       - condition: not
         conditions:
           - condition: state
-            entity_id: device_tracker.google_maps_112174659110860535869
+            entity_id: person.fabian
             state: home
   action:
     - service: notify.telegram_fabian
@@ -7841,8 +7901,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id:
-        - device_tracker.google_maps_112056758146194246561
+      entity_id: person.nessie
       from: "Arbeit Nessie"
       to: "not_home"
   condition:
@@ -8513,47 +8572,47 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: sensor.juz
+      entity_id: sensor.juz_outlook
   condition:
     condition: and
     conditions:
       - condition: numeric_state
-        entity_id: sensor.juz
+        entity_id: sensor.juz_outlook
         above: "0"
       - condition: template
         value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
       - condition: not
         conditions:
           - condition: template
-            value_template: "{{'noreply@ionos.de' in state_attr('sensor.juz', 'data')[0]['sender'] }}"
+            value_template: "{{'noreply@ionos.de' in state_attr('sensor.juz_outlook', 'data')[0]['sender'] }}"
   action:
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_juz_mail
         message: >
-          Neue Mail vom {{ as_timestamp(state_attr('sensor.juz', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+          Neue Mail vom {{ as_timestamp(state_attr('sensor.juz_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
-          Absender: {{state_attr('sensor.juz', 'data')[0]['sender']}}
+          Absender: {{state_attr('sensor.juz_outlook', 'data')[0]['sender']}}
 
-          Betreff: {{state_attr('sensor.juz', 'data')[0]['subject']}}
+          Betreff: {{state_attr('sensor.juz_outlook', 'data')[0]['subject']}}
     - delay: "00:00:10"
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_juz_mail
         message: >
-          Inhalt: {{state_attr('sensor.juz', 'data')[0]['body'] | truncate(450)}}
+          Inhalt: {{state_attr('sensor.juz_outlook', 'data')[0]['body'] | truncate(450)}}
 
 - id: send_5freunde_mails_to_telegram
   alias: "send 5freunde mails to telegram"
   initial_state: true
   trigger:
     - platform: state
-      entity_id: sensor.5freunde
+      entity_id: sensor.5freunde_outlook
   condition:
     condition: and
     conditions:
       - condition: numeric_state
-        entity_id: sensor.5freunde
+        entity_id: sensor.5freunde_outlook
         above: "0"
       - condition: template
         value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
@@ -8562,15 +8621,15 @@
       data_template:
         target: !secret telegram_chat_5friends
         message: >
-          Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+          Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
-          Absender: {{state_attr('sensor.5freunde', 'data')[0]['sender']}}
-          Empfänger: {{state_attr('sensor.5freunde', 'data')[0]['to'][0]}}
+          Absender: {{state_attr('sensor.5freunde_outlook', 'data')[0]['sender']}}
+          Empfänger: {{state_attr('sensor.5freunde_outlook', 'data')[0]['to'][0]}}
 
-          Betreff: {{state_attr('sensor.5freunde', 'data')[0]['subject']}}
+          Betreff: {{state_attr('sensor.5freunde_outlook', 'data')[0]['subject']}}
     - delay: "00:00:10"
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_5friends
         message: >
-          Inhalt: {{state_attr('sensor.5freunde', 'data')[0]['body'] | truncate(400)}}
+          Inhalt: {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}

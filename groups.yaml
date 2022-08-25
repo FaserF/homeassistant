@@ -174,3 +174,7 @@ ignored_entities:
     - switch.shutdown
     - media_player.android_tv_192_168_178_12
     - binary_sensor.miwifi_9c_9d_7e_30_89_fb_state
+    - sensor.fabian_ipadpro_geocoded_location
+    - media_player.wohnzimmer_tv_old
+    - sensor.fabian_ipadair2_battery_state
+    - device_tracker.fabian_ipadair2_2

@@ -242,22 +242,22 @@ o365:
     - account_name: 5Freunde
       client_id: !secret O365_client_id
       client_secret: !secret O365_client_secret
-      alt_auth_method: True
+      alt_auth_method: False
       enable_update: True
       track_new_calendar: False
       email_sensor:
-        - name: 5freunde
+        - name: 5freunde Outlook
           max_items: 2
           is_unread: False
           download_attachments: False
     - account_name: JUZ
       client_id: !secret O365_client_id
       client_secret: !secret O365_client_secret
-      alt_auth_method: True
+      alt_auth_method: False
       enable_update: True
       track_new_calendar: False
       email_sensor:
-        - name: juz
+        - name: juz Outlook
           max_items: 4
           is_unread: False
           download_attachments: False

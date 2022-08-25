@@ -296,7 +296,7 @@ views:
           - entity: switch.fernseher
           - entity: switch.staubsauger
           - entity: automation.restart_bluetooth_on_tv
-          - entity: device_tracker.miwifi_34_51_80_d0_44_29
+          - entity: device_tracker.wohnzimmer_tv
           - entity: sensor.wohnzimmer_uhr_timers
         show_header_toggle: true
         title: Weiteres
@@ -327,14 +327,14 @@ views:
               - entity: counter.vacuum_water_level
               - entity: counter.vacuum_runs
               - entity: sensor.valetudo_dreamez10pro_error_description
+              - entity: input_select.wochentagsreinigung
+              - entity: input_select.zweite_wochentagsreinigung
               - entity: sensor.valetudo_dreamez10pro_current_statistics_area
               - entity: sensor.valetudo_dreamez10pro_current_statistics_time
               - entity: sensor.valetudo_dreamez10pro_main_brush
               - entity: sensor.valetudo_dreamez10pro_main_filter
               - entity: sensor.valetudo_dreamez10pro_right_brush
               - entity: sensor.valetudo_dreamez10pro_sensor_cleaning
-              - entity: sensor.valetudo_dreamez10pro_wi_fi_configuration
-              - entity: sensor.valetudo_dreamez10pro_zone_presets
           - type: custom:valetudo-map-card
             vacuum: valetudo_dreamez10pro
       - artwork: cover
@@ -689,8 +689,8 @@ views:
           - entity: input_button.find_fabian_s_phone_by_sound
           - entity: input_button.find_nessie_s_phone_by_sound
           - entity: input_button.find_fabian_s_ipad_by_sound
-          - entity: sensor.juz
-          - entity: sensor.5freunde
+          - entity: sensor.juz_outlook
+          - entity: sensor.5freunde_outlook
   - path: router
     title: Frtizbox
     icon: mdi:router-wireless
@@ -725,13 +725,8 @@ views:
           - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
           - entity: sensor.miwifi_28_d1_27_fc_ab_d8_uptime
           - entity: sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_2_4g
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_devices_5g
           - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
           - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_wan_download_speed
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_wan_upload_speed
         title: Xiaomi AX3600 Verwaltung
         type: entities
         show_header_toggle: false
@@ -742,7 +737,6 @@ views:
           - entity: switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
           - entity: sensor.miwifi_9c_9d_7e_30_89_fb_uptime
           - entity: sensor.miwifi_9c_9d_7e_30_89_fb_memory_usage
-          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_devices
           - entity: update.miwifi_9c_9d_7e_30_89_fb_firmware_update
         title: Xiaomi AX1800 Verwaltung
         type: entities
@@ -750,13 +744,13 @@ views:
         state_color: true
       - entities:
           - entity: button.fritz_box_3490_reboot
-          - entity: sensor.fritz_box_3490_device_uptime
+          - entity: button.fritz_box_3490_reconnect
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_2_4ghz
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
+          - entity: sensor.fritz_box_3490_device_uptime
           - entity: sensor.fritz_box_3490_connection_uptime
-          - entity: binary_sensor.fritz_box_3490_connection
-          - entity: button.fritz_box_3490_reconnect
-          - entity: update.fritz_box_3490_fritz_os
+          - entity: sensor.fritz_box_3490_download_throughput
+          - entity: sensor.fritz_box_3490_upload_throughput
         title: FritzBox 3490 Verwaltung
         type: entities
         show_header_toggle: false
