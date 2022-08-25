@@ -50,7 +50,7 @@
             DISABLE_LINTERS: REPOSITORY_SEMGREP
             DISABLE_ERRORS_LINTERS: REPOSITORY_DEVSKIM,SPELL_CSPELL
             EXCLUDED_DIRECTORIES: .github/workflows/
-            FILTER_REGEX_EXCLUDE: (Homeassistant-Smartlife-Dummy.json)
+            FILTER_REGEX_EXCLUDE: (Homeassistant-Smartlife-Dummy*)
 
         # Upload MegaLinter artifacts
         - name: Archive production artifacts

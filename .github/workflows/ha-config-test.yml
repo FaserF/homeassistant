@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: ⤵️ Check out configuration from GitHub
         uses: actions/checkout@v3.0.2
-      - name: Rename Dummy files for action usage
+      - name: Rename Dummy files and remove custom component stuff for config check
         run: |
             mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
             mv -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant_google_assistant.json
