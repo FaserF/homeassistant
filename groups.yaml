@@ -178,3 +178,5 @@ ignored_entities:
     - media_player.wohnzimmer_tv_old
     - sensor.fabian_ipadair2_battery_state
     - device_tracker.fabian_ipadair2_2
+    - sensor.ks_battery_state_2
+    - update.valetudo_map_card_update

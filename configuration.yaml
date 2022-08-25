@@ -312,6 +312,7 @@ shell_command:
     curl -X POST -H 'Content-Type: application/json' -d '{"message_id": "{{ message_id }}", "chat_id": "{{ chat_id }}", "disable_notification": true}' https://api.telegram.org/bot{{ telegram_bot_api }}/pinChatMessage
   hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
   hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
+  git_push: "/share/scripts/gitpush.sh"
   # overtime_input: !secret overtime_input
 
 # coinbase:
