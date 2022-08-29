@@ -40,7 +40,6 @@
       data:
         entity_id:
           - switch.bett_usb_ports
-          - switch.schreibtisch
     - service: media_player.turn_off
       data:
         area_id:
@@ -1568,6 +1567,214 @@
     - service: switch.turn_off
       data:
         entity_id: switch.fabian_strom
+
+- id: adb_uninstall_apps_when_tv_starts
+  alias: "ADB uninstall apps when tv starts"
+  initial_state: false
+  trigger:
+    - platform: state
+      entity_id: media_player.wohnzimmer_tv
+      from: "unavailable"
+    - platform: state
+      entity_id: media_player.keller_tv
+      from: "unavailable"
+  action:
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.wohnzimmer_tv
+                  state: "unavailable"
+          sequence:
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.smartalexa
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.android.camera2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.inputmethod.international
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.google.android.music
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.appmarket2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 tv.wuaki.apptv
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.MultiScreenInteraction_TV
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer.resource
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.usercenter
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.messagebox
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.waterfall.overseas
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.gallery
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.google.android.videos
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 au.com.stan.and
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.dashboard
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.notereminder
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.useragreement
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.keller_tv
+                  state: "unavailable"
+          sequence:
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.smartalexa
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.android.camera2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.inputmethod.international
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.google.android.music
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.appmarket2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 tv.wuaki.apptv
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.MultiScreenInteraction_TV
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer.resource
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.usercenter
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.messagebox
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.waterfall.overseas
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.gallery
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.google.android.videos
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 au.com.stan.and
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.dashboard
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.notereminder
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.useragreement
 
 - id: turn_on_light_climate_if_tv_starts
   alias: "Turn on light and climate if tv starts"
@@ -4511,6 +4718,7 @@
                     - service: update.install
                       data:
                         entity_id: update.waste_collection_schedule_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.deutscher_wetterdienst_update
@@ -4519,6 +4727,7 @@
                     - service: update.install
                       data:
                         entity_id: update.deutscher_wetterdienst_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.foodsharing_de_update
@@ -4527,6 +4736,7 @@
                     - service: update.install
                       data:
                         entity_id: update.foodsharing_de_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.google_home_update
@@ -4535,6 +4745,7 @@
                     - service: update.install
                       data:
                         entity_id: update.google_home_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.hacs_update
@@ -4543,6 +4754,7 @@
                     - service: update.install
                       data:
                         entity_id: update.hacs_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.local_tuya_update
@@ -4551,6 +4763,7 @@
                     - service: update.install
                       data:
                         entity_id: update.local_tuya_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.miwifi_update
@@ -4559,6 +4772,7 @@
                     - service: update.install
                       data:
                         entity_id: update.miwifi_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.rki_covid_numbers_update
@@ -4567,6 +4781,7 @@
                     - service: update.install
                       data:
                         entity_id: update.rki_covid_numbers_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.ytube_music_player_update
@@ -4575,6 +4790,7 @@
                     - service: update.install
                       data:
                         entity_id: update.ytube_music_player_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.office_365_integration_update
@@ -4583,6 +4799,7 @@
                     - service: update.install
                       data:
                         entity_id: update.office_365_integration_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.toogoodtogo_update
@@ -4591,10 +4808,10 @@
                     - service: update.install
                       data:
                         entity_id: update.toogoodtogo_update
-              default:
-                - service: update.install
-                  data:
-                    entity_id: all
+              # default:
+              # - service: update.install
+              # data:
+              # entity_id: all
             - delay: "00:02:00"
     - choose:
         - conditions:
@@ -4661,10 +4878,12 @@
                   Home Assistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }} wird nun installiert.
 
                   Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
-            - service: shell_command.git_push
+            - service: hassio.addon_restart
+              data:
+                addon: a0d7b954-ssh
             - service: update.install
               data:
-                entity_id: update.home_assistant_core_update
+                entity_id: update.home_assistant_operating_system_update
 
 # - id: incoming_call_fabian
 #   alias: 'Incoming Call Fabian'
