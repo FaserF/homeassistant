@@ -28,14 +28,14 @@ Schlafzimmer:
     - light.bett_gluhbirne
     - light.yeelight_bslamp2_0x0000000013fea10f
     - light.prismatik
+    - light.regal
     # - climate.schlafzimmer
-    - switch.smart_power_strip_pro_socket_1
-    - switch.smart_power_strip_pro_socket_2
-    - switch.smart_power_strip_pro_socket_3
-    - switch.smart_power_strip_pro_socket_4
-    - switch.smart_power_strip_pro_usb_1
+    - switch.steckdose_1
+    - switch.steckdose_2
+    - switch.steckdose_3
+    - switch.steckdose_4
+    - switch.bett_usb_ports
     - switch.fabian_strom
-    - switch.schreibtisch
     - light.lichtschalter
 
 Gästezimmer:
@@ -65,7 +65,6 @@ Keller:
 ignored_entities:
   name: Entitäten welche von der unavailable Automation ignoriert werden sollen
   entities:
-    - device_tracker.ipad
     - device_tracker.nessie_phone
     - device_tracker.fabian_phone
     - media_player.keller_tv_group
@@ -75,8 +74,6 @@ ignored_entities:
     - media_player.wohnzimmer_tv_group
     - media_player.wohnzimmer_tv
     - media_player.wohnzimmer_tv_cast
-    - media_player.chromecast
-    - media_player.chromecast_cast
     - light.keller_gluhbirne
     - light.keller_bulb
     - light.prismatik
@@ -178,3 +175,5 @@ ignored_entities:
     - media_player.wohnzimmer_tv_old
     - sensor.fabian_ipadair2_battery_state
     - device_tracker.fabian_ipadair2_2
+    - sensor.ks_battery_state_2
+    - update.valetudo_map_card_update

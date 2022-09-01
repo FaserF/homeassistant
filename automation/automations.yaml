@@ -40,7 +40,6 @@
       data:
         entity_id:
           - switch.bett_usb_ports
-          - switch.schreibtisch
     - service: media_player.turn_off
       data:
         area_id:
@@ -232,10 +231,6 @@
       entity_id: proximity.home_fabian
       below: 2
   condition:
-    - condition: numeric_state
-      entity_id: person.fabian
-      attribute: gps_accuracy
-      below: 500
     - condition: not
       conditions:
         - condition: state
@@ -247,6 +242,10 @@
         - condition: state
           entity_id: device_tracker.fabian_iphone_2
           state: home
+        - condition: numeric_state
+          entity_id: person.fabian
+          attribute: gps_accuracy
+          above: 500
     - condition: or
       conditions:
         - condition: numeric_state
@@ -283,23 +282,21 @@
       entity_id: proximity.home_nessie
       below: 2
   condition:
-    - condition: numeric_state
-      entity_id: person.nessie
-      attribute: gps_accuracy
-      below: 500
     - condition: not
       conditions:
         - condition: state
           entity_id: device_tracker.nessie_iphone_2
           state: home
-    - condition: not
-      conditions:
         - condition: state
           entity_id: person.nessie
           state: Volleyball
         - condition: state
           entity_id: person.nessie
           state: Einkaufen
+        - condition: numeric_state
+          entity_id: person.nessie
+          attribute: gps_accuracy
+          above: 500
     - condition: or
       conditions:
         - condition: numeric_state
@@ -844,7 +841,7 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.zorneding_to_leuchtenbergring.last_updated) | int > 43.200 }}"
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.zorneding_to_leuchtenbergring.last_updated) | int > 16400 }}"
           sequence:
             - choose:
                 - conditions:
@@ -1570,6 +1567,214 @@
     - service: switch.turn_off
       data:
         entity_id: switch.fabian_strom
+
+- id: adb_uninstall_apps_when_tv_starts
+  alias: "ADB uninstall apps when tv starts"
+  initial_state: false
+  trigger:
+    - platform: state
+      entity_id: media_player.wohnzimmer_tv
+      from: "unavailable"
+    - platform: state
+      entity_id: media_player.keller_tv
+      from: "unavailable"
+  action:
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.wohnzimmer_tv
+                  state: "unavailable"
+          sequence:
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.smartalexa
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.android.camera2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.inputmethod.international
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.google.android.music
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.appmarket2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 tv.wuaki.apptv
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.MultiScreenInteraction_TV
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer.resource
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.usercenter
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.messagebox
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.waterfall.overseas
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.gallery
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.google.android.videos
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 au.com.stan.and
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.dashboard
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.notereminder
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.wohnzimmer_tv
+                command: pm uninstall -k --user 0 com.tcl.useragreement
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.keller_tv
+                  state: "unavailable"
+          sequence:
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.smartalexa
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.android.camera2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.inputmethod.international
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.google.android.music
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.appmarket2
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 tv.wuaki.apptv
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.MultiScreenInteraction_TV
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.partnercustomizer.resource
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.usercenter
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.messagebox
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.waterfall.overseas
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.gallery
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.google.android.videos
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 au.com.stan.and
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.dashboard
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.notereminder
+            - service: androidtv.adb_command
+              continue_on_error: true
+              data:
+                entity_id: media_player.keller_tv
+                command: pm uninstall -k --user 0 com.tcl.useragreement
 
 - id: turn_on_light_climate_if_tv_starts
   alias: "Turn on light and climate if tv starts"
@@ -3762,6 +3967,10 @@
       before: "03:00:00"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_on_ha_restart.attributes.last_triggered) | int > 1800 }}"
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automatic_ha_updates.attributes.last_triggered) | int > 500 }}"
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_off_devices_at_night.attributes.last_triggered) | int > 500 }}"
   action:
     - service: frontend.set_theme
       data:
@@ -3776,6 +3985,7 @@
 
 - id: run_bash_script_with_addon_bash_script_executer_every_hour
   alias: "Run Bash Script with Addon Bash Script Executer every hour"
+  initial_state: false
   trigger:
     - platform: time_pattern
       minutes: "/59"
@@ -4311,7 +4521,7 @@
     - service: telegram_bot.send_message
       data_template:
         message: >
-          Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
+          {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
 
           ------------
 
@@ -4322,7 +4532,6 @@
           {% endif %}
 
           Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
-
 
           {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
           Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
@@ -4362,26 +4571,9 @@
           sequence:
             - service: notify.mobile_app_nessie_iphone
               data_template:
-                title: "Foodsharing Korb in Zorneding"
+                title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
                   {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
-
-                  ------------
-
-                  Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
-
-                  {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
-                  Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
-                  {% endif %}
-
-                  Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
-
-
-                  {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
-                  Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
-                  {% endif %}
-
-                  Google Maps Link: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }}
                 data:
                   push:
                     sound:
@@ -4404,29 +4596,12 @@
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
                   {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
-
-                  ------------
-
-                  Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
-
-                  {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
-                  Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
-                  {% endif %}
-
-                  Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }}
-
-
-                  {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
-                  Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
-                  {% endif %}
-
-                  Google Maps Link: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }}
                 data:
                   push:
                     sound:
                       name: "default"
                       critical: 1
-                      volume: 0.1
+                      volume: 0.4
 
 - id: foodsharing_basket_available_muc_east
   alias: "Foodsharing Basket Available MUC East"
@@ -4446,7 +4621,7 @@
     - service: telegram_bot.send_message
       data_template:
         message: >
-          Es ist ein neuer Foodsharing Korb verfügbar: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['description'] }}
+          {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['description'] }}
 
           ------------
 
@@ -4457,7 +4632,6 @@
           {% endif %}
 
           Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['id'] }}
-
 
           {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] == 'unavailable' %}
           Adresse: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] }}
@@ -4544,6 +4718,7 @@
                     - service: update.install
                       data:
                         entity_id: update.waste_collection_schedule_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.deutscher_wetterdienst_update
@@ -4552,6 +4727,7 @@
                     - service: update.install
                       data:
                         entity_id: update.deutscher_wetterdienst_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.foodsharing_de_update
@@ -4560,6 +4736,7 @@
                     - service: update.install
                       data:
                         entity_id: update.foodsharing_de_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.google_home_update
@@ -4568,6 +4745,7 @@
                     - service: update.install
                       data:
                         entity_id: update.google_home_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.hacs_update
@@ -4576,6 +4754,7 @@
                     - service: update.install
                       data:
                         entity_id: update.hacs_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.local_tuya_update
@@ -4584,6 +4763,7 @@
                     - service: update.install
                       data:
                         entity_id: update.local_tuya_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.miwifi_update
@@ -4592,6 +4772,7 @@
                     - service: update.install
                       data:
                         entity_id: update.miwifi_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.rki_covid_numbers_update
@@ -4600,6 +4781,7 @@
                     - service: update.install
                       data:
                         entity_id: update.rki_covid_numbers_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.ytube_music_player_update
@@ -4608,6 +4790,7 @@
                     - service: update.install
                       data:
                         entity_id: update.ytube_music_player_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.office_365_integration_update
@@ -4616,6 +4799,7 @@
                     - service: update.install
                       data:
                         entity_id: update.office_365_integration_update
+            - choose:
                 - conditions:
                     - condition: state
                       entity_id: update.toogoodtogo_update
@@ -4624,10 +4808,11 @@
                     - service: update.install
                       data:
                         entity_id: update.toogoodtogo_update
-              default:
-                - service: update.install
-                  data:
-                    entity_id: all
+              # default:
+              # - service: update.install
+              # data:
+              # entity_id: all
+            - delay: "00:02:00"
     - choose:
         - conditions:
             - condition: state
@@ -4644,6 +4829,7 @@
             - service: update.install
               data:
                 entity_id: update.adguard_home_update
+            - delay: "00:02:00"
     - choose:
         - conditions:
             - condition: state
@@ -4660,7 +4846,7 @@
             - service: update.install
               data:
                 entity_id: update.fritz_box_3490_fritz_os
-    - delay: "00:02:00"
+            - delay: "00:12:00"
     - choose:
         - conditions:
             - condition: state
@@ -4674,6 +4860,9 @@
                   Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert.
 
                   Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
+            - service: hassio.addon_restart
+              data:
+                addon: a0d7b954-ssh
             - service: update.install
               data:
                 entity_id: update.home_assistant_core_update
@@ -4689,9 +4878,12 @@
                   Home Assistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }} wird nun installiert.
 
                   Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
+            - service: hassio.addon_restart
+              data:
+                addon: a0d7b954-ssh
             - service: update.install
               data:
-                entity_id: update.home_assistant_core_update
+                entity_id: update.home_assistant_operating_system_update
 
 # - id: incoming_call_fabian
 #   alias: 'Incoming Call Fabian'

@@ -19,6 +19,7 @@ megalinter-reports/
 .storage
 .cloud
 .google.token
+.o365-token-cache
 
 # Ensure these YAML files are ignored, otherwise your secret
 # data/credentials will leak.
@@ -30,3 +31,6 @@ google_calendars.yaml
 Homeassistant_google_assistant.json
 config_ic3.yaml
 o365*.yaml
+.google_maps_location_sharing*
+*token*
+*cookie*
