@@ -49,7 +49,7 @@
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             DISABLE_LINTERS: REPOSITORY_SEMGREP
             DISABLE_ERRORS_LINTERS: REPOSITORY_DEVSKIM,SPELL_CSPELL
-            EXCLUDED_DIRECTORIES: .github/workflows/,dummy_files/
+            EXCLUDED_DIRECTORIES: dummy_files,.github/workflows
 
         # Upload MegaLinter artifacts
         - name: Archive production artifacts
