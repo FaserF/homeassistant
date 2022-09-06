@@ -129,6 +129,7 @@ recorder:
       - sensor.fritz_box_3490_max_kbit_s_received
       - sensor.unavailable_entities
       - switch.rpi_cooling_fan
+      input_number.lautstarke_ansagen
 
 # Discover some devices automatically
 discovery:
@@ -169,13 +170,12 @@ logger:
     homeassistant.helpers.service:
       - "Unable to find referenced entities$"
     homeassistant.config_entries:
-      - "Config entry '192.168.31.159' for miwifi integration not ready yet; Retrying in background"
-      - "Config entry '192.168.31.159' for miwifi integration not ready yet: None; Retrying in background"
-      - "Config entry 'Fabian-PC' for system_bridge integration not ready yet: Could not connect to System Bridge.; Retrying in background"
-      - "Config entry 'Schnuppes-PC' for system_bridge integration not ready yet: Could not connect to System Bridge.; Retrying in background"
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
+  logs:
+    custom_components.foodsharing: debug
+    custom_components.rewe: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -236,6 +236,9 @@ telegram_bot:
       - !secret telegram_foodsharing
       - !secret telegram_foodsharing_muc
       - !secret telegram_volleyball
+      - !secret telegram_chat_michelle
+      - !secret telegram_chat_samuel
+      - !secret telegram_chat_daniel
 
 o365:
   accounts:
@@ -588,19 +591,19 @@ intent_script:
     speech:
       text: >
         {%- for state in states.person -%}
-          {%- if state.name.lower() == User.lower() -%}
+          {%- if state.name.lower() == given-name.lower() -%}
             {{ state.name }} ist bei {{ state.state }}
           {%- endif -%}
         {%- else -%}
-          Leider kenne ich den Standort der Person {{ User }} nicht.
+          Leider kenne ich den Standort der Person {{ given-name }} nicht.
         {%- endfor -%}
   find_iPhone:
     speech:
       text: >
-        {%- if User.lower() == "fabian" or User.lower() == "fabi" or User.lower() == "nessie" or User.lower() == "vanessa"  -%}
-          Ich lasse jetzt das Handy von {{ User }} klingeln
+        {%- if given-name.lower() == "fabian" or given-name.lower() == "fabi" or given-name.lower() == "nessie" or given-name.lower() == "vanessa"  -%}
+          Ich lasse jetzt das Handy von {{ given-name }} klingeln
         {%- else -%}
-          Leider kann ich das Handy von {{ User }} nicht suchen.
+          Leider kann ich das Handy von {{ given-name }} nicht suchen.
         {%- endif -%}
     action:
       - service: automation.trigger

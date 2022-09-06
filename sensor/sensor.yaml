@@ -44,14 +44,30 @@
       friendly_name: "Durchschn. Luftfeuchtigkeit"
       unit_of_measurement: "%"
       value_template: >-
-        {{ (float(states.climate.gastezimmer.attributes.current_humidity) + float(states.climate.wohnzimmer.attributes.current_humidity) + float(states.climate.schlafzimmer.attributes.current_humidity) + float(states.climate.bad.attributes.current_humidity)) / 4 | round(2) }}
+        {% if is_state('climate.gastezimmer', 'unavailable') and is_state('climate.wohnzimmer', 'unavailable') -%}
+          {{ (float(states.climate.schlafzimmer.attributes.current_humidity) + float(states.climate.bad.attributes.current_humidity)) / 4 | round(2) }}
+        {% elif is_state('climate.gastezimmer', 'unavailable') -%}
+          {{ (float(states.climate.wohnzimmer.attributes.current_humidity) + float(states.climate.schlafzimmer.attributes.current_humidity) + float(states.climate.bad.attributes.current_humidity)) / 4 | round(2) }}
+        {% elif is_state('climate.wohnzimmer', 'unavailable') -%}
+          {{ (float(states.climate.gastezimmer.attributes.current_humidity) + float(states.climate.schlafzimmer.attributes.current_humidity) + float(states.climate.bad.attributes.current_humidity)) / 4 | round(2) }}
+        {% else %}
+          {{ (float(states.climate.gastezimmer.attributes.current_humidity) + float(states.climate.wohnzimmer.attributes.current_humidity) + float(states.climate.schlafzimmer.attributes.current_humidity) + float(states.climate.bad.attributes.current_humidity)) / 4 | round(2) }}
+        {% endif %}
 - platform: template
   sensors:
     average_house_temp:
       friendly_name: "Durchschn. Temp."
       unit_of_measurement: "°C"
       value_template: >-
-        {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+        {% if is_state('climate.gastezimmer', 'unavailable') and is_state('climate.wohnzimmer', 'unavailable') -%}
+          {{ (float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+        {% elif is_state('climate.gastezimmer', 'unavailable') -%}
+          {{ (float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+        {% elif is_state('climate.wohnzimmer', 'unavailable') -%}
+          {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+        {% else %}
+          {{ (float(states.climate.gastezimmer.attributes.current_temperature) + float(states.climate.wohnzimmer.attributes.current_temperature) + float(states.climate.schlafzimmer.attributes.current_temperature) + float(states.climate.bad.attributes.current_temperature)) / 4 | round(2) }}
+        {% endif %}
 - platform: template
   sensors:
     washing_machine_state:

@@ -176,4 +176,5 @@ ignored_entities:
     - sensor.fabian_ipadair2_battery_state
     - device_tracker.fabian_ipadair2_2
     - sensor.ks_battery_state_2
+    - sensor.iphone_battery_state
     - update.valetudo_map_card_update
