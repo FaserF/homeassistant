@@ -178,3 +178,5 @@ ignored_entities:
     - sensor.ks_battery_state_2
     - sensor.iphone_battery_state
     - update.valetudo_map_card_update
+    - device_tracker.thes_macbook_pro
+    - sensor.thes_macbook_pro_battery_state

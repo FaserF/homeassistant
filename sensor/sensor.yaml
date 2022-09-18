@@ -219,22 +219,6 @@
       arg: /
     - type: memory_use_percent
     - type: processor_temperature
-- platform: deutsche_bahn
-  from: !secret fabian_work
-  to: !secret sbahn_home
-  only_direct: true
-- platform: deutsche_bahn
-  from: !secret nessie_work
-  to: !secret sbahn_home
-  only_direct: true
-- platform: deutsche_bahn
-  from: !secret sbahn_home
-  to: !secret nessie_work
-  only_direct: true
-- platform: deutsche_bahn
-  from: Donnersbergerbruecke
-  to: !secret sbahn_home
-  only_direct: true
 - platform: template
   sensors:
     fs_caller:

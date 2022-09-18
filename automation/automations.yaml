@@ -230,6 +230,8 @@
     - platform: numeric_state
       entity_id: proximity.home_fabian
       below: 2
+      for:
+        seconds: 5
   condition:
     - condition: not
       conditions:
@@ -281,6 +283,8 @@
     - platform: numeric_state
       entity_id: proximity.home_nessie
       below: 2
+      for:
+        seconds: 2
   condition:
     - condition: not
       conditions:
@@ -3036,6 +3040,7 @@
                     entity_id: person.nessie
                     state: home
   action:
+    - delay: "00:04:30"
     - choose:
         - conditions:
             - condition: and
@@ -3236,6 +3241,13 @@
                       entity_id: device_tracker.fabian_iphone_2
                       state: home
               sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.1 }}
+                    entity_id:
+                      - media_player.wohnzimmer_uhr
+                      - media_player.kuche_speaker
                 - service: tts.google_say
                   entity_id:
                     - media_player.wohnzimmer_uhr
@@ -3244,7 +3256,13 @@
                     message: >
                       Es ist {{ now().hour }} Uhr {{ now().minute }} .
                       Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich
-                      {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+                      {% if state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') == 1 %}
+                      eine Minute
+                      {% elif state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') >= 1 %}
+                      {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten
+                      {% else %}
+                      keine
+                      {% endif %} Verspätung.
                 - delay: "00:00:12"
                 - choose:
                     - conditions:
@@ -3298,6 +3316,13 @@
                                     Bad
                                   {% endif %}
                                   muss noch geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id:
+                      - media_player.wohnzimmer_uhr
+                      - media_player.kuche_speaker
         - choose:
             - conditions:
                 - condition: and
@@ -3309,13 +3334,24 @@
                       entity_id: device_tracker.fabian_iphone_2
                       state: home
               sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.1 }}
+                    entity_id: media_player.schlafzimmer_speaker
                 - service: tts.google_say
                   entity_id: media_player.schlafzimmer_speaker
                   data_template:
                     message: >
-                      Es ist
-                      {{ now().hour }} Uhr {{ now().minute }} .
-                      Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten Verspätung.
+                      Es ist {{ now().hour }} Uhr {{ now().minute }} .
+                      Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich
+                      {% if state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') == 1 %}
+                      eine Minute
+                      {% elif state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') >= 1 %}
+                      {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten
+                      {% else %}
+                      keine
+                      {% endif %} Verspätung.
                 - delay: "00:00:12"
                 - choose:
                     - conditions:
@@ -3369,6 +3405,11 @@
                                     Bad
                                   {% endif %}
                                   muss noch geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.schlafzimmer_speaker
 
 - id: turn_on_light_in_sleeping_room_if_tv_turned_off
   alias: "Turn on light in sleeping room if tv turned off"
@@ -3791,6 +3832,7 @@
                   - "Fabi Keller"
                   - "Kai & Adri"
                   - "Flo"
+                  - "Maxi"
                   - "Wo anders (Schreiben wo!)"
                 is_anonymous: false
                 allows_multiple_answers: true
@@ -3804,11 +3846,24 @@
               - "Fabi Keller"
               - "Kai & Adri"
               - "Flo"
+              - "Maxi"
+              - "JUZ"
               - "Draußen trotz nicht so gutem Wetter"
               - "Wo anders (Schreiben wo!)"
             is_anonymous: false
             allows_multiple_answers: true
             disable_notification: true
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_chat_5friends
+        question: "Shisha?"
+        options:
+          - "Ja"
+          - "Nein"
+          - "Mir egal"
+        is_anonymous: false
+        allows_multiple_answers: false
+        disable_notification: true
 
 - id: turn_on_fridge_for_meetings
   alias: "Turn on fridge for meetings"
@@ -4935,6 +4990,15 @@
                     - service: update.install
                       data:
                         entity_id: update.rewe_discounts_update
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: update.deutsche_bahn_update
+                      state: "on"
+                  sequence:
+                    - service: update.install
+                      data:
+                        entity_id: update.deutsche_bahn_update
               # default:
               # - service: update.install
               # data:
@@ -4960,6 +5024,16 @@
               data:
                 entity_id: update.adguard_home_update
             - delay: "00:02:00"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: update.home_assistant_supervisor_update
+              state: "on"
+          sequence:
+            - service: update.install
+              data:
+                entity_id: update.home_assistant_supervisor_update
+            - delay: "00:01:00"
     - choose:
         - conditions:
             - condition: state
@@ -5039,6 +5113,11 @@
                   Home Assistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }} wird nun installiert.
 
                   Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_afk
+                message: >
+                  Raspberry Pi OS wird automatisch aktualisiert. Vaultwarden wird daher zeitweise nicht verfügbar sein für ungefähr 15 Minuten.
             - service: hassio.addon_restart
               data:
                 addon: a0d7b954-ssh
@@ -5062,7 +5141,7 @@
 #     - service: media_player.volume_set
 #       data:
 #         volume_level: >
-            # {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+# {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
 #         entity_id: media_player.wohnzimmer_uhr
 #     - service: tts.google_say
 #       entity_id:
@@ -5077,7 +5156,7 @@
 #     - service: media_player.volume_set
 #       data:
 #         volume_level: >
-          # {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+# {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
 #         entity_id: media_player.wohnzimmer_uhr
 #     - service: automation.turn_off
 #       data:
@@ -5769,7 +5848,7 @@
         - climate.gastezimmer
       to: "unavailable"
       for:
-        minutes: 20
+        hours: 2
   condition:
     condition: not
     conditions:
@@ -6422,10 +6501,11 @@
                   entity_id: media_player.kuche_speaker
                   data_template:
                     message: >
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
-                      Willkommen zurück Fabian.
-                      {% endif %}
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
+                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
+                      Willkommen zurück Nessie und Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
+                      Willkommen zurück Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
                       Willkommen zurück Nessie.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -6464,10 +6544,11 @@
                   entity_id: media_player.schlafzimmer_speaker
                   data_template:
                     message: >
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
-                      Willkommen zurück Fabian.
-                      {% endif %}
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
+                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
+                      Willkommen zurück Nessie und Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
+                      Willkommen zurück Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
                       Willkommen zurück Nessie.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -6509,10 +6590,11 @@
                   entity_id: media_player.gastezimmer_mini
                   data_template:
                     message: >
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
-                      Willkommen zurück Fabian.
-                      {% endif %}
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
+                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
+                      Willkommen zurück Nessie und Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
+                      Willkommen zurück Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
                       Willkommen zurück Nessie.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -6553,10 +6635,11 @@
                   entity_id: media_player.wohnzimmer_uhr
                   data_template:
                     message: >
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
-                      Willkommen zurück Fabian.
-                      {% endif %}
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 220) %}
+                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
+                      Willkommen zurück Nessie und Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
+                      Willkommen zurück Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
                       Willkommen zurück Nessie.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
@@ -6579,31 +6662,31 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.wohnzimmer_uhr
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv
-                  state: "unavailable"
-          sequence:
-            - service: notify.wohnzimmer_tv
-              continue_on_error: true
-              data_template:
-                message: >
-                  Die Luftfeuchtigkeit ist zu hoch im Raum
-                  {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
-                  Gästezimmer,
-                  {% endif %}
-                  {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
-                  Wohnzimmer,
-                  {% endif %}
-                  {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
-                  Schlafzimmer,
-                  {% endif %}
-                  {% if (states.climate.bad.attributes.current_humidity) > 60 %}
-                  Bad,
-                  {% endif %}
-                  Bitte lüften.
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.wohnzimmer_tv
+                      state: "unavailable"
+              sequence:
+                - service: notify.wohnzimmer_tv
+                  continue_on_error: true
+                  data_template:
+                    message: >
+                      Die Luftfeuchtigkeit ist zu hoch im Raum
+                      {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
+                      Gästezimmer,
+                      {% endif %}
+                      {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
+                      Wohnzimmer,
+                      {% endif %}
+                      {% if (states.climate.schlafzimmer.attributes.current_humidity) > 60 %}
+                      Schlafzimmer,
+                      {% endif %}
+                      {% if (states.climate.bad.attributes.current_humidity) > 60 %}
+                      Bad,
+                      {% endif %}
+                      Bitte lüften.
 
 - id: notify_for_extreme_high_humidity
   alias: Notify for extreme high humidity
@@ -8090,34 +8173,7 @@
       data:
         message: "Der Google Maps Homeassistant Coockie scheint abgelaufen zu sein. Bitte erneuern. In der Zwischenzeit funktionieren keine Google Maps Automationen."
 
-# - id: notify_nessie_on_train_delay_home_work
-#   alias: "Notify Nessie on Train delay Home -> Work"
-#   initial_state: true
-#   trigger:
-#     - platform: template
-#       value_template: "{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay | int > 3 }}"
-#   condition:
-#     condition: and
-#     conditions:
-#        - condition: not
-#          conditions:
-#            - condition: state
-#              entity_id: device_tracker.google_maps_112056758146194246561
-#              state: home
-#       - condition: time
-#         after: '06:30:00'
-#         before: '07:10:00'
-#         weekday:
-#           - mon
-#           - tue
-#           - fri
-#   action:
-#     - service: notify.telegram_nessie
-#       data:
-#         title: "Ubahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-#         message: "Nächste Fahrtmöglichkeit: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
-
-- id: notify_fabian_on_sbahn_delay_home_work
+- id: notify_on_sbahn_delay_home_work
   alias: "Notify Fabi on sbahn delay Home -> Work"
   initial_state: true
   trigger:
@@ -8128,9 +8184,14 @@
   condition:
     condition: and
     conditions:
-      - condition: state
-        entity_id: device_tracker.fabian_iphone_2
-        state: home
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: device_tracker.fabian_iphone_2
+            state: home
+          - condition: state
+            entity_id: device_tracker.nessie_iphone_2
+            state: home
       - condition: time
         after: "06:30:00"
         before: "07:10:00"
@@ -8138,14 +8199,26 @@
         entity_id: binary_sensor.workday_sensor
         state: "on"
   action:
-    - service: notify.telegram_fabian
-      data:
-        title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-        message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
-    - service: notify.telegram_nessie
-      data:
-        title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-        message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: device_tracker.fabian_iphone_2
+              state: home
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
+                message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: device_tracker.nessie_iphone_2
+              state: home
+          sequence:
+            - service: notify.telegram_nessie
+              data:
+                title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
+                message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
 
 - id: notify_fabian_on_sbahn_delay_work_home
   alias: "Notify on Sbahn delay Work -> Home"
@@ -8172,6 +8245,9 @@
       - condition: numeric_state
         entity_id: proximity.home_fabian
         below: 89
+      - condition: numeric_state
+        entity_id: proximity.home_fabian
+        above: 20
       - condition: not
         conditions:
           - condition: state
@@ -8241,8 +8317,7 @@
             - condition: time
               after: "18:00:00"
               before: "22:30:00"
-              weekday:
-                - sun
+              weekday: sun
   action:
     - service: notify.telegram_fabian
       data_template:
@@ -8540,6 +8615,12 @@
                           entity_id: media_player.kuche_speaker
                           data_template:
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+                        - delay: 00:00:08
+                        - service: media_player.volume_set
+                          data:
+                            volume_level: >
+                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                            entity_id: media_player.kuche_speaker
                 - choose:
                     - conditions:
                         - condition: state
@@ -8556,6 +8637,12 @@
                           entity_id: media_player.gastezimmer_mini
                           data_template:
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+                        - delay: 00:00:08
+                        - service: media_player.volume_set
+                          data:
+                            volume_level: >
+                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                            entity_id: media_player.gastezimmer_mini
                 - choose:
                     - conditions:
                         - condition: state
@@ -8572,6 +8659,12 @@
                           entity_id: media_player.wohnzimmer_uhr
                           data_template:
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+                        - delay: 00:00:08
+                        - service: media_player.volume_set
+                          data:
+                            volume_level: >
+                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                            entity_id: media_player.wohnzimmer_uhr
     - service: notify.telegram_nessie
       data:
         message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
@@ -8694,7 +8787,7 @@
                           entity_id: media_player.kuche_speaker
                           data_template:
                             message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:05
+                        - delay: 00:00:08
                         - service: media_player.volume_set
                           data:
                             volume_level: >
@@ -8716,7 +8809,7 @@
                           entity_id: media_player.schlafzimmer_speaker
                           data_template:
                             message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:05
+                        - delay: 00:00:08
                         - service: media_player.volume_set
                           data:
                             volume_level: >
@@ -8738,7 +8831,7 @@
                           entity_id: media_player.wohnzimmer_uhr
                           data_template:
                             message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:05
+                        - delay: 00:00:08
                         - service: media_player.volume_set
                           data:
                             volume_level: >
@@ -8884,8 +8977,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id:
-        - device_tracker.nessie_iphone_2
+      entity_id: device_tracker.nessie_iphone_2
       from: "not_home"
       to: "home"
   condition:
@@ -8943,6 +9035,7 @@
           - "Ja"
           - "Nein"
           - "Vielleicht"
+          - "Nur zeitweise/verspätet"
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
@@ -9026,16 +9119,22 @@
   trigger:
     - platform: state
       entity_id: sensor.juz_outlook
+      attribute: data
   condition:
     condition: and
     conditions:
       - condition: numeric_state
         entity_id: sensor.juz_outlook
         above: "0"
-      - condition: template
-        value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
       - condition: not
         conditions:
+          - condition: state
+            entity_id: sensor.juz_outlook
+            state: unavailable
+          - condition: state
+            entity_id: sensor.juz_outlook
+            attribute: data
+            state: ""
           - condition: template
             value_template: "{{'noreply@ionos.de' in state_attr('sensor.juz_outlook', 'data')[0]['sender'] }}"
   action:
@@ -9047,13 +9146,10 @@
 
           Absender: {{state_attr('sensor.juz_outlook', 'data')[0]['sender']}}
 
-          Betreff: {{state_attr('sensor.juz_outlook', 'data')[0]['subject']}}
-    - delay: "00:00:10"
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_juz_mail
-        message: >
-          Inhalt: {{state_attr('sensor.juz_outlook', 'data')[0]['body'] | truncate(450)}}
+
+          *Betreff:* {{state_attr('sensor.juz_outlook', 'data')[0]['subject']}}
+
+          *Inhalt:* {{state_attr('sensor.juz_outlook', 'data')[0]['body'] | truncate(450)}}
 
 - id: send_5freunde_mails_to_telegram
   alias: "send 5freunde mails to telegram"
@@ -9061,28 +9157,58 @@
   trigger:
     - platform: state
       entity_id: sensor.5freunde_outlook
+      attribute: data
   condition:
     condition: and
     conditions:
       - condition: numeric_state
         entity_id: sensor.5freunde_outlook
         above: "0"
-      - condition: template
-        value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: sensor.5freunde_outlook
+            state: unavailable
+          - condition: state
+            entity_id: sensor.5freunde_outlook
+            attribute: data
+            state: ""
   action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_5friends
-        message: >
-          Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: template
+                  value_template: "{{'PayPal' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                - condition: template
+                  value_template: "{{'juzzorneding@gmail.com' in state_attr('sensor.5freunde_outlook', 'data')[0]['to'] }}"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_juz_leiter
+                message: >
+                  Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
-          Absender: {{state_attr('sensor.5freunde_outlook', 'data')[0]['sender']}}
-          Empfänger: {{state_attr('sensor.5freunde_outlook', 'data')[0]['to'][0]}}
+                  *Absender:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['sender']}}
 
-          Betreff: {{state_attr('sensor.5freunde_outlook', 'data')[0]['subject']}}
-    - delay: "00:00:10"
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_5friends
-        message: >
-          Inhalt: {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
+                  *Empfänger:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['to'][0]}}
+
+
+                  *Betreff:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['subject']}}
+
+                  *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
+      default:
+        - service: telegram_bot.send_message
+          data_template:
+            target: !secret telegram_chat_5friends
+            message: >
+              Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+              *Absender:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['sender']}}
+
+              *Empfänger:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['to'][0]}}
+
+
+              *Betreff:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['subject']}}
+
+              *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}

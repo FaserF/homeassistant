@@ -104,6 +104,7 @@ recorder:
       - sun.sun # Don't record sun data
       - sensor.last_boot # Comes from 'systemmonitor' sensor platform
       - sensor.date
+      - input_number.lautstarke_ansagen
       - sensor.fsphone_charging
       - sensor.vkphone_charging
       - sensor.fs_smspin
@@ -129,7 +130,6 @@ recorder:
       - sensor.fritz_box_3490_max_kbit_s_received
       - sensor.unavailable_entities
       - switch.rpi_cooling_fan
-      input_number.lautstarke_ansagen
 
 # Discover some devices automatically
 discovery:
@@ -161,8 +161,6 @@ logger:
       - "Update of * is taking over 10 seconds"
     homeassistant.components.switch:
       - "Setup of switch platform adguard is taking over 10 seconds."
-    homeassistant.components.sensor:
-      - "Setup of sensor platform deutsche_bahn is taking over 10 seconds."
     homeassistant.components.google_maps.device_tracker:
       - "Ignoring * update because timestamp is older than last timestamp"
     homeassistant.components.light:
@@ -174,7 +172,7 @@ logger:
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
   logs:
-    custom_components.foodsharing: debug
+    custom_components.deutschebahn: debug
     custom_components.rewe: debug
 
 # Enables a map showing the location of tracked devices
@@ -228,6 +226,7 @@ telegram_bot:
       - !secret telegram_chat_yannick
       - !secret telegram_chat_lars
       - !secret telegram_chat_5friends
+      - !secret telegram_chat_juz_leiter
       - !secret telegram_chat_afk
       - !secret telegram_chat_polygon
       - !secret telegram_chat_jutta
@@ -239,31 +238,6 @@ telegram_bot:
       - !secret telegram_chat_michelle
       - !secret telegram_chat_samuel
       - !secret telegram_chat_daniel
-
-o365:
-  accounts:
-    - account_name: 5Freunde
-      client_id: !secret O365_client_id
-      client_secret: !secret O365_client_secret
-      alt_auth_method: False
-      enable_update: True
-      track_new_calendar: False
-      email_sensor:
-        - name: 5freunde Outlook
-          max_items: 2
-          is_unread: False
-          download_attachments: False
-    - account_name: JUZ
-      client_id: !secret O365_client_id
-      client_secret: !secret O365_client_secret
-      alt_auth_method: False
-      enable_update: True
-      track_new_calendar: False
-      email_sensor:
-        - name: juz Outlook
-          max_items: 4
-          is_unread: False
-          download_attachments: False
 
 notify:
   - name: telegram_fabian
@@ -775,3 +749,22 @@ xiaomi_miio_cooker:
   host: 192.168.178.220
   token: !secret rice_cooker_token
   model: chunmi.cooker.eh1
+
+o365:
+  accounts:
+    - account_name: 5Freunde
+      client_id: !secret O365_client_id
+      client_secret: !secret O365_client_secret
+      track_new_calendar: False
+      query_sensors:
+        - name: "5freunde Outlook"
+          max_items: 3
+          download_attachments: False
+    - account_name: JUZ
+      client_id: !secret O365_client_id
+      client_secret: !secret O365_client_secret
+      track_new_calendar: False
+      query_sensors:
+        - name: "JUZ Outlook"
+          max_items: 5
+          download_attachments: False
