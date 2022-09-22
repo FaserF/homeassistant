@@ -159,6 +159,7 @@ ignored_entities:
     - person.isi
     - person.maxi
     - person.samuel
+    - person.nathalie
     - input_button.find_fabian_s_ipad_by_sound
     - input_button.find_fabian_s_phone_by_sound
     - input_button.find_nessie_s_phone_by_sound
@@ -180,3 +181,4 @@ ignored_entities:
     - update.valetudo_map_card_update
     - device_tracker.thes_macbook_pro
     - sensor.thes_macbook_pro_battery_state
+    - sensor.fabian_iphone6s_battery_state

@@ -1107,6 +1107,9 @@
           - condition: state
             entity_id: person.kai
             state: "home"
+          - condition: state
+            entity_id: person.nathalie
+            state: "home"
   action:
     - service: input_boolean.turn_on
       data:
@@ -4797,6 +4800,48 @@
 
           Google Maps Link: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['maps'] }}
         target: !secret telegram_foodsharing_muc
+
+- id: rewe_discount_keyword_available
+  alias: "Rewe Discount Keyword available"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: sensor.rewe_440421
+  #condition:
+  #  condition: and
+  #  conditions:
+  #    - condition: or
+  #      conditions:
+  #        - condition: template
+  #          value_template: "{{'Bier' in state_attr('sensor.rewe_440421', 'discounts') }}"
+  #        - condition: template
+  #          value_template: "{{'Spezi' in state_attr('sensor.rewe_440421', 'discounts') }}"
+  #        - condition: template
+  #          value_template: "{{'Oettinger' in state_attr('sensor.rewe_440421', 'discounts') }}"
+  action:
+    - service: notify.telegram_fabian
+      data_template:
+        message: >
+          Neues Angebot im Rewe Prospekt für
+          {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
+          {%- for product in product_list_loop -%}
+            {% if 'Spezi' in product.Product or 'Bier' in product.Product or 'Oettinger' in product.Product %}
+
+              - {{product.Product }}.
+
+              Preis: {{product.Price.price }}
+
+              Bild:
+            {%- endif -%}
+          {%- endfor -%}
+    - service: notify.telegram_fabian
+      data_template:
+        message: >
+          Neues Angebot im Rewe Prospekt für {{ state_attr('sensor.rewe_440421', 'discounts')[0]['product'] }}.
+
+          Preis: {{ state_attr('sensor.rewe_440421', 'discounts')[0]['price']['price'] }}
+
+          {{ state_attr('sensor.rewe_440421', 'discounts')[0]['picture link'] }}.
 
 - id: automatic_ha_updates
   alias: "Automatic HA Updates"
