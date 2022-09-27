@@ -381,7 +381,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data:
                 message: "Adri ist gleich da"
                 data:
@@ -483,7 +483,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data:
                 message: "Kai ist gleich da"
                 data:
@@ -588,7 +588,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data:
                 message: "Flo ist gleich da"
                 data:
@@ -2158,7 +2158,7 @@
                       name: "default"
                       critical: 1
                       volume: 0.1
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data:
                 message: "Das Fenster im Bad kann wieder geschlossen werden."
                 data:
@@ -2192,7 +2192,7 @@
             - service: notify.telegram_fabian
               data:
                 message: "Das Fenster im Bad kann wieder geschlossen werden."
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data:
                 message: "Das Fenster im Bad kann wieder geschlossen werden."
                 data:
@@ -3796,6 +3796,35 @@
         inline_keyboard:
           - "Einschalten:/climateson"
 
+- id: remind_for_polygon_events
+  alias: "remind for Polygon Events"
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 172800) | round(-1) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 173800) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: calendar.votgaming_kalender
+            attribute: message
+            state: "Gruppentreffen"
+  action:
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_chat_polygon
+        question: "Es findet am {{ as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) | timestamp_custom('%d.%m.%Y %H:%M', true) }} Uhr {{ states.calendar.votgaming_kalender.attributes.message }} statt. Ich bin dabei?"
+        options:
+          - "Ja"
+          - "Nein"
+          - "Wahrscheinlich schon"
+        is_anonymous: false
+        allows_multiple_answers: false
+
 - id: remind_for_gruppentreffen
   alias: "remind for Gruppentreffen"
   initial_state: true
@@ -4686,8 +4715,6 @@
 
           ------------
 
-          Verfügbar bis: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['available until'] }}
-
           {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
           Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
           {% endif %}
@@ -4752,7 +4779,7 @@
                   entity_id: proximity.home_fabian
                   below: 5
           sequence:
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data_template:
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
@@ -4786,8 +4813,6 @@
 
           ------------
 
-          Verfügbar bis: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['available until'] }}
-
           {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] == 'unavailable' %}
           Bild: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] }}
           {% endif %}
@@ -4805,43 +4830,46 @@
   alias: "Rewe Discount Keyword available"
   initial_state: true
   trigger:
-    - platform: state
-      entity_id: sensor.rewe_440421
-  #condition:
-  #  condition: and
-  #  conditions:
-  #    - condition: or
-  #      conditions:
-  #        - condition: template
-  #          value_template: "{{'Bier' in state_attr('sensor.rewe_440421', 'discounts') }}"
-  #        - condition: template
-  #          value_template: "{{'Spezi' in state_attr('sensor.rewe_440421', 'discounts') }}"
-  #        - condition: template
-  #          value_template: "{{'Oettinger' in state_attr('sensor.rewe_440421', 'discounts') }}"
+    - platform: time
+      at: "06:40:00"
+  condition:
+    - condition: time
+      weekday:
+        - mon
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: sensor.rewe_440421
+          state: "unavailable"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data_template:
+        target: !secret telegram_chat_juz_leiter
         message: >
-          Neues Angebot im Rewe Prospekt für
+          Neue eventuell für das JUZ relevante Angebote im Rewe Zorneding Prospekt:
           {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
           {%- for product in product_list_loop -%}
-            {% if 'Spezi' in product.Product or 'Bier' in product.Product or 'Oettinger' in product.Product %}
+            {% if 'Spezi' in product.product or 'Hell' in product.product or 'Chips' in product.product or 'Oettinger' in product.product %}
 
-              - {{product.Product }}.
+          {{product.price.price }} € - {{product.product }}
 
-              Preis: {{product.Price.price }}
-
-              Bild:
+          {{ product.picture_link }}
             {%- endif -%}
           {%- endfor -%}
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data_template:
+        target: !secret telegram_chat_fabian
         message: >
-          Neues Angebot im Rewe Prospekt für {{ state_attr('sensor.rewe_440421', 'discounts')[0]['product'] }}.
+          Neue Angebote diese Woche im Rewe Zorneding Prospekt:
+          {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
+          {%- for product in product_list_loop -%}
+            {% if 'Almighurt' in product.product or 'Ehrmann' in product.product or 'Oettinger' in product.product %}
 
-          Preis: {{ state_attr('sensor.rewe_440421', 'discounts')[0]['price']['price'] }}
+          {{product.price.price }} € - {{product.product }}
 
-          {{ state_attr('sensor.rewe_440421', 'discounts')[0]['picture link'] }}.
+          {{ product.picture_link }}
+            {%- endif -%}
+          {%- endfor -%}
 
 - id: automatic_ha_updates
   alias: "Automatic HA Updates"
@@ -7235,7 +7263,6 @@
 
 - id: detect_if_washing_machine_is_currently_active
   alias: Detect if Washing machine is currently active
-  initial_state: true
   mode: single
   trigger:
     - platform: numeric_state
@@ -7296,7 +7323,6 @@
 
 - id: set_washing_machine_active_when_power_detected
   alias: Set washing machine active when power detected
-  initial_state: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.keller_steckdose_energy_power
@@ -7324,7 +7350,6 @@
 # When the power drops, move the state of the washing machine to Clean
 - id: set_washing_machine_clean_when_power_drops
   alias: Set washing machine clean when power drops
-  initial_state: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.keller_steckdose_energy_power
@@ -7412,7 +7437,6 @@
 
 - id: set_washing_machine_idle_after_timeout
   alias: Set washing machine idle after timeout
-  initial_state: true
   trigger:
     - platform: state
       entity_id: input_select.washing_machine_status
@@ -7684,7 +7708,7 @@
             #   data:
             #     data:
             #       tag: 'notification-about-sensor'
-            - service: notify.mobile_app_iphone
+            - service: notify.mobile_app_fabian_iphone
               data_template:
                 title: "Zeit off zu gehen"
                 message: "Es ist 22 Uhr."
@@ -7719,7 +7743,7 @@
 #            {% set state = 'off' %}
 #            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
 #    action:
-#      - service: notify.mobile_app_iphone
+#      - service: notify.mobile_app_fabian_iphone
 #        data_template:
 #          title: "Flugmodus"
 #          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -9051,14 +9075,14 @@
   initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 86400) | round(-1) }}"
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 172800) | round(-1) }}"
   condition:
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
+        value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 173800) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 86400 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 172800 }}"
   action:
     - service: shell_command.unpin_all_telegram
       data_template:
@@ -9068,7 +9092,7 @@
       data_template:
         target: !secret telegram_volleyball
         message: >
-          Erinnerung: Es findet am {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom("%d.%m.%Y %H:%M", true) }} Uhr {{ states.calendar.volleyballtraining.attributes.message }} statt.
+          Erinnerung: Es findet übermorgen ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom("%H:%M", true) }} Uhr {{ states.calendar.volleyballtraining.attributes.message }} statt.
           {% if not is_state_attr('calendar.volleyballtraining', 'description', '') %}
             Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
           {% endif %}
@@ -9090,25 +9114,23 @@
   initial_state: true
   trigger:
     - platform: time
-      at: "12:30:00"
+      at: "14:30:00"
   condition:
     condition: and
     conditions:
       - condition: time
         weekday:
-          - sat
+          - fri
       - condition: or
         conditions:
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
+            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[2]['condition'] == 'sunny' }}"
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'partlycloudy' }}"
+            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[2]['condition'] == 'partlycloudy' }}"
       - condition: template
-        value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] | int >= 20 }}"
-      - condition: or
-        conditions:
-          - condition: template
-            value_template: "{{ now().month <= 10 and now().month >= 4 }}"
+        value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[2]['temperature'] | int >= 20 }}"
+      - condition: template
+        value_template: "{{ now().month <= 10 and now().month >= 4 }}"
   action:
     - service: shell_command.unpin_all_telegram
       data_template:
@@ -9117,11 +9139,12 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "Morgen ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball?"
+        question: "Übermorgen ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
         options:
           - "Ja"
           - "Nein"
           - "Vielleicht"
+          - "Nur zeitweise/verspätet"
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
@@ -9138,18 +9161,10 @@
       - condition: template
         value_template: "{{ ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) > 0) }}"
   action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_juz_group
-        message: >
-          Das JUZ hat am {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom("%d.%m.%Y %H:%M", true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
-          {% if not is_state_attr('calendar.juz_zorneding_public', 'description', '') %}
-            Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}
-          {% endif %}
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_juz_group
-        question: "Ich komme zum {{ states.calendar.juz_zorneding_public.attributes.message }} ?"
+        question: "Das JUZ hat morgen ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -9157,6 +9172,16 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{not is_state_attr('calendar.juz_zorneding_public', 'description', '')}}"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_juz_group
+                message: >
+                  Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}
 
 - id: send_juz_mails_to_telegram
   alias: "send juz mails to telegram"

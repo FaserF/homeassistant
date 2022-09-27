@@ -182,3 +182,4 @@ ignored_entities:
     - device_tracker.thes_macbook_pro
     - sensor.thes_macbook_pro_battery_state
     - sensor.fabian_iphone6s_battery_state
+    - sensor.fabian_iphone12_battery_state

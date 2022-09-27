@@ -706,7 +706,7 @@
       event_data:
         command: "/lostfabian"
   action:
-    - service: notify.mobile_app_iphone
+    - service: notify.mobile_app_fabian_iphone
       data:
         message: "This phone is marked as lost! +49176 66334870"
         data:
@@ -787,7 +787,7 @@
               name: "default"
               critical: 1
               volume: 0.4
-    - service: notify.mobile_app_iphone
+    - service: notify.mobile_app_fabian_iphone
       data:
         message: "Wichtige Nachricht, schau auf dein Handy!"
         data:
@@ -923,7 +923,7 @@
     - service: switch.turn_on
       data:
         entity_id: switch.schloss
-    - service: notify.mobile_app_iphone
+    - service: notify.mobile_app_fabian_iphone
       data:
         message: "Es klingelt! Jemand ist da."
         data:

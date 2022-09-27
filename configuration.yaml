@@ -130,6 +130,7 @@ recorder:
       - sensor.fritz_box_3490_max_kbit_s_received
       - sensor.unavailable_entities
       - switch.rpi_cooling_fan
+      - sensor.rewe_440421
 
 # Discover some devices automatically
 discovery:
@@ -173,7 +174,7 @@ logger:
   default: warning
   logs:
     custom_components.deutschebahn: debug
-    custom_components.rewe: debug
+    #custom_components.rewe: debug
 
 # Enables a map showing the location of tracked devices
 map:
