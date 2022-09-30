@@ -129,7 +129,6 @@ recorder:
       - sensor.fritz_box_3490_max_kbit_s_sent
       - sensor.fritz_box_3490_max_kbit_s_received
       - sensor.unavailable_entities
-      - switch.rpi_cooling_fan
       - sensor.rewe_440421
 
 # Discover some devices automatically
@@ -261,23 +260,6 @@ media_source:
 
 # speedtestdotnet:
 # server_id: 21514
-
-climate:
-  - platform: generic_thermostat
-    name: RPI Cooling Fan Controller
-    heater: switch.rpi_cooling_fan
-    target_sensor: sensor.processor_temperature
-    min_temp: 30
-    max_temp: 80
-    ac_mode: true
-    target_temp: 45
-    cold_tolerance: 0.1
-    hot_tolerance: 0.1
-    min_cycle_duration:
-      seconds: 30
-    keep_alive:
-      minutes: 5
-    initial_hvac_mode: "cool"
 
 shell_command:
   # create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
@@ -435,10 +417,6 @@ google_assistant:
     switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz:
       expose: false
     switch.fritz_box_3490_wi_fi_fritz_box_gastzugang:
-      expose: false
-    switch.rpi_cooling_fan:
-      expose: false
-    climate.rpi_cooling_fan_controller:
       expose: false
     switch.adguard_protection:
       expose: false
