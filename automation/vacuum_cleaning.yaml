@@ -1,6 +1,6 @@
 ---
-- id: turn_on_staubsauger_weekly
-  alias: "Turn on staubsauger weekly"
+- id: turn_on_vacuum_weekly
+  alias: "Turn on vacuum weekly"
   initial_state: true
   trigger:
     platform: time
@@ -61,7 +61,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
+                payload: '{"segment_ids": ["5", "4", "2", "3"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:
@@ -73,7 +73,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["6", "8", "3", "4"], "customOrder": true}'
+                payload: '{"segment_ids": ["5", "4", "2", "3"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:
@@ -93,19 +93,19 @@
                     - service: mqtt.publish
                       data:
                         topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                        payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+                        payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
               default:
                 # else if only nessie is not at home clean all rooms except sleeping room
                 - service: mqtt.publish
                   data:
                     topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                    payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+                    payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
       default:
         # default if fabi & nessie at home: clean only living room, floor & kitchen
         - service: mqtt.publish
           data:
             topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-            payload: '{"segment_ids": ["6", "8", "4"], "customOrder": true}'
+            payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
 
 - id: vacuum_cleaner_error
   alias: "Vacuum Cleaner Error"

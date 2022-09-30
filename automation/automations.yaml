@@ -876,6 +876,84 @@
                     message: "Starte Homeassistant neu, da DB API Verbindung verloren wurde."
                 - service: homeassistant.restart
 
+- id: set_high_climate_to_lower_value
+  alias: "Set high climate to lower value"
+  initial_state: true
+  trigger:
+    - platform: numeric_state
+      entity_id: "climate.gastezimmer"
+      attribute: temperature
+      above: 20
+      for:
+        minutes: 20
+    - platform: numeric_state
+      entity_id: "climate.schlafzimmer"
+      attribute: temperature
+      above: 20
+      for:
+        minutes: 20
+    - platform: numeric_state
+      entity_id: "climate.bad"
+      attribute: temperature
+      above: 20
+      for:
+        minutes: 10
+    - platform: numeric_state
+      entity_id: "climate.wohnzimmer"
+      attribute: temperature
+      above: 22
+      for:
+        minutes: 12
+  action:
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: "climate.gastezimmer"
+              attribute: temperature
+              above: 20
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.schlafzimmer
+                temperature: 20
+                hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: "climate.schlafzimmer"
+              attribute: temperature
+              above: 20
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.schlafzimmer
+                temperature: 20
+                hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: "climate.bad"
+              attribute: temperature
+              above: 20
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.bad
+                temperature: 20
+                hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: "climate.wohnzimmer"
+              attribute: temperature
+              above: 22
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.wohnzimmer
+                temperature: 20
+                hvac_mode: heat
+
 - id: set_climate_at_night
   alias: "Set climate at night"
   initial_state: true
@@ -2914,17 +2992,17 @@
       entity_id:
         - sensor.fabian_ipadpro_battery_state
         - sensor.fabian_phone_battery_state
-        - sensor.nessie_iphone_battery_state_2
+        - sensor.nessie_iphone_battery_state
       to: "discharging"
     - platform: state
       entity_id:
         - sensor.fabian_ipadpro_battery_state
         - sensor.fabian_phone_battery_state
-        - sensor.nessie_iphone_battery_state_2
+        - sensor.nessie_iphone_battery_state
       to: "Not Charging"
     - platform: numeric_state
       entity_id:
-        - sensor.fabian_ipadpro_battery_level
+        - sensor.fabian_ipadpro_battery_state
         - sensor.fabian_iphone_battery_state
         - sensor.nessie_iphone_battery_state
       above: 90
@@ -2940,7 +3018,7 @@
       #       entity_id: sensor.fabian_ipadpro_battery_state
       #       state: 'discharging'
       #     - condition: numeric_state
-      #       entity_id: sensor.fabian_ipadpro_battery_level
+      #       entity_id: sensor.fabian_ipadpro_battery_state
       #       above: 90
       - condition: or
         conditions:
@@ -2953,7 +3031,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: sensor.nessie_iphone_battery_state_2
+            entity_id: sensor.nessie_iphone_battery_state
             state: "discharging"
           - condition: numeric_state
             entity_id: sensor.nessie_phone_battery_level
@@ -3807,6 +3885,8 @@
     conditions:
       - condition: template
         value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 173800) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_polygon_events.attributes.last_triggered) | int > 86700 }}"
       - condition: not
         conditions:
           - condition: state
@@ -5464,29 +5544,30 @@
                   {{ states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_description }}
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_current_warning_level.attributes.warning_1_end }} Uhr.
-- id: raspberryppi_temp_warning
-  alias: "RaspberryPi Temp Warning"
+
+- id: server_temp_warning
+  alias: "Server Temp Warning"
   initial_state: true
   trigger:
     - platform: numeric_state
       entity_id: sensor.processor_temperature
-      above: 75
+      above: 60
     - platform: numeric_state
       entity_id: sensor.processor_temperature
-      above: 78
+      above: 76
   condition:
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.raspberrypi_temp_warning.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.server_temp_warning.attributes.last_triggered) | int > 3600 }}"
   action:
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: "ACHTUNG! RaspberryPi Temperatur sehr hoch: {{ states.sensor.processor_temperature.state }}"
+        message: "ACHTUNG! Server Temperatur sehr hoch: {{ states.sensor.processor_temperature.state }}"
 
-- id: raspberrypi_ram_load_warning
-  alias: "RaspberryPi RAM Load Warning"
+- id: server_ram_load_warning
+  alias: "Server RAM Load Warning"
   initial_state: true
   trigger:
     - platform: numeric_state
@@ -5501,7 +5582,7 @@
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: "ACHTUNG! RaspberryPi RAM Auslastung sehr hoch: {{ states.sensor.memory_use_percent.state }}"
+        message: "ACHTUNG! Server RAM Auslastung sehr hoch: {{ states.sensor.memory_use_percent.state }}"
 
 - id: turn_on_schloss_on_button_press
   alias: Turn on Schloss on button press

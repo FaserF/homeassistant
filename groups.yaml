@@ -183,3 +183,5 @@ ignored_entities:
     - sensor.thes_macbook_pro_battery_state
     - sensor.fabian_iphone6s_battery_state
     - sensor.fabian_iphone12_battery_state
+    - update.miwifi_28_d1_27_fc_ab_d8_firmware_update
+    - sensor.miwifi_28_d1_27_fc_ab_d8_mode
