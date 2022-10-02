@@ -172,8 +172,9 @@ logger:
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
   #logs:
-    #custom_components.deutschebahn: debug
-    #custom_components.rewe: debug
+  #custom_components.deutschebahn: debug
+  #custom_components.rewe: debug
+  #custom_components.foodsharing: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -239,19 +240,6 @@ telegram_bot:
       - !secret telegram_chat_samuel
       - !secret telegram_chat_daniel
 
-notify:
-  - name: telegram_fabian
-    platform: telegram
-    chat_id: !secret telegram_chat_fabian
-  - name: telegram_nessie
-    platform: telegram
-    chat_id: !secret telegram_chat_nessie
-  # - platform: html5
-  # name: browser
-  # vapid_pub_key: !secret vapid_pub_key
-  # vapid_prv_key: !secret vapid_prv_key
-  # vapid_email: !secret vapid_email
-
 media_source:
 
 # media_player:
@@ -312,6 +300,8 @@ sensor: !include_dir_merge_list sensor
 switch: !include_dir_merge_list switch
 
 light: !include_dir_merge_list light
+
+notify: !include_dir_merge_list notify
 
 # no_ip:
 # domain: !secret domain_noip

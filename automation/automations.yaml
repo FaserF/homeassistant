@@ -4444,11 +4444,9 @@
                   entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
-            - service: system_bridge.send_command
-              data:
-                bridge: adad8b8056b4dfcde2399824f9be1dd5
-                command: shutdown
-                arguments: "/s /t 0"
+            - service: button.press
+              target:
+                entity_id: button.fabian_pc_shutdown
             - delay: "00:30:00"
     - choose:
         - conditions:
@@ -4464,11 +4462,9 @@
                   entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
-            - service: system_bridge.send_command
-              data:
-                bridge: adad8b8056b4dfcde2399824f9be1dd5
-                command: shutdown
-                arguments: "/s /t 0"
+            - service: button.press
+              target:
+                entity_id: button.fabian_pc_shutdown
             - delay: "00:30:00"
     - choose:
         - conditions:
@@ -4484,11 +4480,9 @@
                   entity_id: sensor.schlafzimmer_power
                   above: 20
           sequence:
-            - service: system_bridge.send_command
-              data:
-                bridge: adad8b8056b4dfcde2399824f9be1dd5
-                command: shutdown
-                arguments: "/s /t 0"
+            - service: button.press
+              target:
+                entity_id: button.fabian_pc_shutdown
             - delay: "00:01:00"
     - choose:
         - conditions:
@@ -4571,11 +4565,9 @@
                   entity_id: sensor.nessie_pc_energy_power
                   above: 20
           sequence:
-            - service: system_bridge.send_command
-              data:
-                bridge: adad8b8056b4dfcde2399???
-                command: shutdown
-                arguments: "/s /t 0"
+            - service: button.press
+              target:
+                entity_id: button.rgb_pc_shutdown
             - delay: "00:30:00"
     - choose:
         - conditions:
@@ -4588,11 +4580,9 @@
                   entity_id: sensor.nessie_pc_energy_power
                   above: 20
           sequence:
-            - service: system_bridge.send_command
-              data:
-                bridge: adad8b8056b4dfcde2399???
-                command: shutdown
-                arguments: "/s /t 0"
+            - service: button.press
+              target:
+                entity_id: button.rgb_pc_shutdown
             - delay: "00:30:00"
     - choose:
         - conditions:
@@ -4605,11 +4595,9 @@
                   entity_id: sensor.nessie_pc_energy_power
                   above: 20
           sequence:
-            - service: system_bridge.send_command
-              data:
-                bridge: adad8b8056b4dfcde2399???
-                command: shutdown
-                arguments: "/s /t 0"
+            - service: button.press
+              target:
+                entity_id: button.rgb_pc_shutdown
             - delay: "00:01:00"
     - choose:
         - conditions:
@@ -7728,74 +7716,6 @@
               entity_id: media_player.wohnzimmer_uhr
               data:
                 message: "Der Timer in der Küche ist in {{ states.sensor.kuche_speaker_timers.state }} Minuten fertig."
-
-- id: remind_for_going_off
-  alias: "Remind for going off"
-  initial_state: true
-  trigger:
-    platform: time
-    at: "22:05:00"
-  condition:
-    condition: and
-    conditions:
-      - condition: time
-        weekday:
-          - mon
-          - tue
-          - wed
-          - thu
-          - sun
-      - condition: state
-        entity_id: device_tracker.rgb_pc
-        state: home
-  action:
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: device_tracker.rgb_pc
-              state: home
-          sequence:
-            # - service: notify.browser
-            #   data_template:
-            #     message: "Es ist 22 Uhr - Zeit off zu gehen."
-            #     target: Nessie-PC
-            #   data:
-            #     data:
-            #       tag: 'notification-about-sensor'
-            - service: notify.mobile_app_nessie_phone
-              data_template:
-                title: "Zeit off zu gehen"
-                message: "Es ist 22 Uhr."
-              data:
-                data:
-                  tag: "notification-about-sensor"
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: device_tracker.fabian_pc
-                  state: home
-                - condition: state
-                  entity_id: device_tracker.nsta0552
-                  state: home
-          sequence:
-            # - service: notify.browser
-            #   data_template:
-            #     message: "Es ist 22 Uhr - Zeit off zu gehen."
-            #     target:
-            #       - Fabian-PC
-            #       - Fabian-Hackbook
-            #   data:
-            #     data:
-            #       tag: 'notification-about-sensor'
-            - service: notify.mobile_app_fabian_iphone
-              data_template:
-                title: "Zeit off zu gehen"
-                message: "Es ist 22 Uhr."
-              data:
-                data:
-                  tag: "notification-about-sensor"
 
 #  - id: turn_on_airplane_mode_fabi
 #    alias: 'Turn on Airplane Mode Fabi'
