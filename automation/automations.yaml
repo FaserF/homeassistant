@@ -914,7 +914,7 @@
           sequence:
             - service: climate.set_temperature
               data:
-                entity_id: climate.schlafzimmer
+                entity_id: climate.gastezimmer
                 temperature: 20
                 hvac_mode: heat
     - choose:
@@ -3279,9 +3279,28 @@
               entity_id: light.yeelight_bslamp2_0x13fea10f
               data_template:
                 brightness: "{{states.light.yeelight_bslamp2_0x13fea10f.attributes.brightness + 5}}"
-    - service: automation.trigger
-      data:
-        entity_id: automation.increase_lights_in_morning
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: light.leds_tisch
+              state: "on"
+            - condition: state
+              entity_id: light.yeelight_bslamp2_0x13fea10f
+              state: "on"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: light.leds_tisch
+                  attribute: brightness
+                  state: "255"
+                - condition: state
+                  entity_id: light.yeelight_bslamp2_0x13fea10f
+                  attribute: brightness
+                  state: "255"
+          sequence:
+            - service: automation.trigger
+              data:
+                entity_id: automation.increase_lights_in_morning
 
 - id: Remind for leaving in the morning
   alias: "Remind for leaving in the morning"

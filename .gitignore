@@ -13,6 +13,7 @@
 !light/
 !automation/
 !device_tracker/
+!notify/
 
 # Ignore folders.
 megalinter-reports/
