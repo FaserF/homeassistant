@@ -911,6 +911,9 @@
               entity_id: "climate.gastezimmer"
               attribute: temperature
               above: 20
+            - condition: state
+              entity_id: "climate.gastezimmer"
+              state: "heat"
           sequence:
             - service: climate.set_temperature
               data:
@@ -923,6 +926,9 @@
               entity_id: "climate.schlafzimmer"
               attribute: temperature
               above: 20
+            - condition: state
+              entity_id: "climate.schlafzimmer"
+              state: "heat"
           sequence:
             - service: climate.set_temperature
               data:
@@ -935,6 +941,9 @@
               entity_id: "climate.bad"
               attribute: temperature
               above: 20
+            - condition: state
+              entity_id: "climate.bad"
+              state: "heat"
           sequence:
             - service: climate.set_temperature
               data:
@@ -947,6 +956,9 @@
               entity_id: "climate.wohnzimmer"
               attribute: temperature
               above: 22
+            - condition: state
+              entity_id: "climate.wohnzimmer"
+              state: "heat"
           sequence:
             - service: climate.set_temperature
               data:
@@ -1142,6 +1154,8 @@
     conditions:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_unavailable_device.attributes.last_triggered) | int > 3200 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automatic_ha_updates.attributes.last_triggered) | int > 3200 }}"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -3929,12 +3943,12 @@
   initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 86400) | round(-1) }}"
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 111600) | round(-1) }}"
   condition:
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
+        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 112600) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: state
         entity_id: calendar.votgaming_kalender
         attribute: message
@@ -3956,7 +3970,7 @@
             - service: telegram_bot.send_poll
               data_template:
                 target: !secret telegram_chat_5friends
-                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Wo treffen wir uns?"
+                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[1].temperature }} °. Wo treffen wir uns?"
                 options:
                   - "See"
                   - "Weiher"
@@ -3972,7 +3986,7 @@
         - service: telegram_bot.send_poll
           data_template:
             target: !secret telegram_chat_5friends
-            question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Wo treffen wir uns?"
+            question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].temperature }} °. Wo treffen wir uns?"
             options:
               - "Fabi Keller"
               - "Kai & Adri"
@@ -3987,7 +4001,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_5friends
-        question: "Shisha?"
+        question: "Shisha (wenn Treffen in keinem geschlossenem Raum)?"
         options:
           - "Ja"
           - "Nein"
@@ -4936,7 +4950,7 @@
           Neue eventuell für das JUZ relevante Angebote im Rewe Zorneding Prospekt:
           {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
           {%- for product in product_list_loop -%}
-            {% if 'Spezi' in product.product or 'Hell' in product.product or 'Chips' in product.product or 'Oettinger' in product.product %}
+            {% if 'Spezi' in product.product or 'Hell' in product.product or 'Chips' in product.product or 'Silenca' in product.product or 'Oettinger' in product.product %}
 
           {{product.price.price }} € - {{product.product }}
 
@@ -9108,18 +9122,10 @@
       data_template:
         telegram_bot_api: !secret telegram_bot_api
         chat_id: !secret telegram_volleyball
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_volleyball
-        message: >
-          Erinnerung: Es findet übermorgen ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom("%H:%M", true) }} Uhr {{ states.calendar.volleyballtraining.attributes.message }} statt.
-          {% if not is_state_attr('calendar.volleyballtraining', 'description', '') %}
-            Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
-          {% endif %}
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "Ich komme zum {{ states.calendar.volleyballtraining.attributes.message }} ?"
+        question: "Übermorgen ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -9128,13 +9134,23 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{not is_state_attr('calendar.volleyballtraining', 'description', '')}}"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_volleyball
+                message: >
+                  Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
 
 - id: remind_for_volleyball_on_warm_sundays
   alias: "Remind for Volleyball on warm Sundays"
   initial_state: true
   trigger:
     - platform: time
-      at: "14:30:00"
+      at: "13:00:00"
   condition:
     condition: and
     conditions:
@@ -9168,18 +9184,28 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{not is_state_attr('calendar.volleyballtraining', 'description', '')}}"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_volleyball
+                message: >
+                  Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
 
 - id: remind_for_juz
   alias: "remind for juz"
   initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - 86400) | round(-1) }}"
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - 111600) | round(-1) }}"
   condition:
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) < 87050) and ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) > 0) }}"
+        value_template: "{{ ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) < 112600) and ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) > 0) }}"
   action:
     - service: telegram_bot.send_poll
       data_template:

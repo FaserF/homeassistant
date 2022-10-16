@@ -187,3 +187,9 @@ ignored_entities:
     - sensor.miwifi_28_d1_27_fc_ab_d8_mode
     - button.fabian_pc_shutdown
     - button.rgb_pc_shutdown
+    - sensor.fabian_pc_gpu_temperature
+    - sensor.fabian_pc_gpu_load
+    - sensor.fabian_pc_cpu_load
+    - sensor.rgb_pc_gpu_temperature
+    - sensor.rgb_pc_gpu_load
+    - sensor.rgb_pc_cpu_load

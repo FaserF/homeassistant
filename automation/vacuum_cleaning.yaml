@@ -123,20 +123,46 @@
       to: "error"
   action:
     - delay: "00:00:30"
-    - service: telegram_bot.send_message
-      data_template:
-        message: >
-          James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.fabian
+              state: "home"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
-          Die Reinigung wurde daher unterbrochen.
-        target: !secret telegram_chat_fabian
-    - service: telegram_bot.send_message
-      data_template:
-        message: >
-          James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
+                  Die Reinigung wurde daher unterbrochen.
+                target: !secret telegram_chat_fabian
+        - conditions:
+            - condition: state
+              entity_id: person.nessie
+              state: "home"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
-          Die Reinigung wurde daher unterbrochen.
-        target: !secret telegram_chat_nessie
+                  Die Reinigung wurde daher unterbrochen.
+                target: !secret telegram_chat_nessie
+      default:
+        - service: telegram_bot.send_message
+          data_template:
+            message: >
+              James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
+
+              Die Reinigung wurde daher unterbrochen.
+            target: !secret telegram_chat_fabian
+        - service: telegram_bot.send_message
+          data_template:
+            message: >
+              James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
+
+              Die Reinigung wurde daher unterbrochen.
+            target: !secret telegram_chat_nessie
 
 - id: james_room_cleaning
   alias: "James Raum Reinigiung"
@@ -154,7 +180,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["6"]}'
+                payload: '{"segment_ids": ["5"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -163,7 +189,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["4"]}'
+                payload: '{"segment_ids": ["3"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -172,7 +198,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["3"]}'
+                payload: '{"segment_ids": ["2"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -181,7 +207,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["7"]}'
+                payload: '{"segment_ids": ["6"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -199,7 +225,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5"]}'
+                payload: '{"segment_ids": ["4"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
