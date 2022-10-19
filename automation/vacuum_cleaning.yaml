@@ -3,8 +3,9 @@
   alias: "Turn on vacuum weekly"
   initial_state: true
   trigger:
-    platform: time
-    at: "13:00:00"
+    - platform: state
+      entity_id: schedule.reinigung
+      to: "on"
   condition:
     - condition: state
       entity_id: input_boolean.abwesend_modus
@@ -12,36 +13,6 @@
     - condition: state
       entity_id: input_boolean.leiser_modus
       state: "off"
-    - condition: or
-      conditions:
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Mon") and (states.input_select.wochentagsreinigung.state=="Montag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Tue") and (states.input_select.wochentagsreinigung.state=="Dienstag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Wed") and (states.input_select.wochentagsreinigung.state=="Mittwoch")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Thu") and (states.input_select.wochentagsreinigung.state=="Donnerstag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Fri") and (states.input_select.wochentagsreinigung.state=="Freitag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Sat") and (states.input_select.wochentagsreinigung.state=="Samstag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Sun") and (states.input_select.wochentagsreinigung.state=="Sonntag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Mon") and (states.input_select.zweite_wochentagsreinigung.state=="Montag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Tue") and (states.input_select.zweite_wochentagsreinigung.state=="Dienstag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Wed") and (states.input_select.zweite_wochentagsreinigung.state=="Mittwoch")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Thu") and (states.input_select.zweite_wochentagsreinigung.state=="Donnerstag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Fri") and (states.input_select.zweite_wochentagsreinigung.state=="Freitag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Sat") and (states.input_select.zweite_wochentagsreinigung.state=="Samstag")}}'
-        - condition: template
-          value_template: '{{ (now().strftime("%a") == "Sun") and (states.input_select.zweite_wochentagsreinigung.state=="Sonntag")}}'
   action:
     - service: switch.turn_on
       data:

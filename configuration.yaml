@@ -453,6 +453,9 @@ google_assistant:
     switch.nessie_pc:
       expose: false
       room: Gästezimmer
+    switch.gastezimmer_usb_ports:
+      expose: true
+      room: Gästezimmer
     input_boolean.nessie_pc_strom:
       name: Nessie PC
       expose: true
@@ -505,6 +508,9 @@ google_assistant:
       room: Keller
     ## Küche
     switch.xiaomi_miio_cooker:
+      expose: true
+      room: Küche
+    switch.kuchengerate:
       expose: true
       room: Küche
 

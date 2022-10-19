@@ -189,6 +189,8 @@
           {% else %}
             0
           {% endif %}
+        {% elif (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
+          {{ (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int + (1320) | int - as_timestamp(now()) ) | timestamp_custom("%M", false) }}
         {% else %}
           0
         {% endif %}
@@ -209,6 +211,8 @@
           {% else %}
             Inaktiv
           {% endif %}
+        {% elif (as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 1320 - as_timestamp(now()) > 0 ) %}
+          Kohle
         {% else %}
           Inaktiv
         {% endif %}

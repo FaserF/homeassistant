@@ -40,6 +40,7 @@
       data:
         entity_id:
           - switch.bett_usb_ports
+          - switch.kuchengerate
     - service: media_player.turn_off
       data:
         area_id:
@@ -112,6 +113,9 @@
               data:
                 entity_id: climate.gastezimmer
                 hvac_mode: auto
+            - service: switch.turn_off
+              data:
+                entity_id: switch.gastezimmer_usb_ports
     - choose:
         - conditions:
             - condition: not
@@ -4309,6 +4313,14 @@
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.leiser_modus
+    - service: switch.turn_off
+      data:
+        entity_id:
+          #- switch.bett_gluhbirne
+          #- switch.lampe_gastezimmer
+          - switch.gastezimmer_usb_ports
+          - switch.google_nest
+          - switch.bettlicht
     - choose:
         - conditions:
             - condition: state
@@ -4358,6 +4370,14 @@
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.leiser_modus
+    - service: switch.turn_on
+      data:
+        entity_id:
+          #- switch.bett_gluhbirne
+          #- switch.lampe_gastezimmer
+          #- switch.gastezimmer_usb_ports
+          - switch.google_nest
+          - switch.bettlicht
     - choose:
         - conditions:
             - condition: state
@@ -4432,6 +4452,25 @@
     - service: switch.turn_off
       data:
         entity_id: switch.adaptive_lighting_guest_room
+    - service: switch.turn_on
+      data:
+        entity_id:
+          - switch.gastezimmer_usb_ports
+          - switch.steckerleiste_gastezimmer
+
+- id: turn_off_guest_mode
+  alias: Turn on Guest Mode mode
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: input_boolean.gast_modus
+      to: "off"
+  action:
+    - service: switch.turn_off
+      data:
+        entity_id:
+          - switch.gastezimmer_usb_ports
+          - switch.steckerleiste_gastezimmer
 
 - id: turn_on_fs_strom
   alias: Turn on FS Strom
@@ -5047,6 +5086,9 @@
                   {% if states.update.rewe_discounts_update.state == "on" %}
                   {{ states.update.rewe_discounts_update.attributes.friendly_name }} Changelog: {{ states.update.rewe_discounts_update.attributes.release_url }} - von Version {{state_attr('update.rewe_discounts_update', 'installed_version')}} zu Version {{state_attr('update.rewe_discounts_update', 'latest_version')}}.
                   {% endif %}
+                  {% if states.update.generic_remote_control_card_update.state == "on" %}
+                  {{ states.update.generic_remote_control_card_update.attributes.friendly_name }} Changelog: {{ states.update.generic_remote_control_card_update.attributes.release_url }} - von Version {{state_attr('update.generic_remote_control_card_update', 'installed_version')}} zu Version {{state_attr('update.generic_remote_control_card_update', 'latest_version')}}.
+                  {% endif %}
             - choose:
                 - conditions:
                     - condition: state
@@ -5173,6 +5215,15 @@
                     - service: update.install
                       data:
                         entity_id: update.deutsche_bahn_update
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: update.generic_remote_control_card_update
+                      state: "on"
+                  sequence:
+                    - service: update.install
+                      data:
+                        entity_id: update.generic_remote_control_card_update
               # default:
               # - service: update.install
               # data:
@@ -5291,7 +5342,7 @@
               data_template:
                 target: !secret telegram_chat_afk
                 message: >
-                  Raspberry Pi OS wird automatisch aktualisiert. Vaultwarden wird daher zeitweise nicht verfügbar sein für ungefähr 15 Minuten.
+                  Homeassistant OS wird automatisch aktualisiert. Vaultwarden wird daher zeitweise nicht verfügbar sein für ungefähr 15 Minuten.
             - service: hassio.addon_restart
               data:
                 addon: a0d7b954-ssh
@@ -5598,7 +5649,7 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.raspberrypi_ram_load_warning.attributes.last_triggered) | int > 3600 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.server_ram_load_warning.attributes.last_triggered) | int > 3600 }}"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -6980,6 +7031,19 @@
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
                   - "Dauer:/remaining_time"
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "JUZ"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_5friends
+                message: "Kohleanzünder wurde eingeschaltet."
+                inline_keyboard:
+                  - "Dauer:/remaining_time"
       # ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
@@ -7025,6 +7089,17 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_afk
+                message: "Bitte Kohle wenden."
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "JUZ"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_5friends
                 message: "Bitte Kohle wenden."
       default:
         - service: telegram_bot.send_message
@@ -7111,6 +7186,17 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_afk
+                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "JUZ"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_5friends
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
       default:
         - service: telegram_bot.send_message
@@ -7749,6 +7835,41 @@
               entity_id: media_player.wohnzimmer_uhr
               data:
                 message: "Der Timer in der Küche ist in {{ states.sensor.kuche_speaker_timers.state }} Minuten fertig."
+
+- id: turn_off_kitchen_devices_after_x_minutes
+  alias: "Turn off kitchen devices after x minutes"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: switch.kuchengerate
+      to: "on"
+      for:
+        minutes: 12
+    - platform: state
+      entity_id: switch.kuchengerate
+      from: "off"
+      to: "on"
+      for:
+        minutes: 16
+    - platform: state
+      entity_id: switch.xiaomi_miio_cooker
+      from: "on"
+      to: "off"
+      for:
+        minutes: 40
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: switch.xiaomi_miio_cooker
+        state: "off"
+      - condition: state
+        entity_id: switch.kuchengerate
+        state: "on"
+  action:
+    - service: switch.turn_off
+      data:
+        entity_id: switch.kuchengerate
 
 #  - id: turn_on_airplane_mode_fabi
 #    alias: 'Turn on Airplane Mode Fabi'
