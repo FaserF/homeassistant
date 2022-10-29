@@ -32,7 +32,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5", "4", "2", "3"], "customOrder": true}'
+                payload: '{"segment_ids": ["5", "2", "3", "4"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:
@@ -44,7 +44,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5", "4", "2", "3"], "customOrder": true}'
+                payload: '{"segment_ids": ["5", "2", "3", "4"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:

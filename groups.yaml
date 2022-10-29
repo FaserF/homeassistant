@@ -193,3 +193,9 @@ ignored_entities:
     - sensor.rgb_pc_gpu_temperature
     - sensor.rgb_pc_gpu_load
     - sensor.rgb_pc_cpu_load
+    - switch.fernseher_old
+    - switch.nessie_pc_old
+    - sensor.nessie_pc_energy_power_old
+    - sensor.nessie_pc_energy_today_old
+    - sensor.nessie_pc_energy_yesterday_old
+    - light.lampe_gastezimmer

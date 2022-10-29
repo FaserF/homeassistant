@@ -556,6 +556,23 @@
         message: "{{ states.sensor.coal_lighter_finish_duration.attributes.friendly_name }} ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig."
         disable_notification: true
 
+- id: telegram_start_coal_lighter_timer
+  alias: Telegram Start Coal Lighter Timer
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: "/shisha"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/shisha"
+  action:
+    - service: input_button.press
+      target:
+        entity_id: input_button.kohleanzunder_timer
+
 - id: telegram_turn_off_fridge
   alias: Telegram Turn off fridge
   initial_state: true

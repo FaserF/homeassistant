@@ -34,13 +34,13 @@
     - service: switch.turn_off
       data:
         area_id:
-          - "{{ area_id('Wohnzimmer') }}"
           - "{{ area_id('Keller') }}"
     - service: switch.turn_off
       data:
         entity_id:
           - switch.bett_usb_ports
           - switch.kuchengerate
+          - switch.fernseher
     - service: media_player.turn_off
       data:
         area_id:
@@ -164,6 +164,11 @@
             - service: media_player.turn_off
               data:
                 entity_id: media_player.gastezimmer_mini
+            - service: switch.turn_off
+              data:
+                entity_id:
+                  - switch.steckerleiste_gastezimmer
+                  - switch.gastezimmer_usb_ports
             # - service: select.select_option
             # data:
             # option: min
@@ -706,18 +711,34 @@
                 {% set state = 'on' %}
                 {{ states[domain] | selectattr('state','eq', state) | list | count > 1 }}
           sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: "Alle Lichter werden in 20 Minuten ausgeschaltet, außer im Keller."
-                inline_keyboard:
-                  - "Abbruch:/cancellight, Okay:/telegramno"
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_nessie
-                message: "Alle Lichter werden in 20 Minuten ausgeschaltet, außer im Keller."
-                inline_keyboard:
-                  - "Abbruch:/cancellight, Okay:/telegramno"
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet, außer im Keller."
+                        inline_keyboard:
+                          - "Abbruch:/cancellight, Okay:/telegramno"
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.nessie
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_nessie
+                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet, außer im Keller."
+                        inline_keyboard:
+                          - "Abbruch:/cancellight, Okay:/telegramno"
     - choose:
         - conditions:
             - condition: state
@@ -774,14 +795,30 @@
                   - "{{ area_id('Wohnzimmer') }}"
                   - "{{ area_id('Schlafzimmer') }}"
                   - "{{ area_id('Gaestezimmer') }}"
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_nessie
-                message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.nessie
+                          state: "home"
+                  sequence:
+                  - service: telegram_bot.send_message
+                    data_template:
+                      target: !secret telegram_chat_nessie
+                      message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
         - conditions:
             - condition: state
@@ -1177,7 +1214,7 @@
 
 - id: activate_guest_mode_if_guest_is_here
   alias: "Activate guest mode if guest is here"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.isi
@@ -1294,10 +1331,6 @@
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: "Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist."
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_nessie
         message: "Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist."
 
 - id: remind_fabi_to_ventilate
@@ -1590,7 +1623,7 @@
   initial_state: true
   trigger:
     - platform: numeric_state
-      entity_id: sensor.nessie_pc_energy_power
+      entity_id: sensor.steckerleiste_gastezimmer_energy_power
       below: 15
       for:
         seconds: 30
@@ -1632,7 +1665,7 @@
       for:
         minutes: 5
     - platform: numeric_state
-      entity_id: sensor.nessie_pc_energy_power
+      entity_id: sensor.steckerleiste_gastezimmer_energy_power
       below: 25
       for:
         minutes: 10
@@ -1640,7 +1673,7 @@
     condition: and
     conditions:
       - condition: numeric_state
-        entity_id: sensor.nessie_pc_energy_power
+        entity_id: sensor.steckerleiste_gastezimmer_energy_power
         below: 25
   action:
     - service: switch.turn_off
@@ -2245,15 +2278,6 @@
                   entity_id: input_boolean.leiser_modus
                   state: "on"
           sequence:
-            - service: notify.mobile_app_nessie_iphone
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
             - service: notify.mobile_app_fabian_iphone
               data:
                 message: "Das Fenster im Bad kann wieder geschlossen werden."
@@ -2335,15 +2359,6 @@
             - service: notify.telegram_nessie
               data:
                 message: "Das Fenster im Bad kann wieder geschlossen werden."
-            - service: notify.mobile_app_nessie_iphone
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
         - conditions:
             - condition: state
               entity_id: input_boolean.gast_modus
@@ -4234,8 +4249,6 @@
   alias: "Remind for DST change - Winter/Sommerzeit"
   initial_state: true
   trigger:
-    # - platform: time
-    # at: '15:30:00'
     - platform: template
       value_template: "{{ now().timetuple().tm_isdst }}"
   action:
@@ -4269,26 +4282,67 @@
     platform: homeassistant
     event: start
   condition:
-    - condition: time
-      after: "03:10:00"
-      before: "03:00:00"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_on_ha_restart.attributes.last_triggered) | int > 1800 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automatic_ha_update.attributes.last_triggered) | int > 500 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_off_devices_at_night.attributes.last_triggered) | int > 500 }}"
   action:
     - service: frontend.set_theme
       data:
         name: transparentgray-LAB
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_fabian
-        message: "Homeassistant wurde soeben gestartet."
     # - service: button.press
     # target:
     # entity_id: button.synchronize_devices
+    - service: switch.turn_on
+      data:
+        entity_id:
+          - switch.bettlicht
+          - switch.google_nest
+          - switch.lenovo_uhr
+          - switch.leds_wohnzimmer
+    - choose:
+        - conditions:
+            - condition: time
+              after: "03:10:00"
+              before: "03:00:00"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automatic_ha_update.attributes.last_triggered) | int > 500 }}"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: "Homeassistant wurde soeben gestartet."
+
+- id: turn_on_devices_on_tasmota_restart
+  alias: Turn on devices on tasmota restart
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: switch.bettlicht
+      from: "unavailable"
+      to: "off"
+    - platform: state
+      entity_id: switch.bettlicht
+      from: "unavailable"
+      to: "off"
+    - platform: state
+      entity_id: switch.bettlicht
+      from: "unavailable"
+      to: "off"
+    - platform: state
+      entity_id: switch.bettlicht
+      from: "unavailable"
+      to: "off"
+  condition:
+    - condition: state
+      entity_id: "input_boolean.abwesend_modus"
+      state: "off"
+  action:
+    - service: switch.turn_on
+      data:
+        entity_id:
+          - switch.bettlicht
+          - switch.google_nest
+          - switch.lenovo_uhr
+          - switch.leds_wohnzimmer
 
 - id: run_bash_script_with_addon_bash_script_executer_every_hour
   alias: "Run Bash Script with Addon Bash Script Executer every hour"
@@ -4634,7 +4688,7 @@
                   entity_id: device_tracker.rgb_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.nessie_pc_energy_power
+                  entity_id: sensor.steckerleiste_gastezimmer_energy_power
                   above: 20
           sequence:
             - service: button.press
@@ -4649,7 +4703,7 @@
                   entity_id: device_tracker.rgb_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.nessie_pc_energy_power
+                  entity_id: sensor.steckerleiste_gastezimmer_energy_power
                   above: 20
           sequence:
             - service: button.press
@@ -4664,7 +4718,7 @@
                   entity_id: device_tracker.rgb_pc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.nessie_pc_energy_power
+                  entity_id: sensor.steckerleiste_gastezimmer_energy_power
                   above: 20
           sequence:
             - service: button.press
@@ -4682,7 +4736,7 @@
                   entity_id: device_tracker.vku_lb_20
                   state: "not_home"
                 - condition: numeric_state
-                  entity_id: sensor.nessie_pc_energy_power
+                  entity_id: sensor.steckerleiste_gastezimmer_energy_power
                   above: 20
           sequence:
             - service: notify.telegram_nessie
@@ -4696,7 +4750,7 @@
             - condition: and
               conditions:
                 - condition: numeric_state
-                  entity_id: sensor.nessie_pc_energy_power
+                  entity_id: sensor.steckerleiste_gastezimmer_energy_power
                   below: 21
           sequence:
             - service: switch.turn_off
@@ -4784,10 +4838,6 @@
     - service: telegram_bot.send_message
       data:
         target: !secret telegram_chat_fabian
-        message: "ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!"
-    - service: telegram_bot.send_message
-      data:
-        target: !secret telegram_chat_nessie
         message: "ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!"
     - service: tts.google_say
       entity_id:
@@ -4891,23 +4941,6 @@
           - condition: template
             value_template: "{{'Zorneding' in state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}"
   action:
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.nessie
-              state: "home"
-          sequence:
-            - service: notify.mobile_app_nessie_iphone
-              data_template:
-                title: "Neuer Foodsharing Korb in Zorneding"
-                message: >
-                  {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
     - choose:
         - conditions:
             - condition: or
@@ -5682,7 +5715,7 @@
 
 - id: nessie_phone_battery_low
   alias: Nessie Phone Battery low
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.nessie_iphone_battery_state
@@ -5701,7 +5734,7 @@
 
 - id: fabi_phone_battery_low
   alias: Fabi Phone Battery low
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.fabian_iphone_battery_state
@@ -6722,7 +6755,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_speaker
-                - delay: 00:00:02
+                - delay: 00:00:03
                 - service: tts.google_say
                   entity_id: media_player.kuche_speaker
                   data_template:
@@ -6970,18 +7003,26 @@
       to: "on"
       for:
         minutes: 2
+    - platform: state
+      entity_id: input_button.kohleanzunder_timer
   condition:
     condition: and
     conditions:
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 1080 }}"
-      - condition: state
-        entity_id: switch.kohleanzunder
-        state: "on"
-      - condition: numeric_state
-        entity_id: sensor.keller_steckdose_energy_power
-        above: 420
-        below: 570
+      - condition: or
+        conditions:
+          - condition: and
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.keller_steckdose_energy_power
+                above: 420
+                below: 570
+              - condition: state
+                entity_id: switch.kohleanzunder
+                state: "on"
+          - condition: template
+            value_template: "{{ as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.state) | int < 30 }}"
   action:
     - service: automation.turn_off
       data:
@@ -7044,6 +7085,25 @@
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
                   - "Dauer:/remaining_time"
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "Kai-Adri"
+                #- condition: state
+                #  entity_id: person.adri
+                #  state: "Kai-Adri"
+                #- condition: state
+                #  entity_id: person.kai
+                #  state: "Kai-Adri"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_afk
+                message: "Kohleanzünder wurde eingeschaltet."
+                inline_keyboard:
+                  - "Dauer:/remaining_time"
       # ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
@@ -7101,6 +7161,23 @@
               data_template:
                 target: !secret telegram_chat_5friends
                 message: "Bitte Kohle wenden."
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "Kai-Adri"
+                #- condition: state
+                #  entity_id: person.adri
+                #  state: "Kai-Adri"
+                #- condition: state
+                #  entity_id: person.kai
+                #  state: "Kai-Adri"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_afk
+                message: "Bitte Kohle wenden."
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -7141,10 +7218,18 @@
     #           continue_on_error: true
     #           data:
     #             message: "Der Eisschlauch kann schon mal geholt werden."
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_fabian
-        message: "Der Eisschlauch kann schon mal geholt werden."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: "Der Eisschlauch kann schon mal geholt werden."
     - delay: "00:02:00"
     - service: switch.turn_off
       data:
@@ -7197,7 +7282,24 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
-                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+                message: "Die Kohle sollte fertig sein!"
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "Kai-Adri"
+                #- condition: state
+                #  entity_id: person.adri
+                #  state: "Kai-Adri"
+                #- condition: state
+                #  entity_id: person.kai
+                #  state: "Kai-Adri"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_afk
+                message: "Die Kohle sollte fertig sein!"
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -8024,7 +8126,7 @@
 
 - id: nessie_forgot_pill
   alias: "Nessie forgot pill"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: time
       at: "23:00:00"
@@ -8075,7 +8177,7 @@
 
 - id: nessie_forgot_pill_weekend
   alias: "Nessie forgot pill weekend"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: time
       at: "00:00:00"
@@ -8317,7 +8419,7 @@
 
 - id: remind_for_guest_mode
   alias: remind for guest mode
-  initial_state: true
+  initial_state: false
   trigger:
     platform: state
     entity_id: media_player.keller_tv
@@ -8485,7 +8587,7 @@
 
 - id: notify_on_sbahn_delay_work_nessie_home
   alias: "Notify on Sbahn delay Work Nessie -> Home"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.nessie
@@ -8550,7 +8652,7 @@
 
 - id: notify_nessie_fabian_on_way_home
   alias: "Notify Nessie Fabian on way home"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_fabian
@@ -8588,7 +8690,7 @@
 
 - id: notify_nessie_fabian_on_way_home_longer_distance
   alias: "Notify Nessie Fabian on way home longer distance"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_fabian
@@ -8626,7 +8728,7 @@
 
 - id: notify_nessie_fabian_on_way_home_long_distance
   alias: "Notify Nessie Fabian on way home long distance"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_fabian
@@ -8661,7 +8763,7 @@
 
 - id: notify_fabian_nessie_on_way_home
   alias: "Notify Fabian Nessie on way home"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_nessie
@@ -8707,7 +8809,7 @@
 
 - id: notify_fabian_nessie_on_way_home_longer_distance
   alias: "Notify Fabian Nessie on way home longer distance"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_nessie
@@ -8750,7 +8852,7 @@
 
 - id: notify_fabian_nessie_on_way_home_long_distance
   alias: "Notify Fabian Nessie on way home long distance"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_nessie
@@ -8790,7 +8892,7 @@
 
 - id: notify_nessie_fabian_on_way_home_from_sta
   alias: "Notify Nessie Fabian on way home from STA"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.fabian
@@ -8895,7 +8997,7 @@
 
 - id: notify_nessie_fabian_on_way_home_from_gil
   alias: "Notify Nessie Fabian on way home from GIL"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.fabian
@@ -8919,7 +9021,7 @@
 
 - id: notify_nessie_fabian_on_way_home_from_muc
   alias: "Notify Nessie Fabian on way home from MUC"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.fabian
@@ -8941,7 +9043,7 @@
 
 - id: notify_nessie_fabian_on_way_home_from_whm
   alias: "Notify Nessie Fabian on way home from WHM"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.fabian
@@ -8963,7 +9065,7 @@
 
 - id: notify_fabian_nessie_on_way_home_from_work
   alias: "Notify Fabian Nessie on way home from work"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.nessie
@@ -9067,7 +9169,7 @@
 
 - id: notify_fabian_nessie_on_way_home_from_berufsschule
   alias: "Notify Fabian Nessie on way home from Berufsschule"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.nessie
@@ -9198,7 +9300,7 @@
 
 - id: telegram_send_daily_weather_forecast_nessie
   alias: "Telegram send daily weather forecast nessie"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: device_tracker.nessie_iphone_2
