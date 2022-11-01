@@ -815,10 +815,10 @@
                           entity_id: person.nessie
                           state: "home"
                   sequence:
-                  - service: telegram_bot.send_message
-                    data_template:
-                      target: !secret telegram_chat_nessie
-                      message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_nessie
+                        message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
         - conditions:
             - condition: state
@@ -3337,7 +3337,6 @@
 
 - id: Remind for leaving in the morning
   alias: "Remind for leaving in the morning"
-  initial_state: true
   trigger:
     - platform: time
       at: "06:55:00"
