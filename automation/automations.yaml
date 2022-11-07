@@ -9519,6 +9519,22 @@
                 - condition: template
                   value_template: "{{'PayPal' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
                 - condition: template
+                  value_template: "{{'service@paypal.de' in state_attr('sensor.5freunde_outlook', 'data')[0]['sender'] }}"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_juz_leiter
+                message: >
+                  Neue PayPal Bezahlung vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+                  *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: template
+                  value_template: "{{'PayPal' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                - condition: template
                   value_template: "{{'juzzorneding@gmail.com' in state_attr('sensor.5freunde_outlook', 'data')[0]['to'] }}"
           sequence:
             - service: telegram_bot.send_message
