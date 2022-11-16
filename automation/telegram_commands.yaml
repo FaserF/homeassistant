@@ -572,6 +572,11 @@
     - service: input_button.press
       target:
         entity_id: input_button.kohleanzunder_timer
+    - service: telegram_bot.send_message
+      data_template:
+        target: "{{ trigger.event.data.chat_id }}"
+        message: "Kohleanzünder Timer wurde gestartet."
+        disable_notification: true
 
 - id: telegram_turn_off_fridge
   alias: Telegram Turn off fridge

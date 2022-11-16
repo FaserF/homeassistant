@@ -298,7 +298,7 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.nessie_iphone_2
+          entity_id: device_tracker.android
           state: home
         - condition: state
           entity_id: person.nessie
@@ -2277,6 +2277,14 @@
                 - condition: state
                   entity_id: input_boolean.leiser_modus
                   state: "on"
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
+                - condition: state
+                  entity_id: person.nessie
+                  state: home
           sequence:
             - service: notify.mobile_app_fabian_iphone
               data:
@@ -2295,19 +2303,29 @@
                 message: "Das Fenster im Bad kann wieder geschlossen werden."
     - choose:
         - conditions:
-            - condition: or
+            - condition: and
               conditions:
-                - condition: state
-                  entity_id: device_tracker.fabian_pc
-                  state: "home"
-                - condition: state
-                  entity_id: device_tracker.nsta0552
-                  state: "home"
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.schlafzimmer_speaker
-                  state: "off"
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: home
+                    - condition: state
+                      entity_id: person.nessie
+                      state: home
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: device_tracker.fabian_pc
+                      state: "home"
+                    - condition: state
+                      entity_id: device_tracker.nsta0552
+                      state: "home"
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.schlafzimmer_speaker
+                      state: "off"
           sequence:
             - service: notify.telegram_fabian
               data:
@@ -3108,7 +3126,7 @@
       from: "not_home"
       to: "home"
     - platform: state
-      entity_id: device_tracker.nessie_iphone_2
+      entity_id: device_tracker.android
       from: "not_home"
       to: "home"
   condition:
@@ -3131,12 +3149,12 @@
                 entity_id: device_tracker.fabian_iphone_2
                 state: home
               - condition: state
-                entity_id: device_tracker.nessie_iphone_2
+                entity_id: device_tracker.android
                 state: home
           - condition: and
             conditions:
               - condition: state
-                entity_id: device_tracker.nessie_iphone_2
+                entity_id: device_tracker.android
                 state: home
               - condition: not
                 conditions:
@@ -3352,7 +3370,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.nessie_iphone_2
+            entity_id: device_tracker.android
             state: home
           - condition: state
             entity_id: device_tracker.fabian_iphone_2
@@ -3367,7 +3385,7 @@
                 - condition: or
                   conditions:
                     - condition: state
-                      entity_id: device_tracker.nessie_iphone_2
+                      entity_id: device_tracker.android
                       state: home
                     - condition: state
                       entity_id: device_tracker.fabian_iphone_2
@@ -3460,7 +3478,7 @@
                 - condition: and
                   conditions:
                     - condition: state
-                      entity_id: device_tracker.nessie_iphone_2
+                      entity_id: device_tracker.android
                       state: home
                     - condition: state
                       entity_id: device_tracker.fabian_iphone_2
@@ -3958,7 +3976,6 @@
 
 - id: remind_for_gruppentreffen
   alias: "remind for Gruppentreffen"
-  initial_state: true
   trigger:
     - platform: template
       value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 111600) | round(-1) }}"
@@ -3988,7 +4005,7 @@
             - service: telegram_bot.send_poll
               data_template:
                 target: !secret telegram_chat_5friends
-                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[1].temperature }} °. Wo treffen wir uns?"
+                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[1].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
                 options:
                   - "See"
                   - "Weiher"
@@ -4004,7 +4021,7 @@
         - service: telegram_bot.send_poll
           data_template:
             target: !secret telegram_chat_5friends
-            question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].temperature }} °. Wo treffen wir uns?"
+            question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
             options:
               - "Fabi Keller"
               - "Kai & Adri"
@@ -5302,7 +5319,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_afk
+                target: !secret telegram_chat_fabian
                 disable_notification: true
                 message: >
                   Vaultwarden Update {{ states.update.vaultwarden_bitwarden_update.attributes.latest_version }} wird nun installiert.
@@ -5372,7 +5389,7 @@
                   Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_afk
+                target: !secret telegram_chat_fabian
                 message: >
                   Homeassistant OS wird automatisch aktualisiert. Vaultwarden wird daher zeitweise nicht verfügbar sein für ungefähr 15 Minuten.
             - service: hassio.addon_restart
@@ -6754,7 +6771,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_speaker
-                - delay: 00:00:03
+                - delay: 00:00:05
                 - service: tts.google_say
                   entity_id: media_player.kuche_speaker
                   data_template:
@@ -6797,7 +6814,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.schlafzimmer_speaker
-                - delay: 00:00:02
+                - delay: 00:00:05
                 - service: tts.google_say
                   entity_id: media_player.schlafzimmer_speaker
                   data_template:
@@ -6843,7 +6860,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.gastezimmer_mini
-                - delay: 00:00:02
+                - delay: 00:00:05
                 - service: tts.google_say
                   entity_id: media_player.gastezimmer_mini
                   data_template:
@@ -6889,6 +6906,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
+                - delay: 00:00:05
                 - service: tts.google_say
                   entity_id: media_player.wohnzimmer_uhr
                   data_template:
@@ -7029,6 +7047,110 @@
           - automation.detect_if_washing_machine_is_currently_active
           - automation.detect_if_pizzamaker_is_currently_active
     - choose:
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: template
+                  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_start_coal_lighter_timer.attributes.last_triggered) | int > 5 }}"
+          sequence:
+            - choose:
+                # IF 5 friends are there
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.flo
+                          state: home
+                        - condition: state
+                          entity_id: person.maxi
+                          state: home
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "JUZ"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_5friends
+                        message: "Kohleanzünder wurde eingeschaltet."
+                        inline_keyboard:
+                          - "Dauer:/remaining_time"
+                # ELSEIF only K&A are there
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: and
+                          conditions:
+                            - condition: and
+                              conditions:
+                                - condition: state
+                                  entity_id: person.kai
+                                  state: home
+                                - condition: state
+                                  entity_id: person.adri
+                                  state: home
+                            - condition: not
+                              conditions:
+                                - condition: state
+                                  entity_id: person.flo
+                                  state: home
+                                - condition: state
+                                  entity_id: person.maxi
+                                  state: home
+                        - condition: and
+                          conditions:
+                            - condition: state
+                              entity_id: person.fabian
+                              state: "Kai-Adri"
+                            - condition: state
+                              entity_id: person.adri
+                              state: "Kai-Adri"
+                            - condition: state
+                              entity_id: person.kai
+                              state: "Kai-Adri"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_afk
+                        message: "Kohleanzünder wurde eingeschaltet."
+                        inline_keyboard:
+                          - "Dauer:/remaining_time"
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.adri
+                          state: home
+                        - condition: and
+                          conditions:
+                            - condition: state
+                              entity_id: person.fabian
+                              state: "Kai-Adri"
+                            - condition: state
+                              entity_id: person.adri
+                              state: "Kai-Adri"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_adrian
+                        message: "Kohleanzünder wurde eingeschaltet."
+                        inline_keyboard:
+                          - "Dauer:/remaining_time"
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: "Kohleanzünder wurde eingeschaltet."
+                        inline_keyboard:
+                          - "Dauer:/remaining_time"
+              # ELSE only notify fabian
+              default:
+                - service: telegram_bot.send_message
+                  data_template:
+                    target: !secret telegram_chat_fabian
+                    message: "Kohleanzünder wurde eingeschaltet."
+                    inline_keyboard:
+                      - "Dauer:/remaining_time"
+    - delay: "00:09:00"
+    - choose:
         # IF 5 friends are there
         - conditions:
             - condition: or
@@ -7039,144 +7161,76 @@
                 - condition: state
                   entity_id: person.maxi
                   state: home
+                - condition: state
+                  entity_id: person.fabian
+                  state: "JUZ"
           sequence:
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
-                message: "Kohleanzünder wurde eingeschaltet."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
+                message: "Bitte Kohle wenden."
         # ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
-                - condition: state
-                  entity_id: person.kai
-                  state: home
+                - condition: and
+                  conditions:
+                    - condition: and
+                      conditions:
+                        - condition: state
+                          entity_id: person.kai
+                          state: home
+                        - condition: state
+                          entity_id: person.adri
+                          state: home
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: person.flo
+                          state: home
+                        - condition: state
+                          entity_id: person.maxi
+                          state: home
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.adri
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.kai
+                      state: "Kai-Adri"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_afk
+                message: "Bitte Kohle wenden."
+        - conditions:
+            - condition: or
+              conditions:
                 - condition: state
                   entity_id: person.adri
                   state: home
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.adri
+                      state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_afk
-                message: "Kohleanzünder wurde eingeschaltet."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "JUZ"
-          sequence:
+                target: !secret telegram_chat_adrian
+                message: "Bitte Kohle wenden."
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_5friends
-                message: "Kohleanzünder wurde eingeschaltet."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "Kai-Adri"
-                #- condition: state
-                #  entity_id: person.adri
-                #  state: "Kai-Adri"
-                #- condition: state
-                #  entity_id: person.kai
-                #  state: "Kai-Adri"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Kohleanzünder wurde eingeschaltet."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
+                target: !secret telegram_chat_fabian
+                message: "Bitte Kohle wenden."
       # ELSE only notify fabian
-      default:
-        - service: telegram_bot.send_message
-          data_template:
-            target: !secret telegram_chat_fabian
-            message: "Kohleanzünder wurde eingeschaltet."
-            inline_keyboard:
-              - "Dauer:/remaining_time"
-    - delay: "00:09:00"
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_5friends
-                message: "Bitte Kohle wenden."
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.kai
-                  state: home
-                - condition: state
-                  entity_id: person.adri
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Bitte Kohle wenden."
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "JUZ"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_5friends
-                message: "Bitte Kohle wenden."
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "Kai-Adri"
-                #- condition: state
-                #  entity_id: person.adri
-                #  state: "Kai-Adri"
-                #- condition: state
-                #  entity_id: person.kai
-                #  state: "Kai-Adri"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Bitte Kohle wenden."
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -7224,6 +7278,9 @@
                 - condition: state
                   entity_id: person.fabian
                   state: home
+                - condition: state
+                  entity_id: person.fabian
+                  state: JUZ
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -7235,6 +7292,7 @@
         entity_id: switch.kohleanzunder
     - delay: "00:01:00"
     - choose:
+        # IF 5 friends are there
         - conditions:
             - condition: or
               conditions:
@@ -7244,36 +7302,6 @@
                 - condition: state
                   entity_id: person.maxi
                   state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_5friends
-                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.kai
-                  state: home
-                - condition: state
-                  entity_id: person.adri
-                  state: home
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
-        - conditions:
-            - condition: or
-              conditions:
                 - condition: state
                   entity_id: person.fabian
                   state: "JUZ"
@@ -7281,24 +7309,69 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
-                message: "Die Kohle sollte fertig sein!"
+                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+        # ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "Kai-Adri"
-                #- condition: state
-                #  entity_id: person.adri
-                #  state: "Kai-Adri"
-                #- condition: state
-                #  entity_id: person.kai
-                #  state: "Kai-Adri"
+                - condition: and
+                  conditions:
+                    - condition: and
+                      conditions:
+                        - condition: state
+                          entity_id: person.kai
+                          state: home
+                        - condition: state
+                          entity_id: person.adri
+                          state: home
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: person.flo
+                          state: home
+                        - condition: state
+                          entity_id: person.maxi
+                          state: home
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.adri
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.kai
+                      state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_afk
-                message: "Die Kohle sollte fertig sein!"
+                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.adri
+                  state: home
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.adri
+                      state: "Kai-Adri"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_adrian
+                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+      # ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -7477,6 +7550,7 @@
         state: "on"
   action:
     - choose:
+        # IF 5 friends are there
         - conditions:
             - condition: or
               conditions:
@@ -7486,44 +7560,81 @@
                 - condition: state
                   entity_id: person.maxi
                   state: home
+                - condition: state
+                  entity_id: person.fabian
+                  state: "JUZ"
           sequence:
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
                 message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
+        # ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
-                - condition: state
-                  entity_id: person.kai
-                  state: home
-                - condition: state
-                  entity_id: person.adri
-                  state: home
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
+                - condition: and
+                  conditions:
+                    - condition: and
+                      conditions:
+                        - condition: state
+                          entity_id: person.kai
+                          state: home
+                        - condition: state
+                          entity_id: person.adri
+                          state: home
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: person.flo
+                          state: home
+                        - condition: state
+                          entity_id: person.maxi
+                          state: home
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.adri
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.kai
+                      state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_afk
                 message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.adri
+                  state: home
+                - condition: and
+                  conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "Kai-Adri"
+                    - condition: state
+                      entity_id: person.adri
+                      state: "Kai-Adri"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_adrian
+                message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+      # ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
             target: !secret telegram_chat_fabian
             message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
-            inline_keyboard:
-              - "Dauer:/remaining_time"
 
 - id: check_if_washing_machine_has_been_forgotten
   alias: Check if washing machine has been forgotten
@@ -7820,6 +7931,10 @@
   action:
     - service: switch.turn_on
       data:
+        entity_id: switch.kuchengerate
+    - delay: 00:00:40
+    - service: switch.turn_on
+      data:
         entity_id: switch.xiaomi_miio_cooker
     - service: notify.telegram_nessie
       data_template:
@@ -8076,21 +8191,6 @@
                 data:
                   inline_keyboard:
                     - "Erledigt:/pilldone, Erinnern in 1h:/pill1h"
-            - service: notify.mobile_app_nessie_iphone
-              data_template:
-                title: "Pillen Reminder"
-                message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
-                data:
-                  actions:
-                    - action: "pilldone"
-                      title: "Erledigt"
-                    - action: "pill1h"
-                      title: "Erinnern in 1h"
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
     - choose:
         - conditions:
             - condition: numeric_state
@@ -8107,21 +8207,6 @@
             - service: notify.telegram_fabian
               data:
                 message: "Heute ist der letze Tag, an dem Nessie die Pille nimmt für 7 Tage."
-            - service: notify.mobile_app_nessie_iphone
-              data_template:
-                title: "Pillen Reminder"
-                message: "Pille nehmen nicht vergessen! Heute ist der letze Tag, an dem du die Pille nehmen musst. Ab morgen kommen für 7 Tage keine Erinnerungen."
-                data:
-                  actions:
-                    - action: "pilldone"
-                      title: "Erledigt"
-                    - action: "pill1h"
-                      title: "Erinnern in 1h"
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
 
 - id: nessie_forgot_pill
   alias: "Nessie forgot pill"
@@ -8515,7 +8600,7 @@
             entity_id: device_tracker.fabian_iphone_2
             state: home
           - condition: state
-            entity_id: device_tracker.nessie_iphone_2
+            entity_id: device_tracker.android
             state: home
       - condition: time
         after: "06:30:00"
@@ -8537,7 +8622,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.nessie_iphone_2
+              entity_id: device_tracker.android
               state: home
           sequence:
             - service: notify.telegram_nessie
@@ -9302,7 +9387,7 @@
   initial_state: false
   trigger:
     - platform: state
-      entity_id: device_tracker.nessie_iphone_2
+      entity_id: device_tracker.android
       from: "not_home"
       to: "home"
   condition:
@@ -9332,6 +9417,8 @@
   trigger:
     - platform: template
       value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 172800) | round(-1) }}"
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 144000) | round(-1) }}"
   condition:
     condition: and
     conditions:
@@ -9339,6 +9426,8 @@
         value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 173800) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 172800 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 144000 }}"
   action:
     - service: shell_command.unpin_all_telegram
       data_template:
@@ -9347,7 +9436,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "Übermorgen ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
+        question: "{{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%A',false) }} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -9397,7 +9486,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "Übermorgen ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
+        question: "{{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%A',false) }} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
         options:
           - "Ja"
           - "Nein"
@@ -9432,7 +9521,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_juz_group
-        question: "Das JUZ hat morgen ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
+        question: "Das JUZ hat {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%A',false) }} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -9521,19 +9610,78 @@
                 - condition: template
                   value_template: "{{'service@paypal.de' in state_attr('sensor.5freunde_outlook', 'data')[0]['sender'] }}"
           sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_juz_leiter
-                message: >
-                  Neue PayPal Bezahlung vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: template
+                          value_template: "{{'Erhaltener Betrag' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - condition: or
+                              conditions:
+                                - condition: template
+                                  value_template: "{{'Mitteilung von' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                          sequence:
+                            - service: telegram_bot.send_message
+                              data_template:
+                                target: !secret telegram_chat_juz_leiter
+                                message: >
+                                  Neue PayPal *Einnahme* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
-                  *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
-    - choose:
+                                  {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € von: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Hallo Fabian Seitz!).*?(?= hat)', index=0, ignorecase=False) }}
+
+                                  Für: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=:).*?(?=Transaktionsdetails)', index=0, ignorecase=False) }}
+                      default:
+                        - service: telegram_bot.send_message
+                          data_template:
+                            target: !secret telegram_chat_juz_leiter
+                            message: >
+                              Neue PayPal *Einnahme* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+                              {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € von: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Hallo Fabian Seitz!).*?(?= hat)', index=0, ignorecase=False) }}
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: template
+                          value_template: "{{'Geld gesendet' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - condition: or
+                              conditions:
+                                - condition: template
+                                  value_template: "{{'Mitteilung von' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                          sequence:
+                            - service: telegram_bot.send_message
+                              data_template:
+                                target: !secret telegram_chat_juz_leiter
+                                message: >
+                                  Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+                                  {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
+
+                                  Für: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Ihre Mitteilung an ).*?(?=Transaktionsdetails)', index=0, ignorecase=False) }}
+                      default:
+                        - service: telegram_bot.send_message
+                          data_template:
+                            target: !secret telegram_chat_juz_leiter
+                            message: >
+                              Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+                              {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
+              default:
+                - service: telegram_bot.send_message
+                  data_template:
+                    target: !secret telegram_chat_juz_leiter
+                    message: >
+                      Neue PayPal Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+                      *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
         - conditions:
             - condition: or
               conditions:
-                - condition: template
-                  value_template: "{{'PayPal' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
                 - condition: template
                   value_template: "{{'juzzorneding@gmail.com' in state_attr('sensor.5freunde_outlook', 'data')[0]['to'] }}"
           sequence:
@@ -9541,11 +9689,9 @@
               data_template:
                 target: !secret telegram_chat_juz_leiter
                 message: >
-                  Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+                  Neue JUZ Gmail Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                   *Absender:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['sender']}}
-
-                  *Empfänger:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['to'][0]}}
 
 
                   *Betreff:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['subject']}}
