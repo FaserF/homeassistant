@@ -364,6 +364,7 @@ google_assistant:
     - light
     - input_boolean
     - vacuum
+    - cover
   expose_by_default: false
   entity_config:
     # Disabled Entitys
@@ -457,6 +458,9 @@ google_assistant:
       name: Bettlicht
       expose: true
       room: Schlafzimmer
+    cover.schlafzimmer_rollo:
+      expose: true
+      room: Schlafzimmer
     ## Gästezimmer
     light.lampe_gastezimmer:
       name: Nachtlampe
@@ -473,6 +477,9 @@ google_assistant:
       room: Gästezimmer
     input_boolean.nessie_pc_strom:
       name: Nessie PC
+      expose: true
+      room: Gästezimmer
+    cover.gastezimmer_rollo:
       expose: true
       room: Gästezimmer
     ## Wohnzimmer
@@ -504,6 +511,9 @@ google_assistant:
       room: Wohnzimmer
       aliases:
         - Staubsaugroboter
+    cover.wohnzimmer_rollo:
+      expose: true
+      room: Wohnzimmer
     ## Keller
     switch.waschmaschine:
       expose: true

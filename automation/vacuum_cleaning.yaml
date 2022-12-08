@@ -32,7 +32,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5", "2", "3", "4"], "customOrder": true}'
+                payload: '{"segment_ids": ["5", "2", "3", "4", "6"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:
@@ -64,9 +64,9 @@
                     - service: mqtt.publish
                       data:
                         topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                        payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
+                        payload: '{"segment_ids": ["5", "3", "4", "6"], "customOrder": true}'
               default:
-                # else if only nessie is not at home clean all rooms except sleeping room
+                # else if only nessie is not at home but guest mode is on, clean all rooms except guest room
                 - service: mqtt.publish
                   data:
                     topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
