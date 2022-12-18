@@ -180,7 +180,7 @@
             # option: min
             # target:
             # entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-    - delay: '00:30:00'
+    - delay: "00:30:00"
     - choose:
         - conditions:
             - condition: not
