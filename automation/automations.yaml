@@ -180,6 +180,28 @@
             # option: min
             # target:
             # entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+    - delay: '00:30:00'
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
+                - condition: state
+                  entity_id: person.nessie
+                  state: home
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+            - condition: template
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature'] | int <= 10 }}"
+            - condition: template
+              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature'] | int >= 28 }}"
+          sequence:
+            - service: cover.close_cover
+              target:
+                entity_id: all
 
 - id: turn_on_5ghz_wifi_and_ssh_off_if_coming_home
   alias: "Turn on 5ghz wifi and ssh off if coming home"
@@ -197,6 +219,14 @@
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.abwesend_modus
+    - choose:
+        - conditions:
+            - condition: sun
+              before: sunset
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id: all
     - choose:
         - conditions:
             - condition: not
@@ -3196,7 +3226,6 @@
             - delay: "00:02:30"
             - service: automation.trigger
               entity_id: automation.increase_lights_in_morning
-    - delay: "00:00:30"
     - service: cover.open_cover
       target:
         entity_id: cover.schlafzimmer_rollo
@@ -3713,12 +3742,137 @@
       data:
         entity_id: light.prismatik
 
-- id: close_covers_when_sunset
-  alias: "Close all covers when sun set"
+- id: open_covers_when_sunrise
+  alias: "Open all covers when sun rise"
+  trigger:
+    - platform: sun
+      event: sunrise
+    - platform: time
+      at: "08:00:00"
+    - platform: time
+      at: "11:00:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: person.fabian
+            state: home
+          - condition: state
+            entity_id: person.nessie
+            state: home
+      - condition: or
+        conditions:
+          - condition: and
+            conditions:
+              - condition: state
+                entity_id: binary_sensor.workday_sensor
+                state: "on"
+              - condition: time
+                after: "09:30:00"
+                before: "16:30:00"
+          - condition: and
+            conditions:
+              - condition: state
+                entity_id: binary_sensor.workday_sensor
+                state: "off"
+              - condition: time
+                after: "07:30:00"
+                before: "16:30:00"
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.abwesend_modus
+              state: "on"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: all
+              data:
+                position: 30
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.abwesend_modus
+              state: "off"
+            - condition: state
+              entity_id: device_tracker.fabian_iphone_2
+              state: "home"
+          sequence:
+            - delay: "00:02:00"
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.schlafzimmer_rollo
+              data:
+                position: 30
+            - delay: "00:03:00"
+            - service: cover.open_cover
+              target:
+                entity_id: cover.schlafzimmer_rollo
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.abwesend_modus
+              state: "off"
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id:
+                  - cover.wohnzimmer_rollo_fenster
+                  - cover.wohnzimmer_rollo_tur
+
+- id: lower_covers_when_sunset
+  alias: "lower all covers when sun set"
   trigger:
     platform: sun
     event: sunset
     offset: "00:30:00"
+  action:
+    - service: cover.set_cover_position
+      target:
+        entity_id: all
+      data:
+        position: 23
+
+- id: lower_covers_when_very_bright_outside
+  alias: "lower all covers when very brigt outside"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.dwd_illuminance
+      above: 8000
+    - platform: numeric_state
+      entity_id: sensor.fabian_s_zuhause_solar_percentage
+      above: 70
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: "12:30:00"
+        before: "17:30:00"
+  action:
+    - service: cover.set_cover_position
+      target:
+        entity_id: cover.schlafzimmer_rollo
+      data:
+        position: 50
+    - service: cover.set_cover_position
+      target:
+        entity_id:
+          - cover.wohnzimmer_rollo_fenster
+          - cover.wohnzimmer_rollo_tur
+      data:
+        position: 70
+
+- id: close_covers_when_sunset
+  alias: "Close all covers at evening"
+  trigger:
+    - platform: time
+      at: "21:00:00"
   action:
     - service: cover.close_cover
       target:
@@ -8095,13 +8249,13 @@
       entity_id: switch.kuchengerate
       to: "on"
       for:
-        minutes: 12
+        minutes: 20
     - platform: state
       entity_id: switch.kuchengerate
       from: "off"
       to: "on"
       for:
-        minutes: 16
+        minutes: 25
     - platform: state
       entity_id: switch.xiaomi_miio_cooker
       from: "on"
@@ -9458,11 +9612,11 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 143000) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
+        value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 145000) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 143000 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 144000 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 143000 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 144000 }}"
   action:
     - service: shell_command.unpin_all_telegram
       data_template:

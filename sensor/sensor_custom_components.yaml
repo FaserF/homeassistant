@@ -15,8 +15,8 @@
 #  from: Donnersbergerbruecke
 #  to: !secret sbahn_home
 #  only_direct: true
-#- platform: dwd_illuminance
-#  entity_id: weather.dwd_weather_ebersberg_1h
+- platform: dwd_illuminance
+  entity_id: weather.dwd_weather_ebersberg_1h
 ## Waste sensors
 - platform: waste_collection_schedule
   name: Restmüll
