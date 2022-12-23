@@ -479,9 +479,6 @@ google_assistant:
       name: Nessie PC
       expose: true
       room: Gästezimmer
-    cover.gastezimmer_rollo:
-      expose: true
-      room: Gästezimmer
     ## Wohnzimmer
     light.deckenlampe:
       expose: true
@@ -511,7 +508,10 @@ google_assistant:
       room: Wohnzimmer
       aliases:
         - Staubsaugroboter
-    cover.wohnzimmer_rollo:
+    cover.wohnzimmer_rollo_fenster:
+      expose: true
+      room: Wohnzimmer
+    cover.wohnzimmer_rollo_tur:
       expose: true
       room: Wohnzimmer
     ## Keller

@@ -1,4 +1,37 @@
 ---
+- id: remind_to_open_doors_for_vacuum
+  alias: "Remind to open doors for vacuum"
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.schedule.reinigung.attributes.next_event) - 1200) | round(-1) }}"
+  condition:
+    - condition: state
+      entity_id: input_boolean.abwesend_modus
+      state: "off"
+    - condition: state
+      entity_id: input_boolean.leiser_modus
+      state: "off"
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.nessie
+              state: "home"
+          sequence:
+            - service: notify.telegram_nessie
+              data_template:
+                message: "Die geplante Staubsauger Reinigung startet in 20 Minuten. Bitte alle Türen öffnen."
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.fabian
+              state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Die geplante Staubsauger Reinigung startet in 20 Minuten. Bitte alle Türen öffnen."
+
 - id: turn_on_vacuum_weekly
   alias: "Turn on vacuum weekly"
   initial_state: true
@@ -224,9 +257,6 @@
         entity_id: vacuum.valetudo_dreamez10pro
         state: idle
   action:
-    - service: counter.increment
-      target:
-        entity_id: counter.vacuum_runs
     - service: counter.decrement
       target:
         entity_id: counter.vacuum_water_level
@@ -236,23 +266,68 @@
               entity_id: counter.vacuum_water_level
               below: 1
           sequence:
-            - service: notify.telegram_nessie
-              data_template:
-                message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
-            - service: notify.telegram_fabian
-              data_template:
-                message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: proximity.home_nessie
+                      below: 35
+                  sequence:
+                    - service: notify.telegram_nessie
+                      data_template:
+                        message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: proximity.home_fabian
+                      below: 70
+                  sequence:
+                    - service: notify.telegram_nessie
+                      data_template:
+                        message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
     - choose:
         - conditions:
             - condition: template
               value_template: "{{ states('counter.vacuum_runs')|float % 30 == 0 }}"
           sequence:
-            - service: notify.telegram_nessie
-              data_template:
-                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
-            - service: notify.telegram_fabian
-              data_template:
-                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: proximity.home_nessie
+                      below: 35
+                  sequence:
+                    - service: notify.telegram_nessie
+                      data_template:
+                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: proximity.home_fabian
+                      below: 70
+                  sequence:
+                    - service: notify.telegram_nessie
+                      data_template:
+                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: numeric_state
+                          entity_id: proximity.home_nessie
+                          below: 35
+                        - condition: numeric_state
+                          entity_id: proximity.home_fabian
+                          below: 70
+                  sequence:
+                    - service: counter.increment
+                      target:
+                        entity_id: counter.vacuum_runs
+        - conditions:
+            - condition: template
+              value_template: "{{ states('counter.vacuum_runs')|float % 30 != 0 }}"
+          sequence:
+            - service: counter.increment
+              target:
+                entity_id: counter.vacuum_runs
 
 - id: vacuum_water_refilled
   alias: "Vacuum Water refilled"

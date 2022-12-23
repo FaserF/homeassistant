@@ -1170,48 +1170,48 @@
               target:
                 entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
-- id: set_wifi_settings_at_morning
-  alias: "Set wifi settings at morning"
-  initial_state: true
-  trigger:
-    - platform: time
-      at: "00:06:15"
-  condition:
-    - condition: time
-      weekday:
-        - mon
-        - tue
-        - wed
-        - thu
-        - fri
-  action:
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-                  state: "max"
-          sequence:
-            - service: select.select_option
-              data:
-                option: max
-              target:
-                entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-    - delay: "00:01:00"
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-                  state: "max"
-          sequence:
-            - service: select.select_option
-              data:
-                option: max
-              target:
-                entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+#- id: set_wifi_settings_at_morning
+#  alias: "Set wifi settings at morning"
+#  initial_state: true
+#  trigger:
+#    - platform: time
+#      at: "00:06:15"
+#  condition:
+#    - condition: time
+#      weekday:
+#        - mon
+#        - tue
+#        - wed
+#        - thu
+#        - fri
+#  action:
+#    - choose:
+#        - conditions:
+#            - condition: not
+#              conditions:
+#                - condition: state
+#                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+#                  state: "max"
+#          sequence:
+#            - service: select.select_option
+#              data:
+#                option: max
+#              target:
+#                entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+#    - delay: "00:01:00"
+#    - choose:
+#        - conditions:
+#            - condition: not
+#              conditions:
+#                - condition: state
+#                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+#                  state: "max"
+#          sequence:
+#            - service: select.select_option
+#              data:
+#                option: max
+#              target:
+#                entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
 - id: remind_for_unavailable_device
   alias: "Remind for unavailable device"
@@ -2307,34 +2307,6 @@
                 - condition: state
                   entity_id: input_boolean.leiser_modus
                   state: "on"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: home
-                - condition: state
-                  entity_id: person.nessie
-                  state: home
-          sequence:
-            - service: notify.mobile_app_fabian_iphone
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
-            - service: notify.telegram_fabian
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-            - service: notify.telegram_nessie
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-    - choose:
-        - conditions:
-            - condition: and
-              conditions:
                 - condition: or
                   conditions:
                     - condition: state
@@ -2343,6 +2315,41 @@
                     - condition: state
                       entity_id: person.nessie
                       state: home
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: home
+              sequence:
+                - service: notify.mobile_app_fabian_iphone
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+                    data:
+                      push:
+                        sound:
+                          name: "default"
+                          critical: 1
+                          volume: 0.1
+                - service: notify.telegram_fabian
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.nessie
+                      state: home
+              sequence:
+                - service: notify.telegram_nessie
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+    - choose:
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
                 - condition: or
                   conditions:
                     - condition: state
@@ -2390,6 +2397,9 @@
                 entity_id: media_player.schlafzimmer_speaker
     - choose:
         - conditions:
+            - condition: state
+              entity_id: person.nessie
+              state: home
             - condition: or
               conditions:
                 - condition: state
@@ -3205,6 +3215,15 @@
     - delay: "00:04:30"
     - choose:
         - conditions:
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id: cover.schlafzimmer_rollo
+    - choose:
+        - conditions:
             - condition: and
               conditions:
                 - condition: numeric_state
@@ -3226,38 +3245,35 @@
             - delay: "00:02:30"
             - service: automation.trigger
               entity_id: automation.increase_lights_in_morning
-    - service: cover.open_cover
-      target:
-        entity_id: cover.schlafzimmer_rollo
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.leiser_modus
-              state: "off"
-            - condition: state
-              entity_id: input_boolean.gast_modus
-              state: "off"
-            - condition: or
-              conditions:
-                - condition: numeric_state
-                  entity_id: climate.gastezimmer
-                  attribute: current_humidity
-                  above: 60
-                - condition: numeric_state
-                  entity_id: climate.wohnzimmer
-                  attribute: current_humidity
-                  above: 60
-                - condition: numeric_state
-                  entity_id: climate.schlafzimmer
-                  attribute: current_humidity
-                  above: 60
-                - condition: numeric_state
-                  entity_id: climate.bad
-                  attribute: current_humidity
-                  above: 60
-          sequence:
-            #- service: automation.trigger
-            #  entity_id: automation.notify_for_high_humidity
+    #- choose:
+    #    - conditions:
+    #        - condition: state
+    #          entity_id: input_boolean.leiser_modus
+    #          state: "off"
+    #        - condition: state
+    #          entity_id: input_boolean.gast_modus
+    #          state: "off"
+    #        - condition: or
+    #          conditions:
+    #            - condition: numeric_state
+    #              entity_id: climate.gastezimmer
+    #              attribute: current_humidity
+    #              above: 60
+    #            - condition: numeric_state
+    #              entity_id: climate.wohnzimmer
+    #              attribute: current_humidity
+    #              above: 60
+    #            - condition: numeric_state
+    #              entity_id: climate.schlafzimmer
+    #              attribute: current_humidity
+    #              above: 60
+    #            - condition: numeric_state
+    #              entity_id: climate.bad
+    #              attribute: current_humidity
+    #              above: 60
+    #      sequence:
+    #        - service: automation.trigger
+    #          entity_id: automation.notify_for_high_humidity
     # - service: light.turn_on
     #   data_template:
     #     entity_id: light.bett_gluhbirne
@@ -3754,6 +3770,9 @@
   condition:
     condition: and
     conditions:
+      - condition: state
+        entity_id: input_boolean.gast_modus
+        state: "off"
       - condition: or
         conditions:
           - condition: state
@@ -3768,7 +3787,7 @@
             conditions:
               - condition: state
                 entity_id: binary_sensor.workday_sensor
-                state: "on"
+                state: "off"
               - condition: time
                 after: "09:30:00"
                 before: "16:30:00"
@@ -3776,7 +3795,7 @@
             conditions:
               - condition: state
                 entity_id: binary_sensor.workday_sensor
-                state: "off"
+                state: "on"
               - condition: time
                 after: "07:30:00"
                 before: "16:30:00"
@@ -3800,8 +3819,12 @@
             - condition: state
               entity_id: device_tracker.fabian_iphone_2
               state: "home"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.schlafzimmer_rollo
+                  state: "open"
           sequence:
-            - delay: "00:02:00"
             - service: cover.set_cover_position
               target:
                 entity_id: cover.schlafzimmer_rollo
@@ -3833,18 +3856,44 @@
     event: sunset
     offset: "00:30:00"
   action:
-    - service: cover.set_cover_position
-      target:
-        entity_id: all
-      data:
-        position: 23
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.wohnzimmer_rollo_fenster
+                  state: "closed"
+                - condition: state
+                  entity_id: cover.wohnzimmer_rollo_tur
+                  state: "closed"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id:
+                  - cover.wohnzimmer_rollo_fenster
+                  - cover.wohnzimmer_rollo_tur
+              data:
+                position: 23
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.schlafzimmer_rollo
+                  state: "closed"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.schlafzimmer_rollo
+              data:
+                position: 23
 
 - id: lower_covers_when_very_bright_outside
   alias: "lower all covers when very brigt outside"
   trigger:
     - platform: numeric_state
       entity_id: sensor.dwd_illuminance
-      above: 8000
+      above: 85000
     - platform: numeric_state
       entity_id: sensor.fabian_s_zuhause_solar_percentage
       above: 70
@@ -3855,18 +3904,34 @@
         after: "12:30:00"
         before: "17:30:00"
   action:
-    - service: cover.set_cover_position
-      target:
-        entity_id: cover.schlafzimmer_rollo
-      data:
-        position: 50
-    - service: cover.set_cover_position
-      target:
-        entity_id:
-          - cover.wohnzimmer_rollo_fenster
-          - cover.wohnzimmer_rollo_tur
-      data:
-        position: 70
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.schlafzimmer_rollo
+                  state: "closed"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.schlafzimmer_rollo
+              data:
+                position: 50
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.schlafzimmer_rollo
+                  state: "closed"
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id:
+                  - cover.wohnzimmer_rollo_fenster
+                  - cover.wohnzimmer_rollo_tur
+              data:
+                position: 70
 
 - id: close_covers_when_sunset
   alias: "Close all covers at evening"
@@ -3996,7 +4061,7 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.dwd_illuminance
-      above: 2510
+      above: 20000
     - platform: numeric_state
       entity_id: sensor.fabian_s_zuhause_solar_percentage
       above: 25
@@ -4622,9 +4687,14 @@
           #- switch.gastezimmer_usb_ports
           - switch.google_nest
           - switch.bettlicht
-    - service: cover.open_cover
-      target:
-        entity_id: all
+    - choose:
+        - conditions:
+            - condition: sun
+              before: sunset
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id: all
     - choose:
         - conditions:
             - condition: state
@@ -9822,6 +9892,7 @@
                                   {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € von: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Hallo Fabian Seitz!).*?(?= hat)', index=0, ignorecase=False) }}
 
                                   Für: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=:).*?(?=Transaktionsdetails)', index=0, ignorecase=False) }}
+                                  #PayPal #PayPalEinnahme
                       default:
                         - service: telegram_bot.send_message
                           data_template:
@@ -9830,6 +9901,7 @@
                               Neue PayPal *Einnahme* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                               {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € von: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Hallo Fabian Seitz!).*?(?= hat)', index=0, ignorecase=False) }}
+                              #PayPal #PayPalEinnahme
                 - conditions:
                     - condition: or
                       conditions:
@@ -9852,6 +9924,7 @@
                                   {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
 
                                   Für: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Ihre Mitteilung an ).*?(?=Transaktionsdetails)', index=0, ignorecase=False) }}
+                                  #PayPal #PayPalAusgabe
                       default:
                         - service: telegram_bot.send_message
                           data_template:
@@ -9860,6 +9933,7 @@
                               Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                               {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
+                              #PayPal #PayPalAusgabe
               default:
                 - service: telegram_bot.send_message
                   data_template:
@@ -9868,6 +9942,7 @@
                       Neue PayPal Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                       *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
+                      #PayPal
         - conditions:
             - condition: or
               conditions:
