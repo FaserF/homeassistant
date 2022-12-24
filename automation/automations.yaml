@@ -2321,28 +2321,28 @@
                     - condition: state
                       entity_id: person.fabian
                       state: home
-              sequence:
-                - service: notify.mobile_app_fabian_iphone
-                  data:
-                    message: "Das Fenster im Bad kann wieder geschlossen werden."
-                    data:
-                      push:
-                        sound:
-                          name: "default"
-                          critical: 1
-                          volume: 0.1
-                - service: notify.telegram_fabian
-                  data:
-                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+                  sequence:
+                    - service: notify.mobile_app_fabian_iphone
+                      data:
+                        message: "Das Fenster im Bad kann wieder geschlossen werden."
+                        data:
+                          push:
+                            sound:
+                              name: "default"
+                              critical: 1
+                              volume: 0.1
+                    - service: notify.telegram_fabian
+                      data:
+                        message: "Das Fenster im Bad kann wieder geschlossen werden."
             - choose:
                 - conditions:
                     - condition: state
                       entity_id: person.nessie
                       state: home
-              sequence:
-                - service: notify.telegram_nessie
-                  data:
-                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+                  sequence:
+                    - service: notify.telegram_nessie
+                      data:
+                        message: "Das Fenster im Bad kann wieder geschlossen werden."
     - choose:
         - conditions:
             - condition: and
