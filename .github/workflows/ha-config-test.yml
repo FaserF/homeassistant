@@ -48,11 +48,11 @@ jobs:
         run: |
           cp -f dummy_files/custom_components_dummy.yaml custom_components.yaml
           cp -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant_google_assistant.json
-          cp -r switch/switch_custom_components.yaml
-          cp -r sensor/sensor_custom_components.yaml
-          cp -r light/light_custom_components.yaml
-          cp -r notify/notify_custom_components.yaml
-          cp -r device_tracker/device_tracker_custom_components.yaml
+          rm -r switch/switch_custom_components.yaml
+          rm -r sensor/sensor_custom_components.yaml
+          rm -r light/light_custom_components.yaml
+          rm -r notify/notify_custom_components.yaml
+          rm -r device_tracker/device_tracker_custom_components.yaml
           sed -n '/## Custom Components/q;p' < configuration.yaml > configuration.yaml
       - name: 🚀 Run Home Assistant Configuration Check
         uses: frenck/action-home-assistant@v1.4
