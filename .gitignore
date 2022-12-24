@@ -3,6 +3,7 @@
 *
 # You can whitelist files/folders with !, these will not be ignored.
 !*.yaml
+!*.yml
 !.gitignore
 !README.MD
 !*.md
@@ -14,6 +15,9 @@
 !automation/
 !device_tracker/
 !notify/
+!.github/
+!.github/workflows
+!automerge-megalinter.yml
 
 # Ignore folders.
 megalinter-reports/
