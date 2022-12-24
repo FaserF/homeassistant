@@ -37,23 +37,26 @@ jobs:
     name: "Home Assistant Core ${{ matrix.version }} Configuration Check"
     #needs: [yamllint]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ["beta"]
+        #version: ["stable", "beta", "dev"]
     steps:
       - name: ⤵️ Check out configuration from GitHub
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v3.2.0
       - name: Rename Dummy files and remove custom component stuff for config check
         run: |
-            mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
-            mv -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant_google_assistant.json
-            rm -r switch/switch_custom_components.yaml
-            rm -r sensor/sensor_custom_components.yaml
-            rm -r light/light_custom_components.yaml
-            rm -r notify/notify_custom_components.yaml
-            rm -r device_tracker/device_tracker_custom_components.yaml
-            sed -n '/## Custom Components/q;p' < configuration.yaml > configuration.yaml
-
+          mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
+          mv -f dummy_files/Homeassistant-SmartLife-Dummy.json Homeassistant_google_assistant.json
+          rm -r switch/switch_custom_components.yaml
+          rm -r sensor/sensor_custom_components.yaml
+          rm -r light/light_custom_components.yaml
+          rm -r notify/notify_custom_components.yaml
+          rm -r device_tracker/device_tracker_custom_components.yaml
+          sed -n '/## Custom Components/q;p' < configuration.yaml > configuration.yaml
       - name: 🚀 Run Home Assistant Configuration Check
-        uses: frenck/action-home-assistant@v1.3
+        uses: frenck/action-home-assistant@v1.4
         with:
           path: "."
           secrets: ./secrets.fake.yaml
-          version: "beta"
+          version: "${{ matrix.version }}"
