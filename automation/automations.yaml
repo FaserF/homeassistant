@@ -228,9 +228,22 @@
             - condition: time
               after: "08:00:00"
           sequence:
-            - service: cover.open_cover
-              target:
-                entity_id: all
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: weather.dwd_weather_ebersberg_1h
+                      attribute: temperature
+                      above: 25
+                  sequence:
+                    - service: cover.set_cover_position
+                      target:
+                        entity_id: all
+                        data:
+                          position: 70
+              default:
+                - service: cover.open_cover
+                  target:
+                    entity_id: all
     #- choose:
     #    - conditions:
     #        - condition: not
@@ -5155,6 +5168,8 @@
           {{ product.picture_link }}
             {%- endif -%}
           {%- endfor -%}
+
+          #Angebote
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian

@@ -143,6 +143,9 @@
       - condition: time
         after: "11:30:00"
         before: "17:30:00"
+      - condition: state
+        entity_id: input_boolean.abwesend_modus
+        state: "off"
   action:
     - choose:
         - conditions:
@@ -181,6 +184,114 @@
                 entity_id: cover.wohnzimmer_rollo_tur
               data:
                 position: 90
+
+- id: open_covers_when_darker_outside
+  alias: "open all covers when darker outside"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.dwd_illuminance
+      below: 20000
+    - platform: numeric_state
+      entity_id: sensor.fabian_s_zuhause_solar_percentage
+      above: 70
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: "11:30:00"
+        before: "17:30:00"
+      - condition: state
+        entity_id: input_boolean.abwesend_modus
+        state: "off"
+      - condition: numeric_state
+        entity_id: sensor.dwd_illuminance
+        above: 6000
+      - condition: numeric_state
+        entity_id: sensor.fabian_s_zuhause_solar_percentage
+        above: 10
+      - condition: sun
+        before: sunset
+      - condition: numeric_state
+        entity_id: weather.dwd_weather_ebersberg_1h
+        attribute: temperature
+        below: 25
+  action:
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: cover.schlafzimmer_rollo
+              attribute: current_position
+              below: 85
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id: cover.schlafzimmer_rollo
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: cover.wohnzimmer_rollo_fenster
+              attribute: current_position
+              below: 95
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id:
+                  - cover.wohnzimmer_rollo_fenster
+                  - cover.wohnzimmer_rollo_tur
+
+- id: lower_covers_when_hot_outside
+  alias: "lower covers when hot outside"
+  trigger:
+    - platform: numeric_state
+      entity_id: weather.dwd_weather_ebersberg_1h
+      attribute: temperature
+      above: 25
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: "11:30:00"
+        before: "17:30:00"
+      - condition: state
+        entity_id: input_boolean.abwesend_modus
+        state: "off"
+  action:
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: input_boolean.fabian_pc_strom
+                      state: "on"
+                  sequence:
+                    - service: cover.set_cover_position
+                      target:
+                        entity_id: cover.schlafzimmer_rollo
+                      data:
+                        position: 75
+              default:
+                - service: cover.set_cover_position
+                  target:
+                    entity_id:
+                      - cover.wohnzimmer_rollo_fenster
+                      - cover.wohnzimmer_rollo_tur
+                    data:
+                      position: 60
+      default:
+        - service: cover.set_cover_position
+          target:
+            entity_id: all
+            data:
+              position: 25
 
 - id: close_covers_when_sunset
   alias: "Close all covers at evening"
