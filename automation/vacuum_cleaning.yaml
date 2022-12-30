@@ -46,6 +46,9 @@
     - condition: state
       entity_id: input_boolean.leiser_modus
       state: "off"
+    - condition: state
+      entity_id: input_boolean.gast_modus
+      state: "off"
   action:
     - service: switch.turn_on
       data:
@@ -238,6 +241,28 @@
             - service: vacuum.start
               data:
                 entity_id: vacuum.valetudo_dreamez10pro
+    - delay: "00:30:00"
+    - service: input_select.select_option
+      data:
+        entity_id: input_select.vacuum_cleaning_location
+        option: "Gesamt"
+
+- id: vacuum_reset_water_level
+  alias: "Reset the Vacuum water level"
+  trigger:
+    - platform: state
+      entity_id: vacuum.valetudo_dreamez10pro
+      from: "Returning to dock"
+      to: "docked"
+  action:
+    - service: select.select_option
+      data:
+        entity_id: select.valetudo_dreamez10pro_water_grade
+        option: "medium"
+    - service: select.select_option
+      data:
+        entity_id: select.valetudo_dreamez10pro_operation_mode
+        option: "vacuum_and_mop"
 
 - id: vacuum_cleaner_counter
   alias: "Set Counter with Cleaner Runs and remind for emptying and refilling"

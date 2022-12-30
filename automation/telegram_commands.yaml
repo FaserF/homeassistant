@@ -349,10 +349,14 @@
   alias: Telegram Admin
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/admin"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/admin"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/admin@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -369,10 +373,14 @@
   alias: Telegram Status
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/status"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/status"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/status@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -383,10 +391,14 @@
   alias: Telegram Essen
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/food"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/food"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/food@smartlife_ha_bot"
   action:
     - service: shell_command.randomfood
       data_template:
@@ -404,10 +416,14 @@
   alias: Telegram Essen Vegetarisch
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/foodv"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/foodv"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/foodv@smartlife_ha_bot"
   action:
     - service: shell_command.randomfood
       data_template:
@@ -426,10 +442,14 @@
   alias: Telegram Essen Fleisch
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/foodn"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/foodn"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/foodn@smartlife_ha_bot"
   action:
     - service: shell_command.randomfood
       data_template:
@@ -473,10 +493,14 @@
   alias: "Telegram food no"
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_callback
-    event_data:
-      data: "/foodno"
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: "/foodno"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "foodno@smartlife_ha_bot"
   action:
     - service: telegram_bot.answer_callback_query
       data_template:
@@ -503,10 +527,14 @@
   alias: "Telegram answer no"
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_callback
-    event_data:
-      data: "/telegramno"
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: "/telegramno"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/telegramno@smartlife_ha_bot"
   action:
     - service: telegram_bot.answer_callback_query
       data_template:
@@ -549,6 +577,10 @@
       event_type: telegram_command
       event_data:
         command: "/remaining_time"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/remaining_time@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -568,6 +600,10 @@
       event_type: telegram_command
       event_data:
         command: "/shisha"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/shisha@smartlife_ha_bot"
   action:
     - service: input_button.press
       target:
@@ -582,10 +618,14 @@
   alias: Telegram Turn off fridge
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_callback
-    event_data:
-      data: "/fridgeoff"
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: "/fridgeoff"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/fridgeoff@smartlife_ha_bot"
   condition:
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_turn_off_fridge.attributes.last_triggered) | int > 4600 }}"
@@ -651,10 +691,14 @@
   alias: "Telegram send weather forecast"
   initial_state: true
   trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/weather"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/weather"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/weather@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -667,7 +711,6 @@
           {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
 
           Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
-          Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
 - id: turn_on_strom_kühlschrank
   alias: "Turn on Strom Kühlschrank"
@@ -685,6 +728,10 @@
       event_type: telegram_command
       event_data:
         command: "/fridge"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/fridge@smartlife_ha_bot"
   action:
     - service: switch.turn_on
       data:
@@ -727,6 +774,10 @@
       event_type: telegram_command
       event_data:
         command: "/lostfabian"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/lostfabian@smartlife_ha_bot"
   action:
     - service: notify.mobile_app_fabian_iphone
       data:
@@ -757,31 +808,6 @@
       data:
         account: !secret vapid_email
         device_name: Fabian-iPad
-
-- id: find_phone_nessie
-  alias: "Find Nessies Phone by sound"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: input_button.find_nessie_s_phone_by_sound
-    - platform: event
-      event_type: telegram_command
-      event_data:
-        command: "/lostnessie"
-  action:
-    - service: notify.mobile_app_nessie_iphone
-      data:
-        message: "This phone is marked as lost! +49176 47365403"
-        data:
-          push:
-            sound:
-              name: "default"
-              critical: 1
-              volume: 1.0
-    - service: icloud.play_sound
-      data:
-        account: !secret vapid_email
-        device_name: Nessie-iPhone
 
 - id: telegram_urgent_message
   alias: "Telegram urgent message"
