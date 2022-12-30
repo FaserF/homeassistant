@@ -1,4 +1,3 @@
-
 - id: open_covers_when_sunrise
   alias: "Open all covers when sun rise"
   trigger:
