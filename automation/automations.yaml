@@ -3761,8 +3761,6 @@
       data:
         entity_id: light.prismatik
 
-
-
 - id: turn_on_lights_in_guest_room_when_dark_outside
   alias: "Turn on lights in guest room when dark outside"
   initial_state: true
