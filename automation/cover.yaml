@@ -94,7 +94,7 @@
   trigger:
     platform: sun
     event: sunset
-    offset: "00:30:00"
+    offset: "00:15:00"
   action:
     - choose:
         - conditions:
@@ -277,21 +277,21 @@
                       target:
                         entity_id: cover.schlafzimmer_rollo
                       data:
-                        position: 75
+                        position: 80
               default:
                 - service: cover.set_cover_position
                   target:
                     entity_id:
                       - cover.wohnzimmer_rollo_fenster
                       - cover.wohnzimmer_rollo_tur
-                    data:
-                      position: 60
+                  data:
+                    position: 60
       default:
         - service: cover.set_cover_position
           target:
             entity_id: all
-            data:
-              position: 25
+          data:
+            position: 25
 
 - id: close_covers_when_sunset
   alias: "Close all covers at evening"
