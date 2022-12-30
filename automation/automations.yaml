@@ -3761,78 +3761,7 @@
       data:
         entity_id: light.prismatik
 
-- id: turn_on_lights_in_sleeping_room_when_dark_outside
-  alias: "Turn on lights in sleeping room when dark outside"
-  trigger:
-    - platform: sun
-      event: sunset
-      offset: "-00:20:00"
-    - platform: numeric_state
-      entity_id: sensor.dwd_illuminance
-      below: 2000
-    - platform: numeric_state
-      entity_id: sensor.fabian_s_zuhause_solar_percentage
-      below: 27
-  condition:
-    condition: and
-    conditions:
-      - condition: state
-        entity_id: "device_tracker.wohnzimmer_tv"
-        state: "not_home"
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: "device_tracker.fabian_pc"
-            state: "home"
-          - condition: state
-            entity_id: "device_tracker.nsta0552"
-            state: "home"
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: "person.fabian"
-            state: "home"
-          - condition: state
-            entity_id: "person.nessie"
-            state: "home"
-      - condition: or
-        conditions:
-          - condition: and
-            conditions:
-              - condition: numeric_state
-                entity_id: sensor.dwd_illuminance
-                below: 2000
-              - condition: time
-                after: "15:00:00"
-          - condition: numeric_state
-            entity_id: sensor.fabian_s_zuhause_solar_percentage
-            below: 20
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_sleeping_room_when_dark_outside.attributes.last_triggered) | int > 1800 }}"
-  action:
-    - service: light.turn_on
-      data:
-        entity_id: light.leds_tisch
-        brightness: 255
-        transition: 2
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: "device_tracker.fabian_pc"
-              state: "home"
-          sequence:
-            - service: light.turn_on
-              data:
-                entity_id: light.prismatik
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: "device_tracker.nsta0552"
-              state: "home"
-          sequence:
-            - service: light.turn_on
-              data:
-                entity_id: light.yeelight_bslamp2_0x13fea10f
+
 
 - id: turn_on_lights_in_guest_room_when_dark_outside
   alias: "Turn on lights in guest room when dark outside"
@@ -3877,14 +3806,6 @@
           - condition: state
             entity_id: "device_tracker.rgb_pc"
             state: "home"
-          # - condition: and
-          # conditions:
-          # - condition: state
-          # entity_id: 'device_tracker.vku_lb_20'
-          #  state: 'home'
-          # - condition: state
-          # entity_id: 'switch.nessie_pc'
-          # state: 'on'
   action:
     - service: light.turn_on
       data:
@@ -6691,8 +6612,7 @@
           sequence:
             - service: light.turn_on
               data:
-                entity_id:
-                  - light.leds_tisch
+                entity_id: light.leds_tisch
                 brightness: 255
                 transition: 2
             - service: light.turn_on
