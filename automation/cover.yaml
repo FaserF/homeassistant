@@ -134,7 +134,7 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.dwd_illuminance
-      above: 85000
+      above: 20000
     - platform: numeric_state
       entity_id: sensor.fabian_s_zuhause_solar_percentage
       above: 70
@@ -142,11 +142,14 @@
     condition: and
     conditions:
       - condition: time
-        after: "12:30:00"
+        after: "11:30:00"
         before: "17:30:00"
   action:
     - choose:
         - conditions:
+            - condition: state
+              entity_id: input_boolean.fabian_pc_strom
+              state: "on"
             - condition: not
               conditions:
                 - condition: state
@@ -160,19 +163,25 @@
                 position: 50
     - choose:
         - conditions:
+            - condition: state
+              entity_id: switch.fernseher
+              state: "on"
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: cover.schlafzimmer_rollo
+                  entity_id: cover.wohnzimmer_rollo_fenster
                   state: "closed"
           sequence:
             - service: cover.set_cover_position
               target:
-                entity_id:
-                  - cover.wohnzimmer_rollo_fenster
-                  - cover.wohnzimmer_rollo_tur
+                entity_id: cover.wohnzimmer_rollo_fenster
               data:
                 position: 70
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.wohnzimmer_rollo_tur
+              data:
+                position: 90
 
 - id: close_covers_when_sunset
   alias: "Close all covers at evening"

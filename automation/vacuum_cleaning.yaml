@@ -12,6 +12,14 @@
     - condition: state
       entity_id: input_boolean.leiser_modus
       state: "off"
+    - condition: state
+      entity_id: schedule.reinigung
+      state: "off"
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.valetudo_dreamez10pro
+          state: "cleaning"
   action:
     - choose:
         - conditions:

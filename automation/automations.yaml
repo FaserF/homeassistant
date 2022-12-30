@@ -223,6 +223,8 @@
         - conditions:
             - condition: sun
               before: sunset
+            - condition: sun
+              after: sunrise
             - condition: time
               after: "08:00:00"
           sequence:
@@ -1221,7 +1223,10 @@
   alias: "Remind for unavailable device"
   initial_state: true
   trigger:
-    - platform: numeric_state
+    #- platform: numeric_state
+    #  entity_id: sensor.unavailable_entities
+    #  above: 0
+    - platform: state
       entity_id: sensor.unavailable_entities
   condition:
     condition: and
@@ -9756,6 +9761,7 @@
                                   {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € von: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Hallo Fabian Seitz!).*?(?= hat)', index=0, ignorecase=False) }}
 
                                   Für: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=:).*?(?=Transaktionsdetails)', index=0, ignorecase=False) }}
+
                                   #PayPal #PayPalEinnahme
                       default:
                         - service: telegram_bot.send_message
@@ -9765,6 +9771,7 @@
                               Neue PayPal *Einnahme* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                               {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € von: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Hallo Fabian Seitz!).*?(?= hat)', index=0, ignorecase=False) }}
+
                               #PayPal #PayPalEinnahme
                 - conditions:
                     - condition: or
@@ -9788,6 +9795,7 @@
                                   {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
 
                                   Für: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<=Ihre Mitteilung an ).*?(?=Transaktionsdetails)', index=0, ignorecase=False) }}
+
                                   #PayPal #PayPalAusgabe
                       default:
                         - service: telegram_bot.send_message
@@ -9797,6 +9805,7 @@
                               Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                               {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
+
                               #PayPal #PayPalAusgabe
               default:
                 - service: telegram_bot.send_message
@@ -9806,6 +9815,7 @@
                       Neue PayPal Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
 
                       *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
+
                       #PayPal
         - conditions:
             - condition: or
