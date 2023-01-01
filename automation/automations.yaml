@@ -1438,15 +1438,15 @@
       data:
         message: "Du bist nun seit 4 Stunden am PC und solltest einmal lüften und aufstehen."
 
-- id: turn_on_light_and_climate_if_fpc_starts
-  alias: "Turn on light and climate if fpc starts"
+- id: automations_if_fpc_starts
+  alias: "Automations if Fabian PC starts"
   initial_state: true
   trigger:
     - platform: state
       entity_id: switch.fabian_strom
       to: "on"
       for:
-        seconds: 5
+        seconds: 10
   condition:
     condition: and
     conditions:
@@ -1498,6 +1498,11 @@
               state: "off"
             - condition: time
               after: "08:45:00"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: climate.schlafzimmer
+                  state: "off"
             - condition: or
               conditions:
                 - condition: state
@@ -1519,6 +1524,27 @@
                 entity_id: climate.schlafzimmer
                 temperature: 19
                 hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.schlafzimmer_rollo
+                  state: "closed"
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.dwd_illuminance
+                  above: 15000
+                - condition: numeric_state
+                  entity_id: sensor.fabian_s_zuhause_solar_percentage
+                  above: 50
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.schlafzimmer_rollo
+              data:
+                position: 50
 
 - id: turn_off_tleds_and_climate_if_fpc_stops
   alias: "Turn off tleds and climate if fpc stops"
@@ -1981,8 +2007,8 @@
                 entity_id: media_player.keller_tv
                 command: pm uninstall -k --user 0 com.tcl.useragreement
 
-- id: turn_on_light_climate_if_tv_starts
-  alias: "Turn on light and climate if tv starts"
+- id: automations_if_tv_starts
+  alias: "Automations if tv starts"
   initial_state: true
   trigger:
     - platform: state
@@ -2017,12 +2043,50 @@
               entity_id: "weather.dwd_weather_ebersberg_1h"
               attribute: temperature
               below: 17
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: climate.wohnzimmer
+                  state: "off"
           sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: binary_sensor.schlafzimmer_open_window
+                      state: "on"
+                  sequence:
+                    - delay: "00:25:00"
             - service: climate.set_temperature
               data:
                 entity_id: climate.wohnzimmer
                 temperature: 21.5
                 hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: cover.wohnzimmer_rollo_fenster
+                  state: "closed"
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.dwd_illuminance
+                  above: 15000
+                - condition: numeric_state
+                  entity_id: sensor.fabian_s_zuhause_solar_percentage
+                  above: 70
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.wohnzimmer_rollo_fenster
+              data:
+                position: 75
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.wohnzimmer_rollo_tur
+              data:
+                position: 90
 
 - id: turn_off_climate_if_tv_stops
   alias: "Turn off climate if tv stops"

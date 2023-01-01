@@ -348,7 +348,6 @@ rest_command:
   # method: POST
   # content_type: "application/json"
   # payload: '{"command":"{{ command }}", "user":"{{ user }}", "broadcast":true}'
-
   # assistant_converse:
   # url: http://192.168.31.2:3000/api/assistant
   # method: POST

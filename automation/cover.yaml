@@ -133,7 +133,7 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.dwd_illuminance
-      above: 20000
+      above: 15000
     - platform: numeric_state
       entity_id: sensor.fabian_s_zuhause_solar_percentage
       above: 70
@@ -178,7 +178,7 @@
               target:
                 entity_id: cover.wohnzimmer_rollo_fenster
               data:
-                position: 70
+                position: 75
             - service: cover.set_cover_position
               target:
                 entity_id: cover.wohnzimmer_rollo_tur
