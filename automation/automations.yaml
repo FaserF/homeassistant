@@ -169,6 +169,10 @@
                 entity_id:
                   - switch.steckerleiste_gastezimmer
                   - switch.gastezimmer_usb_ports
+            - service: climate.set_hvac_mode
+              data:
+                entity_id: climate.gastezimmer
+                hvac_mode: auto
             # - service: select.select_option
             # data:
             # option: min
@@ -219,6 +223,8 @@
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.abwesend_modus
+    - service: automation.trigger
+      entity_id: automation.set_climate_at_night
     - choose:
         - conditions:
             - condition: sun
@@ -739,6 +745,9 @@
     - condition: state
       entity_id: input_boolean.gast_modus
       state: "off"
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "on"
     - condition: template
       value_template: >
         {% set domain = 'light' %}
@@ -792,18 +801,34 @@
               entity_id: media_player.keller_tv
               state: "unavailable"
           sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: "Alle Lichter werden in 20 Minuten ausgeschaltet."
-                inline_keyboard:
-                  - "Abbruch:/cancellight, Okay:/telegramno"
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_nessie
-                message: "Alle Lichter werden in 20 Minuten ausgeschaltet."
-                inline_keyboard:
-                  - "Abbruch:/cancellight, Okay:/telegramno"
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet."
+                        inline_keyboard:
+                          - "Abbruch:/cancellight, Okay:/telegramno"
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.nessie
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_nessie
+                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet."
+                        inline_keyboard:
+                          - "Abbruch:/cancellight, Okay:/telegramno"
 
 - id: turn_off_light_at_night
   alias: "Turn off light at night"
@@ -876,14 +901,31 @@
           sequence:
             - service: light.turn_off
               entity_id: all
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_nessie
-                message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: person.nessie
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_nessie
+                        message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
 
 - id: turn_off_devices_at_night_notify
   alias: "Turn off devices at night - notify"
@@ -900,11 +942,19 @@
         - condition: state
           entity_id: switch.kuhlschrank
           state: "on"
+        - condition: state
+          entity_id: switch.fernseher_keller
+          state: "on"
+        - condition: template
+          value_template: >
+            {% set domain = 'light' %}
+            {% set state = 'on' %}
+            {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
   action:
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: "Fernseher & Kühlschrank werden in 20 Minuten ausgeschaltet."
+        message: "Fernseher & Lichter werden in 20 Minuten ausgeschaltet."
         inline_keyboard:
           - "Abbruch:/cancellight, Okay:/telegramno"
 
@@ -925,6 +975,14 @@
                 - condition: state
                   entity_id: switch.kuhlschrank
                   state: "on"
+                - condition: state
+                  entity_id: switch.fernseher_keller
+                  state: "on"
+                - condition: template
+                  value_template: >
+                    {% set domain = 'light' %}
+                    {% set state = 'on' %}
+                    {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
             - condition: template
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
           sequence:
@@ -932,12 +990,15 @@
               entity_id:
                 - switch.fernseher
                 - switch.kuhlschrank
+                - switch.fernseher_keller
+            - service: light.turn_off
+              entity_id: all
             - service: media_player.turn_off
               entity_id: media_player.keller_tv
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_fabian
-                message: "Fernseher & Kühlschrank wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+                message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
         - conditions:
             - condition: template
@@ -975,25 +1036,25 @@
       attribute: temperature
       above: 20
       for:
-        minutes: 20
+        minutes: 15
     - platform: numeric_state
       entity_id: "climate.schlafzimmer"
       attribute: temperature
       above: 20
       for:
-        minutes: 20
+        minutes: 15
     - platform: numeric_state
       entity_id: "climate.bad"
       attribute: temperature
       above: 20
       for:
-        minutes: 10
+        minutes: 8
     - platform: numeric_state
       entity_id: "climate.wohnzimmer"
       attribute: temperature
       above: 22
       for:
-        minutes: 12
+        minutes: 25
   action:
     - choose:
         - conditions:
@@ -1092,16 +1153,64 @@
     - choose:
         - conditions:
             - condition: state
+              entity_id: input_boolean.thermostate_aus
+              state: "off"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.gastezimmer
+                temperature: 17
+                hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: state
               entity_id: input_boolean.gast_modus
               state: "off"
             - condition: state
               entity_id: "input_boolean.thermostate_aus"
               state: "off"
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
+                - condition: state
+                  entity_id: input_boolean.abwesend_modus
+                  state: "on"
           sequence:
             - service: climate.set_hvac_mode
               data:
                 entity_id: climate.gastezimmer
                 hvac_mode: "auto"
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+            - condition: state
+              entity_id: "input_boolean.thermostate_aus"
+              state: "off"
+            - condition: state
+              entity_id: "climate.gastezimmer"
+              attribute: preset_mode
+              state: "home"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
+                  for:
+                    hours: 12
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.gastezimmer
+                temperature: 17
+                hvac_mode: heat
     - choose:
         - conditions:
             - condition: state
@@ -2052,7 +2161,7 @@
             - choose:
                 - conditions:
                     - condition: state
-                      entity_id: binary_sensor.schlafzimmer_open_window
+                      entity_id: binary_sensor.wohnzimmer_open_window
                       state: "on"
                   sequence:
                     - delay: "00:25:00"
@@ -3252,8 +3361,8 @@
       data:
         entity_id: switch.bett_usb_ports
 
-- id: turn_on_lights_in_morning
-  alias: "Turn on lights in morning"
+- id: turn_on_lights_and_cover_in_morning
+  alias: "Turn on lights and open cover in morning"
   initial_state: true
   trigger:
     - platform: state
@@ -3324,10 +3433,6 @@
                 entity_id: cover.schlafzimmer_rollo
               data:
                 position: 30
-            - delay: "00:04:30"
-            - service: cover.open_cover
-              target:
-                entity_id: cover.schlafzimmer_rollo
     - choose:
         - conditions:
             - condition: and
@@ -3351,6 +3456,17 @@
             - delay: "00:02:30"
             - service: automation.trigger
               entity_id: automation.increase_lights_in_morning
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+            - condition: time
+              after: "07:00:00"
+          sequence:
+            - service: cover.open_cover
+              target:
+                entity_id: cover.schlafzimmer_rollo
     #- choose:
     #    - conditions:
     #        - condition: state
@@ -4074,7 +4190,7 @@
 
 - id: remind_for_polygon_events
   alias: "remind for Polygon Events"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: template
       value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 172800) | round(-1) }}"
@@ -4170,6 +4286,16 @@
           - "Ja"
           - "Nein"
           - "Mir egal"
+        is_anonymous: false
+        allows_multiple_answers: false
+        disable_notification: true
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_chat_5friends
+        question: "Gemeinsam kochen?"
+        options:
+          - "Ja, esse mit"
+          - "Nein, brauche nix"
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
@@ -4982,10 +5108,10 @@
   action:
     - service: notify.telegram_fabian
       data:
-        message: "Away Mode wurde aktiviert, da keiner daheim ist."
+        message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
     - service: notify.telegram_nessie
       data:
-        message: "Away Mode wurde aktiviert, da keiner daheim ist."
+        message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.abwesend_modus
@@ -5206,20 +5332,20 @@
           {%- endfor -%}
 
           #Angebote
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_fabian
-        message: >
-          Neue Angebote diese Woche im Rewe Zorneding Prospekt:
-          {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
-          {%- for product in product_list_loop -%}
-            {% if 'Almighurt' in product.product or 'Ehrmann' in product.product or 'Oettinger' in product.product %}
+    #- service: telegram_bot.send_message
+    #  data_template:
+    #    target: !secret telegram_chat_fabian
+    #    message: >
+    #      Neue Angebote diese Woche im Rewe Zorneding Prospekt:
+    #      {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
+    #      {%- for product in product_list_loop -%}
+    #        {% if 'Almighurt' in product.product or 'Ehrmann' in product.product or 'Oettinger' in product.product %}
 
-          {{product.price.price }} € - {{product.product }}
+    #      {{product.price.price }} € - {{product.product }}
 
-          {{ product.picture_link }}
-            {%- endif -%}
-          {%- endfor -%}
+    #      {{ product.picture_link }}
+    #        {%- endif -%}
+    #      {%- endfor -%}
 
 - id: automatic_ha_updates
   alias: "Automatic HA Updates"
@@ -5902,25 +6028,6 @@
       data:
         entity_id: switch.schloss
 
-- id: nessie_phone_battery_low
-  alias: Nessie Phone Battery low
-  initial_state: false
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.nessie_iphone_battery_state
-      below: 5
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.nessie_phone_battery_low.attributes.last_triggered) | int > 3600 }}"
-  action:
-    - service: telegram_bot.send_message
-      data_template:
-        title: "Nessie Akku unter 5%"
-        target: !secret telegram_chat_fabian
-        message: ""
-
 - id: fabi_phone_battery_low
   alias: Fabi Phone Battery low
   initial_state: false
@@ -6290,6 +6397,8 @@
         - binary_sensor.schlafzimmer_battery_state
       from: "off"
       to: "on"
+      for:
+        hours: 4
     - platform: state
       entity_id:
         - climate.wohnzimmer
@@ -6300,6 +6409,8 @@
   condition:
     condition: not
     conditions:
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.low_battery_thermostats.attributes.last_triggered) | int > 43200 }}"
       - condition: state
         entity_id: climate.bad
         state: "unavailable"
@@ -6308,29 +6419,6 @@
         state: "unavailable"
   action:
     - service: notify.telegram_fabian
-      data_template:
-        message: >
-          Die Batterie im Thermostat
-          {% if is_state('climate.wohnzimmer', 'unavailable') %}
-          Wohnzimmer
-          {% endif %}
-          {% if is_state('climate.gastezimmer', 'unavailable') %}
-          Gästezimmer
-          {% endif %}
-          {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') %}
-          Schlafzimmer
-          {% endif %}
-          {% if is_state('binary_sensor.bad_battery_state', 'on') %}
-          Bad
-          {% endif %}
-          ist
-          {% if is_state('binary_sensor.schlafzimmer_battery_state', 'on') or is_state('binary_sensor.bad_battery_state', 'on') %}
-          bald
-          {% else %}
-          KOMPLETT
-          {% endif %}
-          leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen funktionieren so lange nur eingeschränkt.
-    - service: notify.telegram_nessie
       data_template:
         message: >
           Die Batterie im Thermostat
@@ -7146,7 +7234,7 @@
         - climate.schlafzimmer
         - climate.bad
       attribute: current_humidity
-      above: 67
+      above: 69
   condition:
     - condition: time
       after: "06:00:00"
@@ -7162,22 +7250,34 @@
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_for_extreme_high_humidity.attributes.last_triggered) | int > 32400 }}"
   action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_fabian
-        message: >
-          Achtung, sehr hohe Luftfeuchtigkeit.{% if (states.climate.gastezimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Gästezimmer{{ states.climate.gastezimmer.attributes.current_humidity }} %.{% endif %}
-          {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer{{ states.climate.wohnzimmer.attributes.current_humidity }} %.{% endif %}
-          {% if (states.climate.schlafzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Schlafzimmer{{ states.climate.schlafzimmer.attributes.current_humidity }} %.{% endif %}
-          {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad{{ states.climate.bad.attributes.current_humidity }} %.{% endif %}
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_nessie
-        message: >
-          Achtung, sehr hohe Luftfeuchtigkeit.{% if (states.climate.gastezimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Gästezimmer{{ states.climate.gastezimmer.attributes.current_humidity }} %.{% endif %}
-          {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer{{ states.climate.wohnzimmer.attributes.current_humidity }} %.{% endif %}
-          {% if (states.climate.schlafzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Schlafzimmer{{ states.climate.schlafzimmer.attributes.current_humidity }} %.{% endif %}
-          {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad{{ states.climate.bad.attributes.current_humidity }} %.{% endif %}
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_fabian
+              below: 89
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: >
+                  Achtung, sehr hohe Luftfeuchtigkeit.{% if (states.climate.gastezimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Gästezimmer{{ states.climate.gastezimmer.attributes.current_humidity }} %.{% endif %}
+                  {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer{{ states.climate.wohnzimmer.attributes.current_humidity }} %.{% endif %}
+                  {% if (states.climate.schlafzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Schlafzimmer{{ states.climate.schlafzimmer.attributes.current_humidity }} %.{% endif %}
+                  {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad{{ states.climate.bad.attributes.current_humidity }} %.{% endif %}
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_fabian
+              below: 89
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_nessie
+                message: >
+                  Achtung, sehr hohe Luftfeuchtigkeit.{% if (states.climate.gastezimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Gästezimmer{{ states.climate.gastezimmer.attributes.current_humidity }} %.{% endif %}
+                  {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer{{ states.climate.wohnzimmer.attributes.current_humidity }} %.{% endif %}
+                  {% if (states.climate.schlafzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Schlafzimmer{{ states.climate.schlafzimmer.attributes.current_humidity }} %.{% endif %}
+                  {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad{{ states.climate.bad.attributes.current_humidity }} %.{% endif %}
 
 - id: detect_if_coal_lighter_is_currently_active
   alias: Detect if coal lighter is currently active
@@ -7344,6 +7444,15 @@
               data_template:
                 target: !secret telegram_chat_5friends
                 message: "Bitte Kohle wenden."
+            - service: notify.mobile_app_fabian_iphone
+              data:
+                message: "Bitte Kohle wenden"
+                data:
+                  push:
+                    sound:
+                      name: "default"
+                      critical: 1
+                      volume: 0.7
         # ELSEIF only K&A are there
         - conditions:
             - condition: or
@@ -7382,6 +7491,15 @@
               data_template:
                 target: !secret telegram_chat_afk
                 message: "Bitte Kohle wenden."
+            - service: notify.mobile_app_fabian_iphone
+              data:
+                message: "Bitte Kohle wenden"
+                data:
+                  push:
+                    sound:
+                      name: "default"
+                      critical: 1
+                      volume: 0.7
         - conditions:
             - condition: or
               conditions:
@@ -7405,12 +7523,30 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: "Bitte Kohle wenden."
+            - service: notify.mobile_app_fabian_iphone
+              data:
+                message: "Bitte Kohle wenden"
+                data:
+                  push:
+                    sound:
+                      name: "default"
+                      critical: 1
+                      volume: 0.7
       # ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
             target: !secret telegram_chat_fabian
             message: "Bitte Kohle wenden."
+        - service: notify.mobile_app_fabian_iphone
+          data:
+            message: "Bitte Kohle wenden"
+            data:
+              push:
+                sound:
+                  name: "default"
+                  critical: 1
+                  volume: 0.7
     - choose:
         - conditions:
             - condition: not
@@ -7487,7 +7623,16 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
-                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+                message: "Die Kohle sollte fertig sein!"
+            - service: notify.mobile_app_fabian_iphone
+              data:
+                message: "Die Kohle sollte fertig sein!"
+                data:
+                  push:
+                    sound:
+                      name: "default"
+                      critical: 1
+                      volume: 0.7
         # ELSEIF only K&A are there
         - conditions:
             - condition: or
@@ -7526,6 +7671,15 @@
               data_template:
                 target: !secret telegram_chat_afk
                 message: "Die Kohle sollte fertig sein! Strom ausschalten nicht vergessen."
+            - service: notify.mobile_app_fabian_iphone
+              data:
+                message: "Die Kohle sollte fertig sein!"
+                data:
+                  push:
+                    sound:
+                      name: "default"
+                      critical: 1
+                      volume: 0.7
         - conditions:
             - condition: or
               conditions:
@@ -7549,12 +7703,30 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+            - service: notify.mobile_app_fabian_iphone
+              data:
+                message: "Die Kohle sollte fertig sein!"
+                data:
+                  push:
+                    sound:
+                      name: "default"
+                      critical: 1
+                      volume: 0.7
       # ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
             target: !secret telegram_chat_fabian
             message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
+        - service: notify.mobile_app_fabian_iphone
+          data:
+            message: "Die Kohle sollte fertig sein!"
+            data:
+              push:
+                sound:
+                  name: "default"
+                  critical: 1
+                  volume: 0.7
     - service: automation.turn_on
       data:
         entity_id:
@@ -7585,7 +7757,7 @@
 
 - id: detect_if_pizzamaker_is_currently_active
   alias: Detect if pizzamaker is currently active
-  initial_state: true
+  initial_state: false
   mode: single
   trigger:
     - platform: numeric_state
@@ -9325,212 +9497,6 @@
       data:
         message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich. Voraussichtlich daheim in ca. 1,5 Stunden."
 
-- id: notify_fabian_nessie_on_way_home_from_work
-  alias: "Notify Fabian Nessie on way home from work"
-  initial_state: false
-  trigger:
-    - platform: state
-      entity_id: person.nessie
-      from: "Arbeit Nessie"
-      to: "not_home"
-  condition:
-    - condition: time
-      after: "13:15:00"
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-    - condition: numeric_state
-      entity_id: proximity.home_fabian
-      below: 35
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
-  action:
-    - parallel:
-        - choose:
-            - conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: home
-                - condition: state
-                  entity_id:
-                    - input_boolean.leiser_modus
-                    - input_boolean.gast_modus
-                  state: "off"
-              sequence:
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: media_player.kuche_speaker
-                          state: "off"
-                      sequence:
-                        - service: media_player.volume_set
-                          data_template:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                            entity_id: media_player.kuche_speaker
-                        - delay: 00:00:02
-                        - service: tts.google_say
-                          entity_id: media_player.kuche_speaker
-                          data_template:
-                            message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:08
-                        - service: media_player.volume_set
-                          data:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                            entity_id: media_player.kuche_speaker
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: media_player.schlafzimmer_speaker
-                          state: "off"
-                      sequence:
-                        - service: media_player.volume_set
-                          data_template:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                            entity_id: media_player.schlafzimmer_speaker
-                        - delay: 00:00:02
-                        - service: tts.google_say
-                          entity_id: media_player.schlafzimmer_speaker
-                          data_template:
-                            message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:08
-                        - service: media_player.volume_set
-                          data:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                            entity_id: media_player.schlafzimmer_speaker
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: media_player.wohnzimmer_uhr
-                          state: "off"
-                      sequence:
-                        - service: media_player.volume_set
-                          data_template:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                            entity_id: media_player.wohnzimmer_uhr
-                        - delay: 00:00:02
-                        - service: tts.google_say
-                          entity_id: media_player.wohnzimmer_uhr
-                          data_template:
-                            message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:08
-                        - service: media_player.volume_set
-                          data:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                            entity_id: media_player.wohnzimmer_uhr
-    - service: notify.telegram_fabian
-      data:
-        message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-
-- id: notify_fabian_nessie_on_way_home_from_berufsschule
-  alias: "Notify Fabian Nessie on way home from Berufsschule"
-  initial_state: false
-  trigger:
-    - platform: state
-      entity_id: person.nessie
-      from: "Berufsschule"
-      to: "not_home"
-  condition:
-    - condition: time
-      after: "13:15:00"
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-    - condition: numeric_state
-      entity_id: proximity.home_fabian
-      below: 35
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_nessie_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
-  action:
-    - parallel:
-        - choose:
-            - conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: home
-                - condition: state
-                  entity_id:
-                    - input_boolean.leiser_modus
-                    - input_boolean.gast_modus
-                  state: "off"
-              sequence:
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: media_player.kuche_speaker
-                          state: "off"
-                      sequence:
-                        - service: media_player.volume_set
-                          data_template:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                            entity_id: media_player.kuche_speaker
-                        - delay: 00:00:02
-                        - service: tts.google_say
-                          entity_id: media_player.kuche_speaker
-                          data_template:
-                            message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:05
-                        - service: media_player.volume_set
-                          data:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                            entity_id: media_player.kuche_speaker
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: media_player.schlafzimmer_speaker
-                          state: "off"
-                      sequence:
-                        - service: media_player.volume_set
-                          data_template:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                            entity_id: media_player.schlafzimmer_speaker
-                        - delay: 00:00:02
-                        - service: tts.google_say
-                          entity_id: media_player.schlafzimmer_speaker
-                          data_template:
-                            message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:05
-                        - service: media_player.volume_set
-                          data:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                            entity_id: media_player.schlafzimmer_speaker
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: media_player.wohnzimmer_uhr
-                          state: "off"
-                      sequence:
-                        - service: media_player.volume_set
-                          data_template:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                            entity_id: media_player.wohnzimmer_uhr
-                        - delay: 00:00:02
-                        - service: tts.google_say
-                          entity_id: media_player.wohnzimmer_uhr
-                          data_template:
-                            message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-                        - delay: 00:00:05
-                        - service: media_player.volume_set
-                          data:
-                            volume_level: >
-                              {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                            entity_id: media_player.wohnzimmer_uhr
-    - service: notify.telegram_fabian
-      data:
-        message: "Nessie ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.donnersbergerbruecke_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
-
 - id: telegram_send_daily_weather_forecast_fabian
   alias: "Telegram send daily weather forecast fabian"
   initial_state: true
@@ -9558,7 +9524,8 @@
           {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
 
           Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
-          Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
+
+        #Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
 - id: telegram_send_daily_weather_forecast_nessie
   alias: "Telegram send daily weather forecast nessie"
@@ -9587,7 +9554,8 @@
           {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
 
           Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
-          Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
+
+        #Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
 - id: remind_for_volleyball
   alias: "remind for volleyball"
@@ -9603,9 +9571,9 @@
       - condition: template
         value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 173000) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 144000 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 143000 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 144000 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 143000 }}"
   action:
     - service: shell_command.unpin_all_telegram
       data_template:
@@ -9614,7 +9582,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "{{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%A',false) }} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
+        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -9639,7 +9607,7 @@
   initial_state: true
   trigger:
     - platform: time
-      at: "13:00:00"
+      at: "23:00:00"
   condition:
     condition: and
     conditions:
@@ -9664,7 +9632,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "{{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%A',false) }} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[1].temperature }} °. Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
+        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }} °. Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
         options:
           - "Ja"
           - "Nein"
@@ -9699,7 +9667,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_juz_group
-        question: "Das JUZ hat {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%A',false) }} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
+        question: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
         options:
           - "Ja"
           - "Nein"

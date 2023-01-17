@@ -13,14 +13,14 @@
       - condition: state
         entity_id: input_boolean.gast_modus
         state: "off"
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: person.fabian
-            state: home
-          - condition: state
-            entity_id: person.nessie
-            state: home
+      #- condition: or
+      #  conditions:
+      #    - condition: state
+      #      entity_id: person.fabian
+      #      state: home
+      #    - condition: state
+      #      entity_id: person.nessie
+      #      state: home
       - condition: or
         conditions:
           - condition: and

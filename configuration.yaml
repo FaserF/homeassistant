@@ -298,7 +298,7 @@ template:
         attributes:
           entities: >
             {% if state_attr('group.ignored_entities','entity_id') != none %}
-              {% set ignore_seconds = 360 %}
+              {% set ignore_seconds = 600 %}
               {% set ignore_ts = (now().timestamp() - ignore_seconds)|as_datetime %}
               {{ states
                 |rejectattr('domain','eq','group')

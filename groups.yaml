@@ -209,3 +209,4 @@ ignored_entities:
     - sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
     - sensor.miwifi_28_d1_27_fc_ab_d8_uptime
     - switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
+    - sensor.iphone_11p_battery_state
