@@ -767,3 +767,5 @@ o365:
         - name: "JUZ Outlook"
           max_items: 5
           download_attachments: False
+
+whatsapp:

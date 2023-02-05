@@ -272,6 +272,32 @@
         entity_id: select.valetudo_dreamez10pro_operation_mode
         option: "vacuum_and_mop"
 
+- id: warning_for_closed_doors
+  alias: "Warning for closed doors"
+  trigger:
+    - platform: state
+      entity_id: vacuum.valetudo_dreamez10pro
+      from: "returning"
+      to: "docked"
+      for:
+        minutes: 2
+  condition:
+    condition: and
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.valetudo_dreamez10pro_current_statistics_area
+        below: 220
+  action:
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_fabian
+              below: 70
+          sequence:
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Anscheinend waren Türen bei der geplanten Reinigung geschlossen. Daher wurden nicht alle Räume gesaugt."
+
 - id: vacuum_cleaner_counter
   alias: "Set Counter with Cleaner Runs and remind for emptying and refilling"
   trigger:
@@ -314,7 +340,7 @@
                       entity_id: proximity.home_fabian
                       below: 70
                   sequence:
-                    - service: notify.telegram_nessie
+                    - service: notify.telegram_fabian
                       data_template:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
     - choose:
@@ -337,7 +363,7 @@
                       entity_id: proximity.home_fabian
                       below: 70
                   sequence:
-                    - service: notify.telegram_nessie
+                    - service: notify.telegram_fabian
                       data_template:
                         message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
             - choose:

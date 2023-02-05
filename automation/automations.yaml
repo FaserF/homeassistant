@@ -67,19 +67,22 @@
             - condition: state
               entity_id: device_tracker.rgb_pc
               state: "home"
+            - condition: numeric_state
+              entity_id: sensor.steckerleiste_gastezimmer_energy_power
+              above: 20
           sequence:
             - service: notify.telegram_fabian
               data:
                 message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-                data:
-                  inline_keyboard:
-                    - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
-            - service: notify.telegram_nessie
-              data:
-                message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-                data:
-                  inline_keyboard:
-                    - "Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc"
+                #data:
+                #  inline_keyboard:
+                #    - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
+            #- service: notify.telegram_nessie
+            #  data:
+            #    message: "Keiner ist mehr zu Hause. Nessie-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+            #    data:
+            #      inline_keyboard:
+            #        - "Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc"
     - choose:
         - conditions:
             - condition: state
@@ -206,6 +209,61 @@
             - service: cover.close_cover
               target:
                 entity_id: all
+
+- id: turn_off_climates_if_someone_is_not_at_home
+  alias: "Turn off climates if someone is not at home"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: person.fabian
+      from: "home"
+      to: "not_home"
+      for:
+        minutes: 1
+    - platform: state
+      entity_id: person.nessie
+      from: "home"
+      to: "not_home"
+      for:
+        minutes: 1
+  action:
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+                  for:
+                    hours: 14
+            - condition: state
+              entity_id: person.nessie
+              state: "home"
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.schlafzimmer
+                temperature: 17
+                hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: "home"
+            - condition: state
+              entity_id: person.fabian
+              state: "home"
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.gastezimmer
+                temperature: 17
+                hvac_mode: heat
 
 - id: Automations if coming home
   alias: "Automations if coming home"
@@ -1026,6 +1084,31 @@
                     target: !secret telegram_chat_fabian
                     message: "Starte Homeassistant neu, da DB API Verbindung verloren wurde."
                 - service: homeassistant.restart
+
+- id: set_high_climate_in_bathroom_to_auto
+  alias: "Set high climate in bathroom to auto"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: "climate.bad"
+      to: "heat"
+      for:
+        minutes: 10
+    - platform: state
+      entity_id: "climate.bad"
+      to: "heat"
+      for:
+        minutes: 25
+  condition:
+    - condition: numeric_state
+      entity_id: "climate.bad"
+      attribute: temperature
+      above: 18
+  action:
+    - service: climate.set_hvac_mode
+      data:
+        entity_id: climate.bad
+        hvac_mode: auto
 
 - id: set_high_climate_to_lower_value
   alias: "Set high climate to lower value"
@@ -2258,7 +2341,7 @@
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
               data:
-                message: Es wurde vergessen das Fenster im Bad zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
     - choose:
         - conditions:
             - condition: or
@@ -2279,7 +2362,7 @@
                 - media_player.kuche_speaker
                 - media_player.schlafzimmer_speaker
               data:
-                message: Es wurde eventuell vermutlich vergessen das Fenster im Bad zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
       default:
         - service: notify.telegram_fabian
           data:
@@ -2331,7 +2414,7 @@
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
               data:
-                message: Es wurde eventuell vergessen das Fenster im Schlafzimmer zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster im Schlafzimmer zu schließen.
     - choose:
         - conditions:
             - condition: or
@@ -2403,7 +2486,7 @@
             - service: tts.google_say
               entity_id: media_player.gastezimmer_mini
               data:
-                message: Es wurde eventuell vergessen das Fenster im Wohnzimmer zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster im Wohnzimmer zu schließen.
     - choose:
         - conditions:
             - condition: or
@@ -2420,7 +2503,7 @@
                 - media_player.kuche_speaker
                 - media_player.schlafzimmer_speaker
               data:
-                message: Es wurde eventuell vergessen das Fenster im Wohnzimmer zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster im Wohnzimmer zu schließen.
       default:
         - service: notify.telegram_fabian
           data:
@@ -2474,7 +2557,7 @@
                 - media_player.kuche_speaker
                 - media_player.schlafzimmer_speaker
               data:
-                message: Es wurde eventuell vergessen das Fenster im Gästezimmer zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster im Gästezimmer zu schließen.
       default:
         - service: notify.telegram_fabian
           data:
@@ -2779,47 +2862,47 @@
             - service: notify.telegram_nessie
               data:
                 message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: device_tracker.rgb_pc
-                  state: "home"
-                - condition: state
-                  entity_id: device_tracker.vku_lb_20
-                  state: "home"
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.gastezimmer_mini
-                  state: "off"
-          sequence:
-            - service: notify.telegram_nessie
-              data:
-                message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.gast_modus
-              state: "off"
-            - condition: state
-              entity_id: input_boolean.leiser_modus
-              state: "off"
-          sequence:
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                entity_id: media_player.gastezimmer_mini
-            - service: tts.google_say
-              entity_id: media_player.gastezimmer_mini
-              data:
-                message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                entity_id: media_player.gastezimmer_mini
+    #- choose:
+        #- conditions:
+        #    - condition: or
+        #      conditions:
+        #        - condition: state
+        #          entity_id: device_tracker.rgb_pc
+        #          state: "home"
+        #        - condition: state
+        #          entity_id: device_tracker.vku_lb_20
+        #          state: "home"
+        #    - condition: not
+        #      conditions:
+        #        - condition: state
+        #          entity_id: media_player.gastezimmer_mini
+        #          state: "off"
+        #  sequence:
+        #    - service: notify.telegram_nessie
+        #      data:
+        #        message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
+        #- conditions:
+        #    - condition: state
+        #      entity_id: input_boolean.gast_modus
+        #      state: "off"
+        #    - condition: state
+        #      entity_id: input_boolean.leiser_modus
+        #      state: "off"
+        #  sequence:
+        #    - service: media_player.volume_set
+        #      data_template:
+        #        volume_level: >
+        #          {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+        #        entity_id: media_player.gastezimmer_mini
+        #    - service: tts.google_say
+        #      entity_id: media_player.gastezimmer_mini
+        #      data:
+        #        message: Das Fenster im Schlafzimmer kann wieder geschlossen werden.
+        #    - service: media_player.volume_set
+        #      data_template:
+        #        volume_level: >
+        #          {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+        #        entity_id: media_player.gastezimmer_mini
     - choose:
         - conditions:
             - condition: state
@@ -2837,22 +2920,22 @@
             - service: notify.telegram_fabian
               data:
                 message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
-        - conditions:
-            - condition: state
-              entity_id: person.nessie
-              state: home
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "off"
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "idle"
-          sequence:
-            - service: notify.telegram_nessie
-              data:
-                message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
+        #- conditions:
+        #    - condition: state
+        #      entity_id: person.nessie
+        #      state: home
+        #    - condition: not
+        #      conditions:
+        #        - condition: state
+        #          entity_id: media_player.kuche_speaker
+        #          state: "off"
+        #        - condition: state
+        #          entity_id: media_player.kuche_speaker
+        #          state: "idle"
+        #  sequence:
+        #    - service: notify.telegram_nessie
+        #      data:
+        #        message: "Das Fenster im Schlafzimmer kann wieder geschlossen werden."
         - conditions:
             - condition: state
               entity_id: input_boolean.leiser_modus
@@ -3281,7 +3364,7 @@
 
 - id: turn_off_bett_if_no_device_is_charging
   alias: "Turn off bett if no device is charging"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id:
@@ -3384,7 +3467,7 @@
         entity_id: binary_sensor.workday_sensor
         state: "on"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_morning.attributes.last_triggered) | int > 1800 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_and_open_cover_in_morning.attributes.last_triggered) | int > 1800 }}"
       #- condition: or
       #  conditions:
       #    - condition: and
@@ -5171,16 +5254,28 @@
         entity_id: "input_boolean.abwesend_modus"
         state: "off"
   action:
-    - service: telegram_bot.send_message
-      data_template:
-        message: >
-          Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
-        target: !secret telegram_chat_fabian
-    - service: telegram_bot.send_message
-      data_template:
-        message: >
-          Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
-        target: !secret telegram_chat_nessie
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_fabian
+              below: 89
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
+                target: !secret telegram_chat_fabian
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_nessie
+              below: 55
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
+                target: !secret telegram_chat_nessie
 
 - id: foodsharing_basket_available
   alias: "Foodsharing Basket Available"
@@ -5331,6 +5426,7 @@
             {%- endif -%}
           {%- endfor -%}
 
+          ---
           #Angebote
     #- service: telegram_bot.send_message
     #  data_template:
@@ -8043,18 +8139,30 @@
         entity_id: sensor.keller_steckdose_energy_power
         above: 22
   action:
-    - service: notify.telegram_nessie
-      data:
-        message: "Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:"
-        data:
-          inline_keyboard:
-            - "30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb"
-    - service: notify.telegram_fabian
-      data:
-        message: "Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:"
-        data:
-          inline_keyboard:
-            - "30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb"
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_fabian
+              below: 89
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:"
+                data:
+                  inline_keyboard:
+                    - "30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb"
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: proximity.home_nessie
+              below: 55
+          sequence:
+            - service: notify.telegram_nessie
+              data:
+                message: "Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:"
+                data:
+                  inline_keyboard:
+                    - "30° PL:/washerstart30, 40° PL:/washerstart40, 40° Koch-Bunt:/washerstart40kb, 20° Fein:/washerstart20fw, 60° Koch-Bunt:/washerstart60kb"
     - service: input_select.select_option
       data:
         entity_id: input_select.washing_machine_status
@@ -9527,53 +9635,23 @@
 
         #Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
-- id: telegram_send_daily_weather_forecast_nessie
-  alias: "Telegram send daily weather forecast nessie"
-  initial_state: false
-  trigger:
-    - platform: state
-      entity_id: device_tracker.android
-      from: "not_home"
-      to: "home"
-  condition:
-    - condition: time
-      before: "10:00:00"
-    - condition: time
-      after: "05:00:00"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_nessie.attributes.last_triggered) | int > 10800 }}"
-  action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_nessie
-        disable_notification: true
-        message: >
-          Wettervorhersage für heute
-          {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
-          *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
-          {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
-
-          Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
-
-        #Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
-
 - id: remind_for_volleyball
   alias: "remind for volleyball"
   initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 172800) | round(-1) }}"
+      value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 172800) | round(-2) }}"
     - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 144000) | round(-1) }}"
+      value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 140400) | round(-2) }}"
   condition:
     condition: and
     conditions:
       - condition: template
         value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 173000) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 143000 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 140200 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 143000 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 140200 }}"
   action:
     - service: shell_command.unpin_all_telegram
       data_template:
@@ -9657,7 +9735,7 @@
   initial_state: true
   trigger:
     - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - 111600) | round(-1) }}"
+      value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - 111600) | round(-2) }}"
   condition:
     condition: and
     conditions:
@@ -9675,6 +9753,12 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
+    - service: whatsapp.send_message
+      data_template:
+        clientId: default
+        to: !secret whatsapp_chat_juz_group
+        body:
+          text: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
     - choose:
         - conditions:
             - condition: template
@@ -9685,6 +9769,13 @@
                 target: !secret telegram_chat_juz_group
                 message: >
                   Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}
+            - service: whatsapp.send_message
+              data_template:
+                clientId: default
+                to: !secret whatsapp_chat_juz_group
+                body:
+                  text: "Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}"
+
 
 - id: send_juz_mails_to_telegram
   alias: "send juz mails to telegram"

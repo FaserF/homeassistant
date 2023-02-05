@@ -96,37 +96,52 @@
     event: sunset
     offset: "00:15:00"
   action:
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: cover.wohnzimmer_rollo_fenster
-                  state: "closed"
-                - condition: state
-                  entity_id: cover.wohnzimmer_rollo_tur
-                  state: "closed"
-          sequence:
-            - service: cover.set_cover_position
-              target:
-                entity_id:
-                  - cover.wohnzimmer_rollo_fenster
-                  - cover.wohnzimmer_rollo_tur
-              data:
-                position: 23
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: cover.schlafzimmer_rollo
-                  state: "closed"
-          sequence:
-            - service: cover.set_cover_position
-              target:
-                entity_id: cover.schlafzimmer_rollo
-              data:
-                position: 23
+    - parallel:
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: cover.wohnzimmer_rollo_fenster
+                      state: "closed"
+                    - condition: state
+                      entity_id: cover.wohnzimmer_rollo_tur
+                      state: "closed"
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: state
+                          entity_id: binary_sensor.wohnzimmer_open_window
+                          state: "on"
+                      sequence:
+                        - delay: "00:15:00"
+                - service: cover.set_cover_position
+                  target:
+                    entity_id:
+                      - cover.wohnzimmer_rollo_fenster
+                      - cover.wohnzimmer_rollo_tur
+                  data:
+                    position: 23
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: cover.schlafzimmer_rollo
+                      state: "closed"
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: state
+                          entity_id: binary_sensor.schlafzimmer_open_window
+                          state: "on"
+                      sequence:
+                        - delay: "00:15:00"
+                - service: cover.set_cover_position
+                  target:
+                    entity_id: cover.schlafzimmer_rollo
+                  data:
+                    position: 23
 
 - id: lower_covers_when_very_bright_outside
   alias: "lower all covers when very brigt outside"
@@ -299,6 +314,45 @@
     - platform: time
       at: "21:00:00"
   action:
-    - service: cover.close_cover
-      target:
-        entity_id: all
+    - parallel:
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: cover.wohnzimmer_rollo_fenster
+                      state: "closed"
+                    - condition: state
+                      entity_id: cover.wohnzimmer_rollo_tur
+                      state: "closed"
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: state
+                          entity_id: binary_sensor.wohnzimmer_open_window
+                          state: "on"
+                      sequence:
+                        - delay: "00:15:00"
+                - service: cover.close_cover
+                  target:
+                    entity_id:
+                      - cover.wohnzimmer_rollo_fenster
+                      - cover.wohnzimmer_rollo_tur
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: cover.schlafzimmer_rollo
+                      state: "closed"
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: state
+                          entity_id: binary_sensor.schlafzimmer_open_window
+                          state: "on"
+                      sequence:
+                        - delay: "00:15:00"
+                - service: cover.close_cover
+                  target:
+                    entity_id: cover.schlafzimmer_rollo
