@@ -2582,250 +2582,254 @@
         entity_id: "climate.bad"
         attribute: current_temperature
         below: 21
-      - condition: time
-        before: "23:00:00"
-      - condition: time
-        after: "07:50:00"
   action:
     - choose:
         - conditions:
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: input_boolean.leiser_modus
-                  state: "on"
-                - condition: or
+            - condition: time
+              before: "21:30:00"
+            - condition: time
+              after: "07:50:00"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: and
+                      conditions:
+                        - condition: state
+                          entity_id: input_boolean.leiser_modus
+                          state: "on"
+                        - condition: or
+                          conditions:
+                            - condition: state
+                              entity_id: person.fabian
+                              state: home
+                            - condition: state
+                              entity_id: person.nessie
+                              state: home
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - condition: state
+                              entity_id: person.fabian
+                              state: home
+                          sequence:
+                            - service: notify.mobile_app_fabian_iphone
+                              data:
+                                message: "Das Fenster im Bad kann wieder geschlossen werden."
+                                data:
+                                  push:
+                                    sound:
+                                      name: "default"
+                                      critical: 1
+                                      volume: 0.1
+                            - service: notify.telegram_fabian
+                              data:
+                                message: "Das Fenster im Bad kann wieder geschlossen werden."
+                    - choose:
+                        - conditions:
+                            - condition: state
+                              entity_id: person.nessie
+                              state: home
+                          sequence:
+                            - service: notify.telegram_nessie
+                              data:
+                                message: "Das Fenster im Bad kann wieder geschlossen werden."
+      default:
+        - choose:
+            - conditions:
+                - condition: and
                   conditions:
                     - condition: state
                       entity_id: person.fabian
                       state: home
-                    - condition: state
-                      entity_id: person.nessie
-                      state: home
-          sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: home
-                  sequence:
-                    - service: notify.mobile_app_fabian_iphone
-                      data:
-                        message: "Das Fenster im Bad kann wieder geschlossen werden."
-                        data:
-                          push:
-                            sound:
-                              name: "default"
-                              critical: 1
-                              volume: 0.1
-                    - service: notify.telegram_fabian
-                      data:
-                        message: "Das Fenster im Bad kann wieder geschlossen werden."
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.nessie
-                      state: home
-                  sequence:
-                    - service: notify.telegram_nessie
-                      data:
-                        message: "Das Fenster im Bad kann wieder geschlossen werden."
-    - choose:
-        - conditions:
-            - condition: and
-              conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity_id: device_tracker.fabian_pc
+                          state: "home"
+                        - condition: state
+                          entity_id: device_tracker.nsta0552
+                          state: "home"
+                    - condition: not
+                      conditions:
+                        - condition: state
+                          entity_id: media_player.schlafzimmer_speaker
+                          state: "off"
+              sequence:
+                - service: notify.telegram_fabian
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+                - service: notify.mobile_app_fabian_iphone
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+                    data:
+                      push:
+                        sound:
+                          name: "default"
+                          critical: 1
+                          volume: 0.1
+            - conditions:
                 - condition: state
-                  entity_id: person.fabian
+                  entity_id: input_boolean.leiser_modus
+                  state: "off"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                    entity_id: media_player.schlafzimmer_speaker
+                - service: tts.google_say
+                  entity_id: media_player.schlafzimmer_speaker
+                  data:
+                    message: Das Fenster im Bad kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.schlafzimmer_speaker
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: person.nessie
                   state: home
                 - condition: or
                   conditions:
                     - condition: state
-                      entity_id: device_tracker.fabian_pc
+                      entity_id: device_tracker.rgb_pc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.nsta0552
+                      entity_id: device_tracker.vku_lb_20
                       state: "home"
                 - condition: not
                   conditions:
                     - condition: state
-                      entity_id: media_player.schlafzimmer_speaker
+                      entity_id: media_player.gastezimmer_mini
                       state: "off"
-          sequence:
-            - service: notify.telegram_fabian
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-            - service: notify.mobile_app_fabian_iphone
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.1
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.leiser_modus
-              state: "off"
-          sequence:
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                entity_id: media_player.schlafzimmer_speaker
-            - service: tts.google_say
-              entity_id: media_player.schlafzimmer_speaker
-              data:
-                message: Das Fenster im Bad kann wieder geschlossen werden.
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                entity_id: media_player.schlafzimmer_speaker
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.nessie
-              state: home
-            - condition: or
-              conditions:
+              sequence:
+                - service: notify.telegram_nessie
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+            - conditions:
                 - condition: state
-                  entity_id: device_tracker.rgb_pc
-                  state: "home"
+                  entity_id: input_boolean.gast_modus
+                  state: "off"
                 - condition: state
-                  entity_id: device_tracker.vku_lb_20
-                  state: "home"
-            - condition: not
-              conditions:
-                - condition: state
+                  entity_id: input_boolean.leiser_modus
+                  state: "off"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                    entity_id: media_player.gastezimmer_mini
+                - service: tts.google_say
                   entity_id: media_player.gastezimmer_mini
+                  data:
+                    message: Das Fenster im Bad kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.gastezimmer_mini
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.kuche_speaker
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.kuche_speaker
+                      state: "idle"
+              sequence:
+                - service: notify.telegram_fabian
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+            - conditions:
+                - condition: state
+                  entity_id: person.nessie
+                  state: home
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.kuche_speaker
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.kuche_speaker
+                      state: "idle"
+              sequence:
+                - service: notify.telegram_nessie
+                  data:
+                    message: "Das Fenster im Bad kann wieder geschlossen werden."
+            - conditions:
+                - condition: state
+                  entity_id: input_boolean.leiser_modus
                   state: "off"
-          sequence:
-            - service: notify.telegram_nessie
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.gast_modus
-              state: "off"
-            - condition: state
-              entity_id: input_boolean.leiser_modus
-              state: "off"
-          sequence:
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                entity_id: media_player.gastezimmer_mini
-            - service: tts.google_say
-              entity_id: media_player.gastezimmer_mini
-              data:
-                message: Das Fenster im Bad kann wieder geschlossen werden.
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                entity_id: media_player.gastezimmer_mini
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.fabian
-              state: home
-            - condition: not
-              conditions:
-                - condition: state
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.kuche_speaker
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.kuche_speaker
+                      state: "idle"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                    entity_id: media_player.kuche_speaker
+                - service: tts.google_say
                   entity_id: media_player.kuche_speaker
+                  data:
+                    message: Das Fenster im Bad kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.kuche_speaker
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.wohnzimmer_tv
+                      state: "unavailable"
+              sequence:
+                - service: notify.wohnzimmer_tv
+                  continue_on_error: true
+                  data:
+                    message: Das Fenster im Bad kann wieder geschlossen werden.
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: input_boolean.leiser_modus
                   state: "off"
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "idle"
-          sequence:
-            - service: notify.telegram_fabian
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-        - conditions:
-            - condition: state
-              entity_id: person.nessie
-              state: home
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "off"
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "idle"
-          sequence:
-            - service: notify.telegram_nessie
-              data:
-                message: "Das Fenster im Bad kann wieder geschlossen werden."
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.leiser_modus
-              state: "off"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "off"
-                - condition: state
-                  entity_id: media_player.kuche_speaker
-                  state: "idle"
-          sequence:
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                entity_id: media_player.kuche_speaker
-            - service: tts.google_say
-              entity_id: media_player.kuche_speaker
-              data:
-                message: Das Fenster im Bad kann wieder geschlossen werden.
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                entity_id: media_player.kuche_speaker
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv
-                  state: "unavailable"
-          sequence:
-            - service: notify.wohnzimmer_tv
-              continue_on_error: true
-              data:
-                message: Das Fenster im Bad kann wieder geschlossen werden.
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.leiser_modus
-              state: "off"
-            - condition: or
-              conditions:
-                - condition: state
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.wohnzimmer_uhr
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.wohnzimmer_uhr
+                      state: "idle"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                    entity_id: media_player.wohnzimmer_uhr
+                - service: tts.google_say
                   entity_id: media_player.wohnzimmer_uhr
-                  state: "off"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  state: "idle"
-          sequence:
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-                entity_id: media_player.wohnzimmer_uhr
-            - service: tts.google_say
-              entity_id: media_player.wohnzimmer_uhr
-              data:
-                message: Das Fenster im Bad kann wieder geschlossen werden.
-            - service: media_player.volume_set
-              data_template:
-                volume_level: >
-                  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                entity_id: media_player.wohnzimmer_uhr
+                  data:
+                    message: Das Fenster im Bad kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.wohnzimmer_uhr
 
 - id: remind_for_open_window_after_5_minutes_in_sleeping_room
   alias: "Remind for open window after 5 minutes in sleeping room"
@@ -4337,7 +4341,7 @@
                 options:
                   - "See"
                   - "Weiher"
-                  - "Fabi Keller"
+                  - "Fabi"
                   - "Kai & Adri"
                   - "Flo"
                   - "Maxi"
@@ -4351,7 +4355,7 @@
             target: !secret telegram_chat_5friends
             question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
             options:
-              - "Fabi Keller"
+              - "Fabi"
               - "Kai & Adri"
               - "Flo"
               - "Maxi"
@@ -5427,6 +5431,7 @@
           {%- endfor -%}
 
           ---
+
           #Angebote
     #- service: telegram_bot.send_message
     #  data_template:
@@ -7132,12 +7137,8 @@
                   entity_id: media_player.kuche_speaker
                   data_template:
                     message: >
-                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
-                      Willkommen zurück Nessie und Fabi.
-                      {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
+                      {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
                       Willkommen zurück Fabi.
-                      {% elif (as_timestamp(now()) - as_timestamp(states.person.nessie.last_changed) | int < 240) %}
-                      Willkommen zurück Nessie.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
                       {% if (states.climate.gastezimmer.attributes.current_humidity) > 60 %}
@@ -9801,6 +9802,16 @@
             state: ""
           - condition: template
             value_template: "{{'noreply@ionos.de' in state_attr('sensor.juz_outlook', 'data')[0]['sender'] }}"
+          - condition: template
+            value_template: "{{'Angenommen: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Abgelehnt: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Vorläufig angenommen: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Aktualisierte Einladung: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Termin abgesagt: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
   action:
     - service: telegram_bot.send_message
       data_template:
@@ -9837,6 +9848,16 @@
             entity_id: sensor.5freunde_outlook
             attribute: data
             state: ""
+          - condition: template
+            value_template: "{{'Angenommen: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Abgelehnt: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Vorläufig angenommen: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Aktualisierte Einladung: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Termin abgesagt: ' in state_attr('sensor.5freunde_outlook', 'data')[0]['subject'] }}"
   action:
     - choose:
         - conditions:

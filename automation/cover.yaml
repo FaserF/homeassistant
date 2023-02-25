@@ -1,3 +1,4 @@
+---
 - id: open_covers_when_sunrise
   alias: "Open all covers when sun rise"
   trigger:
@@ -156,11 +157,13 @@
     condition: and
     conditions:
       - condition: time
-        after: "11:30:00"
+        after: "13:30:00"
         before: "17:30:00"
       - condition: state
         entity_id: input_boolean.abwesend_modus
         state: "off"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.lower_covers_when_very_bright_outside.attributes.last_triggered) | int > 3600 }}"
   action:
     - choose:
         - conditions:
@@ -177,7 +180,7 @@
               target:
                 entity_id: cover.schlafzimmer_rollo
               data:
-                position: 50
+                position: 59
     - choose:
         - conditions:
             - condition: state

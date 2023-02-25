@@ -1,3 +1,4 @@
+---
 animated_background:
   default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
   entity: weather.dwd_weather_ebersberg_1h

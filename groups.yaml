@@ -211,3 +211,4 @@ ignored_entities:
     - switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
     - sensor.iphone_11p_battery_state
     - switch.024munml4k8md6t_internet_access
+    - sensor.keller_tv_device
