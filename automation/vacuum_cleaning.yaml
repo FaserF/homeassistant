@@ -324,6 +324,15 @@
         entity_id: counter.vacuum_water_level
     - choose:
         - conditions:
+            - condition: state
+              entity_id: select.valetudo_dreamez10pro_water_grade
+              state: high
+          sequence:
+            - service: counter.decrement
+              target:
+                entity_id: counter.vacuum_water_level
+    - choose:
+        - conditions:
             - condition: numeric_state
               entity_id: counter.vacuum_water_level
               below: 1

@@ -212,3 +212,5 @@ ignored_entities:
     - sensor.iphone_11p_battery_state
     - switch.024munml4k8md6t_internet_access
     - sensor.keller_tv_device
+    - sensor.adrians_ipad_battery_state
+    - sensor.lutuli_int_consol_de_battery_state
