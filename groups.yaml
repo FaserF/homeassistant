@@ -214,3 +214,9 @@ ignored_entities:
     - sensor.keller_tv_device
     - sensor.adrians_ipad_battery_state
     - sensor.lutuli_int_consol_de_battery_state
+    - sensor.fabian_ipadpro_battery_state_3
+    - sensor.fabian_iphone_battery_state
+    - sensor.fabian_macbookpro_battery_state
+    - sensor.iphone11p_battery_state
+    - sensor.lutuli_int_consol_de_battery_state_2
+    - sensor.thes_macbook_pro_battery_state_2

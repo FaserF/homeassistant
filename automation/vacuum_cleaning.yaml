@@ -166,21 +166,6 @@
 
                   Die Reinigung wurde daher unterbrochen.
                 target: !secret telegram_chat_nessie
-      default:
-        - service: telegram_bot.send_message
-          data_template:
-            message: >
-              James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
-
-              Die Reinigung wurde daher unterbrochen.
-            target: !secret telegram_chat_fabian
-        - service: telegram_bot.send_message
-          data_template:
-            message: >
-              James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
-
-              Die Reinigung wurde daher unterbrochen.
-            target: !secret telegram_chat_nessie
 
 - id: james_room_cleaning
   alias: "James Raum Reinigiung"
@@ -339,18 +324,18 @@
           sequence:
             - choose:
                 - conditions:
-                    - condition: numeric_state
-                      entity_id: proximity.home_nessie
-                      below: 35
+                    - condition: state
+                      entity_id: person.nessie
+                      state: home
                   sequence:
                     - service: notify.telegram_nessie
                       data_template:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
             - choose:
                 - conditions:
-                    - condition: numeric_state
-                      entity_id: proximity.home_fabian
-                      below: 70
+                    - condition: state
+                      entity_id: person.fabian
+                      state: home
                   sequence:
                     - service: notify.telegram_fabian
                       data_template:

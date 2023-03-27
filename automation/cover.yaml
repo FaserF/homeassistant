@@ -156,6 +156,11 @@
   condition:
     condition: and
     conditions:
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: weather.dwd_weather_ebersberg_1h
+            state: "rainy"
       - condition: time
         after: "13:30:00"
         before: "17:30:00"
