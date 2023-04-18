@@ -2,9 +2,9 @@
 - name: telegram_fabian
   platform: telegram
   chat_id: !secret telegram_chat_fabian
-- name: telegram_nessie
+- name: telegram_samuel
   platform: telegram
-  chat_id: !secret telegram_chat_nessie
+  chat_id: !secret telegram_chat_samuel
 # - platform: html5
 # name: browser
 # vapid_pub_key: !secret vapid_pub_key

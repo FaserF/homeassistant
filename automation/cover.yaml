@@ -20,7 +20,7 @@
       #      entity_id: person.fabian
       #      state: home
       #    - condition: state
-      #      entity_id: person.nessie
+      #      entity_id: person.samuel
       #      state: home
       - condition: or
         conditions:
@@ -63,18 +63,18 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: cover.schlafzimmer_rollo
+                  entity_id: cover.fabians_zimmer_rollo
                   state: "open"
           sequence:
             - service: cover.set_cover_position
               target:
-                entity_id: cover.schlafzimmer_rollo
+                entity_id: cover.fabians_zimmer_rollo
               data:
                 position: 30
             - delay: "00:03:00"
             - service: cover.open_cover
               target:
-                entity_id: cover.schlafzimmer_rollo
+                entity_id: cover.fabians_zimmer_rollo
     - choose:
         - conditions:
             - condition: state
@@ -128,7 +128,7 @@
                 - condition: not
                   conditions:
                     - condition: state
-                      entity_id: cover.schlafzimmer_rollo
+                      entity_id: cover.fabians_zimmer_rollo
                       state: "closed"
               sequence:
                 - choose:
@@ -140,7 +140,7 @@
                         - delay: "00:15:00"
                 - service: cover.set_cover_position
                   target:
-                    entity_id: cover.schlafzimmer_rollo
+                    entity_id: cover.fabians_zimmer_rollo
                   data:
                     position: 23
 
@@ -178,12 +178,12 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: cover.schlafzimmer_rollo
+                  entity_id: cover.fabians_zimmer_rollo
                   state: "closed"
           sequence:
             - service: cover.set_cover_position
               target:
-                entity_id: cover.schlafzimmer_rollo
+                entity_id: cover.fabians_zimmer_rollo
               data:
                 position: 59
     - choose:
@@ -242,13 +242,13 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: cover.schlafzimmer_rollo
+              entity_id: cover.fabians_zimmer_rollo
               attribute: current_position
               below: 85
           sequence:
             - service: cover.open_cover
               target:
-                entity_id: cover.schlafzimmer_rollo
+                entity_id: cover.fabians_zimmer_rollo
     - choose:
         - conditions:
             - condition: numeric_state
@@ -287,7 +287,7 @@
                   entity_id: person.fabian
                   state: "home"
                 - condition: state
-                  entity_id: person.nessie
+                  entity_id: person.samuel
                   state: "home"
           sequence:
             - choose:
@@ -298,7 +298,7 @@
                   sequence:
                     - service: cover.set_cover_position
                       target:
-                        entity_id: cover.schlafzimmer_rollo
+                        entity_id: cover.fabians_zimmer_rollo
                       data:
                         position: 80
               default:
@@ -351,7 +351,7 @@
                 - condition: not
                   conditions:
                     - condition: state
-                      entity_id: cover.schlafzimmer_rollo
+                      entity_id: cover.fabians_zimmer_rollo
                       state: "closed"
               sequence:
                 - choose:
@@ -363,4 +363,4 @@
                         - delay: "00:15:00"
                 - service: cover.close_cover
                   target:
-                    entity_id: cover.schlafzimmer_rollo
+                    entity_id: cover.fabians_zimmer_rollo

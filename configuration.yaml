@@ -22,44 +22,6 @@ system_health:
 api:
 mobile_app:
 
-zone:
-  # This will override the default home zone
-  - name: Home
-    latitude: !secret latitude
-    longitude: !secret longitude
-    radius: 100
-    icon: mdi:account-multiple
-
-  - name: Arbeit Fabi
-    latitude: !secret latitude_work
-    longitude: !secret longitude_work
-    radius: 250
-    icon: mdi:school
-
-  - name: Arbeit Fabi WHM
-    latitude: !secret latitude_work_whm
-    longitude: !secret longitude_work_whm
-    radius: 250
-    icon: mdi:school
-
-  - name: Arbeit Fabi MUC
-    latitude: !secret latitude_work_muc
-    longitude: !secret longitude_work_muc
-    radius: 250
-    icon: mdi:school
-
-  - name: Arbeit Fabi GIL
-    latitude: !secret latitude_work_gil
-    longitude: !secret longitude_work_gil
-    radius: 250
-    icon: mdi:school
-
-  - name: Arbeit Nessie
-    latitude: !secret latitude_work_nessie
-    longitude: !secret longitude_work_nessie
-    radius: 250
-    icon: mdi:school
-
 http:
   ssl_certificate: !secret ssl_certificate
   ssl_key: !secret ssl_key
@@ -145,6 +107,8 @@ recorder:
       - sensor.unavailable_entities
       - sensor.rewe_440421
       - sensor.icloud3_event_log
+      - sensor.juz_outlook
+      - sensor.5freunde_outlook
 
 # Discover some devices automatically
 discovery:
@@ -199,10 +163,10 @@ map:
 sun:
 
 proximity:
-  home_nessie:
+  home_samuel:
     zone: home
-    ignored_zones: zone.arbeit_nessie
-    devices: person.nessie
+    ignored_zones: zone.arbeit_samuel
+    devices: person.samuel
     tolerance: 50
   home_fabian:
     zone: home
@@ -222,7 +186,6 @@ telegram_bot:
     api_key: !secret telegram_bot_api
     allowed_chat_ids:
       - !secret telegram_chat_fabian
-      - !secret telegram_chat_nessie
       - !secret telegram_chat_adrian
       - !secret telegram_chat_kai
       - !secret telegram_chat_flo
@@ -287,7 +250,7 @@ template:
         attributes:
           entities: >
             {% if state_attr('group.ignored_entities','entity_id') != none %}
-              {% set ignore_seconds = 600 %}
+              {% set ignore_seconds = 800 %}
               {% set ignore_ts = (now().timestamp() - ignore_seconds)|as_datetime %}
               {{ states
                 |rejectattr('domain','eq','group')
@@ -295,6 +258,10 @@ template:
                 |rejectattr('domain','eq','automation')
                 |rejectattr('domain','eq','device_tracker')
                 |rejectattr('entity_id','in',state_attr('group.ignored_entities','entity_id'))
+                |rejectattr('entity_id', 'search', '_internet_access')
+                |rejectattr('entity_id', 'search', '_do_not_disturb')
+                |rejectattr('entity_id', 'search', '_alarm_volume')
+                |rejectattr('entity_id', 'search', 'sensor.fabian_iphone_')
                 |rejectattr('last_changed','ge',ignore_ts)
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
@@ -320,13 +287,6 @@ rest_command:
     url: http://192.168.178.16:9170/command
     headers:
       api-key: !secret system_bridge_fabian
-    content_type: "application/json; charset=utf-8"
-    payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
-  nessie_pc_system_bridge:
-    method: POST
-    url: http://192.168.178.15:9170/command
-    headers:
-      api-key: !secret system_bridge_nessie
     content_type: "application/json; charset=utf-8"
     payload: '{ "command": "{{ command }}", "arguments": ["{{ arguments }}"] }'
   # assistant_relay:
@@ -386,9 +346,9 @@ google_assistant:
       expose: false
     switch.kuche_speaker_do_not_disturb:
       expose: false
-    switch.schlafzimmer_speaker_do_not_disturb:
+    switch.fabian_s_lautsprecher_do_not_disturb:
       expose: false
-    switch.gastezimmer_mini_do_not_disturb:
+    switch.samuel_s_mini_do_not_disturb:
       expose: false
     switch.wohnzimmer_uhr_do_not_disturb:
       expose: false
@@ -398,7 +358,7 @@ google_assistant:
       expose: false
     switch.kohleanzunder:
       expose: false
-    switch.nessie_pc_shutdown:
+    switch.samuel_pc_shutdown:
       expose: false
     switch.fabian_pc_shutdown:
       expose: false
@@ -420,55 +380,55 @@ google_assistant:
       expose: false
       name: Adblocker
     # Enabled Entitys
-    ## Schlafzimmer
+    ## Fabians Zimmer
     light.regal:
       name: Regal
       expose: true
-      room: Schlafzimmer
+      room: Fabians Zimmer
     input_boolean.fabian_pc_strom:
-      name: Strom Schlafzimmer
+      name: Strom Fabians Zimmer
       expose: true
-      room: Schlafzimmer
+      room: Fabians Zimmer
     switch.bett_usb_ports:
       name: Bett Steckdose
       expose: true
-      room: Schlafzimmer
+      room: Fabians Zimmer
     light.lichtschalter:
       name: Licht Schalter
       expose: true
-      room: Schlafzimmer
+      room: Fabians Zimmer
     light.bett_gluhbirne:
       name: Bett Glühbirne
       expose: true
-      room: Schlafzimmer
+      room: Fabians Zimmer
     light.leds_tisch:
       expose: true
-      room: Schlafzimmer
+      room: Fabians Zimmer
     light.yeelight_bslamp2_0x13fea10f:
       name: Bettlicht
       expose: true
-      room: Schlafzimmer
-    cover.schlafzimmer_rollo:
+      room: Fabians Zimmer
+    cover.fabians_zimmer_rollo:
       expose: true
-      room: Schlafzimmer
-    ## Gästezimmer
+      room: Fabians Zimmer
+    ## Samuels Zimmer
     light.lampe_gastezimmer:
       name: Nachtlampe
       expose: true
-      room: Gästezimmer
+      room: Samuels Zimmer
     light.leds_gastezimmer:
       expose: true
-      room: Gästezimmer
-    switch.nessie_pc:
+      room: Samuels Zimmer
+    switch.samuel_pc:
       expose: false
-      room: Gästezimmer
+      room: Samuels Zimmer
     switch.gastezimmer_usb_ports:
       expose: true
-      room: Gästezimmer
-    input_boolean.nessie_pc_strom:
-      name: Nessie PC
+      room: Samuels Zimmer
+    input_boolean.samuel_pc_strom:
+      name: Samuel PC
       expose: true
-      room: Gästezimmer
+      room: Samuels Zimmer
     ## Wohnzimmer
     light.deckenlampe:
       expose: true
@@ -564,7 +524,7 @@ intent_script:
   find_iPhone:
     speech:
       text: >
-        {%- if given-name.lower() == "fabian" or given-name.lower() == "fabi" or given-name.lower() == "nessie" or given-name.lower() == "vanessa"  -%}
+        {%- if given-name.lower() == "fabian" or given-name.lower() == "fabi" or given-name.lower() == "samuel" or given-name.lower() == "vanessa"  -%}
           Ich lasse jetzt das Handy von {{ given-name }} klingeln
         {%- else -%}
           Leider kann ich das Handy von {{ given-name }} nicht suchen.
@@ -574,7 +534,7 @@ intent_script:
         entity_id: automation.find_phone_fabian
       # - service: automation.trigger
       # entity_id: >
-      # {%- if User.lower() == "fabian" or User.lower() == "fabi" -%}automation.find_phone_fabian{%- elif User.lower() == "nessie" or User.lower() == "vanessa" -%}automation.find_phone_nessie{%- endif -%}
+      # {%- if User.lower() == "fabian" or User.lower() == "fabi" -%}automation.find_phone_fabian{%- elif User.lower() == "samuel" or User.lower() == "vanessa" -%}automation.find_phone_samuel{%- endif -%}
   vacuum_room_cleaning:
     speech:
       text: Starte manuelle Raumreinigung in {{ Room }}.
@@ -598,7 +558,7 @@ intent_script:
                   payload: '{"segment_ids": ["4"]}'
           - conditions:
               - condition: template
-                value_template: "{{ ((Room)) == 'Schlafzimmer' }}"
+                value_template: "{{ ((Room)) == 'Fabians Zimmer' }}"
             sequence:
               - service: mqtt.publish
                 data:
@@ -606,7 +566,7 @@ intent_script:
                   payload: '{"segment_ids": ["3"]}'
           - conditions:
               - condition: template
-                value_template: "{{ ((Room)) == 'Gästezimmer' }}"
+                value_template: "{{ ((Room)) == 'Samuels Zimmer' }}"
             sequence:
               - service: mqtt.publish
                 data:
@@ -659,8 +619,8 @@ input_select:
     options:
       - Wohnzimmer
       - Küche
-      - Schlafzimmer
-      - Gästezimmer
+      - Fabians-Zimmer
+      - Samuels-Zimmer
       - Bad
       - Flur
       - Gesamt

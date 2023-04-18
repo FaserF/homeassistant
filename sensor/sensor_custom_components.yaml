@@ -1,20 +1,4 @@
 ---
-#- platform: deutschebahn
-#  from: !secret fabian_work
-#  to: !secret sbahn_home
-#  only_direct: true
-#- platform: deutschebahn
-#  from: !secret nessie_work
-#  to: !secret sbahn_home
-#  only_direct: true
-#- platform: deutschebahn
-#  from: !secret sbahn_home
-#  to: !secret nessie_work
-#  only_direct: true
-#- platform: deutschebahn
-#  from: Donnersbergerbruecke
-#  to: !secret sbahn_home
-#  only_direct: true
 - platform: dwd_illuminance
   entity_id: weather.dwd_weather_ebersberg_1h
 ## Waste sensors

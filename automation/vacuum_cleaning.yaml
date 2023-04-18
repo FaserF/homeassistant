@@ -27,10 +27,10 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: person.nessie
+              entity_id: person.samuel
               state: "home"
           sequence:
-            - service: notify.telegram_nessie
+            - service: notify.telegram_samuel
               data_template:
                 message: "Die geplante Staubsauger Reinigung startet in 30 Minuten. Bitte alle Türen öffnen."
     - choose:
@@ -72,10 +72,10 @@
                   entity_id: person.fabian
                   state: "home"
                 - condition: state
-                  entity_id: person.nessie
+                  entity_id: person.samuel
                   state: "home"
           sequence:
-            # if Fabi & Nessie not at home clean all rooms
+            # if Fabi & samuel not at home clean all rooms
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
@@ -96,7 +96,7 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: person.nessie
+                  entity_id: person.samuel
                   state: "home"
           sequence:
             - choose:
@@ -107,19 +107,19 @@
                           entity_id: input_boolean.gast_modus
                           state: "on"
                   sequence:
-                    # else if only nessie is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
+                    # else if only samuel is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
                     - service: mqtt.publish
                       data:
                         topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                         payload: '{"segment_ids": ["5", "3", "4", "6"], "customOrder": true}'
               default:
-                # else if only nessie is not at home but guest mode is on, clean all rooms except guest room
+                # else if only samuel is not at home but guest mode is on, clean all rooms except guest room
                 - service: mqtt.publish
                   data:
                     topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                     payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
       default:
-        # default if fabi & nessie at home: clean only living room, floor & kitchen
+        # default if fabi & samuel at home: clean only living room, floor & kitchen
         - service: mqtt.publish
           data:
             topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
@@ -156,7 +156,7 @@
                 target: !secret telegram_chat_fabian
         - conditions:
             - condition: state
-              entity_id: person.nessie
+              entity_id: person.samuel
               state: "home"
           sequence:
             - service: telegram_bot.send_message
@@ -165,7 +165,7 @@
                   James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
                   Die Reinigung wurde daher unterbrochen.
-                target: !secret telegram_chat_nessie
+                target: !secret telegram_chat_samuel
 
 - id: james_room_cleaning
   alias: "James Raum Reinigiung"
@@ -196,7 +196,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
-              state: "Schlafzimmer"
+              state: "Fabians-Zimmer"
           sequence:
             - service: mqtt.publish
               data:
@@ -205,7 +205,7 @@
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
-              state: "Gästezimmer"
+              state: "Samuels-Zimmer"
           sequence:
             - service: mqtt.publish
               data:
@@ -325,10 +325,10 @@
             - choose:
                 - conditions:
                     - condition: state
-                      entity_id: person.nessie
+                      entity_id: person.samuel
                       state: home
                   sequence:
-                    - service: notify.telegram_nessie
+                    - service: notify.telegram_samuel
                       data_template:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
             - choose:
@@ -348,10 +348,10 @@
             - choose:
                 - conditions:
                     - condition: numeric_state
-                      entity_id: proximity.home_nessie
+                      entity_id: proximity.home_samuel
                       below: 35
                   sequence:
-                    - service: notify.telegram_nessie
+                    - service: notify.telegram_samuel
                       data_template:
                         message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
             - choose:
@@ -368,7 +368,7 @@
                     - condition: or
                       conditions:
                         - condition: numeric_state
-                          entity_id: proximity.home_nessie
+                          entity_id: proximity.home_samuel
                           below: 35
                         - condition: numeric_state
                           entity_id: proximity.home_fabian
@@ -412,10 +412,10 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: person.nessie
+                  entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_nessie
+            - service: notify.telegram_samuel
               data_template:
                 message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
     - choose:

@@ -1,4 +1,0 @@
----
-#- platform: icloud3
-#  username: !secret vapid_email
-#  password: !secret apple_pw

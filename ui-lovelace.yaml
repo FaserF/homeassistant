@@ -1,4 +1,3 @@
----
 animated_background:
   default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
   entity: weather.dwd_weather_ebersberg_1h
@@ -73,19 +72,17 @@ views:
     path: home
     badges:
       - entity: person.fabian
-      - entity: person.nessie
-      - entity: sensor.fabian_iphone_battery_state
-      - entity: sensor.nessie_iphone_battery_state
-      - entity: sensor.fabian_ipadpro_battery_state
+      - entity: person.samuel
+      - entity: sensor.fabian_iphone_icloud_battery
+      - entity: sensor.fabian_ipad_icloud_battery
       - entity: sensor.washing_machine_finish_duration
-      - entity: sensor.steckerleiste_gastezimmer_energy_power
-      - entity: sensor.schlafzimmer_power
+      - entity: sensor.steckerleiste_samuel_s_zimmer_energy_power
+      - entity: sensor.fabian_schreibtisch_power
       - entity: sensor.keller_steckdose_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
       - entity: sensor.fabian_s_zuhause_solar_percentage
       - entity: sensor.dwd_illuminance
-      - entity: counter.pille
       - entity: sensor.lk_ebersberg_weekincidence
       - entity: sensor.lk_munchen_weekincidence
       - entity: sensor.average_house_humidity
@@ -141,7 +138,7 @@ views:
           - entity: input_boolean.fabian_pc_strom
             secondary_info: last-changed
           - entity: switch.bett_usb_ports
-          - entity: input_boolean.nessie_pc_strom
+          - entity: input_boolean.samuel_pc_strom
             secondary_info: last-changed
           - entity: switch.gastezimmer_usb_ports
           - entity: switch.kuchengerate
@@ -175,26 +172,26 @@ views:
             name: Fenster
         step_layout: column
         step_size: "1"
-      - entity: climate.schlafzimmer
+      - entity: climate.fabian_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
             unit: "%"
-          - entity: sensor.schlafzimmer_heating
+          - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
-          - entity: binary_sensor.schlafzimmer_open_window
+          - entity: binary_sensor.fabian_s_zimmer_open_window
             name: Fenster
         step_size: "1"
-      - entity: climate.gastezimmer
+      - entity: climate.samuel_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
             unit: "%"
-          - entity: sensor.gastezimmer_heating
+          - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
-          - entity: binary_sensor.gastezimmer_open_window
+          - entity: binary_sensor.samuel_s_zimmer_open_window
             name: Fenster
         step_size: "1"
       - entity: climate.bad
@@ -260,6 +257,13 @@ views:
             entity: media_player.keller_tv_group
       - type: entities
         entities:
+          - entity: cover.fabians_zimmer_rollo
+          - entity: cover.wohnzimmer_rollo_fenster
+          - entity: cover.wohnzimmer_rollo_tur
+        title: Rolladen
+        show_header_toggle: false
+      - type: entities
+        entities:
           - entity: sensor.bioabfall
           - entity: sensor.altpapier
           - entity: sensor.gelber_sack
@@ -267,11 +271,11 @@ views:
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
-            entity: media_player.schlafzimmer_speaker
+            entity: media_player.fabians_lautsprecher
           - type: custom:mini-media-player
-            entity: media_player.kuche_speaker
+            entity: media_player.kuche_lautsprecher
           - type: custom:mini-media-player
-            entity: media_player.gastezimmer_mini
+            entity: media_player.samuels_lautsprecher
   - icon: mdi:television
     path: wohnzimmer
     title: Wohnzimmer
@@ -314,9 +318,6 @@ views:
             name: Heizleistung
         step_layout: column
         step_size: "1"
-      - artwork: cover
-        entity: media_player.wohnzimmer_tv
-        type: custom:mini-media-player
       - type: grid
         square: false
         columns: 1
@@ -327,6 +328,7 @@ views:
               - entity: input_select.vacuum_cleaning_location
               - entity: input_button.james_room_cleaning
               - entity: select.valetudo_dreamez10pro_water_grade
+              - entity: select.valetudo_dreamez10pro_operation_mode
               - entity: counter.vacuum_water_level
               - entity: counter.vacuum_runs
               - entity: sensor.valetudo_dreamez10pro_error_description
@@ -340,8 +342,15 @@ views:
           - type: custom:valetudo-map-card
             vacuum: valetudo_dreamez10pro
       - artwork: cover
+        entity: media_player.wohnzimmer_tv
+        type: custom:mini-media-player
+      - artwork: cover
         entity: media_player.wohnzimmer_uhr
         type: custom:mini-media-player
+      - type: entities
+        entities:
+          - cover.wohnzimmer_rollo_fenster
+          - cover.wohnzimmer_rollo_tur
       - buttons:
           top:
             call: androidtv.adb_command
@@ -422,9 +431,10 @@ views:
         name: Wohnzimmer TV
         remote_template: ccwgtv
         type: custom:generic-remote-control-card
-  - icon: mdi:bed-empty
-    path: schlafzimmer
-    title: Schlafzimmer
+  - theme: Backend-selected
+    icon: mdi:desktop-classic
+    path: fabian
+    title: fabian_s_zimmer
     badges: []
     cards:
       - type: area
@@ -447,6 +457,7 @@ views:
             type: custom:slider-entity-row
           - entity: light.regal
           - entity: switch.bett_usb_ports
+          - entity: switch.bett_steckdose
         show_header_toggle: true
         title: Licht & Strom
         type: entities
@@ -458,7 +469,7 @@ views:
             secondary_info: last-changed
           - entity: device_tracker.nsta0552
             secondary_info: last-changed
-          - entity: sensor.schlafzimmer_power
+          - entity: sensor.fabian_schreibtisch_power
           - entity: sensor.fabian_pc_cpu_load
           - entity: sensor.fabian_pc_gpu_load
           - entity: sensor.fabian_pc_gpu_temperature
@@ -466,24 +477,29 @@ views:
         show_header_toggle: true
         title: Fabian PC
         type: entities
-      - entity: climate.schlafzimmer
+      - entity: climate.fabian_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
             unit: "%"
-          - entity: sensor.schlafzimmer_heating
+          - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
         step_size: "1"
       - artwork: cover
-        entity: media_player.schlafzimmer_speaker
+        entity: media_player.fabians_lautsprecher
         type: custom:mini-media-player
       - artwork: cover
         entity: media_player.ytube_music_player
         type: custom:mini-media-player
-  - icon: mdi:desktop-tower
-    path: gastezimmer
-    title: Gästezimmer
+      - features:
+          - type: cover-open-close
+        type: tile
+        entity: cover.fabians_zimmer_rollo
+  - theme: Backend-selected
+    icon: mdi:table-furniture
+    path: samuel
+    title: Samuel's Zimmer
     badges: []
     cards:
       - type: area
@@ -491,43 +507,39 @@ views:
       - entities:
           - entity: switch.adaptive_lighting_guest_room
             name: Adaptives Licht
-          - entity: light.lampe_gastezimmer
+          - entity: light.lampe_samuel_s_zimmer
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.leds_gastezimmer
+          - entity: light.leds_samuel_s_zimmer
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: number.leds_gastezimmer_effect_speed
+          - entity: number.leds_samuel_s_zimmer_effect_speed
         show_header_toggle: true
         title: Licht
         type: entities
       - entities:
-          - entity: input_boolean.nessie_pc_strom
-          - entity: button.rgb_pc_shutdown
+          - entity: input_boolean.samuel_pc_strom
           - entity: device_tracker.rgb_pc
           - entity: device_tracker.vku_lb_20
             secondary_info: last-changed
-          - entity: sensor.steckerleiste_gastezimmer_energy_power
-          - entity: sensor.steckerleiste_gastezimmer_energy_today
-          - entity: sensor.rgb_pc_cpu_load
-          - entity: sensor.rgb_pc_gpu_load
-          - entity: sensor.rgb_pc_gpu_temperature
+          - entity: sensor.steckerleiste_samuel_s_zimmer_energy_power
+          - entity: sensor.steckerleiste_samuel_s_zimmer_energy_today
         show_header_toggle: false
         title: Nessie PC
         type: entities
-      - entity: climate.gastezimmer
+      - entity: climate.samuel_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
             unit: "%"
-          - entity: sensor.gastezimmer_heating
+          - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
         step_size: "1"
       - artwork: cover
-        entity: media_player.gastezimmer_mini
+        entity: media_player.samuels_lautsprecher
         type: custom:mini-media-player
   - icon: mdi:washing-machine
     path: keller
@@ -557,7 +569,6 @@ views:
       - entities:
           - entity: switch.waschmaschine
           - entity: sensor.keller_steckdose_energy_power
-          - entity: sensor.washing_machine_state
           - entity: sensor.washing_machine_mode
           - entity: sensor.washing_machine_finish_time
           - entity: sensor.washing_machine_finish_duration
@@ -688,13 +699,13 @@ views:
         entities:
           - entity: sensor.kuche_speaker_timers
           - entity: sensor.wohnzimmer_uhr_timers
-          - entity: sensor.schlafzimmer_speaker_timers
-          - entity: sensor.gastezimmer_mini_timers
+          - entity: sensor.fabian_s_zimmer_speaker_timers
+          - entity: sensor.samuel_s_zimmer_mini_timers
         title: Google Nest Timers
       - type: entities
         entities:
-          - entity: switch.gastezimmer_mini_do_not_disturb
-          - entity: switch.schlafzimmer_speaker_do_not_disturb
+          - entity: switch.samuel_s_zimmer_mini_do_not_disturb
+          - entity: switch.fabian_s_zimmer_speaker_do_not_disturb
           - entity: switch.wohnzimmer_uhr_do_not_disturb
           - entity: switch.kuche_speaker_do_not_disturb
         title: Google Nest DND
@@ -703,13 +714,13 @@ views:
         entities:
           - entity: automation.pill_reminder
           - entity: input_button.find_fabian_s_phone_by_sound
-          - entity: input_button.find_nessie_s_phone_by_sound
           - entity: input_button.find_fabian_s_ipad_by_sound
           - entity: sensor.juz_outlook
           - entity: sensor.5freunde_outlook
           - entity: input_number.lautstarke_ansagen
-  - path: router
-    title: Frtizbox
+  - theme: Backend-selected
+    path: netzwerk
+    title: Netzwerk
     icon: mdi:router-wireless
     visible:
       - user: b3f36b2d84254a458f3e592a2eb7b130
@@ -779,7 +790,6 @@ views:
           - entity: person.flo
           - entity: person.maxi
           - entity: person.samuel
-          - entity: person.isi
           - entity: person.papa
         title: Freunde & Bekannte
       - type: map
@@ -792,8 +802,11 @@ views:
           - entity: person.samuel
         hours_to_show: 24
         dark_mode: true
-  - title: RaspberryPi
-    path: raspberrypi
+        default_zoom: 11
+        title: Location History (24h)
+  - theme: Backend-selected
+    title: Server
+    path: server
     icon: mdi:raspberry-pi
     badges: []
     cards:
@@ -831,8 +844,8 @@ views:
       - type: entities
         entities:
           - binary_sensor.bad_open_window
-          - binary_sensor.gastezimmer_open_window
-          - binary_sensor.schlafzimmer_open_window
+          - binary_sensor.samuel_s_zimmer_open_window
+          - binary_sensor.fabian_s_zimmer_open_window
   - panel: false
     path: extension
     title: Browser Extension View
@@ -860,34 +873,5 @@ views:
             toggle: true
             type: custom:slider-entity-row
         show_header_toggle: true
-        title: Schlafzimmer
+        title: fabian_s_zimmer
         type: entities
-  - title: Browser Extension View Nessie
-    path: extensionn
-    icon: mdi:google-chrome
-    visible: []
-    badges: []
-    cards:
-      - entities:
-          - entity: light.lichtschalter
-          - entity: input_boolean.nessie_pc_strom
-          - entity: light.lampe_gastezimmer
-            group: true
-            toggle: true
-            type: custom:slider-entity-row
-          - entity: light.leds_gastezimmer
-            group: true
-            toggle: true
-            type: custom:slider-entity-row
-        show_header_toggle: true
-        title: Schlafzimmer
-        type: entities
-      - entity: climate.gastezimmer
-        type: custom:simple-thermostat
-        sensors:
-          - attribute: current_humidity
-            name: Luftfeuchtigkeit
-            unit: "%"
-          - entity: sensor.gastezimmer_heating
-            name: Heizleistung
-        step_size: "1"

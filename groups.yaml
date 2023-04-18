@@ -19,17 +19,17 @@ Wohnzimmer:
     - light.deckenlampe
     - vacuum.valetudo_dreamez10pro
 
-Schlafzimmer:
-  name: Schlafzimmer
+FabiansZimmer:
+  name: fabian_s_zimmer
   icon: mdi:bed
   entities:
-    - media_player.schlafzimmer_speaker
+    - media_player.fabian_s_zimmer_speaker
     - light.leds_tisch
     - light.bett_gluhbirne
     - light.yeelight_bslamp2_0x0000000013fea10f
     - light.prismatik
     - light.regal
-    # - climate.schlafzimmer
+    # - climate.fabian_s_zimmer
     - switch.steckdose_1
     - switch.steckdose_2
     - switch.steckdose_3
@@ -38,8 +38,8 @@ Schlafzimmer:
     - switch.fabian_strom
     - light.lichtschalter
 
-Gästezimmer:
-  name: Gästezimmer
+SamuelsZimmer:
+  name: samuel_s_zimmer
   icon: mdi:laptop
   entities:
     - media_player.gastezimmer_mini
@@ -90,8 +90,8 @@ ignored_entities:
     - weather.dwd_weather_ebersberg_halbing
     - sensor.kuche_mini_alarms
     - sensor.kuche_mini_timers
-    - sensor.schlafzimmer_speaker_alarms
-    - sensor.schlafzimmer_speaker_timers
+    - sensor.fabian_s_zimmer_speaker_alarms
+    - sensor.fabian_s_zimmer_speaker_timers
     - sensor.washing_machine_mode
     - sensor.gastezimmer_mini_alarms
     - sensor.gastezimmer_mini_timers
@@ -136,11 +136,11 @@ ignored_entities:
     - light.xiaomi_89fb_7604_led
     - number.gastezimmer_mini_alarm_volume
     - number.kuche_speaker_alarm_volume
-    - number.schlafzimmer_speaker_alarm_volume
+    - number.fabian_s_zimmer_speaker_alarm_volume
     - number.wohnzimmer_uhr_alarm_volume
-    - sensor.schlafzimmer_speaker_device
+    - sensor.fabian_s_zimmer_speaker_device
     - sensor.wohnzimmer_uhr_device
-    - switch.schlafzimmer_speaker_do_not_disturb
+    - switch.fabian_s_zimmer_speaker_do_not_disturb
     - switch.wohnzimmer_uhr_do_not_disturb
     - sensor.gastezimmer_mini_device
     - sensor.kuche_speaker_device
@@ -158,8 +158,6 @@ ignored_entities:
     - person.flo
     - person.isi
     - person.maxi
-    - person.samuel
-    - person.nathalie
     - input_button.find_fabian_s_ipad_by_sound
     - input_button.find_fabian_s_phone_by_sound
     - input_button.find_nessie_s_phone_by_sound
@@ -220,3 +218,41 @@ ignored_entities:
     - sensor.iphone11p_battery_state
     - sensor.lutuli_int_consol_de_battery_state_2
     - sensor.thes_macbook_pro_battery_state_2
+    - media_player.fabian_s_zimmer_tv
+    - media_player.fabian_s_zimmer_tv_cast
+    - sensor.fabians_lautsprecher_alarms
+    - sensor.samuels_mini_alarms
+    - sensor.samuels_mini_timers
+    - sensor.fabians_lautsprecher_timers
+    - sensor.fabians_lautsprecher_alarms
+    - sensor.fabians_lautsprecher_timers
+    - sensor.samuels_lautsprecher_alarms
+    - sensor.samuels_lautsprecher_timers
+    - media_player.schlafzimmer_tv_2
+    - media_player.schlafzimmer_tv
+    - media_player.schlafzimmer_tv_cast
+    - sensor.fabians_lautsprecher_device
+    - sensor.samuels_mini_device
+    - switch.fabians_lautsprecher_do_not_disturb
+    - switch.samuels_mini_do_not_disturb
+    - number.fabians_lautsprecher_alarm_volume
+    - number.samuels_mini_alarm_volume
+    - sensor.wohnzimmer_tv_device
+    - sensor.schlafzimmer_tv_device
+    - sensor.kuche_lautsprecher_alarms
+    - sensor.kuche_lautsprecher_timers
+    - sensor.fabian_iphone_activity
+    - sensor.fabian_iphone_floors_ascended
+    - sensor.fabian_iphone_distance
+    - sensor.fabian_iphone_floors_descended
+    - sensor.fabian_iphone_connection_type
+    - sensor.fabian_iphone_average_active_pace
+    - sensor.fabian_iphone_battery_level
+    - sensor.fabian_iphone_steps
+    - binary_sensor.fabian_iphone_focus
+    - sensor.fabian_iphone_storage
+    - sensor.fabian_iphone_bssid
+    - sensor.fabian_iphone_sim_2
+    - sensor.fabian_iphone_ssid
+    - sensor.fabian_iphone_last_update_trigger
+    - sensor.fabian_iphone_sim_1

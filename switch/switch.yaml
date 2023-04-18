@@ -7,14 +7,6 @@
 #      Content-Type: 'application/json; charset=utf-8'
 #      api-key: !secret system_bridge_fabian
 #    payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
-#  - platform: rest
-#    name: Nessie PC Shutdown
-#    method: POST
-#    resource: http://192.168.178.15:9170/command
-#    headers:
-#      Content-Type: 'application/json; charset=utf-8'
-#      api-key: !secret system_bridge_nessie
-#    payload: '{ "command": "shutdown /s /t 0", "arguments": [] }'
 - platform: template
   switches:
     xiaomi_miio_cooker:
