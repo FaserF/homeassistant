@@ -262,6 +262,7 @@ template:
                 |rejectattr('entity_id', 'search', '_do_not_disturb')
                 |rejectattr('entity_id', 'search', '_alarm_volume')
                 |rejectattr('entity_id', 'search', 'sensor.fabian_iphone_')
+                |rejectattr('entity_id', 'search', 'sensor.m2101k6g_')
                 |rejectattr('last_changed','ge',ignore_ts)
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
