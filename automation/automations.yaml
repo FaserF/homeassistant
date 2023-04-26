@@ -228,6 +228,21 @@
                     entity_id: all
     - choose:
         - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+            - condition: state
+              entity_id: person.fabian
+              state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Welcome back.Samuel ist nicht daheim."
+
+    - choose:
+        - conditions:
             - condition: numeric_state
               entity_id: counter.vacuum_water_level
               below: 1
@@ -1280,8 +1295,47 @@
                 entity_id:
                   - climate.wohnzimmer
                   - climate.fabian_s_zimmer
+                  - climate.samuel_s_zimmer
                   - climate.bad
                 hvac_mode: "auto"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+            - condition: state
+              entity_id: person.samuel
+              state: "home"
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.fabian_s_zimmer
+                temperature: 17
+                hvac_mode: heat
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.gast_modus
+              state: "off"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+            - condition: state
+              entity_id: person.fabian
+              state: "home"
+          sequence:
+            - service: climate.set_temperature
+              data:
+                entity_id: climate.samuel_s_zimmer
+                temperature: 17
+                hvac_mode: heat
     - choose:
         - conditions:
             - condition: state
@@ -1295,40 +1349,6 @@
                   - climate.fabian_s_zimmer
                   - climate.samuel_s_zimmer
                   - climate.bad
-                hvac_mode: "off"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.gast_modus
-              state: "off"
-            - condition: state
-              entity_id: "input_boolean.thermostate_aus"
-              state: "off"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.samuel
-                  state: "home"
-                - condition: state
-                  entity_id: input_boolean.abwesend_modus
-                  state: "on"
-          sequence:
-            - service: climate.set_hvac_mode
-              data:
-                entity_id: climate.samuel_s_zimmer
-                hvac_mode: "auto"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: input_boolean.gast_modus
-              state: "off"
-            - condition: state
-              entity_id: "input_boolean.thermostate_aus"
-              state: "on"
-          sequence:
-            - service: climate.set_hvac_mode
-              data:
-                entity_id: climate.samuel_s_zimmer
                 hvac_mode: "off"
 
 - id: set_climate_on_weekdays
@@ -1857,7 +1877,7 @@
             - service: climate.set_temperature
               data:
                 entity_id: climate.samuel_s_zimmer
-                temperature: 19
+                temperature: 20
                 hvac_mode: heat
     - choose:
         - conditions:
@@ -5560,6 +5580,23 @@
                       name: "default"
                       critical: 1
                       volume: 0.4
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 5
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_samuel
+                title: "Neuer Foodsharing Korb in Zorneding"
+                message: >
+                  {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
 
 - id: foodsharing_basket_available_muc_east
   alias: "Foodsharing Basket Available MUC East"
