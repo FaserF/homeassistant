@@ -68,15 +68,15 @@
             - service: notify.telegram_fabian
               data:
                 message: "Keiner ist mehr zu Hause. Samuel-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-                #data:
-                #  inline_keyboard:
-                #    - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
-            #- service: notify.telegram_samuel
-            #  data:
-            #    message: "Keiner ist mehr zu Hause. samuel-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-            #    data:
-            #      inline_keyboard:
-            #        - "Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc"
+                # data:
+                #   inline_keyboard:
+                #     - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
+            # - service: notify.telegram_samuel
+            #   data:
+            #     message: "Keiner ist mehr zu Hause. samuel-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+            #     data:
+            #       inline_keyboard:
+            #         - "Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc"
     - choose:
         - conditions:
             - condition: state
@@ -382,36 +382,36 @@
                           Die Reinigung wurde daher unterbrochen.
                         target: !secret telegram_chat_samuel
 
-    #- choose:
-    #    - conditions:
-    #        - condition: not
-    #          conditions:
-    #            - condition: state
-    #              entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-    #              state: "max"
-    #      sequence:
-    #        - service: select.select_option
-    #          data:
-    #            option: max
-    #          target:
-    #            entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-    #- delay: "00:00:40"
-    #- choose:
-    #    - conditions:
-    #        - condition: not
-    #          conditions:
-    #            - condition: state
-    #              entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-    #              state: "max"
-    #      sequence:
-    #        - service: select.select_option
-    #          data:
-    #            option: max
-    #          target:
-    #            entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-    # - service: switch.turn_off
-    # data:
-    # entity_id: switch.fritzbox_3490_portforward_ssh
+    # - choose:
+    #     - conditions:
+    #         - condition: not
+    #           conditions:
+    #             - condition: state
+    #               entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+    #               state: "max"
+    #       sequence:
+    #         - service: select.select_option
+    #           data:
+    #             option: max
+    #           target:
+    #             entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+    # - delay: "00:00:40"
+    # - choose:
+    #     - conditions:
+    #         - condition: not
+    #           conditions:
+    #             - condition: state
+    #               entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+    #               state: "max"
+    #       sequence:
+    #         - service: select.select_option
+    #           data:
+    #             option: max
+    #           target:
+    #             entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+    #  - service: switch.turn_off
+    #  data:
+    #  entity_id: switch.fritzbox_3490_portforward_ssh
 
 - id: open_door_for_fabian
   alias: "Open the door for Fabian if coming home"
@@ -461,10 +461,10 @@
     - service: switch.turn_on
       data:
         entity_id: switch.schloss
-    #- service: telegram_bot.send_message
-    #  data:
-    #    target: !secret telegram_chat_fabian
-    #    message: "Gartentor wurde automatisch geöffnet, da du gleich daheim bist."
+    # - service: telegram_bot.send_message
+    #   data:
+    #     target: !secret telegram_chat_fabian
+    #     message: "Gartentor wurde automatisch geöffnet, da du gleich daheim bist."
 
 - id: open_door_for_samuel
   alias: "Open the door for samuel if coming home"
@@ -541,12 +541,12 @@
         - condition: state
           entity_id: person.samuel
           state: home
-    # - condition: not
-    #   conditions:
-    #     - condition: state
-    #       entity_id: proximity.home_ka
-    #       attribute: dir_of_travel
-    #       state: 'away_from'
+    #  - condition: not
+    #    conditions:
+    #      - condition: state
+    #        entity_id: proximity.home_ka
+    #        attribute: dir_of_travel
+    #        state: 'away_from'
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
@@ -643,12 +643,12 @@
         - condition: state
           entity_id: person.samuel
           state: home
-    # - condition: not
-    #   conditions:
-    #     - condition: state
-    #       entity_id: proximity.home_ka
-    #       attribute: dir_of_travel
-    #       state: 'away_from'
+    #  - condition: not
+    #    conditions:
+    #      - condition: state
+    #        entity_id: proximity.home_ka
+    #        attribute: dir_of_travel
+    #        state: 'away_from'
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
@@ -746,12 +746,12 @@
         - condition: state
           entity_id: person.samuel
           state: home
-    # - condition: not
-    #   conditions:
-    #     - condition: state
-    #       entity_id: proximity.home_ka
-    #       attribute: dir_of_travel
-    #       state: 'away_from'
+    #  - condition: not
+    #    conditions:
+    #      - condition: state
+    #        entity_id: proximity.home_ka
+    #        attribute: dir_of_travel
+    #        state: 'away_from'
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
@@ -766,10 +766,10 @@
     - service: switch.turn_on
       data:
         entity_id: switch.schloss
-    # - service: telegram_bot.send_message
-    #   data:
-    #     target: !secret telegram_chat_flo
-    #     message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
+    #  - service: telegram_bot.send_message
+    #    data:
+    #      target: !secret telegram_chat_flo
+    #      message: 'Gartentor wurde automatisch geöffnet, da du gleich bei Fabi bist und die Google Homes klingeln.'
     - choose:
         - conditions:
             - condition: and
@@ -825,47 +825,47 @@
               data:
                 message: "Flo ist gleich da."
 
-# - id: notify_if_someone_joined_lan_play_server
-#   alias: Notify if someone joined lan play server
-#   trigger:
-#     - platform: numeric_state
-#       entity_id: sensor.switch_lan_play_online
-#       above: 0
-#   condition:
-#     - condition: template
-#       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_if_someone_joined_lan_play_server.attributes.last_triggered) | int > 300 }}"
-#   action:
-#     - service: telegram_bot.send_message
-#       data_template:
-#         target: !secret telegram_chat_fabian
-#         message: 'Jemand ist dem LAN-Play Server beigetreten. Spieleranzahl: {{ states.sensor.switch_lan_play_online.state }}'
-
-#  - id: turn_on_ventilator_if_coming_home
-#    alias: 'Turn on ventilator if coming home'
-#    initial_state: true
+#  - id: notify_if_someone_joined_lan_play_server
+#    alias: Notify if someone joined lan play server
 #    trigger:
-#      - platform: state
-#        entity_id: person.fabian
-#        from: 'not_home'
-#        to: 'home'
-#      - platform: state
-#        entity_id: person.samuel
-#        from: 'not_home'
-#        to: 'home'
+#      - platform: numeric_state
+#        entity_id: sensor.switch_lan_play_online
+#        above: 0
 #    condition:
-#      condition: and
-#      conditions:
-#        - condition: numeric_state
-#          entity_id: 'weather.dwd_weather_ebersberg_1h'
-#          attribute: temperature
-#          above: 22
-#        - condition: time
-#          after: '12:00:00'
-#          before: '21:00:00'
+#      - condition: template
+#        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_if_someone_joined_lan_play_server.attributes.last_triggered) | int > 300 }}"
 #    action:
-#      - service: switch.turn_on
-#        data:
-#          entity_id: switch.ventilator
+#      - service: telegram_bot.send_message
+#        data_template:
+#          target: !secret telegram_chat_fabian
+#          message: 'Jemand ist dem LAN-Play Server beigetreten. Spieleranzahl: {{ states.sensor.switch_lan_play_online.state }}'
+
+#   - id: turn_on_ventilator_if_coming_home
+#     alias: 'Turn on ventilator if coming home'
+#     initial_state: true
+#     trigger:
+#       - platform: state
+#         entity_id: person.fabian
+#         from: 'not_home'
+#         to: 'home'
+#       - platform: state
+#         entity_id: person.samuel
+#         from: 'not_home'
+#         to: 'home'
+#     condition:
+#       condition: and
+#       conditions:
+#         - condition: numeric_state
+#           entity_id: 'weather.dwd_weather_ebersberg_1h'
+#           attribute: temperature
+#           above: 22
+#         - condition: time
+#           after: '12:00:00'
+#           before: '21:00:00'
+#     action:
+#       - service: switch.turn_on
+#         data:
+#           entity_id: switch.ventilator
 
 - id: turn_off_light_at_night_notify
   alias: "Turn off light at night - notify"
@@ -998,9 +998,9 @@
             - service: light.turn_off
               data:
                 area_id:
-                  - 7c05afe47efd44f5a0a064769ad6e105 #Wohnzimmer
-                  - 33e9a108bf1948e5848f156e0851d50c #Fabians Zimmer
-                  - b67ac5462e454381aa87f812161d8578 #Samuels Zimmer
+                  - 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
+                  - 33e9a108bf1948e5848f156e0851d50c # Fabians Zimmer
+                  - b67ac5462e454381aa87f812161d8578 # Samuels Zimmer
             - choose:
                 - conditions:
                     - condition: or
@@ -1424,56 +1424,56 @@
               target:
                 entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
-#- id: set_wifi_settings_at_morning
-#  alias: "Set wifi settings at morning"
-#  initial_state: true
-#  trigger:
-#    - platform: time
-#      at: "00:06:15"
-#  condition:
-#    - condition: time
-#      weekday:
-#        - mon
-#        - tue
-#        - wed
-#        - thu
-#        - fri
-#  action:
-#    - choose:
-#        - conditions:
-#            - condition: not
-#              conditions:
-#                - condition: state
-#                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-#                  state: "max"
-#          sequence:
-#            - service: select.select_option
-#              data:
-#                option: max
-#              target:
-#                entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-#    - delay: "00:01:00"
-#    - choose:
-#        - conditions:
-#            - condition: not
-#              conditions:
-#                - condition: state
-#                  entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-#                  state: "max"
-#          sequence:
-#            - service: select.select_option
-#              data:
-#                option: max
-#              target:
-#                entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+# - id: set_wifi_settings_at_morning
+#   alias: "Set wifi settings at morning"
+#   initial_state: true
+#   trigger:
+#     - platform: time
+#       at: "00:06:15"
+#   condition:
+#     - condition: time
+#       weekday:
+#         - mon
+#         - tue
+#         - wed
+#         - thu
+#         - fri
+#   action:
+#     - choose:
+#         - conditions:
+#             - condition: not
+#               conditions:
+#                 - condition: state
+#                   entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+#                   state: "max"
+#           sequence:
+#             - service: select.select_option
+#               data:
+#                 option: max
+#               target:
+#                 entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
+#     - delay: "00:01:00"
+#     - choose:
+#         - conditions:
+#             - condition: not
+#               conditions:
+#                 - condition: state
+#                   entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+#                   state: "max"
+#           sequence:
+#             - service: select.select_option
+#               data:
+#                 option: max
+#               target:
+#                 entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
 
 - id: remind_for_unavailable_device
   alias: "Remind for unavailable device"
   initial_state: true
   trigger:
-    #- platform: numeric_state
-    #  entity_id: sensor.unavailable_entities
-    #  above: 0
+    # - platform: numeric_state
+    #   entity_id: sensor.unavailable_entities
+    #   above: 0
     - platform: state
       entity_id: sensor.unavailable_entities
   condition:
@@ -1600,10 +1600,10 @@
     - service: switch.turn_on
       data:
         entity_id: switch.adguard_filtering
-    #- service: telegram_bot.send_message
-    #  data_template:
-    #    target: !secret telegram_chat_fabian
-    #    message: "Adguard wurde wieder eingeschaltet."
+    # - service: telegram_bot.send_message
+    #   data_template:
+    #     target: !secret telegram_chat_fabian
+    #     message: "Adguard wurde wieder eingeschaltet."
 
 - id: deactivate_silent_mode_after_12_hours
   alias: "Deactivate silent mode after 12 hours"
@@ -1722,43 +1722,43 @@
             - service: light.turn_on
               data:
                 entity_id: light.prismatik
-    #- choose:
-    #    - conditions:
-    #        - condition: numeric_state
-    #          entity_id: "weather.dwd_weather_ebersberg_1h"
-    #          attribute: temperature
-    #          below: 16
-    #        - condition: state
-    #          entity_id: "input_boolean.thermostate_aus"
-    #          state: "off"
-    #        - condition: time
-    #          after: "08:45:00"
-    #        - condition: not
-    #          conditions:
-    #            - condition: state
-    #              entity_id: climate.fabian_s_zimmer
-    #              state: "off"
-    #        - condition: or
-    #          conditions:
-    #            - condition: state
-    #              entity_id: device_tracker.wohnzimmer_tv
-    #              state: "not_home"
-    #            - condition: state
-    #              entity_id: switch.fernseher
-    #              state: "off"
-    #      sequence:
-    #        - choose:
-    #            - conditions:
-    #                - condition: state
-    #                  entity_id: binary_sensor.fabian_s_zimmer_open_window
-    #                  state: "on"
-    #              sequence:
-    #                - delay: "00:25:00"
-    #- service: climate.set_temperature
-    #  data:
-    #    entity_id: climate.fabian_s_zimmer
-    #    temperature: 19
-    #    hvac_mode: heat
+    # - choose:
+    #     - conditions:
+    #         - condition: numeric_state
+    #           entity_id: "weather.dwd_weather_ebersberg_1h"
+    #           attribute: temperature
+    #           below: 16
+    #         - condition: state
+    #           entity_id: "input_boolean.thermostate_aus"
+    #           state: "off"
+    #         - condition: time
+    #           after: "08:45:00"
+    #         - condition: not
+    #           conditions:
+    #             - condition: state
+    #               entity_id: climate.fabian_s_zimmer
+    #               state: "off"
+    #         - condition: or
+    #           conditions:
+    #             - condition: state
+    #               entity_id: device_tracker.wohnzimmer_tv
+    #               state: "not_home"
+    #             - condition: state
+    #               entity_id: switch.fernseher
+    #               state: "off"
+    #       sequence:
+    #         - choose:
+    #             - conditions:
+    #                 - condition: state
+    #                   entity_id: binary_sensor.fabian_s_zimmer_open_window
+    #                   state: "on"
+    #               sequence:
+    #                 - delay: "00:25:00"
+    # - service: climate.set_temperature
+    #   data:
+    #     entity_id: climate.fabian_s_zimmer
+    #     temperature: 19
+    #     hvac_mode: heat
     - choose:
         - conditions:
             - condition: time
@@ -1937,7 +1937,7 @@
               data:
                 transition: 2
                 brightness: 255
-                # color_mode: white
+                #  color_mode: white
             - service: light.turn_on
               target:
                 entity_id: light.leds_samuel_s_zimmer
@@ -3585,14 +3585,14 @@
       - condition: state
         entity_id: switch.bett_usb_ports
         state: "on"
-      # - condition: or
-      #   conditions:
-      #     - condition: state
-      #       entity_id: sensor.fabian_ipadpro_battery_state
-      #       state: 'discharging'
-      #     - condition: numeric_state
-      #       entity_id: sensor.fabian_ipadpro_battery_state
-      #       above: 90
+      #  - condition: or
+      #    conditions:
+      #      - condition: state
+      #        entity_id: sensor.fabian_ipadpro_battery_state
+      #        state: 'discharging'
+      #      - condition: numeric_state
+      #        entity_id: sensor.fabian_ipadpro_battery_state
+      #        above: 90
       - condition: or
         conditions:
           - condition: state
@@ -3647,10 +3647,10 @@
       entity_id: device_tracker.fabian_iphone
       from: "not_home"
       to: "home"
-    #- platform: state
-    #  entity_id: device_tracker.android
-    #  from: "not_home"
-    #  to: "home"
+    # - platform: state
+    #   entity_id: device_tracker.android
+    #   from: "not_home"
+    #   to: "home"
   condition:
     condition: and
     conditions:
@@ -3663,36 +3663,36 @@
         state: "on"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_and_open_cover_in_morning.attributes.last_triggered) | int > 1800 }}"
-      #- condition: or
-      #  conditions:
-      #    - condition: and
-      #      conditions:
-      #        - condition: state
-      #          entity_id: device_tracker.fabian_iphone
-      #          state: home
-      #        - condition: state
-      #          entity_id: device_tracker.android
-      #          state: home
-      #    - condition: and
-      #      conditions:
-      #        - condition: state
-      #          entity_id: device_tracker.android
-      #          state: home
-      #        - condition: not
-      #          conditions:
-      #            - condition: state
-      #              entity_id: person.fabian
-      #              state: home
-      #    - condition: and
-      #      conditions:
-      #        - condition: state
-      #          entity_id: device_tracker.fabian_iphone
-      #          state: home
-      #        - condition: not
-      #          conditions:
-      #            - condition: state
-      #              entity_id: person.samuel
-      #              state: home
+      # - condition: or
+      #   conditions:
+      #     - condition: and
+      #       conditions:
+      #         - condition: state
+      #           entity_id: device_tracker.fabian_iphone
+      #           state: home
+      #         - condition: state
+      #           entity_id: device_tracker.android
+      #           state: home
+      #     - condition: and
+      #       conditions:
+      #         - condition: state
+      #           entity_id: device_tracker.android
+      #           state: home
+      #         - condition: not
+      #           conditions:
+      #             - condition: state
+      #               entity_id: person.fabian
+      #               state: home
+      #     - condition: and
+      #       conditions:
+      #         - condition: state
+      #           entity_id: device_tracker.fabian_iphone
+      #           state: home
+      #         - condition: not
+      #           conditions:
+      #             - condition: state
+      #               entity_id: person.samuel
+      #               state: home
   action:
     - delay: "00:04:30"
     - choose:
@@ -3745,54 +3745,54 @@
             - service: cover.open_cover
               target:
                 entity_id: cover.fabians_zimmer_rollo
-    #- choose:
-    #    - conditions:
-    #        - condition: state
-    #          entity_id: input_boolean.leiser_modus
-    #          state: "off"
-    #        - condition: state
-    #          entity_id: input_boolean.gast_modus
-    #          state: "off"
-    #        - condition: or
-    #          conditions:
-    #            - condition: numeric_state
-    #              entity_id: climate.samuel_s_zimmer
-    #              attribute: current_humidity
-    #              above: 60
-    #            - condition: numeric_state
-    #              entity_id: climate.wohnzimmer
-    #              attribute: current_humidity
-    #              above: 60
-    #            - condition: numeric_state
-    #              entity_id: climate.fabian_s_zimmer
-    #              attribute: current_humidity
-    #              above: 60
-    #            - condition: numeric_state
-    #              entity_id: climate.bad
-    #              attribute: current_humidity
-    #              above: 60
-    #      sequence:
-    #        - service: automation.trigger
-    #          entity_id: automation.notify_for_high_humidity
-    # - service: light.turn_on
-    #   data_template:
-    #     entity_id: light.bett_gluhbirne
-    #     brightness: 100
-    #     rgb_color: >
-    #       {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
-    #       [255,255,255]
-    #       {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
-    #       [0,0,255]
-    #       {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
-    #       [0,255,0]
-    #       {% else %}
-    #       [0,0,0]
-    #       {% endif %}
-    # - delay: '00:05:00'
-    # - service: light.turn_off
-    #   data:
-    #     entity_id:
-    #       - light.yeelight_bslamp2_0x13fea10f
+    # - choose:
+    #     - conditions:
+    #         - condition: state
+    #           entity_id: input_boolean.leiser_modus
+    #           state: "off"
+    #         - condition: state
+    #           entity_id: input_boolean.gast_modus
+    #           state: "off"
+    #         - condition: or
+    #           conditions:
+    #             - condition: numeric_state
+    #               entity_id: climate.samuel_s_zimmer
+    #               attribute: current_humidity
+    #               above: 60
+    #             - condition: numeric_state
+    #               entity_id: climate.wohnzimmer
+    #               attribute: current_humidity
+    #               above: 60
+    #             - condition: numeric_state
+    #               entity_id: climate.fabian_s_zimmer
+    #               attribute: current_humidity
+    #               above: 60
+    #             - condition: numeric_state
+    #               entity_id: climate.bad
+    #               attribute: current_humidity
+    #               above: 60
+    #       sequence:
+    #         - service: automation.trigger
+    #           entity_id: automation.notify_for_high_humidity
+    #  - service: light.turn_on
+    #    data_template:
+    #      entity_id: light.bett_gluhbirne
+    #      brightness: 100
+    #      rgb_color: >
+    #        {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
+    #        [255,255,255]
+    #        {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
+    #        [0,0,255]
+    #        {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
+    #        [0,255,0]
+    #        {% else %}
+    #        [0,0,0]
+    #        {% endif %}
+    #  - delay: '00:05:00'
+    #  - service: light.turn_off
+    #    data:
+    #      entity_id:
+    #        - light.yeelight_bslamp2_0x13fea10f
     - delay: "00:20:00"
     - service: switch.turn_on
       data:
@@ -4165,7 +4165,7 @@
     - service: light.turn_off
       data:
         area_id:
-          - 7c05afe47efd44f5a0a064769ad6e105 #Wohnzimmer
+          - 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
 
 - id: turn_off_prismatik_during_the_day
   alias: "Turn off Prismatik during the day"
@@ -4274,7 +4274,7 @@
     - service: light.turn_on
       data:
         area_id:
-          - b67ac5462e454381aa87f812161d8578 #Samuels Zimmer
+          - b67ac5462e454381aa87f812161d8578 # Samuels Zimmer
         transition: 2
 
 - id: turn_on_lights_in_sleeping_room_when_dark_outside
@@ -4369,9 +4369,9 @@
     - service: light.turn_off
       data:
         area_id:
-          - 7c05afe47efd44f5a0a064769ad6e105 #Wohnzimmer
-          - 33e9a108bf1948e5848f156e0851d50c #Fabians Zimmer
-          - b67ac5462e454381aa87f812161d8578 #Samuels Zimmer
+          - 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
+          - 33e9a108bf1948e5848f156e0851d50c # Fabians Zimmer
+          - b67ac5462e454381aa87f812161d8578 # Samuels Zimmer
 
 - id: turn_off_climates_on_warm_days
   alias: "Turn off Climates on warm days"
@@ -4390,9 +4390,9 @@
         value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
       - condition: template
         value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= 14 }}"
-      # - condition: state
-      #   entity_id: 'weather.dwd_weather_ebersberg_1h'
-      #   state: 'sunny'
+      #  - condition: state
+      #    entity_id: 'weather.dwd_weather_ebersberg_1h'
+      #    state: 'sunny'
       - condition: state
         entity_id: "input_boolean.thermostate_aus"
         state: "off"
@@ -4652,7 +4652,7 @@
                   entity_id: "switch.kuhlschrank"
                   state: "off"
                 - condition: template
-                  value_template: "{{ now().month <= 10 and now().month >= 4 }}" # Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+                  value_template: "{{ now().month <= 10 and now().month >= 4 }}" #  Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
                 - condition: numeric_state
                   entity_id: weather.dwd_weather_ebersberg_1h
                   attribute: temperature
@@ -4671,7 +4671,7 @@
               entity_id: "switch.kuhlschrank"
               state: "off"
             - condition: template
-              value_template: "{{ now().month <= 10 and now().month >= 4 }}" # Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
+              value_template: "{{ now().month <= 10 and now().month >= 4 }}" #  Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
             - condition: state
               entity_id: input_boolean.abwesend_modus
               state: "off"
@@ -4750,7 +4750,7 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_door_for_meetings.attributes.last_triggered) | int > 7200 }}"
       - condition: template
-        value_template: "{{ now().month <= 4 or now().month >= 10 }}" # Im Sommer ist der Keller warm genug, da muss nicht die Wärme vom Flur genutzt werden.
+        value_template: "{{ now().month <= 4 or now().month >= 10 }}" #  Im Sommer ist der Keller warm genug, da muss nicht die Wärme vom Flur genutzt werden.
       - condition: state
         entity_id: person.fabian
         state: "home"
@@ -4850,9 +4850,9 @@
     - service: frontend.set_theme
       data:
         name: transparentgray-LAB
-    # - service: button.press
-    # target:
-    # entity_id: button.synchronize_devices
+    #  - service: button.press
+    #  target:
+    #  entity_id: button.synchronize_devices
     - service: switch.turn_on
       data:
         entity_id:
@@ -4945,7 +4945,7 @@
     - service: switch.turn_off
       data:
         entity_id:
-          #- switch.lampe_samuel_s_zimmer
+          # - switch.lampe_samuel_s_zimmer
           - switch.samuel_s_zimmer_usb_ports
           - switch.bett_gluhbirne
           - switch.bett_steckdose
@@ -4959,10 +4959,10 @@
               entity_id: "input_boolean.thermostate_aus"
               state: "off"
           sequence:
-            #- service: climate.set_preset_mode
-            #  data:
-            #    entity_id: all
-            #    preset_mode: "away"
+            # - service: climate.set_preset_mode
+            #   data:
+            #     entity_id: all
+            #     preset_mode: "away"
             - service: climate.set_hvac_mode
               data:
                 entity_id: all
@@ -5009,8 +5009,8 @@
     - service: switch.turn_on
       data:
         entity_id:
-          #- switch.lampe_samuel_s_zimmer
-          #- switch.samuel_s_zimmer_usb_ports
+          # - switch.lampe_samuel_s_zimmer
+          # - switch.samuel_s_zimmer_usb_ports
           - switch.bett_gluhbirne
           - switch.bettlicht
     - choose:
@@ -5027,10 +5027,10 @@
               entity_id: "input_boolean.thermostate_aus"
               state: "off"
           sequence:
-            #- service: climate.set_preset_mode
-            #  data:
-            #    entity_id: all
-            #    preset_mode: "home"
+            # - service: climate.set_preset_mode
+            #   data:
+            #     entity_id: all
+            #     preset_mode: "home"
             - service: climate.set_hvac_mode
               data:
                 entity_id: climate.fabian_s_zimmer
@@ -5504,8 +5504,8 @@
   trigger:
     - platform: state
       entity_id: sensor.foodsharing_48_082236
-    # - platform: template
-    # value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
+    #  - platform: template
+    #  value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
   condition:
     condition: and
     conditions:
@@ -5541,8 +5541,8 @@
   trigger:
     - platform: state
       entity_id: sensor.foodsharing_48_082236
-    # - platform: template
-    # value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
+    #  - platform: template
+    #  value_template: {{ states.sensor.foodsharing_48_082236.attributes.baskets[-1]['id'] }}
   condition:
     condition: and
     conditions:
@@ -5666,21 +5666,21 @@
 
           ---
 
-          #Angebote
-    #- service: telegram_bot.send_message
-    #  data_template:
-    #    target: !secret telegram_chat_fabian
-    #    message: >
-    #      Neue Angebote diese Woche im Rewe Zorneding Prospekt:
-    #      {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
-    #      {%- for product in product_list_loop -%}
-    #        {% if 'Almighurt' in product.product or 'Ehrmann' in product.product or 'Oettinger' in product.product %}
+          # Angebote
+    # - service: telegram_bot.send_message
+    #   data_template:
+    #     target: !secret telegram_chat_fabian
+    #     message: >
+    #       Neue Angebote diese Woche im Rewe Zorneding Prospekt:
+    #       {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
+    #       {%- for product in product_list_loop -%}
+    #         {% if 'Almighurt' in product.product or 'Ehrmann' in product.product or 'Oettinger' in product.product %}
 
-    #      {{product.price.price }} € - {{product.product }}
+    #       {{product.price.price }} € - {{product.product }}
 
-    #      {{ product.picture_link }}
-    #        {%- endif -%}
-    #      {%- endfor -%}
+    #       {{ product.picture_link }}
+    #         {%- endif -%}
+    #       {%- endfor -%}
 
 - id: automatic_ha_updates
   alias: "Automatic HA Updates"
@@ -5907,10 +5907,10 @@
                     - service: update.install
                       data:
                         entity_id: update.generic_remote_control_card_update
-              # default:
-              # - service: update.install
-              # data:
-              # entity_id: all
+              #  default:
+              #  - service: update.install
+              #  data:
+              #  entity_id: all
             - delay: "00:02:00"
     - choose:
         - conditions:
@@ -6034,107 +6034,107 @@
               data:
                 entity_id: update.home_assistant_operating_system_update
 
-# - id: incoming_call_fabian
-#   alias: 'Incoming Call Fabian'
-#   initial_state: true
-#   trigger:
-#     - platform: state
-#       entity_id: automation.incoming_call_fabian
-#       to: 'on'
-#   condition:
-#     - condition: state
-#       entity_id: 'input_boolean.leiser_modus'
-#       state: 'off'
-#   action:
-#     - service: media_player.volume_set
-#       data:
-#         volume_level: >
-# {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-#         entity_id: media_player.wohnzimmer_uhr
-#     - service: tts.google_say
-#       entity_id:
-#       - media_player.wohnzimmer_uhr
-#       - media_player.fabians_lautsprecher
-#       data_template:
-#         message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
-#     - service: media_player.media_pause
-#       data:
-#         entity_id: media_player.wohnzimmer_tv
-#     - delay: '00:00:09'
-#     - service: media_player.volume_set
-#       data:
-#         volume_level: >
-# {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-#         entity_id: media_player.wohnzimmer_uhr
-#     - service: automation.turn_off
-#       data:
-#         entity_id: automation.incoming_call_fabian
-#     - service: media_player.turn_off
-#       data:
-#         entity_id: media_player.wohnzimmer_uhr
-#     - service: media_player.turn_off
-#       data:
-#         entity_id: media_player.fabians_lautsprecher
-
-# - id: incoming_call_samuel
-#   alias: 'Incoming Call samuel'
-#   initial_state: true
-#   trigger:
-#     - platform: state
-#       entity_id: automation.incoming_call_samuel
-#       to: 'on'
-#   condition:
-#     - condition: state
-#       entity_id: 'input_boolean.leiser_modus'
-#       state: 'off'
-#   action:
-#     - service: media_player.volume_set
-#       data:
-#         volume_level: 0.7
-#         entity_id: media_player.wohnzimmer_uhr
-#     - service: tts.google_say
-#       entity_id:
-#       - media_player.wohnzimmer_uhr
-#       - media_player.fabians_lautsprecher
-#       data:
-#         message: 'samuel wird soeben angerufen!'
-#     - delay: '00:00:10'
-#     - service: media_player.volume_set
-#       data:
-#         volume_level: 0.3
-#         entity_id: media_player.wohnzimmer_uhr
-#     - service: automation.turn_off
-#       data:
-#         entity_id: automation.incoming_call_samuel
-#     - service: media_player.turn_off
-#       data:
-#         entity_id: media_player.wohnzimmer_uhr
-#     - service: media_player.turn_off
-#       data:
-#         entity_id: media_player.fabians_lautsprecher
-
-# not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
-#  - id: coinbase_balance_high
-#    alias: 'Coinbase balance high'
+#  - id: incoming_call_fabian
+#    alias: 'Incoming Call Fabian'
 #    initial_state: true
 #    trigger:
-#      - platform: template
-#        value_template: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] |replace(“EUR”,"")|replace(“ ”,"")|float| int > 220 }}
-#      - platform: numeric_state
-#        entity_id: sensor.coinbase_btc_wallet
-#        attribute: "Balance in native currency"
-#        above: 220
+#      - platform: state
+#        entity_id: automation.incoming_call_fabian
+#        to: 'on'
 #    condition:
-#      condition: and
-#      conditions:
-# Maximal einmal am Tag schreiben
-#        - condition: template
-#          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.coinbase_balance_high.attributes.last_triggered) | int > 86400 }}"
+#      - condition: state
+#        entity_id: 'input_boolean.leiser_modus'
+#        state: 'off'
 #    action:
-#      - service: telegram_bot.send_message
+#      - service: media_player.volume_set
+#        data:
+#          volume_level: >
+#  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+#          entity_id: media_player.wohnzimmer_uhr
+#      - service: tts.google_say
+#        entity_id:
+#        - media_player.wohnzimmer_uhr
+#        - media_player.fabians_lautsprecher
 #        data_template:
-#          target: !secret telegram_chat_fabian
-#          message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
+#          message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
+#      - service: media_player.media_pause
+#        data:
+#          entity_id: media_player.wohnzimmer_tv
+#      - delay: '00:00:09'
+#      - service: media_player.volume_set
+#        data:
+#          volume_level: >
+#  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+#          entity_id: media_player.wohnzimmer_uhr
+#      - service: automation.turn_off
+#        data:
+#          entity_id: automation.incoming_call_fabian
+#      - service: media_player.turn_off
+#        data:
+#          entity_id: media_player.wohnzimmer_uhr
+#      - service: media_player.turn_off
+#        data:
+#          entity_id: media_player.fabians_lautsprecher
+
+#  - id: incoming_call_samuel
+#    alias: 'Incoming Call samuel'
+#    initial_state: true
+#    trigger:
+#      - platform: state
+#        entity_id: automation.incoming_call_samuel
+#        to: 'on'
+#    condition:
+#      - condition: state
+#        entity_id: 'input_boolean.leiser_modus'
+#        state: 'off'
+#    action:
+#      - service: media_player.volume_set
+#        data:
+#          volume_level: 0.7
+#          entity_id: media_player.wohnzimmer_uhr
+#      - service: tts.google_say
+#        entity_id:
+#        - media_player.wohnzimmer_uhr
+#        - media_player.fabians_lautsprecher
+#        data:
+#          message: 'samuel wird soeben angerufen!'
+#      - delay: '00:00:10'
+#      - service: media_player.volume_set
+#        data:
+#          volume_level: 0.3
+#          entity_id: media_player.wohnzimmer_uhr
+#      - service: automation.turn_off
+#        data:
+#          entity_id: automation.incoming_call_samuel
+#      - service: media_player.turn_off
+#        data:
+#          entity_id: media_player.wohnzimmer_uhr
+#      - service: media_player.turn_off
+#        data:
+#          entity_id: media_player.fabians_lautsprecher
+
+#  not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
+#   - id: coinbase_balance_high
+#     alias: 'Coinbase balance high'
+#     initial_state: true
+#     trigger:
+#       - platform: template
+#         value_template: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] |replace(“EUR”,"")|replace(“ ”,"")|float| int > 220 }}
+#       - platform: numeric_state
+#         entity_id: sensor.coinbase_btc_wallet
+#         attribute: "Balance in native currency"
+#         above: 220
+#     condition:
+#       condition: and
+#       conditions:
+#  Maximal einmal am Tag schreiben
+#         - condition: template
+#           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.coinbase_balance_high.attributes.last_triggered) | int > 86400 }}"
+#     action:
+#       - service: telegram_bot.send_message
+#         data_template:
+#           target: !secret telegram_chat_fabian
+#           message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
 
 - id: dwd_weather_warnings
   alias: "DWD Weather Warnings"
@@ -6146,7 +6146,7 @@
   condition:
     condition: and
     conditions:
-      # Maximal zwei mal am Tag schreiben
+      #  Maximal zwei mal am Tag schreiben
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.dwd_weather_warnings.attributes.last_triggered) | int > 43200 }}"
   action:
@@ -6840,27 +6840,27 @@
       data:
         message: "Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_box_3490_external_ip.state }}"
 
-#  - id: turn_on_fritzbox_wifi_if_miwifi_is_off
-#    alias: Turn on Fritzbox Wifi if Miwifi is off
-#    initial_state: true
-#    trigger:
-#      - platform: state
-#        entity_id: sbinary_sensor.xiaomi_abd8_wan_state
-#        state: "not_connected"
-#      - platform: template
-#        value_template: "{{ if not is_state('sbinary_sensor.xiaomi_abd8_wan_state', 'connected'}}"
-#    condition:
-#      - condition: template
-#        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_fritzbox_wifi_if_miwifi_is_off.attributes.last_triggered) | int > 360 }}"
-#      - condition: not
-#        conditions:
-#          - condition: state
-#            entity_id: 'binary_sensor.fritz_box_3490_connection'
-#            state: 'not_connected'
-#    action:
-#      - service: notify.telegram_fabian
-#        data:
-#          message: 'Miwifi hat kein Internet'
+#   - id: turn_on_fritzbox_wifi_if_miwifi_is_off
+#     alias: Turn on Fritzbox Wifi if Miwifi is off
+#     initial_state: true
+#     trigger:
+#       - platform: state
+#         entity_id: sbinary_sensor.xiaomi_abd8_wan_state
+#         state: "not_connected"
+#       - platform: template
+#         value_template: "{{ if not is_state('sbinary_sensor.xiaomi_abd8_wan_state', 'connected'}}"
+#     condition:
+#       - condition: template
+#         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_fritzbox_wifi_if_miwifi_is_off.attributes.last_triggered) | int > 360 }}"
+#       - condition: not
+#         conditions:
+#           - condition: state
+#             entity_id: 'binary_sensor.fritz_box_3490_connection'
+#             state: 'not_connected'
+#     action:
+#       - service: notify.telegram_fabian
+#         data:
+#           message: 'Miwifi hat kein Internet'
 
 - id: fritzbox_no_internet_access
   alias: Fritzbox no Internet access
@@ -6892,10 +6892,10 @@
           - condition: template
             value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fritzbox_no_internet_access.attributes.last_triggered) | int > 1200 }}"
   action:
-    # - service: rest_command.assistant_broadcast
-    #   data:
-    #     command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
-    #     user: "homeassistant"
+    #  - service: rest_command.assistant_broadcast
+    #    data:
+    #      command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
+    #      user: "homeassistant"
     - service: tts.google_say
       entity_id:
         - media_player.fabians_lautsprecher
@@ -6943,10 +6943,10 @@
                   entity_id: person.fabian
                   state: home
           sequence:
-            # - service: rest_command.assistant_broadcast
-            #   data:
-            #     command: Die Internetverbindung ist wiederhergestellt.
-            #     user: "homeassistant"
+            #  - service: rest_command.assistant_broadcast
+            #    data:
+            #      command: Die Internetverbindung ist wiederhergestellt.
+            #      user: "homeassistant"
             - service: tts.google_say
               entity_id:
                 - media_player.fabians_lautsprecher
@@ -6977,54 +6977,54 @@
       data:
         entity_id: automation.fritzbox_internet_access_returned
 
-# - id: internet_speed_test_poor_fabian
-#   alias: Internet Speed Test Poor Fabian
+#  - id: internet_speed_test_poor_fabian
+#    alias: Internet Speed Test Poor Fabian
 #
-#   initial_state: true
-#   trigger:
-#     - platform: template
-#       value_template: "{{ states('sensor.speedtest_download')|float < 40 }}"
-#   condition:
-#     - condition: template
-#       value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
-#   action:
-#     - service: notify.telegram_fabian
-#       data:
-#         message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ states.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
+#    initial_state: true
+#    trigger:
+#      - platform: template
+#        value_template: "{{ states('sensor.speedtest_download')|float < 40 }}"
+#    condition:
+#      - condition: template
+#        value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
+#    action:
+#      - service: notify.telegram_fabian
+#        data:
+#          message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ states.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
 
-# - id: internet_speed_test_poor_fabian
-#   alias: Internet Speed Test Poor samuel
+#  - id: internet_speed_test_poor_fabian
+#    alias: Internet Speed Test Poor samuel
 #
-#   initial_state: true
-#   trigger:
-#     - platform: template
-#       value_template: "{{ states('sensor.speedtest_download')|float < 30 }}"
-#   condition:
-#     - condition: template
-#       value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
-#     - condition: state
-#       entity_id: device_tracker.md3f9bmc
-#       state: home
-#   action:
-#     - service: notify.telegram_samuel
-#       data:
-#         message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
+#    initial_state: true
+#    trigger:
+#      - platform: template
+#        value_template: "{{ states('sensor.speedtest_download')|float < 30 }}"
+#    condition:
+#      - condition: template
+#        value_template: "{{ states.device_tracker.google_maps_112056758146194246561.state == 'home' }}"
+#      - condition: state
+#        entity_id: device_tracker.md3f9bmc
+#        state: home
+#    action:
+#      - service: notify.telegram_samuel
+#        data:
+#          message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
-# - id: update_tasmota
-#   alias: Update Tasmota
-#   initial_state: true
-#   trigger:
-#     - platform: numeric_state
-#       entity_id: sensor.latest_tasmota
-#       above: 0
-#   action:
-#     - service: notify.telegram_fabian
-#       data:
-#         message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
-#     - service: mqtt.publish
-#       data:
-#         topic: cmnd/tasmotas/Upgrade
-#         payload: 1
+#  - id: update_tasmota
+#    alias: Update Tasmota
+#    initial_state: true
+#    trigger:
+#      - platform: numeric_state
+#        entity_id: sensor.latest_tasmota
+#        above: 0
+#    action:
+#      - service: notify.telegram_fabian
+#        data:
+#          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
+#      - service: mqtt.publish
+#        data:
+#          topic: cmnd/tasmotas/Upgrade
+#          payload: 1
 
 - id: deckenlampe_button_hold
   alias: Deckenlampe Button Hold
@@ -7068,11 +7068,11 @@
                   entity_id: light.leds_wohnzimmer_tv
                   state: "unavailable"
           sequence:
-            # - service: light.turn_off
-            #   data:
-            #     area_id: 7c05afe47efd44f5a0a064769ad6e105 #Wohnzimmer
-            #     transition: 2
-            #     brightness: 255
+            #  - service: light.turn_off
+            #    data:
+            #      area_id: 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
+            #      transition: 2
+            #      brightness: 255
             - service: light.turn_on
               data:
                 entity_id: light.yeelight_color_0x36dc050
@@ -7107,7 +7107,7 @@
           sequence:
             - service: light.turn_off
               data:
-                area_id: 7c05afe47efd44f5a0a064769ad6e105 #Wohnzimmer
+                area_id: 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
 
 - id: deckenlampe_button_double_press
   alias: Deckenlampe Button double press
@@ -7234,7 +7234,7 @@
             - service: light.turn_off
               data:
                 area_id:
-                  - 33e9a108bf1948e5848f156e0851d50c #Fabians Zimmer
+                  - 33e9a108bf1948e5848f156e0851d50c # Fabians Zimmer
 
 - id: lichtschalter_button_double_press
   alias: Lichtschalter Button double press
@@ -7680,7 +7680,7 @@
           - automation.detect_if_washing_machine_is_currently_active
           - automation.detect_if_pizzamaker_is_currently_active
     - choose:
-        # IF 5 friends are there
+        #  IF 5 friends are there
         - conditions:
             - condition: or
               conditions:
@@ -7706,7 +7706,7 @@
               data_template:
                 target: !secret telegram_chat_5friends
                 message: "Kohleanzünder wurde eingeschaltet."
-        # ELSEIF only K&A are there
+        #  ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
@@ -7773,7 +7773,7 @@
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
                   - "Dauer:/remaining_time"
-      # ELSE only notify fabian
+      #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -7783,7 +7783,7 @@
               - "Dauer:/remaining_time"
     - delay: "00:09:00"
     - choose:
-        # IF 5 friends are there
+        #  IF 5 friends are there
         - conditions:
             - condition: or
               conditions:
@@ -7810,7 +7810,7 @@
                       name: "default"
                       critical: 1
                       volume: 0.7
-        # ELSEIF only K&A are there
+        #  ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
@@ -7889,7 +7889,7 @@
                       name: "default"
                       critical: 1
                       volume: 0.7
-      # ELSE only notify fabian
+      #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -7922,23 +7922,23 @@
               data:
                 entity_id: media_player.keller_tv
                 command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-            # - service: notify.keller_tv
-            #   continue_on_error: true
-            #   data:
-            #     message: "Bitte Kohle wenden."
+            #  - service: notify.keller_tv
+            #    continue_on_error: true
+            #    data:
+            #      message: "Bitte Kohle wenden."
     - delay: "00:06:00"
-    # - choose:
-    #     - conditions:
-    #         - condition: not
-    #           conditions:
-    #             - condition: state
-    #               entity_id: media_player.keller_tv
-    #               state: unavailable
-    #       sequence:
-    #         - service: notify.keller_tv
-    #           continue_on_error: true
-    #           data:
-    #             message: "Der Eisschlauch kann schon mal geholt werden."
+    #  - choose:
+    #      - conditions:
+    #          - condition: not
+    #            conditions:
+    #              - condition: state
+    #                entity_id: media_player.keller_tv
+    #                state: unavailable
+    #        sequence:
+    #          - service: notify.keller_tv
+    #            continue_on_error: true
+    #            data:
+    #              message: "Der Eisschlauch kann schon mal geholt werden."
     - choose:
         - conditions:
             - condition: or
@@ -7963,7 +7963,7 @@
         entity_id: switch.kohleanzunder
     - delay: "00:01:00"
     - choose:
-        # IF 5 friends are there
+        #  IF 5 friends are there
         - conditions:
             - condition: or
               conditions:
@@ -7990,7 +7990,7 @@
                       name: "default"
                       critical: 1
                       volume: 0.7
-        # ELSEIF only K&A are there
+        #  ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
@@ -8069,7 +8069,7 @@
                       name: "default"
                       critical: 1
                       volume: 0.7
-      # ELSE only notify fabian
+      #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -8257,7 +8257,7 @@
         state: "on"
   action:
     - choose:
-        # IF 5 friends are there
+        #  IF 5 friends are there
         - conditions:
             - condition: or
               conditions:
@@ -8275,7 +8275,7 @@
               data_template:
                 target: !secret telegram_chat_5friends
                 message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
-        # ELSEIF only K&A are there
+        #  ELSEIF only K&A are there
         - conditions:
             - condition: or
               conditions:
@@ -8336,7 +8336,7 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
-      # ELSE only notify fabian
+      #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -8468,15 +8468,15 @@
       - condition: state
         entity_id: sensor.washing_machine_state
         state: Finishing
-      # - condition: template
-      #   value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
+      #  - condition: template
+      #    value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 50 }}"
   action:
     - service: input_select.select_option
       data:
         entity_id: input_select.washing_machine_status
         option: Running
 
-# When the power drops, move the state of the washing machine to Clean
+#  When the power drops, move the state of the washing machine to Clean
 - id: set_washing_machine_clean_when_power_drops
   alias: Set washing machine clean when power drops
   trigger:
@@ -8820,40 +8820,40 @@
       data:
         entity_id: switch.kuchengerate
 
-#  - id: turn_on_airplane_mode_fabi
-#    alias: 'Turn on Airplane Mode Fabi'
-#    initial_state: true
-#    trigger:
-#      - platform: time
-#        at: '23:30:00'
-#      - platform: time
-#        at: '03:30:00'
-#    condition:
-#      condition: and
-#      conditions:
-#        - condition: time
-#          weekday:
-#            - mon
-#            - tue
-#            - wed
-#            - thu
-#            - sun
-#        - condition: state
-#          entity_id: device_tracker.fabian_iphone
-#          state: home
-#        - condition: template
-#          value_template: >
-#            {% set domain = 'light' %}
-#            {% set state = 'off' %}
-#            {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
-#    action:
-#      - service: notify.mobile_app_fabian_iphone
-#        data_template:
-#          title: "Flugmodus"
-#          message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
-#        data:
-#          data:
-#            tag: 'notification-about-sensor'
+#   - id: turn_on_airplane_mode_fabi
+#     alias: 'Turn on Airplane Mode Fabi'
+#     initial_state: true
+#     trigger:
+#       - platform: time
+#         at: '23:30:00'
+#       - platform: time
+#         at: '03:30:00'
+#     condition:
+#       condition: and
+#       conditions:
+#         - condition: time
+#           weekday:
+#             - mon
+#             - tue
+#             - wed
+#             - thu
+#             - sun
+#         - condition: state
+#           entity_id: device_tracker.fabian_iphone
+#           state: home
+#         - condition: template
+#           value_template: >
+#             {% set domain = 'light' %}
+#             {% set state = 'off' %}
+#             {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
+#     action:
+#       - service: notify.mobile_app_fabian_iphone
+#         data_template:
+#           title: "Flugmodus"
+#           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
+#         data:
+#           data:
+#             tag: 'notification-about-sensor'
 
 - id: check_termostat_sleepingroom
   alias: "check thermostats"
@@ -8879,9 +8879,9 @@
                   entity_id: device_tracker.fabian_pc
                   state: "home"
           sequence:
-            # - service: notify.telegram_fabian
-            #   data:
-            #     message: "Das Thermostat im fabian_s_zimmer war noch auf {{ states.climate.fabian_s_zimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
+            #  - service: notify.telegram_fabian
+            #    data:
+            #      message: "Das Thermostat im fabian_s_zimmer war noch auf {{ states.climate.fabian_s_zimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
             - service: climate.set_hvac_mode
               data:
                 entity_id: climate.fabian_s_zimmer
@@ -9908,7 +9908,7 @@
 
           Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
-        #Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
+        # Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
 
 - id: remind_for_volleyball
   alias: "remind for volleyball"
@@ -9935,7 +9935,9 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
+        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
+          {% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
+          {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -9985,7 +9987,10 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].condition }} bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }} °. Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
+        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+          {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].condition }}
+          bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }} °.
+          Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
         options:
           - "Ja"
           - "Nein"
@@ -10020,7 +10025,9 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_juz_group
-        question: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
+        question: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+          {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }}
+          Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
         options:
           - "Ja"
           - "Nein"
@@ -10034,7 +10041,8 @@
         clientId: default
         to: !secret whatsapp_chat_juz_group
         body:
-          text: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
+          text: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
+            {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
     - choose:
         - conditions:
             - condition: template

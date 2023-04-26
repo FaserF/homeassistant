@@ -150,11 +150,11 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
-  #logs:
-  #custom_components.deutschebahn: debug
-  #custom_components.rewe: debug
-  #custom_components.foodsharing: debug
-  #custom_components.dwd_illuminance: debug
+  # logs:
+  # custom_components.deutschebahn: debug
+  # custom_components.rewe: debug
+  # custom_components.foodsharing: debug
+  # custom_components.dwd_illuminance: debug
 
 # Enables a map showing the location of tracked devices
 map:
