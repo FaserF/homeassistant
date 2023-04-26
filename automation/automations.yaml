@@ -9935,7 +9935,8 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
+        question:
+          "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
           {% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
           {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
         options:
@@ -9987,7 +9988,8 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
-        question: "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+        question:
+          "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
           {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].condition }}
           bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }} °.
           Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
@@ -10025,7 +10027,8 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_juz_group
-        question: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+        question:
+          "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
           {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }}
           Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch! Ich komme?"
         options:
@@ -10041,7 +10044,8 @@
         clientId: default
         to: !secret whatsapp_chat_juz_group
         body:
-          text: "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
+          text:
+            "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
             {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
     - choose:
         - conditions:
