@@ -181,6 +181,9 @@
       entity_id: person.samuel
       from: "not_home"
       to: "home"
+  condition:
+    condition: template
+    value_template: "{{ trigger.from_state.last_changed > utcnow() - timedelta(minutes=10) }}"
   action:
     - service: input_boolean.turn_off
       data:
@@ -442,6 +445,8 @@
           entity_id: person.fabian
           attribute: gps_accuracy
           above: 500
+        - condition: template
+          value_template: "{{ trigger.from_state.last_changed > utcnow() - timedelta(minutes=10) }}"
     - condition: or
       conditions:
         - condition: numeric_state
