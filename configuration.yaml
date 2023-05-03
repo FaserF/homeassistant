@@ -363,8 +363,6 @@ google_assistant:
       expose: false
     switch.fabian_pc_shutdown:
       expose: false
-    light.keller_gluhbirne:
-      expose: false
     switch.fritzbox_3490_portforward_https_server:
       expose: false
     switch.fritzbox_3490_portforward_ssh:
@@ -413,8 +411,8 @@ google_assistant:
       expose: true
       room: Fabians Zimmer
     ## Samuels Zimmer
-    light.lampe_gastezimmer:
-      name: Nachtlampe
+    light.deckenlampe_samuel:
+      name: Deckenlampe Samuel
       expose: true
       room: Samuels Zimmer
     light.leds_gastezimmer:
@@ -480,6 +478,10 @@ google_assistant:
       expose: true
       room: Keller
     switch.strom_keller:
+      expose: true
+      room: Keller
+    light.deckenlampe_keller:
+      name: Deckenlampe Keller
       expose: true
       room: Keller
     ## Küche
@@ -690,7 +692,6 @@ adaptive_lighting:
     min_brightness: 25
   - name: "guest_room"
     lights:
-      - light.lampe_gastezimmer
       - light.leds_gastezimmer
     min_brightness: 80
     min_color_temp: 4000

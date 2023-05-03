@@ -445,8 +445,6 @@
           entity_id: person.fabian
           attribute: gps_accuracy
           above: 500
-        - condition: template
-          value_template: "{{ trigger.from_state.last_changed > utcnow() - timedelta(minutes=10) }}"
     - condition: or
       conditions:
         - condition: numeric_state
@@ -488,7 +486,7 @@
     - condition: not
       conditions:
         - condition: state
-          entity_id: device_tracker.android
+          entity_id: device_tracker.redmi_note_10_pro
           state: home
         - condition: state
           entity_id: person.samuel
@@ -3653,7 +3651,7 @@
       from: "not_home"
       to: "home"
     # - platform: state
-    #   entity_id: device_tracker.android
+    #   entity_id: device_tracker.redmi_note_10_pro
     #   from: "not_home"
     #   to: "home"
   condition:
@@ -3676,12 +3674,12 @@
       #           entity_id: device_tracker.fabian_iphone
       #           state: home
       #         - condition: state
-      #           entity_id: device_tracker.android
+      #           entity_id: device_tracker.redmi_note_10_pro
       #           state: home
       #     - condition: and
       #       conditions:
       #         - condition: state
-      #           entity_id: device_tracker.android
+      #           entity_id: device_tracker.redmi_note_10_pro
       #           state: home
       #         - condition: not
       #           conditions:
@@ -3923,7 +3921,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.android
+            entity_id: device_tracker.redmi_note_10_pro
             state: home
           - condition: state
             entity_id: device_tracker.fabian_iphone
@@ -3938,7 +3936,7 @@
                 - condition: or
                   conditions:
                     - condition: state
-                      entity_id: device_tracker.android
+                      entity_id: device_tracker.redmi_note_10_pro
                       state: home
                     - condition: state
                       entity_id: device_tracker.fabian_iphone
@@ -4031,7 +4029,7 @@
                 - condition: and
                   conditions:
                     - condition: state
-                      entity_id: device_tracker.android
+                      entity_id: device_tracker.redmi_note_10_pro
                       state: home
                     - condition: state
                       entity_id: device_tracker.fabian_iphone
@@ -9338,7 +9336,7 @@
             entity_id: device_tracker.fabian_iphone
             state: home
           - condition: state
-            entity_id: device_tracker.android
+            entity_id: device_tracker.redmi_note_10_pro
             state: home
       - condition: time
         after: "06:30:00"
@@ -9360,7 +9358,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.android
+              entity_id: device_tracker.redmi_note_10_pro
               state: home
           sequence:
             - service: notify.telegram_samuel
@@ -9914,6 +9912,19 @@
           Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
 
         # Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
+    - conditions:
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: person.samuel
+              state: "home"
+        - condition: state
+          entity_id: person.fabian
+          state: "home"
+      sequence:
+        - service: notify.telegram_fabian
+          data_template:
+            message: "Samuel ist nicht daheim."
 
 - id: remind_for_volleyball
   alias: "remind for volleyball"
@@ -10100,6 +10111,14 @@
             value_template: "{{'Angenommen: ' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
           - condition: template
             value_template: "{{'Abgelehnt: ' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Willkommen bei OTTO UP Plus' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'OTTO-Kundenkonto: Bitte E-Mail-Adresse bestätigen.' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Deine Rechnung von OTTO' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
+          - condition: template
+            value_template: "{{'Deine Bestellung wurde versandt.' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
           - condition: template
             value_template: "{{'Vorläufig angenommen: ' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
           - condition: template
