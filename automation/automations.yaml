@@ -38,6 +38,7 @@
           - switch.bett_usb_ports
           - switch.kuchengerate
           - switch.fernseher
+          - switch.fernseher_samuel
     - service: media_player.turn_off
       data:
         entity_id: all
@@ -62,12 +63,12 @@
               entity_id: device_tracker.md3f9bmc
               state: "home"
             - condition: numeric_state
-              entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+              entity_id: sensor.steckerleiste_samuel_energy_power
               above: 20
           sequence:
             - service: notify.telegram_fabian
               data:
-                message: "Keiner ist mehr zu Hause. Samuel-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
+                message: "Keiner ist mehr zu Hause. Samuels SChreibtisch ist allerdings noch an und wurde nicht ausgeschaltet!"
                 # data:
                 #   inline_keyboard:
                 #     - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
@@ -1642,7 +1643,7 @@
       for:
         hours: 4
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx_2
+      entity_id: device_tracker.c_pf38fwqx
       to: "home"
       for:
         hours: 4
@@ -1664,7 +1665,7 @@
             entity_id: device_tracker.fabian_pc
             state: "home"
           - condition: state
-            entity_id: device_tracker.c_pf38fwqx_2
+            entity_id: device_tracker.c_pf38fwqx
             state: "home"
   action:
     - service: tts.google_say
@@ -1801,7 +1802,7 @@
       for:
         minutes: 1
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx_2
+      entity_id: device_tracker.c_pf38fwqx
       from: "home"
       to: "not_home"
       for:
@@ -1818,7 +1819,7 @@
         for:
           minutes: 1
       - condition: state
-        entity_id: device_tracker.c_pf38fwqx_2
+        entity_id: device_tracker.c_pf38fwqx
         state: "not_home"
         for:
           seconds: 20
@@ -1852,7 +1853,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: switch.samuel_pc
+      entity_id: switch.schreibtisch_samuel
       to: "on"
       for:
         seconds: 5
@@ -1936,11 +1937,7 @@
           sequence:
             - service: light.turn_on
               target:
-                entity_id: light.lampe_samuel_s_zimmer
-              data:
-                transition: 2
-                brightness: 255
-                #  color_mode: white
+                entity_id: switch.lampe_samuel
             - service: light.turn_on
               target:
                 entity_id: light.leds_samuel_s_zimmer
@@ -1960,7 +1957,7 @@
       for:
         minutes: 5
     - platform: numeric_state
-      entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+      entity_id: sensor.steckerleiste_samuel_energy_power
       below: 25
       for:
         minutes: 10
@@ -1968,12 +1965,12 @@
     condition: and
     conditions:
       - condition: numeric_state
-        entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+        entity_id: sensor.steckerleiste_samuel_energy_power
         below: 25
   action:
     - service: switch.turn_off
       data:
-        entity_id: switch.samuel_pc
+        entity_id: switch.schreibtisch_samuel
 
 - id: turn_off_strom_if_fpc_stops
   alias: "Turn off strom if fpc stops"
@@ -1985,7 +1982,7 @@
       for:
         minutes: 10
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx_2
+      entity_id: device_tracker.c_pf38fwqx
       from: "home"
       to: "not_home"
       for:
@@ -2240,7 +2237,7 @@
                 entity_id:
                   - light.leds_wohnzimmer_tv
                   - light.leds_wohnzimmer
-                  - light.yeelight_color_0x36dc050
+                  - light.stehlampe
                 transition: 2
     - choose:
         - conditions:
@@ -2486,7 +2483,7 @@
             - service: tts.google_say
               entity_id: media_player.samuels_lautsprecher
               data:
-                message: Es wurde vermutlich vergessen das Fenster im fabian_s_zimmer zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen.
     - choose:
         - conditions:
             - condition: or
@@ -2506,14 +2503,14 @@
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
               data:
-                message: Es wurde vermutlich vergessen das Fenster im fabian_s_zimmer zu schließen.
+                message: Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen.
       default:
         - service: notify.telegram_fabian
           data:
-            message: "Es wurde vermutlich vergessen das Fenster im fabian_s_zimmer zu schließen."
+            message: "Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen."
         - service: notify.telegram_samuel
           data:
-            message: "Es wurde vermutlich vergessen das Fenster im fabian_s_zimmer zu schließen."
+            message: "Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen."
 
 - id: remind_for_open_window_living_room
   alias: "Remind for open window living room"
@@ -2721,7 +2718,7 @@
                           entity_id: device_tracker.fabian_pc
                           state: "home"
                         - condition: state
-                          entity_id: device_tracker.c_pf38fwqx_2
+                          entity_id: device_tracker.c_pf38fwqx
                           state: "home"
                     - condition: not
                       conditions:
@@ -2771,7 +2768,7 @@
                       entity_id: device_tracker.md3f9bmc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.md3f9bmc
+                      entity_id: input_boolean.samuel_pc_strom
                       state: "home"
                 - condition: not
                   conditions:
@@ -2789,6 +2786,14 @@
                 - condition: state
                   entity_id: input_boolean.leiser_modus
                   state: "off"
+                - condition: state
+                  entity_id: input_boolean.samuel_pc_strom
+                  state: "off"
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: device_tracker.md3f9bmc
+                      state: "home"
               sequence:
                 - service: media_player.volume_set
                   data_template:
@@ -2905,8 +2910,8 @@
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.wohnzimmer_uhr
 
-- id: remind_for_open_window_after_5_minutes_in_sleeping_room
-  alias: "Remind for open window after 5 minutes in sleeping room"
+- id: remind_for_open_window_after_5_minutes_in_fabians_room
+  alias: "Remind for open window after 5 minutes in fabians room"
   initial_state: true
   trigger:
     - platform: state
@@ -2922,202 +2927,200 @@
         attribute: current_temperature
         below: 19
   action:
-    action:
-      - choose:
-          - conditions:
-              - condition: or
-                conditions:
-                  - condition: time
-                    after: "21:30:00"
-                  - condition: time
-                    before: "07:50:00"
-            sequence:
-              - choose:
-                  - conditions:
-                      - condition: and
-                        conditions:
-                          - condition: state
-                            entity_id: input_boolean.leiser_modus
-                            state: "on"
-                          - condition: or
-                            conditions:
-                              - condition: state
-                                entity_id: person.fabian
-                                state: home
-                              - condition: state
-                                entity_id: person.samuel
-                                state: home
-                    sequence:
-                      - choose:
-                          - conditions:
-                              - condition: not
-                                conditions:
-                                  - condition: state
-                                    entity_id: person.fabian
-                                    state: home
-                            sequence:
-                              - service: notify.telegram_samuel
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: time
+                  after: "21:30:00"
+                - condition: time
+                  before: "07:50:00"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: and
+                      conditions:
+                        - condition: state
+                          entity_id: input_boolean.leiser_modus
+                          state: "on"
+                        - condition: or
+                          conditions:
+                            - condition: state
+                              entity_id: person.fabian
+                              state: home
+                            - condition: state
+                              entity_id: person.samuel
+                              state: home
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - condition: not
+                              conditions:
+                                - condition: state
+                                  entity_id: person.fabian
+                                  state: home
+                          sequence:
+                            - service: notify.telegram_samuel
+                              data:
+                                message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
+                    - choose:
+                        - conditions:
+                            - condition: state
+                              entity_id: person.fabian
+                              state: home
+                          sequence:
+                            - service: notify.mobile_app_fabian_iphone
+                              data:
+                                message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
                                 data:
-                                  message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
-                      - choose:
-                          - conditions:
-                              - condition: state
-                                entity_id: person.fabian
-                                state: home
-                            sequence:
-                              - service: notify.mobile_app_fabian_iphone
-                                data:
-                                  message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
-                                  data:
-                                    push:
-                                      sound:
-                                        name: "default"
-                                        critical: 1
-                                        volume: 0.1
-                              - service: notify.telegram_fabian
-                                data:
-                                  message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
-
-        default:
-          - choose:
-              - conditions:
-                  - condition: not
-                    conditions:
-                      - condition: state
-                        entity_id: media_player.samuels_lautsprecher
-                        state: "off"
-                      - condition: state
-                        entity_id: person.fabian
-                        state: "home"
-                sequence:
-                  - service: notify.telegram_samuel
-                    data:
-                      message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
-              - conditions:
-                  - condition: state
-                    entity_id: input_boolean.leiser_modus
-                    state: "off"
-                sequence:
-                  - service: media_player.volume_set
-                    data_template:
-                      volume_level: >
-                        {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                                  push:
+                                    sound:
+                                      name: "default"
+                                      critical: 1
+                                      volume: 0.1
+                            - service: notify.telegram_fabian
+                              data:
+                                message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
+      default:
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
                       entity_id: media_player.samuels_lautsprecher
-                  - service: tts.google_say
+                      state: "off"
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "home"
+              sequence:
+                - service: notify.telegram_samuel
+                  data:
+                    message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
+            - conditions:
+                - condition: state
+                  entity_id: input_boolean.leiser_modus
+                  state: "off"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
-                    data:
-                      message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
-                  - service: media_player.volume_set
-                    data_template:
-                      volume_level: >
-                        {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                      entity_id: media_player.samuels_lautsprecher
-          - choose:
-              - conditions:
-                  - condition: state
-                    entity_id: person.fabian
-                    state: home
-                  - condition: not
-                    conditions:
-                      - condition: state
-                        entity_id: media_player.kuche_lautsprecher
-                        state: "off"
-                      - condition: state
-                        entity_id: media_player.kuche_lautsprecher
-                        state: "idle"
-                      - condition: state
-                        entity_id: device_tracker.fabian_pc
-                        state: "home"
-                      - condition: state
-                        entity_id: device_tracker.c_pf38fwqx_2
-                        state: "home"
-                sequence:
-                  - service: notify.telegram_fabian
-                    data:
-                      message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
-              - conditions:
-                  - condition: state
-                    entity_id: person.samuel
-                    state: home
-                  - condition: not
-                    conditions:
-                      - condition: state
-                        entity_id: media_player.kuche_lautsprecher
-                        state: "off"
-                      - condition: state
-                        entity_id: media_player.kuche_lautsprecher
-                        state: "idle"
-                sequence:
-                  - service: notify.telegram_samuel
-                    data:
-                      message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
-              - conditions:
-                  - condition: state
-                    entity_id: input_boolean.leiser_modus
-                    state: "off"
-                  - condition: or
-                    conditions:
-                      - condition: state
-                        entity_id: media_player.kuche_lautsprecher
-                        state: "off"
-                      - condition: state
-                        entity_id: media_player.kuche_lautsprecher
-                        state: "idle"
-                sequence:
-                  - service: media_player.volume_set
-                    data_template:
-                      volume_level: >
-                        {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                - service: tts.google_say
+                  entity_id: media_player.samuels_lautsprecher
+                  data:
+                    message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.samuels_lautsprecher
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
+                - condition: not
+                  conditions:
+                    - condition: state
                       entity_id: media_player.kuche_lautsprecher
-                  - service: tts.google_say
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.kuche_lautsprecher
+                      state: "idle"
+                    - condition: state
+                      entity_id: device_tracker.fabian_pc
+                      state: "home"
+                    - condition: state
+                      entity_id: device_tracker.c_pf38fwqx
+                      state: "home"
+              sequence:
+                - service: notify.telegram_fabian
+                  data:
+                    message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
+            - conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: home
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.kuche_lautsprecher
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.kuche_lautsprecher
+                      state: "idle"
+              sequence:
+                - service: notify.telegram_samuel
+                  data:
+                    message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
+            - conditions:
+                - condition: state
+                  entity_id: input_boolean.leiser_modus
+                  state: "off"
+                - condition: or
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.kuche_lautsprecher
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.kuche_lautsprecher
+                      state: "idle"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
-                    data:
-                      message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
-                  - service: media_player.volume_set
-                    data_template:
-                      volume_level: >
-                        {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                      entity_id: media_player.kuche_lautsprecher
-          - choose:
-              - conditions:
-                  - condition: state
-                    entity_id: input_boolean.leiser_modus
-                    state: "off"
-                  - condition: or
-                    conditions:
-                      - condition: state
-                        entity_id: media_player.wohnzimmer_uhr
-                        state: "off"
-                      - condition: state
-                        entity_id: media_player.wohnzimmer_uhr
-                        state: "idle"
-                sequence:
-                  - service: media_player.volume_set
-                    data_template:
-                      volume_level: >
-                        {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+                - service: tts.google_say
+                  entity_id: media_player.kuche_lautsprecher
+                  data:
+                    message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.kuche_lautsprecher
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: input_boolean.leiser_modus
+                  state: "off"
+                - condition: or
+                  conditions:
+                    - condition: state
                       entity_id: media_player.wohnzimmer_uhr
-                  - service: tts.google_say
+                      state: "off"
+                    - condition: state
+                      entity_id: media_player.wohnzimmer_uhr
+                      state: "idle"
+              sequence:
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
-                    data:
-                      message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
-                  - service: media_player.volume_set
-                    data_template:
-                      volume_level: >
-                        {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
-                      entity_id: media_player.wohnzimmer_uhr
-          - choose:
-              - conditions:
-                  - condition: not
-                    conditions:
-                      - condition: state
-                        entity_id: media_player.wohnzimmer_tv
-                        state: "unavailable"
-                sequence:
-                  - service: notify.wohnzimmer_tv
-                    continue_on_error: true
-                    data:
-                      message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
+                - service: tts.google_say
+                  entity_id: media_player.wohnzimmer_uhr
+                  data:
+                    message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
+                - service: media_player.volume_set
+                  data_template:
+                    volume_level: >
+                      {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
+                    entity_id: media_player.wohnzimmer_uhr
+        - choose:
+            - conditions:
+                - condition: not
+                  conditions:
+                    - condition: state
+                      entity_id: media_player.wohnzimmer_tv
+                      state: "unavailable"
+              sequence:
+                - service: notify.wohnzimmer_tv
+                  continue_on_error: true
+                  data:
+                    message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
 
 - id: remind_for_open_window_after_5_minutes_in_living_room
   alias: "Remind for open window after 5 minutes in living room"
@@ -3198,7 +3201,7 @@
                   conditions:
                     - condition: state
                       entity_id:
-                        - device_tracker.c_pf38fwqx_2
+                        - device_tracker.c_pf38fwqx
                       state: "home"
                     - condition: state
                       entity_id:
@@ -3288,7 +3291,7 @@
                       entity_id: device_tracker.fabian_pc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.c_pf38fwqx_2
+                      entity_id: device_tracker.c_pf38fwqx
                       state: "home"
               sequence:
                 - service: notify.telegram_fabian
@@ -3416,7 +3419,7 @@
                   conditions:
                     - condition: state
                       entity_id:
-                        - device_tracker.c_pf38fwqx_2
+                        - device_tracker.c_pf38fwqx
                       state: "home"
                     - condition: state
                       entity_id:
@@ -3470,7 +3473,7 @@
                       entity_id: device_tracker.fabian_pc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.c_pf38fwqx_2
+                      entity_id: device_tracker.c_pf38fwqx
                       state: "home"
               sequence:
                 - service: notify.telegram_fabian
@@ -3806,7 +3809,7 @@
               entity_id: device_tracker.fabian_pc
               state: "not_home"
             - condition: state
-              entity_id: "device_tracker.c_pf38fwqx_2"
+              entity_id: "device_tracker.c_pf38fwqx"
               state: "not_home"
           sequence:
             - service: light.turn_off
@@ -4211,6 +4214,12 @@
     - condition: state
       entity_id: device_tracker.wohnzimmer_tv
       state: home
+    - condition: state
+      entity_id: "switch.fernseher"
+      state: "on"
+    - condition: state
+      entity_id: "switch.fernseher"
+      state: "off"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_livingroom_when_dark_outside.attributes.last_triggered) | int > 1800 }}"
     - condition: or
@@ -4227,7 +4236,7 @@
         entity_id:
           - light.leds_wohnzimmer_tv
           - light.leds_wohnzimmer
-          - light.yeelight_color_0x36dc050
+          - light.stehlampe
         transition: 2
 
 - id: turn_on_lights_in_samuel_room_when_dark_outside
@@ -4304,7 +4313,7 @@
             entity_id: "device_tracker.fabian_pc"
             state: "home"
           - condition: state
-            entity_id: "device_tracker.c_pf38fwqx_2"
+            entity_id: "device_tracker.c_pf38fwqx"
             state: "home"
       - condition: or
         conditions:
@@ -4346,7 +4355,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: "device_tracker.c_pf38fwqx_2"
+              entity_id: "device_tracker.c_pf38fwqx"
               state: "home"
           sequence:
             - service: light.turn_on
@@ -5255,12 +5264,12 @@
       entity_id: input_boolean.samuel_pc_strom
       to: "on"
     - platform: state
-      entity_id: switch.samuel_pc
+      entity_id: switch.schreibtisch_samuel
       to: "on"
   action:
     - service: switch.turn_on
       data:
-        entity_id: switch.samuel_pc
+        entity_id: switch.schreibtisch_samuel
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.samuel_pc_strom
@@ -5273,7 +5282,7 @@
       entity_id: input_boolean.samuel_pc_strom
       to: "off"
     - platform: state
-      entity_id: switch.samuel_pc
+      entity_id: switch.schreibtisch_samuel
       to: "off"
   action:
     - choose:
@@ -5284,7 +5293,7 @@
                   entity_id: device_tracker.md3f9bmc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+                  entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
             - service: button.press
@@ -5299,7 +5308,7 @@
                   entity_id: device_tracker.md3f9bmc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+                  entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
             - service: button.press
@@ -5314,7 +5323,7 @@
                   entity_id: device_tracker.md3f9bmc
                   state: "home"
                 - condition: numeric_state
-                  entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+                  entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
             - service: button.press
@@ -5332,7 +5341,7 @@
                   entity_id: device_tracker.md3f9bmc
                   state: "not_home"
                 - condition: numeric_state
-                  entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+                  entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
             - service: notify.telegram_samuel
@@ -5346,16 +5355,16 @@
             - condition: and
               conditions:
                 - condition: numeric_state
-                  entity_id: sensor.steckerleiste_samuel_s_zimmer_energy_power
+                  entity_id: sensor.steckerleiste_samuel_energy_power
                   below: 21
           sequence:
             - service: switch.turn_off
               data:
-                entity_id: switch.samuel_pc
+                entity_id: switch.schreibtisch_samuel
     - choose:
         - conditions:
             - condition: state
-              entity_id: switch.samuel_pc
+              entity_id: switch.schreibtisch_samuel
               state: "off"
           sequence:
             - service: input_boolean.turn_off
@@ -6158,9 +6167,14 @@
             - condition: state
               entity_id: sensor.dwd_weather_warnings_current_warning_level
               state: "2"
-            - condition: numeric_state
-              entity_id: proximity.home_fabian
-              below: 20
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_fabian
+                  below: 20
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -6176,9 +6190,14 @@
             - condition: state
               entity_id: sensor.dwd_weather_warnings_current_warning_level
               state: "2"
-            - condition: numeric_state
-              entity_id: proximity.home_samuel
-              below: 20
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 20
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -6209,9 +6228,14 @@
             - condition: state
               entity_id: sensor.dwd_weather_warnings_current_warning_level
               state: "3"
-            - condition: numeric_state
-              entity_id: proximity.home_fabian
-              below: 20
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_fabian
+                  below: 20
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -6226,9 +6250,14 @@
             - condition: state
               entity_id: sensor.dwd_weather_warnings_current_warning_level
               state: "3"
-            - condition: numeric_state
-              entity_id: proximity.home_samuel
-              below: 20
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 30
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -6257,9 +6286,14 @@
             - condition: state
               entity_id: sensor.dwd_weather_warnings_current_warning_level
               state: "4"
-            - condition: numeric_state
-              entity_id: proximity.home_fabian
-              below: 20
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_fabian
+                  below: 40
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -6274,9 +6308,14 @@
             - condition: state
               entity_id: sensor.dwd_weather_warnings_current_warning_level
               state: "4"
-            - condition: numeric_state
-              entity_id: proximity.home_samuel
-              below: 20
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 40
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -7057,10 +7096,10 @@
             - condition: or
               conditions:
                 - condition: state
-                  entity_id: light.yeelight_color_0x36dc050
+                  entity_id: light.stehlampe
                   state: "off"
                 - condition: state
-                  entity_id: light.yeelight_color_0x36dc050
+                  entity_id: light.stehlampe
                   state: "unavailable"
             - condition: or
               conditions:
@@ -7078,7 +7117,7 @@
             #      brightness: 255
             - service: light.turn_on
               data:
-                entity_id: light.yeelight_color_0x36dc050
+                entity_id: light.stehlampe
                 transition: 2
                 brightness: 255
                 color_temp: 225
@@ -7098,7 +7137,7 @@
                   for:
                     seconds: 1
                 - condition: state
-                  entity_id: light.yeelight_color_0x36dc050
+                  entity_id: light.stehlampe
                   state: "on"
                   for:
                     seconds: 1
@@ -8503,16 +8542,18 @@
       data:
         entity_id: input_select.washing_machine_status
         option: Clean
-    - service: notify.telegram_samuel
-      data:
-        message: "Die Waschmaschine ist fertig."
-        inline_keyboard:
-          - "Erledigt:/telegramwasherdone"
     - service: notify.telegram_fabian
       data:
-        message: "Die Waschmaschine ist fertig."
-        inline_keyboard:
-          - "Erledigt:/telegramwasherdone"
+        message: "Die Waschmaschine ist fertig. Bitte ausräumen."
+        data:
+          inline_keyboard:
+            - "Erledigt:/telegramwasherdone"
+    - service: notify.telegram_samuel
+      data:
+        message: "Die Waschmaschine ist fertig. Bitte ausräumen."
+        data:
+          inline_keyboard:
+            - "Erledigt:/telegramwasherdone"
     - choose:
         - conditions:
             - condition: state
@@ -8884,7 +8925,7 @@
           sequence:
             #  - service: notify.telegram_fabian
             #    data:
-            #      message: "Das Thermostat im fabian_s_zimmer war noch auf {{ states.climate.fabian_s_zimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
+            #      message: "Das Thermostat in Fabians Zimmer war noch auf {{ states.climate.fabian_s_zimmer.attributes.temperature }} °C eingestellt und wurde nun automatisch eingeschaltet."
             - service: climate.set_hvac_mode
               data:
                 entity_id: climate.fabian_s_zimmer
@@ -8921,7 +8962,7 @@
               entity_id: counter.pille
               below: "21"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data_template:
                 message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
                 data:
@@ -8934,7 +8975,7 @@
               below: 22
               above: 20
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "Pille nehmen nicht vergessen! Heute ist der letze Tag, an dem du die Pille nehmen musst. Ab morgen kommen für 7 Tage keine Erinnerungen."
                 data:
@@ -9161,7 +9202,7 @@
       entity_id: device_tracker.md3f9bmc
       to: "home"
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx_2
+      entity_id: device_tracker.c_pf38fwqx
       to: "home"
     - platform: state
       entity_id: device_tracker.md3f9bmc
@@ -9181,7 +9222,7 @@
             entity_id: device_tracker.fabian_pc
             state: "home"
           - condition: state
-            entity_id: device_tracker.c_pf38fwqx_2
+            entity_id: device_tracker.c_pf38fwqx
             state: "home"
           - condition: not
             conditions:
@@ -9191,7 +9232,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: "switch.samuel_pc"
+            entity_id: "switch.schreibtisch_samuel"
             state: "on"
           - condition: not
             conditions:
@@ -9219,10 +9260,10 @@
       entity_id: device_tracker.md3f9bmc
       to: "not_home"
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx_2
+      entity_id: device_tracker.c_pf38fwqx
       to: "not_home"
     - platform: state
-      entity_id: switch.samuel_pc
+      entity_id: switch.schreibtisch_samuel
       to: "off"
   condition:
     - condition: state
@@ -9583,7 +9624,7 @@
 
 - id: notify_fabian_samuel_on_way_home
   alias: "Notify Fabian samuel on way home"
-  initial_state: false
+  initial_state: true
   trigger:
     - platform: state
       entity_id: proximity.home_samuel
@@ -9629,7 +9670,7 @@
 
 - id: notify_fabian_samuel_on_way_home_longer_distance
   alias: "Notify Fabian samuel on way home longer distance"
-  initial_state: false
+  initial_state: true
   trigger:
     - platform: state
       entity_id: proximity.home_samuel
@@ -9672,7 +9713,7 @@
 
 - id: notify_fabian_samuel_on_way_home_long_distance
   alias: "Notify Fabian samuel on way home long distance"
-  initial_state: false
+  initial_state: true
   trigger:
     - platform: state
       entity_id: proximity.home_samuel
@@ -9910,21 +9951,20 @@
           {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
 
           Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
-
-        # Corona 7 Tage Inzidenzwert: {{ states.sensor.lk_ebersberg_weekincidence.state }} .
-    - conditions:
-        - condition: not
-          conditions:
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
             - condition: state
-              entity_id: person.samuel
+              entity_id: person.fabian
               state: "home"
-        - condition: state
-          entity_id: person.fabian
-          state: "home"
-      sequence:
-        - service: notify.telegram_fabian
-          data_template:
-            message: "Samuel ist nicht daheim."
+          sequence:
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Samuel ist nicht daheim."
 
 - id: remind_for_volleyball
   alias: "remind for volleyball"

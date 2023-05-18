@@ -1122,3 +1122,12 @@
                     Jemand
                   {% endif %}
                   ist da.
+
+- id: telegram_poll_answer
+  alias: "Telegram poll answer"
+  initial_state: true
+  trigger:
+  platform: event
+  event_type: telegram_command
+  event_data:
+    poll_answer: "/ping"

@@ -415,13 +415,20 @@ google_assistant:
       name: Deckenlampe Samuel
       expose: true
       room: Samuels Zimmer
-    light.leds_gastezimmer:
+    light.lampe_samuel:
       expose: true
       room: Samuels Zimmer
-    switch.samuel_pc:
+    light.leds_gastezimmer:
       expose: false
       room: Samuels Zimmer
-    switch.gastezimmer_usb_ports:
+    switch.fernseher_samuel:
+      name: Fernseher Samuel
+      expose: true
+      room: Samuels Zimmer
+    switch.schreibtisch_samuel:
+      expose: false
+      room: Samuels Zimmer
+    switch.samuel_schreibtisch_usb_ports:
       expose: true
       room: Samuels Zimmer
     input_boolean.samuel_pc_strom:
@@ -439,7 +446,7 @@ google_assistant:
     light.leds_wohnzimmer:
       expose: true
       room: Wohnzimmer
-    light.yeelight_color_0x36dc050:
+    light.stehlampe:
       expose: true
       room: Wohnzimmer
     switch.fernseher:
@@ -491,13 +498,6 @@ google_assistant:
     switch.kuchengerate:
       expose: true
       room: Küche
-
-binary_sensor:
-  - platform: workday
-    country: DE
-    province: BY
-    add_holidays:
-      - "2023-05-19"
 
 dialogflow:
 intent_script:
@@ -681,7 +681,7 @@ adaptive_lighting:
   - name: "living_room"
     lights:
       - light.leds_wohnzimmer
-      - light.yeelight_color_0x36dc050
+      - light.stehlampe
     min_brightness: 60
     min_color_temp: 3700
   - name: "sleeping_room"

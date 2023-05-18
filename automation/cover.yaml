@@ -134,7 +134,7 @@
                 - choose:
                     - conditions:
                         - condition: state
-                          entity_id: binary_sensor.schlafzimmer_open_window
+                          entity_id: binary_sensor.fabian_s_open_window
                           state: "on"
                       sequence:
                         - delay: "00:15:00"
@@ -320,7 +320,7 @@
   alias: "Close all covers at evening"
   trigger:
     - platform: time
-      at: "21:00:00"
+      at: "21:15:00"
   action:
     - parallel:
         - choose:
@@ -357,7 +357,7 @@
                 - choose:
                     - conditions:
                         - condition: state
-                          entity_id: binary_sensor.schlafzimmer_open_window
+                          entity_id: binary_sensor.fabian_s_open_window
                           state: "on"
                       sequence:
                         - delay: "00:15:00"
