@@ -506,7 +506,7 @@ google_assistant:
       room: Küche
 
 dialogflow:
-  
+
 intent_script:
   washing_machine_finish_duration:
     speech:
