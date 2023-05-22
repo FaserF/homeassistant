@@ -1075,9 +1075,9 @@
         - condition: state
           entity_id: switch.fernseher
           state: "on"
-        - condition: state
-          entity_id: switch.kuhlschrank
-          state: "on"
+        #- condition: state
+        #  entity_id: switch.kuhlschrank
+        #  state: "on"
         - condition: state
           entity_id: switch.fernseher_keller
           state: "on"
@@ -1108,9 +1108,9 @@
                 - condition: state
                   entity_id: switch.fernseher
                   state: "on"
-                - condition: state
-                  entity_id: switch.kuhlschrank
-                  state: "on"
+                #- condition: state
+                #  entity_id: switch.kuhlschrank
+                #  state: "on"
                 - condition: state
                   entity_id: switch.fernseher_keller
                   state: "on"
@@ -1125,7 +1125,7 @@
             - service: switch.turn_off
               entity_id:
                 - switch.fernseher
-                - switch.kuhlschrank
+                #- switch.kuhlschrank
                 - switch.fernseher_keller
             - service: light.turn_off
               entity_id: all
@@ -2327,6 +2327,10 @@
       to: "not_home"
       for:
         minutes: 30
+  condition:
+    - condition: state
+      entity_id: "input_boolean.thermostate_aus"
+      state: "off"
   action:
     - choose:
         - conditions:
@@ -2338,6 +2342,9 @@
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
+                - condition: state
+                  entity_id: climate.fabian_s_zimmer
+                  state: "off"
             - condition: state
               entity_id: person.samuel
               state: "home"
@@ -2357,6 +2364,9 @@
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
+                - condition: state
+                  entity_id: climate.samuel_s_zimmer
+                  state: "off"
             - condition: state
               entity_id: person.fabian
               state: "home"
@@ -4488,8 +4498,8 @@
         inline_keyboard:
           - "Einschalten:/climateson"
 
-- id: remind_for_polygon_events
-  alias: "remind for Polygon Events"
+- id: remind_for_dnd_events
+  alias: "remind for DND Events"
   initial_state: false
   trigger:
     - platform: template
@@ -4501,20 +4511,18 @@
         value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 173800) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_polygon_events.attributes.last_triggered) | int > 86700 }}"
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: calendar.votgaming_kalender
-            attribute: message
-            state: "Gruppentreffen"
+      - condition: state
+        entity_id: calendar.votgaming_kalender
+        attribute: message
+        state: "Dungeons & Dragons Spieleabend"
   action:
     - service: telegram_bot.send_poll
       data_template:
-        target: !secret telegram_chat_polygon
+        target: !secret telegram_spieletreff
         question: "Es findet am {{ as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) | timestamp_custom('%d.%m.%Y %H:%M', true) }} Uhr {{ states.calendar.votgaming_kalender.attributes.message }} statt. Ich bin dabei?"
         options:
           - "Ja"
-          - "Nein"
+          - "Nein (gibts eig nicht :P)"
           - "Wahrscheinlich schon"
         is_anonymous: false
         allows_multiple_answers: false
@@ -4818,6 +4826,45 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: "Demnächst steht {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?"
+
+- id: remind_for_DST_change_Winter_Sommerzeit
+  alias: "Remind for DST change - Winter/Sommerzeit"
+  trigger:
+    platform: time
+    at: "12:00:00"
+  condition:
+    condition: template
+    value_template: "{{ now().strftime('%j') == (now() + timedelta(days=1)).strftime('%j') }}"
+  action:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ (now() + timedelta(days=1)).strftime('%Z') == 'CEST' }}" # Sommerzeitprüfung
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
+                disable_notification: true
+                message: Die Zeitumstellung ist morgen! Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_samuel
+                disable_notification: true
+                message: Die Zeitumstellung ist morgen! Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
+        - conditions:
+            - condition: template
+              value_template: "{{ (now() + timedelta(days=1)).strftime('%Z') == 'CET' }}" # Winterzeitprüfung
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
+                disable_notification: true
+                message: Die Zeitumstellung ist morgen! Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_samuel
+                disable_notification: true
+                message: Die Zeitumstellung ist morgen! Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
 
 - id: remind_for_DST_change_Winter_Sommerzeit
   alias: "Remind for DST change - Winter/Sommerzeit"
@@ -5678,7 +5725,7 @@
 
           ---
 
-          # Angebote
+          #Angebote
     # - service: telegram_bot.send_message
     #   data_template:
     #     target: !secret telegram_chat_fabian
@@ -6404,6 +6451,30 @@
     - service: switch.turn_off
       data:
         entity_id: switch.schloss
+
+- id: turn_on_keller_deckenlampe_on_steckerleiste
+  alias: Turn on Keller Deckenlampe on Steckerleiste
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: switch.frei_keller
+      to: "on"
+  action:
+    - service: light.turn_on
+      data:
+        entity_id: light.deckenlampe_keller
+
+- id: turn_off_keller_deckenlampe_on_steckerleiste
+  alias: Turn off Keller Deckenlampe on Steckerleiste
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: switch.frei_keller
+      to: "off"
+  action:
+    - service: light.turn_off
+      data:
+        entity_id: light.deckenlampe_keller
 
 - id: fabi_phone_battery_low
   alias: Fabi Phone Battery low
@@ -7482,19 +7553,21 @@
                   data_template:
                     message: >
                       {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
-                      Willkommen zurück Fabi und Samuel.
+                      Willkommen zurück Fabi und Samuel
                       {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
                       Willkommen zurück Fabi.
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
+                      Willkommen zurück Samuel.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
                       {% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 60 %}
-                      Samuels Zimmer,
+                      von Samuel,
+                      {% endif %}
+                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
+                      von Fabi,
                       {% endif %}
                       {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                       Wohnzimmer,
-                      {% endif %}
-                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
-                      fabian_s_zimmer,
                       {% endif %}
                       {% if (states.climate.bad.attributes.current_humidity) > 60 %}
                       Bad,
@@ -7525,19 +7598,21 @@
                   data_template:
                     message: >
                       {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
-                      Willkommen zurück Fabi und Samuel.
+                      Willkommen zurück Fabi und Samuel
+                      {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
+                      Willkommen zurück Fabi.
                       {% elif (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
                       Willkommen zurück Samuel.
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
                       {% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 60 %}
-                      Samuels Zimmer,
+                      von Samuel,
+                      {% endif %}
+                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
+                      von Fabi,
                       {% endif %}
                       {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                       Wohnzimmer,
-                      {% endif %}
-                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
-                      fabian_s_zimmer,
                       {% endif %}
                       {% if (states.climate.bad.attributes.current_humidity) > 60 %}
                       Bad,
@@ -7572,7 +7647,7 @@
                   data_template:
                     message: >
                       {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
-                      Willkommen zurück Fabi und Samuel.
+                      Willkommen zurück Fabi und Samuel
                       {% elif (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) %}
                       Willkommen zurück Fabi.
                       {% elif (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
@@ -7580,13 +7655,13 @@
                       {% endif %}
                       Die Luftfeuchtigkeit ist zu hoch im Raum
                       {% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 60 %}
-                      Samuels Zimmer,
+                      von Samuel,
+                      {% endif %}
+                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
+                      von Fabi,
                       {% endif %}
                       {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                       Wohnzimmer,
-                      {% endif %}
-                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
-                      fabian_s_zimmer,
                       {% endif %}
                       {% if (states.climate.bad.attributes.current_humidity) > 60 %}
                       Bad,
@@ -7611,13 +7686,13 @@
                     message: >
                       Die Luftfeuchtigkeit ist zu hoch im Raum
                       {% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 60 %}
-                      Samuels Zimmer,
+                      von Samuel,
+                      {% endif %}
+                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
+                      von Fabi,
                       {% endif %}
                       {% if (states.climate.wohnzimmer.attributes.current_humidity) > 60 %}
                       Wohnzimmer,
-                      {% endif %}
-                      {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 60 %}
-                      fabian_s_zimmer,
                       {% endif %}
                       {% if (states.climate.bad.attributes.current_humidity) > 60 %}
                       Bad,
@@ -9126,9 +9201,9 @@
         entity_id: switch.strom_keller
         state: "off"
   action:
-    - service: switch.turn_off
-      data:
-        entity_id: switch.kuhlschrank
+    #- service: switch.turn_off
+    #  data:
+    #    entity_id: switch.kuhlschrank
     - service: switch.turn_off
       data:
         entity_id: switch.keller_usb_ports
@@ -10019,7 +10094,7 @@
   initial_state: true
   trigger:
     - platform: time
-      at: "23:00:00"
+      at: "13:00:00"
   condition:
     condition: and
     conditions:
@@ -10047,7 +10122,7 @@
         question:
           "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
           {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].condition }}
-          bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }} °.
+          bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }}° und {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].wind_speed }} km/h Wind.
           Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
         options:
           - "Ja"

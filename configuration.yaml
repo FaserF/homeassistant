@@ -385,9 +385,11 @@ google_assistant:
       expose: true
       room: Fabians Zimmer
     input_boolean.fabian_pc_strom:
-      name: Strom Fabians Zimmer
+      name: Strom Fabian
       expose: true
       room: Fabians Zimmer
+      aliases:
+        - Schreibtisch Fabian
     switch.bett_usb_ports:
       name: Bett Steckdose
       expose: true
@@ -435,6 +437,10 @@ google_assistant:
       name: Samuel PC
       expose: true
       room: Samuels Zimmer
+      aliases:
+        - Schreibtisch Samuel
+        - Computer Samuel
+        - PC Samuel
     ## Wohnzimmer
     light.deckenlampe:
       expose: true
@@ -475,7 +481,7 @@ google_assistant:
       expose: true
       room: Keller
     switch.kuhlschrank:
-      expose: true
+      expose: false
       room: Keller
     switch.keller_usb_ports:
       name: USB Ports
@@ -484,7 +490,7 @@ google_assistant:
     switch.fernseher_keller:
       expose: true
       room: Keller
-    switch.strom_keller:
+    light.flutlicht_keller:
       expose: true
       room: Keller
     light.deckenlampe_keller:
@@ -500,6 +506,7 @@ google_assistant:
       room: Küche
 
 dialogflow:
+  
 intent_script:
   washing_machine_finish_duration:
     speech:
