@@ -194,6 +194,43 @@
     - choose:
         - conditions:
             - condition: sun
+              after: sunset
+            - condition: time
+              before: "23:59:00"
+            - condition: or
+              conditions:
+                - condition: or
+                  conditions:
+                    - condition: time
+                      after: "22:00:00"
+                    - condition: state
+                      entity_id: binary_sensor.workday_sensor
+                      state: "off"
+                - condition: state
+                  entity_id: binary_sensor.workday_sensor
+                  state: "on"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.samuel
+                      state: "home"
+                  sequence:
+                    - service: light.turn_on
+                      data:
+                        entity_id: light.lampe_samuel
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: "home"
+                  sequence:
+                    - service: light.turn_on
+                      data:
+                        entity_id: light.yeelight_bslamp2_0x13fea10f
+    - choose:
+        - conditions:
+            - condition: sun
               before: sunset
             - condition: sun
               after: sunrise
@@ -273,6 +310,39 @@
                     - service: notify.telegram_samuel
                       data_template:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ as_timestamp(states.automation.trigger_a_full_dust_bin_reminder.attributes.last_triggered) > as_timestamp(states.automation.telegram_dust_bin_emptied.attributes.last_triggered) }}"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: home
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data:
+                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
+                        target: !secret telegram_chat_fabian
+                        inline_keyboard:
+                          - "Erledigt:/telegramdustbindone"
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.samuel
+                      state: home
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data:
+                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
+                        target: !secret telegram_chat_samuel
+                        inline_keyboard:
+                          - "Erledigt:/telegramdustbindone"
     - choose:
         - conditions:
             - condition: or
@@ -1511,9 +1581,6 @@
   alias: "Activate guest mode if guest is here"
   initial_state: false
   trigger:
-    - platform: state
-      entity_id: person.isi
-      to: "home"
     - platform: time
       at: "01:00:00"
   condition:
@@ -1526,9 +1593,6 @@
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.activate_guest_mode_if_guest_is_here.attributes.last_triggered) | int > 86400 }}"
       - condition: or
         conditions:
-          - condition: state
-            entity_id: person.isi
-            state: "home"
           - condition: state
             entity_id: person.adri
             state: "home"
@@ -1556,11 +1620,6 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: person.isi
-      to: "not_home"
-      for:
-        days: 1
-    - platform: state
       entity_id: input_boolean.gast_modus
       to: "on"
       for:
@@ -1571,9 +1630,17 @@
       - condition: state
         entity_id: input_boolean.gast_modus
         state: "on"
-      - condition: state
-        entity_id: person.isi
-        state: "not_home"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.adri
+            state: "home"
+          - condition: state
+            entity_id: person.kai
+            state: "home"
+          - condition: state
+            entity_id: person.nathalie
+            state: "home"
   action:
     - service: input_boolean.turn_off
       data:
@@ -7783,8 +7850,7 @@
             conditions:
               - condition: numeric_state
                 entity_id: sensor.keller_steckdose_energy_power
-                above: 420
-                below: 570
+                above: 380
               - condition: state
                 entity_id: switch.kohleanzunder
                 state: "on"
@@ -7795,7 +7861,6 @@
       data:
         entity_id:
           - automation.detect_if_washing_machine_is_currently_active
-          - automation.detect_if_pizzamaker_is_currently_active
     - choose:
         #  IF 5 friends are there
         - conditions:
@@ -8205,7 +8270,6 @@
       data:
         entity_id:
           - automation.detect_if_washing_machine_is_currently_active
-          - automation.detect_if_pizzamaker_is_currently_active
     - choose:
         - conditions:
             - condition: not
@@ -8229,132 +8293,6 @@
               data:
                 message: "Die Kohle sollte fertig sein!"
 
-- id: detect_if_pizzamaker_is_currently_active
-  alias: Detect if pizzamaker is currently active
-  initial_state: false
-  mode: single
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.keller_steckdose_energy_power
-      above: 1100
-      below: 1250
-      for:
-        seconds: 35
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) | int > 600 }}"
-      - condition: state
-        entity_id: switch.kohleanzunder
-        state: "on"
-  action:
-    - service: automation.turn_off
-      data:
-        entity_id:
-          - automation.detect_if_washing_machine_is_currently_active
-          - automation.detect_if_coal_lighter_is_currently_active
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_5friends
-                message: "Der Pizzamaker wurde eingeschaltet."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.kai
-                  state: home
-                - condition: state
-                  entity_id: person.adri
-                  state: home
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Der Pizzamaker wurde eingeschaltet."
-                inline_keyboard:
-                  - "Dauer:/remaining_time"
-      default:
-        - service: telegram_bot.send_message
-          data_template:
-            target: !secret telegram_chat_fabian
-            message: "Der Pizzamaker wurde eingeschaltet."
-            inline_keyboard:
-              - "Dauer:/remaining_time"
-    - delay: "00:05:00"
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_5friends
-                message: "Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet."
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.kai
-                  state: home
-                - condition: state
-                  entity_id: person.adri
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet."
-      default:
-        - service: telegram_bot.send_message
-          data_template:
-            target: !secret telegram_chat_fabian
-            message: "Das Gericht im Pizzamaker sollte fertig sein! Strom wird in 5 min ausgeschaltet."
-    - service: automation.turn_on
-      data:
-        entity_id:
-          - automation.detect_if_washing_machine_is_currently_active
-          - automation.detect_if_coal_lighter_is_currently_active
-    - service: androidtv.adb_command
-      data:
-        entity_id: media_player.keller_tv
-        command: "pm clear com.tcl.videoplayer"
-    - service: androidtv.adb_command
-      data:
-        entity_id: media_player.keller_tv
-        command: "am start -a android.intent.action.VIEW -d /sdcard/raab_pizza.mp4 -t video/mp4"
-    - delay: "00:05:00"
-    - service: switch.turn_off
-      data:
-        entity_id: switch.kohleanzunder
-
 - id: check_if_coal_lighter_has_been_forgotten
   alias: Check if coal_lighter has been forgotten
   initial_state: true
@@ -8363,7 +8301,7 @@
       entity_id: switch.kohleanzunder
       to: "on"
       for:
-        minutes: 22
+        minutes: 25
   condition:
     condition: and
     conditions:
@@ -8391,7 +8329,7 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
-                message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+                message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
         #  ELSEIF only K&A are there
         - conditions:
             - condition: or
@@ -8429,7 +8367,7 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_afk
-                message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+                message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
         - conditions:
             - condition: or
               conditions:
@@ -8448,17 +8386,17 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_adrian
-                message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+                message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_fabian
-                message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+                message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
       #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
           data_template:
             target: !secret telegram_chat_fabian
-            message: "Der Kohleanzunder wurde vor 22 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
+            message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
 
 - id: check_if_washing_machine_has_been_forgotten
   alias: Check if washing machine has been forgotten
@@ -8564,7 +8502,6 @@
       data:
         entity_id:
           - automation.detect_if_coal_lighter_is_currently_active
-          - automation.detect_if_pizzamaker_is_currently_active
           - automation.detect_if_washing_machine_is_currently_active
 
 - id: set_washing_machine_active_when_power_detected
@@ -8679,7 +8616,6 @@
         entity_id:
           - automation.detect_if_washing_machine_is_currently_active
           - automation.detect_if_coal_lighter_is_currently_active
-          - automation.detect_if_pizzamaker_is_currently_active
     - service: switch.turn_off
       data:
         entity_id: switch.waschmaschine

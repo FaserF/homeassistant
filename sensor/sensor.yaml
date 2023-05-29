@@ -138,9 +138,9 @@
             {% endif %}
           {% else %}
             {% if as_timestamp(states.switch.waschmaschine.last_changed) < as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) %}
-              Unbekannt, ca. {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780)) | timestamp_custom("%H:%M", true) }}
+              {{ (as_timestamp(states.switch.waschmaschine.last_changed) | int + (9780)) | timestamp_custom("%H:%M", true) }}
             {% else %}
-              Unbekannt, ca. {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780)) | timestamp_custom("%H:%M", true) }}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) | int + (9780)) | timestamp_custom("%H:%M", true) }}
             {% endif %}
           {% endif %}
         {% else %}

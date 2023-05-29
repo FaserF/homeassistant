@@ -506,7 +506,7 @@ google_assistant:
       room: Küche
 
 dialogflow:
-  
+
 intent_script:
   washing_machine_finish_duration:
     speech:
@@ -573,7 +573,7 @@ intent_script:
               - service: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["3"]}'
+                  payload: '{"segment_ids": ["2"]}'
           - conditions:
               - condition: template
                 value_template: "{{ ((Room)) == 'Samuels Zimmer' }}"
@@ -581,7 +581,7 @@ intent_script:
               - service: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["7"]}'
+                  payload: '{"segment_ids": ["5"]}'
           - conditions:
               - condition: template
                 value_template: "{{ ((Room)) == 'Bad' }}"
@@ -597,7 +597,7 @@ intent_script:
               - service: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                  payload: '{"segment_ids": ["5"]}'
+                  payload: '{"segment_ids": ["3"]}'
 
 # Text to speech
 tts:

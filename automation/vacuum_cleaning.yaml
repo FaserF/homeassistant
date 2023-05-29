@@ -79,7 +79,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5", "2", "3", "4", "6"], "customOrder": true}'
+                payload: '{"segment_ids": ["6", "3", "4", "2", "5"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:
@@ -87,11 +87,11 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            # else if only fabi is not at home clean all rooms except guest room
+            # else if only fabi is not at home clean all rooms except fabians room
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5", "2", "3", "4"], "customOrder": true}'
+                payload: '{"segment_ids": ["6", "3", "4", "5"], "customOrder": true}'
         - conditions:
             - condition: not
               conditions:
@@ -99,31 +99,16 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - choose:
-                - conditions:
-                    - condition: not
-                      conditions:
-                        - condition: state
-                          entity_id: input_boolean.gast_modus
-                          state: "on"
-                  sequence:
-                    # else if only samuel is not at home but guest mode is on, clean all rooms except sleeping room & except guest room
-                    - service: mqtt.publish
-                      data:
-                        topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                        payload: '{"segment_ids": ["5", "3", "4", "6"], "customOrder": true}'
-              default:
-                # else if only samuel is not at home but guest mode is on, clean all rooms except guest room
-                - service: mqtt.publish
-                  data:
-                    topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                    payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
+            - service: mqtt.publish
+              data:
+                topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
+                payload: '{"segment_ids": ["6", "3", "4"], "customOrder": true}'
       default:
         # default if fabi & samuel at home: clean only living room, floor & kitchen
         - service: mqtt.publish
           data:
             topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-            payload: '{"segment_ids": ["5", "3", "4"], "customOrder": true}'
+            payload: '{"segment_ids": ["6", "3", "4", "2"], "customOrder": true}'
 
 - id: vacuum_cleaner_error
   alias: "Vacuum Cleaner Error"
@@ -183,7 +168,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["5"]}'
+                payload: '{"segment_ids": ["6"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -192,7 +177,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["3"]}'
+                payload: '{"segment_ids": ["4"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -210,7 +195,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["6"]}'
+                payload: '{"segment_ids": ["5"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -228,7 +213,7 @@
             - service: mqtt.publish
               data:
                 topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
-                payload: '{"segment_ids": ["4"]}'
+                payload: '{"segment_ids": ["3"]}'
         - conditions:
             - condition: state
               entity_id: input_select.vacuum_cleaning_location
@@ -287,6 +272,48 @@
             - service: notify.telegram_fabian
               data_template:
                 message: "Anscheinend waren Türen bei der geplanten Reinigung geschlossen. Daher wurden nicht alle Räume gesaugt."
+
+- id: trigger_a_full_dust_bin_reminder
+  alias: "Trigger a full dust bin reminder"
+  trigger:
+    - platform: state
+      entity_id: automation.trigger_full_dust_bin_reminder
+      to: "on"
+  action:
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 10
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
+                target: !secret telegram_chat_samuel
+                inline_keyboard:
+                  - "Erledigt:/telegramdustbindone"
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_fabian
+                  below: 10
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
+                target: !secret telegram_chat_fabian
+                inline_keyboard:
+                  - "Erledigt:/telegramdustbindone"
 
 - id: vacuum_cleaner_counter
   alias: "Set Counter with Cleaner Runs and remind for emptying and refilling"
@@ -347,38 +374,8 @@
             - condition: template
               value_template: "{{ states('counter.vacuum_runs')|float % 30 == 0 }}"
           sequence:
-            - choose:
-                - conditions:
-                    - condition: numeric_state
-                      entity_id: proximity.home_samuel
-                      below: 35
-                  sequence:
-                    - service: notify.telegram_samuel
-                      data_template:
-                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
-            - choose:
-                - conditions:
-                    - condition: numeric_state
-                      entity_id: proximity.home_fabian
-                      below: 70
-                  sequence:
-                    - service: notify.telegram_fabian
-                      data_template:
-                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein."
-            - choose:
-                - conditions:
-                    - condition: or
-                      conditions:
-                        - condition: numeric_state
-                          entity_id: proximity.home_samuel
-                          below: 35
-                        - condition: numeric_state
-                          entity_id: proximity.home_fabian
-                          below: 70
-                  sequence:
-                    - service: counter.increment
-                      target:
-                        entity_id: counter.vacuum_runs
+            - service: automation.trigger
+              entity_id: automation.trigger_full_dust_bin_reminder
         - conditions:
             - condition: template
               value_template: "{{ states('counter.vacuum_runs')|float % 30 != 0 }}"
