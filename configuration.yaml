@@ -267,6 +267,15 @@ template:
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
 
+command_line:
+  - sensor:
+    name: processor_temperature
+    command: >
+      read -r val </sys/class/thermal/thermal_zone0/temp;echo ${val}
+    value_template: >
+      {{value|multiply(0.001)|round(1)}}
+    unit_of_measurement: °C
+
 sensor: !include_dir_merge_list sensor
 
 switch: !include_dir_merge_list switch

@@ -247,17 +247,8 @@
       arg: /
     - type: memory_use_percent
     # - type: processor_temperature
-- platform: command_line
-  name: processor_temperature
-  command: >
-    read -r val </sys/class/thermal/thermal_zone0/temp;echo ${val}
-  value_template: >
-    {{value|multiply(0.001)|round(1)}}
-  unit_of_measurement: °C
 # - platform: template
 #  sensors:
 #    fs_caller:
 #      friendly_name: "Fabi Anrufer"
 #      value_template: "unbekannter"
-- platform: dwd_weather_warnings
-  region_name: !secret dwd_cell_id
