@@ -10167,6 +10167,8 @@
           - condition: template
             value_template: "{{'OTTO-Kundenkonto: Bitte E-Mail-Adresse bestätigen.' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
           - condition: template
+            value_template: "{{'Änderung der Datennutzung' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
+          - condition: template
             value_template: "{{'Deine Rechnung von OTTO' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
           - condition: template
             value_template: "{{'Deine Bestellung wurde versandt.' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
