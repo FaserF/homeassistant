@@ -182,9 +182,9 @@
       entity_id: person.samuel
       from: "not_home"
       to: "home"
-  condition:
-    condition: template
-    value_template: "{{ trigger.from_state.last_changed > utcnow() - timedelta(minutes=10) }}"
+  #condition:
+  #  condition: template
+  #  value_template: "{{ trigger.from_state.last_changed > utcnow() - timedelta(minutes=4) }}"
   action:
     - service: input_boolean.turn_off
       data:
@@ -215,6 +215,8 @@
                     - condition: state
                       entity_id: person.samuel
                       state: "home"
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
                   sequence:
                     - service: light.turn_on
                       data:
@@ -224,6 +226,8 @@
                     - condition: state
                       entity_id: person.fabian
                       state: "home"
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
                   sequence:
                     - service: light.turn_on
                       data:
@@ -277,6 +281,8 @@
             - condition: state
               entity_id: person.fabian
               state: "home"
+            - condition: template
+              value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
           sequence:
             - service: notify.telegram_fabian
               data_template:
@@ -5371,7 +5377,7 @@
                 entity_id: input_boolean.fabian_pc_strom
 
 - id: turn_on_vk_strom
-  alias: Turn on VK Strom
+  alias: Turn on SK Strom
   initial_state: true
   trigger:
     - platform: state
@@ -5389,7 +5395,7 @@
         entity_id: input_boolean.samuel_pc_strom
 
 - id: turn_off_vk_strom
-  alias: Turn off VK Strom
+  alias: Turn off SK Strom
   initial_state: true
   trigger:
     - platform: state
@@ -5410,9 +5416,6 @@
                   entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
-            - service: button.press
-              target:
-                entity_id: button.rgb_pc_shutdown
             - delay: "00:30:00"
     - choose:
         - conditions:
@@ -5425,34 +5428,25 @@
                   entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
-            - service: button.press
-              target:
-                entity_id: button.rgb_pc_shutdown
             - delay: "00:30:00"
     - choose:
         - conditions:
             - condition: and
               conditions:
-                - condition: state
-                  entity_id: device_tracker.md3f9bmc
-                  state: "home"
                 - condition: numeric_state
                   entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
-            - service: button.press
-              target:
-                entity_id: button.rgb_pc_shutdown
             - delay: "00:01:00"
     - choose:
         - conditions:
             - condition: and
               conditions:
+                #- condition: state
+                #  entity_id: device_tracker.md3f9bmc
+                #  state: "home"
                 - condition: state
-                  entity_id: device_tracker.md3f9bmc
-                  state: "home"
-                - condition: state
-                  entity_id: device_tracker.md3f9bmc
+                  entity_id: person.samuel
                   state: "not_home"
                 - condition: numeric_state
                   entity_id: sensor.steckerleiste_samuel_energy_power
@@ -5460,21 +5454,10 @@
           sequence:
             - service: notify.telegram_samuel
               data:
-                message: "Der PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
-            - service: notify.telegram_fabian
-              data:
-                message: "samuel PC ist noch an und konnte nicht heruntergefahren werden. Daher wurde der Strom nicht ausgeschaltet."
-    - choose:
-        - conditions:
-            - condition: and
-              conditions:
-                - condition: numeric_state
-                  entity_id: sensor.steckerleiste_samuel_energy_power
-                  below: 21
-          sequence:
-            - service: switch.turn_off
-              data:
-                entity_id: switch.schreibtisch_samuel
+                message: "Der PC war noch an, obwohl du nicht mehr zu Hause bist. Der Schreibtischstrom wurde nun dennoch ausgeschaltet."
+    - service: switch.turn_off
+      data:
+        entity_id: switch.schreibtisch_samuel
     - choose:
         - conditions:
             - condition: state

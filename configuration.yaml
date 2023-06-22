@@ -423,9 +423,12 @@ google_assistant:
       room: Fabians Zimmer
     ## Samuels Zimmer
     light.deckenlampe_samuel:
-      name: Deckenlampe Samuel
       expose: true
       room: Samuels Zimmer
+      aliases:
+        - Samuel Licht
+        - Deckenlicht Samuel
+        - Deckenlampe Samuel
     light.lampe_samuel:
       expose: true
       room: Samuels Zimmer
