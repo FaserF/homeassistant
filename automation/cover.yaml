@@ -30,7 +30,7 @@
                 entity_id: binary_sensor.workday_sensor
                 state: "off"
               - condition: time
-                after: "09:30:00"
+                after: "10:00:00"
                 before: "16:30:00"
           - condition: and
             conditions:
@@ -66,15 +66,35 @@
                   entity_id: cover.fabians_zimmer_rollo
                   state: "open"
           sequence:
-            - service: cover.set_cover_position
-              target:
-                entity_id: cover.fabians_zimmer_rollo
-              data:
-                position: 30
-            - delay: "00:03:00"
-            - service: cover.open_cover
-              target:
-                entity_id: cover.fabians_zimmer_rollo
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: weather.dwd_weather_ebersberg_1h
+                      attribute: temperature
+                      above: 22
+                    - condition: or
+                      conditions:
+                        - condition: template
+                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+                        - condition: template
+                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'partlycloudy' }}"
+                  sequence:
+                    - service: cover.set_cover_position
+                      target:
+                        entity_id:
+                          - cover.fabians_zimmer_rollo
+                      data:
+                        position: 60
+              default:
+                - service: cover.set_cover_position
+                  target:
+                    entity_id: cover.fabians_zimmer_rollo
+                  data:
+                    position: 30
+                - delay: "00:03:00"
+                - service: cover.open_cover
+                  target:
+                    entity_id: cover.fabians_zimmer_rollo
     - choose:
         - conditions:
             - condition: state
@@ -84,11 +104,34 @@
               entity_id: input_boolean.gast_modus
               state: "off"
           sequence:
-            - service: cover.open_cover
-              target:
-                entity_id:
-                  - cover.wohnzimmer_rollo_fenster
-                  - cover.wohnzimmer_rollo_tur
+            - choose:
+                - conditions:
+                    - condition: numeric_state
+                      entity_id: weather.dwd_weather_ebersberg_1h
+                      attribute: temperature
+                      above: 22
+                    - condition: or
+                      conditions:
+                        - condition: template
+                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+                        - condition: template
+                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'partlycloudy' }}"
+                  sequence:
+                    - service: cover.set_cover_position
+                      target:
+                        entity_id:
+                          - cover.wohnzimmer_rollo_fenster
+                          - cover.wohnzimmer_rollo_tur
+                      data:
+                        position: 60
+              default:
+                - service: cover.open_cover
+                  target:
+                    entity_id:
+                      - cover.wohnzimmer_rollo_fenster
+                      - cover.wohnzimmer_rollo_tur
+    - service: light.turn_off
+      entity_id: all
 
 - id: lower_covers_when_sunset
   alias: "lower all covers when sun set"
@@ -268,7 +311,7 @@
     - platform: numeric_state
       entity_id: weather.dwd_weather_ebersberg_1h
       attribute: temperature
-      above: 25
+      above: 23
   condition:
     condition: and
     conditions:
@@ -278,6 +321,12 @@
       - condition: state
         entity_id: input_boolean.abwesend_modus
         state: "off"
+      - condition: or
+        conditions:
+          - condition: template
+            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+          - condition: template
+            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'partlycloudy' }}"
   action:
     - choose:
         - conditions:
@@ -307,6 +356,7 @@
                     entity_id:
                       - cover.wohnzimmer_rollo_fenster
                       - cover.wohnzimmer_rollo_tur
+                      - cover.fabians_zimmer_rollo
                   data:
                     position: 60
       default:
@@ -337,6 +387,22 @@
                 - choose:
                     - conditions:
                         - condition: state
+                          entity_id: device_tracker.wohnzimmer_tv
+                          state: "home"
+                        - condition: state
+                          entity_id: switch.fernseher
+                          state: "on"
+                      sequence:
+                        - service: light.turn_on
+                          data:
+                            entity_id:
+                              - light.leds_wohnzimmer_tv
+                              - light.leds_wohnzimmer
+                              - light.stehlampe
+                            transition: 2
+                - choose:
+                    - conditions:
+                        - condition: state
                           entity_id: binary_sensor.wohnzimmer_open_window
                           state: "on"
                       sequence:
@@ -354,6 +420,22 @@
                       entity_id: cover.fabians_zimmer_rollo
                       state: "closed"
               sequence:
+                - choose:
+                    - conditions:
+                        - condition: state
+                          entity_id: device_tracker.fabian_pc
+                          state: home
+                      sequence:
+                        - service: light.turn_on
+                          data:
+                            entity_id:
+                              - light.leds_tisch
+                              - light.yeelight_bslamp2_0x13fea10f
+                            transition: 2
+                        - service: light.turn_on
+                          data:
+                            entity_id:
+                              - light.regal
                 - choose:
                     - conditions:
                         - condition: state

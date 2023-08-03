@@ -260,7 +260,7 @@
                     - condition: numeric_state
                       entity_id: weather.dwd_weather_ebersberg_1h
                       attribute: temperature
-                      above: 25
+                      above: 22
                   sequence:
                     - service: cover.set_cover_position
                       target:
@@ -283,6 +283,8 @@
               state: "home"
             - condition: template
               value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 3600 }}"
           sequence:
             - service: notify.telegram_fabian
               data_template:
@@ -1049,9 +1051,6 @@
     platform: time
     at: "00:50:00"
   condition:
-    - condition: state
-      entity_id: input_boolean.gast_modus
-      state: "off"
     - condition: template
       value_template: >
         {% set domain = 'light' %}
@@ -1088,6 +1087,9 @@
                         - condition: state
                           entity_id: person.fabian
                           state: "home"
+                        - condition: numeric_state
+                          entity_id: proximity.home_fabian
+                          below: 10
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1100,6 +1102,9 @@
                         - condition: state
                           entity_id: person.samuel
                           state: "home"
+                        - condition: numeric_state
+                          entity_id: proximity.home_samuel
+                          below: 10
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1120,6 +1125,9 @@
                         - condition: state
                           entity_id: person.fabian
                           state: "home"
+                        - condition: numeric_state
+                          entity_id: proximity.home_fabian
+                          below: 10
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1133,6 +1141,9 @@
                         - condition: state
                           entity_id: person.samuel
                           state: "home"
+                        - condition: numeric_state
+                          entity_id: proximity.home_samuel
+                          below: 10
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1146,6 +1157,9 @@
     platform: time
     at: "04:30:00"
   condition:
+    - condition: state
+      entity_id: binary_sensor.workday_sensor
+      state: "off"
     - condition: or
       conditions:
         - condition: state
@@ -1163,12 +1177,40 @@
             {% set state = 'on' %}
             {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
   action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_chat_fabian
-        message: "Fernseher & Lichter werden in 20 Minuten ausgeschaltet."
-        inline_keyboard:
-          - "Abbruch:/cancellight, Okay:/telegramno"
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_fabian
+                  below: 10
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_fabian
+                message: "Fernseher & Lichter werden in 20 Minuten ausgeschaltet."
+                inline_keyboard:
+                  - "Abbruch:/cancellight, Okay:/telegramno"
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 5
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_samuel
+                message: "Fernseher & Lichter werden in 20 Minuten ausgeschaltet."
+                inline_keyboard:
+                  - "Abbruch:/cancellight, Okay:/telegramno"
 
 - id: turn_off_devices_at_night
   alias: "Turn off devices at night"
@@ -1207,10 +1249,36 @@
               entity_id: all
             - service: media_player.turn_off
               entity_id: media_player.keller_tv
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: numeric_state
+                          entity_id: proximity.home_fabian
+                          below: 5
+                        - condition: state
+                          entity_id: person.fabian
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_fabian
+                        message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
+            - choose:
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: numeric_state
+                          entity_id: proximity.home_samuel
+                          below: 5
+                        - condition: state
+                          entity_id: person.samuel
+                          state: "home"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_samuel
+                        message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
         - conditions:
             - condition: template
@@ -1360,6 +1428,10 @@
   trigger:
     platform: time
     at: "00:50:00"
+  condition:
+    - condition: time
+      weekday:
+        - thu
   action:
     - service: hassio.addon_stop
       data:
@@ -4300,9 +4372,6 @@
     - condition: state
       entity_id: "switch.fernseher"
       state: "on"
-    - condition: state
-      entity_id: "switch.fernseher"
-      state: "off"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_in_livingroom_when_dark_outside.attributes.last_triggered) | int > 1800 }}"
     - condition: or
@@ -4387,9 +4456,6 @@
   condition:
     condition: and
     conditions:
-      - condition: state
-        entity_id: "device_tracker.wohnzimmer_tv"
-        state: "not_home"
       - condition: or
         conditions:
           - condition: state
@@ -4435,6 +4501,12 @@
             - service: light.turn_on
               data:
                 entity_id: light.prismatik
+            - service: light.turn_on
+              data:
+                entity_id:
+                  - light.leds_tisch
+                  - light.yeelight_bslamp2_0x13fea10f
+                transition: 2
     - choose:
         - conditions:
             - condition: state
@@ -4443,7 +4515,10 @@
           sequence:
             - service: light.turn_on
               data:
-                entity_id: light.yeelight_bslamp2_0x13fea10f
+                entity_id:
+                  - light.leds_tisch
+                  - light.yeelight_bslamp2_0x13fea10f
+                transition: 2
 
 - id: turn_off_lights_in_rooms_when_bright_outside
   alias: "Turn off lights in rooms when bright outside"
@@ -5052,8 +5127,8 @@
       data:
         addon: 605cee21_bashscriptexecuter
 
-- id: run_epicgames_free_addon_once_a_day
-  alias: "Run Epic Games free addon once a day"
+- id: run_epicgames_free_addon_once_a_week
+  alias: "Run Epic Games free addon once a week"
   initial_state: true
   trigger:
     - platform: time
@@ -5513,12 +5588,25 @@
         entity_id: proximity.home_samuel
         above: 80
   action:
-    - service: notify.telegram_fabian
-      data:
-        message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
-    - service: notify.telegram_samuel
-      data:
-        message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: switch.kuhlschrank
+              state: "on"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "Abwesend Modus wurde aktiviert, da keiner daheim ist. Der Kühlschrank ist allerdings noch an, bitte ausschalten, falls 7 Tage oder mehr nicht in Verwendung."
+            - service: notify.telegram_samuel
+              data:
+                message: "Abwesend Modus wurde aktiviert, da keiner daheim ist. Der Kühlschrank ist allerdings noch an, bitte ausschalten, falls 7 Tage oder mehr nicht in Verwendung."
+      default:
+        - service: notify.telegram_fabian
+          data:
+            message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
+        - service: notify.telegram_samuel
+          data:
+            message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
     - service: input_boolean.turn_on
       data:
         entity_id: input_boolean.abwesend_modus
@@ -6997,7 +7085,13 @@
       conditions:
         - condition: state
           entity_id: sensor.fritz_box_3490_external_ip
-          state: unavailable
+          state: "unavailable"
+        - condition: state
+          entity_id: sensor.fritz_box_3490_external_ip
+          state: ""
+        - condition: state
+          entity_id: sensor.fritz_box_3490_external_ip
+          state: "unknown"
   action:
     - service: notify.telegram_fabian
       data:
@@ -7938,6 +8032,19 @@
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
                   - "Dauer:/remaining_time"
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_samuel
+                message: "Kohleanzünder wurde eingeschaltet."
+                inline_keyboard:
+                  - "Dauer:/remaining_time"
       #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
@@ -8054,7 +8161,18 @@
                       name: "default"
                       critical: 1
                       volume: 0.7
-      #  ELSE only notify fabian
+        #  ELSE only notify fabian
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_samuel
+                message: "Bitte Kohle wenden."
       default:
         - service: telegram_bot.send_message
           data_template:
@@ -8121,6 +8239,17 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_fabian
+                message: "Der Eisschlauch kann schon mal geholt werden."
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_samuel
                 message: "Der Eisschlauch kann schon mal geholt werden."
     - delay: "00:02:00"
     - service: switch.turn_off
@@ -8234,6 +8363,17 @@
                       name: "default"
                       critical: 1
                       volume: 0.7
+        - conditions:
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: person.samuel
+                  state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_samuel
+                message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
       #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
@@ -8537,18 +8677,40 @@
       data:
         entity_id: input_select.washing_machine_status
         option: Clean
-    - service: notify.telegram_fabian
-      data:
-        message: "Die Waschmaschine ist fertig. Bitte ausräumen."
-        data:
-          inline_keyboard:
-            - "Erledigt:/telegramwasherdone"
-    - service: notify.telegram_samuel
-      data:
-        message: "Die Waschmaschine ist fertig. Bitte ausräumen."
-        data:
-          inline_keyboard:
-            - "Erledigt:/telegramwasherdone"
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_fabian
+                  below: 35
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "Die Waschmaschine ist fertig. Bitte ausräumen."
+                data:
+                  inline_keyboard:
+                    - "Erledigt:/telegramwasherdone"
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: proximity.home_samuel
+                  below: 35
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data:
+                message: "Die Waschmaschine ist fertig. Bitte ausräumen."
+                data:
+                  inline_keyboard:
+                    - "Erledigt:/telegramwasherdone"
     - choose:
         - conditions:
             - condition: state
