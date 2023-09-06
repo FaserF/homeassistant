@@ -147,7 +147,8 @@
           Läuft nicht
         {% endif %}
       friendly_name: "Waschmaschine Uhrzeit ca. fertig"
-      unit_of_measurement: "Uhr"
+      #unit_of_measurement: "Uhr"
+      #device_class: timestamp
     washing_machine_finish_duration:
       value_template: >
         {% if (is_state("switch.waschmaschine", "on")) -%}
@@ -202,7 +203,8 @@
           0
         {% endif %}
       friendly_name: "Waschmaschine Dauer ca. fertig"
-      unit_of_measurement: "Stunden"
+      #unit_of_measurement: h
+      #device_class: duration
     coal_lighter_finish_duration:
       value_template: >
         {% if (is_state("switch.kohleanzunder", "on")) -%}

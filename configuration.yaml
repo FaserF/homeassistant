@@ -110,11 +110,38 @@ recorder:
       - sensor.juz_outlook
       - sensor.5freunde_outlook
 
-# Discover some devices automatically
-discovery:
-
 # Enables support for tracking state changes over time
 history:
+
+# Example configuration.yaml entry
+alert:
+  gmaps_cookie:
+    name: Google Maps Homeassistant Coockie scheint abgelaufen zu sein (Fabian)
+    done_message: Maps Cookie wurde erneuert
+    entity_id: device_tracker.google_maps_112174659110860535869
+    #attribute: source_type
+    state: "unavailable"
+    repeat: 3200
+    can_acknowledge: true
+    skip_first: true
+  gmaps_cookie_votgaming:
+    name: Google Maps Homeassistant Coockie scheint abgelaufen zu sein (votgaming)
+    done_message: Maps Cookie wurde erneuert
+    entity_id: device_tracker.google_maps_108826716663847481627
+    #attribute: source_type
+    state: "unavailable"
+    repeat: 3200
+    can_acknowledge: true
+    skip_first: true
+  james_stuck:
+    name: James hat ein Problem!
+    message: "James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }} - Die Reinigung wurde daher unterbrochen."
+    done_message: Maps Cookie wurde erneuert
+    entity_id: vacuum.valetudo_dreamez10pro
+    state: "error"
+    repeat: 60
+    can_acknowledge: true
+    skip_first: true
 
 # View all events in a logbook
 logbook:
@@ -150,11 +177,12 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
-  # logs:
-  # custom_components.deutschebahn: debug
-  # custom_components.rewe: debug
-  # custom_components.foodsharing: debug
-  # custom_components.dwd_illuminance: debug
+  logs:
+    # custom_components.deutschebahn: debug
+    # custom_components.rewe: debug
+    # custom_components.foodsharing: debug
+    # custom_components.dwd_illuminance: debug
+    custom_components.chefkoch: debug
 
 # Enables a map showing the location of tracked devices
 map:
@@ -172,6 +200,10 @@ proximity:
     zone: home
     ignored_zones: zone.arbeit_fabi
     devices: person.fabian
+    tolerance: 50
+  home_anna:
+    zone: home
+    devices: person.anna
     tolerance: 50
   home_ka:
     zone: home
@@ -202,10 +234,12 @@ telegram_bot:
       - !secret telegram_chat_juz_mail
       - !secret telegram_foodsharing
       - !secret telegram_foodsharing_muc
+      - !secret telegram_foodsharing_wue
       - !secret telegram_volleyball
       - !secret telegram_chat_michelle
       - !secret telegram_chat_samuel
       - !secret telegram_chat_daniel
+      - !secret telegram_chat_anna
 
 media_source:
 
@@ -244,8 +278,10 @@ template:
         icon: "{{ 'mdi:alert-circle' if states('sensor.unavailable_entities')|int(0) > 0 else 'mdi:check-circle' }}"
         unit_of_measurement: entities
         state: >
-          {% if state_attr('sensor.unavailable_entities','entities') != none %}
+          {% if state_attr('sensor.unavailable_entities','entities') |int(0) > 0 %}
             {{ state_attr('sensor.unavailable_entities','entities')|count }}
+          {% else %}
+            0
           {% endif %}
         attributes:
           entities: >
@@ -418,8 +454,17 @@ google_assistant:
       name: Bettlicht
       expose: true
       room: Fabians Zimmer
+      aliases:
+        - Nachtlicht
     cover.fabians_zimmer_rollo:
       expose: true
+      aliases:
+        - Rollo Fabians Zimmer
+        - Rollo Schlafzimmer
+        - Rolladen Fabians Zimmer
+        - Rolladen Schlafzimmer
+        - Jalousie Fabians Zimmer
+        - Jalousie Schlafzimmer
       room: Fabians Zimmer
     ## Samuels Zimmer
     light.deckenlampe_samuel:
@@ -485,9 +530,17 @@ google_assistant:
     cover.wohnzimmer_rollo_fenster:
       expose: true
       room: Wohnzimmer
+      aliases:
+        - Rollo Wohnzimmer Fenster
+        - Rolladen Wohnzimmer Fenster
+        - Jalousie Wohnzimmer Fenster
     cover.wohnzimmer_rollo_tur:
       expose: true
       room: Wohnzimmer
+      aliases:
+        - Rollo Wohnzimmer Fenster
+        - Rolladen Wohnzimmer Fenster
+        - Jalousie Wohnzimmer Fenster
     ## Keller
     switch.waschmaschine:
       expose: true
@@ -516,6 +569,9 @@ google_assistant:
     switch.kuchengerate:
       expose: true
       room: Küche
+      aliases:
+        - Toaster
+        - Wasserkocher
 
 dialogflow:
 
@@ -701,6 +757,8 @@ adaptive_lighting:
     lights:
       - light.leds_wohnzimmer
       - light.stehlampe
+      - light.stehlampe_oben
+      - light.stehlampe_unten
     min_brightness: 60
     min_color_temp: 3700
   - name: "sleeping_room"
@@ -709,11 +767,6 @@ adaptive_lighting:
       - light.bett_gluhbirne
       # - light.leds_tisch
     min_brightness: 25
-  - name: "guest_room"
-    lights:
-      - light.leds_gastezimmer
-    min_brightness: 80
-    min_color_temp: 4000
 
 xiaomi_miio_cooker:
   name: Xiaomi Rice Cooker

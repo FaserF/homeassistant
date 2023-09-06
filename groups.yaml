@@ -256,3 +256,9 @@ ignored_entities:
     - sensor.fabian_iphone_ssid
     - sensor.fabian_iphone_last_update_trigger
     - sensor.fabian_iphone_sim_1
+    - remote.samuel_s_fernseher
+    - sensor.valetudo_dreamez10pro_status_flag
+    - person.janina
+    - media_player.samuels_lautsprecher
+    - light.deckenlampe_samuel
+    - media_player.chromecast8917

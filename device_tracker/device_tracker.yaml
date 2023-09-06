@@ -3,7 +3,7 @@
   username: !secret gmaps_mail
   max_gps_accuracy: 1000
   new_device_defaults:
-    track_new_devices: false
+    track_new_devices: true
 - platform: google_maps
   username: !secret vapid_email
   max_gps_accuracy: 1000

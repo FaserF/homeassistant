@@ -250,16 +250,18 @@
   trigger:
     - platform: state
       entity_id: vacuum.valetudo_dreamez10pro
-      from: "returning"
-      to: "docked"
+      to: "returning"
       for:
-        minutes: 2
+        minutes: 1
   condition:
     condition: and
     conditions:
       - condition: numeric_state
         entity_id: sensor.valetudo_dreamez10pro_current_statistics_area
         below: 220
+      - condition: numeric_state
+        entity_id: sensor.valetudo_dreamez10pro_current_statistics_area
+        above: 10
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_vacuum_weekly.attributes.last_triggered) | int < 5400 }}"
   action:

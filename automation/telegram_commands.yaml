@@ -1,7 +1,7 @@
 ---
 - id: telegram_pill_1h
   alias: "Telegram pill 1h"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: event
       event_type: telegram_callback
@@ -31,7 +31,7 @@
 
 - id: telegram_pill_marked_done
   alias: "Telegram pill marked done"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: event
       event_type: telegram_callback
@@ -54,7 +54,7 @@
 
 - id: telegram_reset_pill_counter
   alias: "Telegram reset pill counter"
-  initial_state: true
+  initial_state: false
   trigger:
     platform: event
     event_type: telegram_callback
@@ -1145,12 +1145,3 @@
                     Jemand
                   {% endif %}
                   ist da.
-
-- id: telegram_poll_answer
-  alias: "Telegram poll answer"
-  initial_state: true
-  trigger:
-  platform: event
-  event_type: telegram_command
-  event_data:
-    poll_answer: "/ping"
