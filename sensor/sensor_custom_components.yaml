@@ -68,9 +68,9 @@
 #       - description
 #       - image
 - platform: tgtg
-  email: "seitzf1@yahoo.de"
+  email: !secret defaultmail
   access_token: !secret tgtg_access_token
   refresh_token: !secret tgtg_refresh_token
   user_id: "14731770"
-  cookie: "datadome=7Shg~tlYK7Agp44ZGb6OFlr3ZTVwmkeD~GQnyOB9_PYKHUBuJj8tYrZ03MqxKLovNJLrYuKejIb2X0HezwkEuTJHO41Hq5sZp7L_WTSyiDu3cEStWbjKjgRhEo1KgY6K; Max-Age=5184000; Domain=.apptoogoodtogo.com; Path=/; Secure; SameSite=Lax"
-  scan_interval: 900
+  cookie: !secret tgtg_cookie
+  scan_interval: 130

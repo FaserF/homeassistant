@@ -5898,11 +5898,43 @@
   alias: "Too good to go food Available WUE"
   initial_state: true
   trigger:
-    - platform: time
-      at: "12:15:00"
+    - platform: state
+      entity_id: sensor.tgtg_backwerk_wurzburg_hbf
+    - platform: state
+      entity_id: sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg
+    - platform: state
+      entity_id: sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend
+    - platform: state
+      entity_id: sensor.tgtg_dean_david_maulhardgasse
+    - platform: state
+      entity_id: sensor.tgtg_dean_david_maulhardgasse_vegetarisch
+    - platform: state
+      entity_id: sensor.tgtg_denns_biomarkt_wurzburg_backwaren
+    - platform: state
+      entity_id: sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse
+    - platform: state
+      entity_id: sensor.tgtg_edeka_didis_kurnach_obst_gemuse
+    - platform: state
+      entity_id: sensor.tgtg_edeka_didis_kurnach_uberraschungstute
+    - platform: state
+      entity_id: sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet
+    - platform: state
+      entity_id: sensor.tgtg_nordsee_domstrasse_hauptgerichte
+    - platform: state
+      entity_id: sensor.tgtg_nordsee_domstrasse_snacks
+    - platform: state
+      entity_id: sensor.tgtg_sumo_sushi_bar
+    - platform: state
+      entity_id: sensor.tgtg_ursprung_bioladen
+    - platform: state
+      entity_id: sensor.tgtg_webers_backerladen_augustinerstrasse
+    - platform: state
+      entity_id: sensor.tgtg_webers_backerladen_eichhornstrasse
   condition:
     - condition: template
-      value_template: "{{ (states.sensor.tgtg_backwerk_wurzburg_hbf.state | int) + (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state | int) > 0 + (states.sensor.tgtg_dean_david_maulhardgasse.state | int) > 0 + (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state | int) > 0 + (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state | int) > 0 + (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state | int) > 0 + (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state | int) > 0 + (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state | int) > 0 + (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state | int) > 0 + (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state | int) > 0 + (states.sensor.tgtg_nordsee_domstrasse_snacks.state | int) > 0 + (states.sensor.tgtg_sumo_sushi_bar.state | int) > 0 + (states.sensor.tgtg_ursprung_bioladen.state | int) > 0 + (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state | int) > 0 + (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state | int) > 0 }}"
+      value_template: "{{ (states.sensor.tgtg_backwerk_wurzburg_hbf.state | int) + (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state | int) + (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state | int) + (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state | int) + (states.sensor.tgtg_nordsee_domstrasse_snacks.state | int) + (states.sensor.tgtg_sumo_sushi_bar.state | int) + (states.sensor.tgtg_ursprung_bioladen.state | int) + (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state | int) + (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state | int) > 0 }}"
+    - condition: template
+      value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
     - condition: or
       conditions:
         - condition: state
@@ -6126,6 +6158,9 @@
                 - condition: state
                   entity_id: person.anna
                   state: "Anna"
+                - condition: state
+                  entity_id: person.anna
+                  state: "Anna Schule"
           sequence:
             - service: telegram_bot.send_message
               data_template:
