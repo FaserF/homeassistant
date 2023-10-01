@@ -17,7 +17,7 @@ jobs:
   #  runs-on: ubuntu-latest
   #  steps:
   #    - name: ⤵️ Check out configuration from GitHub
-  #      uses: actions/checkout@v3.6.0
+  #      uses: actions/checkout@v4.1.0
   #    - name: 🚀 Run yamllint
   #      uses: frenck/action-yamllint@v1.2.0
   #      continue-on-error: true
@@ -26,7 +26,7 @@ jobs:
   #  runs-on: ubuntu-18.04
   #  steps:
   #    - name: ⤵️ Check out configuration from GitHub
-  #      uses: actions/checkout@v3.6.0
+  #      uses: actions/checkout@v4.1.0
   #    - name: Running Remark lint
   #      uses: "docker://pipelinecomponents/remark-lint:latest"
   #      continue-on-error: true
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out configuration from GitHub
-        uses: actions/checkout@v3.6.0
+        uses: actions/checkout@v4.1.0
       - name: Rename Dummy files and remove custom component stuff for config check
         run: |
             mv -f dummy_files/custom_components_dummy.yaml custom_components.yaml
