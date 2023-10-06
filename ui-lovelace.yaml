@@ -1,6 +1,6 @@
 animated_background:
   default_url: https://cdn.flixel.com/flixel/ypy8bw9fgw1zv2b4htp2.hd.mp4
-  entity: weather.dwd_weather_ebersberg_1h
+  entity: weather.ebersberg_ebersberg
   state_url:
     sunny:
       - https://home.eidolf.de/local/weather/hlhff0h8md4ev0kju5be.hd.mp4
@@ -74,21 +74,21 @@ views:
       - entity: person.fabian
       - entity: person.samuel
       - entity: sensor.fabian_iphone_icloud_battery
-      - entity: sensor.fabian_ipad_icloud_battery
+      - entity: sensor.m2101k6g_battery_level
       - entity: sensor.washing_machine_finish_duration
-      - entity: sensor.steckerleiste_samuel_s_zimmer_energy_power
+      - entity: sensor.steckerleiste_samuel_energy_power
       - entity: sensor.fabian_schreibtisch_power
       - entity: sensor.keller_steckdose_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.zorneding_to_leuchtenbergring
       - entity: sensor.fabian_s_zuhause_solar_percentage
       - entity: sensor.dwd_illuminance
-      - entity: sensor.lk_ebersberg_weekincidence
-      - entity: sensor.lk_munchen_weekincidence
       - entity: sensor.average_house_humidity
       - entity: sensor.average_house_temp
       - entity: sensor.foodsharing_48_082236
       - entity: sensor.rewe_440421
+      - entity: sensor.chefkoch_daily_recommendations
+      - entity: sensor.chefkoch_random_recommendations
     cards:
       - entities:
           - entity: light.deckenlampe
@@ -97,7 +97,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_color_0x36dc050
+          - entity: light.stehlampe
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -115,18 +115,13 @@ views:
             toggle: true
             type: custom:slider-entity-row
           - entity: light.regal
-          - entity: light.lampe_gastezimmer
+          - entity: light.deckenlampe_samuel
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.leds_gastezimmer
-            group: true
-            toggle: true
-            type: custom:slider-entity-row
-          - entity: light.keller_bulb
-            group: true
-            toggle: true
-            type: custom:slider-entity-row
+          - entity: light.lampe_samuel
+          - entity: light.deckenlampe_keller
+          - entity: light.flutlicht_keller
         show_header_toggle: true
         title: Licht
         type: entities
@@ -140,12 +135,13 @@ views:
           - entity: switch.bett_usb_ports
           - entity: input_boolean.samuel_pc_strom
             secondary_info: last-changed
+          - entity: switch.fernseher_samuel
           - entity: switch.gastezimmer_usb_ports
           - entity: switch.kuchengerate
           - entity: switch.waschmaschine
           - entity: switch.kuhlschrank
           - entity: switch.fernseher_keller
-          - entity: switch.strom_keller
+          - entity: switch.frei_keller
           - entity: switch.keller_usb_ports
           - entity: switch.kohleanzunder
           - entity: input_button.schloss
@@ -165,46 +161,46 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.wohnzimmer_open_window
             name: Fenster
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - entity: climate.fabian_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
           - entity: binary_sensor.fabian_s_zimmer_open_window
             name: Fenster
-        step_size: "1"
+        step_size: '1'
       - entity: climate.samuel_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
           - entity: binary_sensor.samuel_s_zimmer_open_window
             name: Fenster
-        step_size: "1"
+        step_size: '1'
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
           - entity: binary_sensor.bad_open_window
             name: Fenster
-        step_size: "1"
+        step_size: '1'
       - type: vertical-stack
         cards:
           - type: entities
@@ -227,23 +223,24 @@ views:
               - entity: sensor.xiaomi_miio_cooker_taste_phase
               - entity: sensor.xiaomi_miio_cooker_cooking_delayed
               - entity: sensor.xiaomi_miio_cooker_temperature
+              - entity: automation.turn_off_kitchen_devices_after_x_minutes
             show_header_toggle: false
       - type: vertical-stack
         cards:
           - type: custom:weather-card
-            entity: weather.dwd_weather_ebersberg_1h
+            entity: weather.ebersberg_ebersberg
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: "6"
-            number_of_forecasts: "8"
+            forecastMaxColumn: '6'
+            number_of_forecasts: '8'
           - type: custom:weather-card
-            entity: weather.dwd_weather_ebersberg
-            number_of_forecasts: "6"
+            entity: weather.ebersberg_ebersberg
+            number_of_forecasts: '6'
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: "5"
+            forecastMaxColumn: '5'
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
@@ -292,7 +289,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_color_0x36dc050
+          - entity: light.stehlampe
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -313,11 +310,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - type: grid
         square: false
         columns: 1
@@ -467,7 +464,7 @@ views:
           - entity: light.prismatik
           - entity: device_tracker.fabian_pc
             secondary_info: last-changed
-          - entity: device_tracker.nsta0552
+          - entity: device_tracker.c_pf38fwqx_2
             secondary_info: last-changed
           - entity: sensor.fabian_schreibtisch_power
           - entity: sensor.fabian_pc_cpu_load
@@ -482,10 +479,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.fabians_lautsprecher
         type: custom:mini-media-player
@@ -507,10 +504,11 @@ views:
       - entities:
           - entity: switch.adaptive_lighting_guest_room
             name: Adaptives Licht
-          - entity: light.lampe_samuel_s_zimmer
+          - entity: light.deckenlampe_samuel
             group: true
             toggle: true
             type: custom:slider-entity-row
+          - entity: light.lampe_samuel
           - entity: light.leds_samuel_s_zimmer
             group: true
             toggle: true
@@ -520,49 +518,58 @@ views:
         title: Licht
         type: entities
       - entities:
+          - entity: switch.fernseher_samuel
           - entity: input_boolean.samuel_pc_strom
-          - entity: device_tracker.rgb_pc
-          - entity: device_tracker.vku_lb_20
-            secondary_info: last-changed
-          - entity: sensor.steckerleiste_samuel_s_zimmer_energy_power
-          - entity: sensor.steckerleiste_samuel_s_zimmer_energy_today
+          - entity: device_tracker.md3f9bmc
+          - entity: sensor.steckerleiste_samuel_energy_power
+          - entity: sensor.steckerleiste_samuel_energy_today
+          - entity: switch.gastezimmer_usb_ports
         show_header_toggle: false
-        title: Nessie PC
+        title: Geräte
         type: entities
       - entity: climate.samuel_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.samuels_lautsprecher
         type: custom:mini-media-player
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: entities
+            entities:
+              - remote.samuel_s_fernseher
+          - type: media-control
+            entity: media_player.samuel_s_fernseher
   - icon: mdi:washing-machine
     path: keller
     title: Keller
     badges:
       - entity: sensor.steckerleiste_keller_energy_power
       - entity: sensor.steckerleiste_keller_energy_today
+      - entity: sensor.kuhlschrank_power
+      - entity: sensor.kuhlschrank_energy_today
     cards:
       - type: area
         area: fd6f6d3c931e48348d9437fc4d103fb4
       - entities:
-          - entity: light.keller_bulb
-            group: true
-            toggle: true
-            type: custom:slider-entity-row
+          - entity: light.deckenlampe_keller
+          - entity: light.flutlicht_keller
         show_header_toggle: true
         title: Licht
         type: entities
       - entities:
           - entity: switch.kuhlschrank
           - entity: switch.fernseher_keller
-          - entity: switch.strom_keller
           - entity: switch.keller_usb_ports
+          - entity: switch.frei_keller
         show_header_toggle: true
         title: Mehrfachsteckdose
         type: entities
@@ -691,23 +698,23 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: entities
         entities:
-          - entity: sensor.kuche_speaker_timers
+          - entity: sensor.kuche_lautsprecher_timers
           - entity: sensor.wohnzimmer_uhr_timers
-          - entity: sensor.fabian_s_zimmer_speaker_timers
-          - entity: sensor.samuel_s_zimmer_mini_timers
+          - entity: sensor.fabians_lautsprecher_timers
+          - entity: sensor.fabians_lautsprecher_timers
         title: Google Nest Timers
       - type: entities
         entities:
-          - entity: switch.samuel_s_zimmer_mini_do_not_disturb
-          - entity: switch.fabian_s_zimmer_speaker_do_not_disturb
+          - entity: switch.kuche_lautsprecher_do_not_disturb
+          - entity: switch.fabians_lautsprecher_do_not_disturb
           - entity: switch.wohnzimmer_uhr_do_not_disturb
-          - entity: switch.kuche_speaker_do_not_disturb
+          - entity: switch.samuels_lautsprecher_do_not_disturb
         title: Google Nest DND
         show_header_toggle: false
       - type: entities
@@ -771,11 +778,11 @@ views:
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: button.fritz_box_3490_reboot
+          - entity: button.fritz_box_3490_restart
           - entity: button.fritz_box_3490_reconnect
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_2_4ghz
           - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
-          - entity: sensor.fritz_box_3490_device_uptime
+          - entity: sensor.fritz_box_3490_last_restart
           - entity: sensor.fritz_box_3490_connection_uptime
           - entity: sensor.fritz_box_3490_download_throughput
           - entity: sensor.fritz_box_3490_upload_throughput
@@ -790,6 +797,7 @@ views:
           - entity: person.flo
           - entity: person.maxi
           - entity: person.samuel
+          - entity: person.janina
           - entity: person.papa
         title: Freunde & Bekannte
       - type: map
@@ -823,6 +831,11 @@ views:
       - type: sensor
         entity: sensor.memory_use_percent
         graph: line
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: custom:icloud3-event-log-card
   - title: Cast
     path: cast
     icon: mdi:cast
@@ -840,7 +853,7 @@ views:
           - device_tracker.google_maps_112174659110860535869
           - device_tracker.google_maps_112056758146194246561
       - type: weather-forecast
-        entity: weather.dwd_weather_ebersberg
+        entity: weather.ebersberg_ebersberg
       - type: entities
         entities:
           - binary_sensor.bad_open_window

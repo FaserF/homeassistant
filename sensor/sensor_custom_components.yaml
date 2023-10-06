@@ -1,6 +1,6 @@
 ---
 - platform: dwd_illuminance
-  entity_id: weather.dwd_weather_ebersberg_1h
+  entity_id: weather.ebersberg_ebersberg
 ## Waste sensors
 - platform: waste_collection_schedule
   name: Restmüll

@@ -201,17 +201,13 @@ proximity:
     ignored_zones: zone.arbeit_fabi
     devices: person.fabian
     tolerance: 50
-  home_anna:
-    zone: home
-    devices: person.anna
-    tolerance: 50
-  home_ka:
-    zone: home
-    ignored_zones: kai_adri
-    devices:
-      - person.kai
-      - person.adri
-    tolerance: 50
+  #home_ka:
+  #  zone: home
+  #  ignored_zones: kai_adri
+  #  devices:
+  #    - person.kai
+  #    - person.adri
+  #  tolerance: 50
 
 telegram_bot:
   - platform: polling
@@ -302,6 +298,38 @@ template:
                 |rejectattr('last_changed','ge',ignore_ts)
                 |selectattr('state','in',['unavailable','unknown','none'])|map(attribute='entity_id')|list }}
             {% endif %}
+  - trigger:
+      - platform: time_pattern
+        hours: /1
+    action:
+      - service: weather.get_forecast
+        data:
+          type: hourly
+        target:
+          entity_id: weather.ebersberg_ebersberg
+        response_variable: hourly
+    sensor:
+      - name: Weather Ebersberg Hourly
+        unique_id: weather_ebersberg_hourly
+        state: "{{ hourly.forecast.temperature }}"
+        attributes:
+          forecast: "{{ hourly.forecast }}"
+  - trigger:
+      - platform: time_pattern
+        hours: /23
+    action:
+      - service: weather.get_forecast
+        data:
+          type: daily
+        target:
+          entity_id: weather.ebersberg_ebersberg
+        response_variable: daily
+    sensor:
+      - name: Weather Ebersberg daily
+        unique_id: weather_ebersberg_daily
+        state: "{{ daily.forecast.temperature }}"
+        attributes:
+          forecast: "{{ daily.forecast }}"
 
 #command_line:
 #  - sensor:
@@ -770,7 +798,7 @@ adaptive_lighting:
 
 xiaomi_miio_cooker:
   name: Xiaomi Rice Cooker
-  host: 192.168.178.220
+  host: 192.168.178.47
   token: !secret rice_cooker_token
   model: chunmi.cooker.eh1
 

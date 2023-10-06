@@ -162,9 +162,9 @@
               entity_id: input_boolean.gast_modus
               state: "off"
             - condition: template
-              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature'] | int <= 10 }}"
+              value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['temperature'] | int <= 10 }}"
             - condition: template
-              value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature'] | int >= 28 }}"
+              value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['temperature'] | int >= 28 }}"
           sequence:
             - service: cover.close_cover
               target:
@@ -258,7 +258,7 @@
             - choose:
                 - conditions:
                     - condition: numeric_state
-                      entity_id: weather.dwd_weather_ebersberg_1h
+                      entity_id: sensor.weather_ebersberg_hourly
                       attribute: temperature
                       above: 22
                   sequence:
@@ -394,6 +394,16 @@
                         target: !secret telegram_chat_samuel
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
+                target: !secret telegram_chat_kai
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
+                target: !secret telegram_chat_adrian
     - choose:
         - conditions:
             - condition: template
@@ -989,7 +999,7 @@
 #       condition: and
 #       conditions:
 #         - condition: numeric_state
-#           entity_id: 'weather.dwd_weather_ebersberg_1h'
+#           entity_id: 'sensor.weather_ebersberg_hourly'
 #           attribute: temperature
 #           above: 22
 #         - condition: time
@@ -1921,7 +1931,7 @@
     # - choose:
     #     - conditions:
     #         - condition: numeric_state
-    #           entity_id: "weather.dwd_weather_ebersberg_1h"
+    #           entity_id: "sensor.weather_ebersberg_hourly"
     #           attribute: temperature
     #           below: 16
     #         - condition: state
@@ -1966,7 +1976,7 @@
                   entity_id: cover.fabians_zimmer_rollo
                   state: "closed"
                 - condition: state
-                  entity_id: weather.dwd_weather_ebersberg_1h
+                  entity_id: sensor.weather_ebersberg_hourly
                   state: "rainy"
             - condition: or
               conditions:
@@ -2053,7 +2063,7 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: "weather.dwd_weather_ebersberg_1h"
+              entity_id: "sensor.weather_ebersberg_hourly"
               attribute: temperature
               below: 17
             - condition: state
@@ -2078,7 +2088,7 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: "weather.dwd_weather_ebersberg_1h"
+              entity_id: "sensor.weather_ebersberg_hourly"
               attribute: temperature
               below: 17
             - condition: state
@@ -2437,7 +2447,7 @@
               entity_id: "input_boolean.thermostate_aus"
               state: "off"
             - condition: numeric_state
-              entity_id: "weather.dwd_weather_ebersberg_1h"
+              entity_id: "sensor.weather_ebersberg_hourly"
               attribute: temperature
               below: 17
             - condition: not
@@ -3965,11 +3975,11 @@
     #      entity_id: light.bett_gluhbirne
     #      brightness: 100
     #      rgb_color: >
-    #        {% if state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'snowy' %}
+    #        {% if state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['condition'] == 'snowy' %}
     #        [255,255,255]
-    #        {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'rainy' %}
+    #        {% elif state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['condition'] == 'rainy' %}
     #        [0,0,255]
-    #        {% elif state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' %}
+    #        {% elif state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['condition'] == 'sunny' %}
     #        [0,255,0]
     #        {% else %}
     #        [0,0,0]
@@ -4573,20 +4583,20 @@
   initial_state: true
   trigger:
     platform: numeric_state
-    entity_id: weather.dwd_weather_ebersberg_1h
+    entity_id: sensor.weather_ebersberg_hourly
     attribute: temperature
     above: 14
   condition:
     condition: and
     conditions:
       - condition: template
-        value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+        value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['condition'] == 'sunny' }}"
       - condition: template
-        value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
+        value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['condition'] == 'sunny' }}"
       - condition: template
-        value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] >= 14 }}"
+        value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] >= 14 }}"
       #  - condition: state
-      #    entity_id: 'weather.dwd_weather_ebersberg_1h'
+      #    entity_id: 'sensor.weather_ebersberg_hourly'
       #    state: 'sunny'
       - condition: state
         entity_id: "input_boolean.thermostate_aus"
@@ -4602,14 +4612,14 @@
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: "Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} ° hat und sonnig ist."
+        message: "Thermostate wurden ausgeschaltet, da es {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} ° hat und sonnig ist."
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_samuel
-        message: "Thermostate wurden ausgeschaltet, da es {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} ° hat und sonnig ist."
+        message: "Thermostate wurden ausgeschaltet, da es {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} ° hat und sonnig ist."
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
@@ -4619,7 +4629,7 @@
   initial_state: true
   trigger:
     - platform: numeric_state
-      entity_id: weather.dwd_weather_ebersberg_1h
+      entity_id: sensor.weather_ebersberg_hourly
       attribute: temperature
       below: 10
     - platform: sun
@@ -4637,7 +4647,7 @@
           - condition: and
             conditions:
               - condition: numeric_state
-                entity_id: weather.dwd_weather_ebersberg_1h
+                entity_id: sensor.weather_ebersberg_hourly
                 attribute: temperature
                 below: 10
               - condition: sun
@@ -4648,25 +4658,25 @@
               - condition: template
                 value_template: "{{ now().month <= 10 and now().month >= 2 }}"
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= 12 }}"
+            value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] <= 12 }}"
           - condition: and
             conditions:
               - condition: template
-                value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] != 'sunny' }}"
+                value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['condition'] != 'sunny' }}"
               - condition: template
-                value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] <= 14 }}"
+                value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] <= 14 }}"
   action:
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
+        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} °C und morgen {{state_attr("sensor.weather_ebersberg_daily", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_samuel
-        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C und morgen {{state_attr("weather.dwd_weather_ebersberg", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
+        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} °C und morgen {{state_attr("sensor.weather_ebersberg_daily", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
@@ -4722,16 +4732,16 @@
                 - condition: or
                   conditions:
                     - condition: template
-                      value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'sunny' }}"
+                      value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['condition'] == 'sunny' }}"
                     - condition: template
-                      value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['condition'] == 'partlycloudy' }}"
+                      value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['condition'] == 'partlycloudy' }}"
                 - condition: template
-                  value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[1]['temperature'] | int >= 18 }}"
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] | int >= 18 }}"
           sequence:
             - service: telegram_bot.send_poll
               data_template:
                 target: !secret telegram_chat_5friends
-                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[1].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
+                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].condition }} bei {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[1].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
                 options:
                   - "See"
                   - "Weiher"
@@ -4747,7 +4757,7 @@
         - service: telegram_bot.send_poll
           data_template:
             target: !secret telegram_chat_5friends
-            question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].condition }} bei {{ states.weather.dwd_weather_ebersberg_1h.attributes.forecast[24].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
+            question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. Es wird {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].condition }} bei {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].temperature }} °.{% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
             options:
               - "Fabi"
               - "Kai & Adri"
@@ -4819,7 +4829,7 @@
                     - condition: template
                       value_template: "{{ now().month <= 10 and now().month >= 4 }}"
                     - condition: numeric_state
-                      entity_id: weather.dwd_weather_ebersberg_1h
+                      entity_id: sensor.weather_ebersberg_hourly
                       attribute: temperature
                       below: 6
           sequence:
@@ -4847,7 +4857,7 @@
                 - condition: template
                   value_template: "{{ now().month <= 10 and now().month >= 4 }}" #  Im Winter ist der Keller kalt genug, da muss der Kühlschrank nicht an sein.
                 - condition: numeric_state
-                  entity_id: weather.dwd_weather_ebersberg_1h
+                  entity_id: sensor.weather_ebersberg_hourly
                   attribute: temperature
                   above: 5
           sequence:
@@ -5161,7 +5171,7 @@
   condition:
     - condition: time
       weekday:
-        - mon
+        - thu
   action:
     - service: hassio.addon_start
       data:
@@ -5791,6 +5801,9 @@
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
+                - condition: state
+                  entity_id: person.fabian
+                  state: "Kai-Adri"
                 - condition: numeric_state
                   entity_id: proximity.home_fabian
                   below: 5
@@ -5820,6 +5833,46 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_samuel
+                title: "Neuer Foodsharing Korb in Zorneding"
+                message: >
+                  {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.kai
+                  state: "home"
+                - condition: state
+                  entity_id: person.kai
+                  state: "Kai-Adri"
+                - condition: state
+                  entity_id: person.kai
+                  state: "JUZ"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_kai
+                title: "Neuer Foodsharing Korb in Zorneding"
+                message: >
+                  {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.adrian
+                  state: "home"
+                - condition: state
+                  entity_id: person.adrian
+                  state: "Kai-Adri"
+                - condition: state
+                  entity_id: person.adrian
+                  state: "JUZ"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_chat_adrian
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
                   {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
@@ -8708,162 +8761,162 @@
             message: "Kohleanzünder wurde eingeschaltet."
             inline_keyboard:
               - "Dauer:/remaining_time"
-    - delay: "00:09:00"
-    - choose:
-        #  IF 5 friends are there
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.flo
-                  state: home
-                - condition: state
-                  entity_id: person.maxi
-                  state: home
-                - condition: state
-                  entity_id: person.fabian
-                  state: "JUZ"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_5friends
-                message: "Bitte Kohle wenden."
-            - service: notify.mobile_app_fabian_iphone
-              data:
-                message: "Bitte Kohle wenden"
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.7
-        #  ELSEIF only K&A are there
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: and
-                  conditions:
-                    - condition: and
-                      conditions:
-                        - condition: state
-                          entity_id: person.kai
-                          state: home
-                        - condition: state
-                          entity_id: person.adri
-                          state: home
-                    - condition: not
-                      conditions:
-                        - condition: state
-                          entity_id: person.flo
-                          state: home
-                        - condition: state
-                          entity_id: person.maxi
-                          state: home
-                - condition: and
-                  conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: "Kai-Adri"
-                    - condition: state
-                      entity_id: person.adri
-                      state: "Kai-Adri"
-                    - condition: state
-                      entity_id: person.kai
-                      state: "Kai-Adri"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_afk
-                message: "Bitte Kohle wenden."
-            - service: notify.mobile_app_fabian_iphone
-              data:
-                message: "Bitte Kohle wenden"
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.7
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.adri
-                  state: home
-                - condition: and
-                  conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: "Kai-Adri"
-                    - condition: state
-                      entity_id: person.adri
-                      state: "Kai-Adri"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_adrian
-                message: "Bitte Kohle wenden."
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: "Bitte Kohle wenden."
-            - service: notify.mobile_app_fabian_iphone
-              data:
-                message: "Bitte Kohle wenden"
-                data:
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.7
-        #  ELSE only notify fabian
-        - conditions:
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: person.samuel
-                  state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_samuel
-                message: "Bitte Kohle wenden."
-      default:
-        - service: telegram_bot.send_message
-          data_template:
-            target: !secret telegram_chat_fabian
-            message: "Bitte Kohle wenden."
-        - service: notify.mobile_app_fabian_iphone
-          data:
-            message: "Bitte Kohle wenden"
-            data:
-              push:
-                sound:
-                  name: "default"
-                  critical: 1
-                  volume: 0.7
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.keller_tv
-                  state: unavailable
-          sequence:
-            - service: androidtv.adb_command
-              continue_on_error: true
-              data:
-                entity_id: media_player.keller_tv
-                command: "pm clear com.tcl.videoplayer"
-            - service: androidtv.adb_command
-              continue_on_error: true
-              data:
-                entity_id: media_player.keller_tv
-                command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
-            #  - service: notify.keller_tv
-            #    continue_on_error: true
-            #    data:
-            #      message: "Bitte Kohle wenden."
+    #- delay: "00:09:00"
+    #- choose:
+    #    #  IF 5 friends are there
+    #    - conditions:
+    #        - condition: or
+    #          conditions:
+    #            - condition: state
+    #              entity_id: person.flo
+    #              state: home
+    #            - condition: state
+    #              entity_id: person.maxi
+    #              state: home
+    #            - condition: state
+    #              entity_id: person.fabian
+    #              state: "JUZ"
+    #      sequence:
+    #        - service: telegram_bot.send_message
+    #          data_template:
+    #            target: !secret telegram_chat_5friends
+    #            message: "Bitte Kohle wenden."
+    #        - service: notify.mobile_app_fabian_iphone
+    #          data:
+    #            message: "Bitte Kohle wenden"
+    #            data:
+    #              push:
+    #                sound:
+    #                  name: "default"
+    #                  critical: 1
+    #                  volume: 0.7
+    #    #  ELSEIF only K&A are there
+    #    - conditions:
+    #        - condition: or
+    #          conditions:
+    #            - condition: and
+    #              conditions:
+    #                - condition: and
+    #                  conditions:
+    #                    - condition: state
+    #                      entity_id: person.kai
+    #                      state: home
+    #                    - condition: state
+    #                      entity_id: person.adri
+    #                      state: home
+    #                - condition: not
+    #                  conditions:
+    #                    - condition: state
+    #                      entity_id: person.flo
+    #                      state: home
+    #                    - condition: state
+    #                      entity_id: person.maxi
+    #                      state: home
+    #            - condition: and
+    #              conditions:
+    #                - condition: state
+    #                  entity_id: person.fabian
+    #                  state: "Kai-Adri"
+    #                - condition: state
+    #                  entity_id: person.adri
+    #                  state: "Kai-Adri"
+    #                - condition: state
+    #                  entity_id: person.kai
+    #                  state: "Kai-Adri"
+    #      sequence:
+    #        - service: telegram_bot.send_message
+    #          data_template:
+    #            target: !secret telegram_chat_afk
+    #            message: "Bitte Kohle wenden."
+    #        - service: notify.mobile_app_fabian_iphone
+    #          data:
+    #            message: "Bitte Kohle wenden"
+    #            data:
+    #              push:
+    #                sound:
+    #                  name: "default"
+    #                  critical: 1
+    #                  volume: 0.7
+    #    - conditions:
+    #        - condition: or
+    #          conditions:
+    #            - condition: state
+    #              entity_id: person.adri
+    #              state: home
+    #            - condition: and
+    #              conditions:
+    #                - condition: state
+    #                  entity_id: person.fabian
+    #                  state: "Kai-Adri"
+    #                - condition: state
+    #                  entity_id: person.adri
+    #                  state: "Kai-Adri"
+    #      sequence:
+    #        - service: telegram_bot.send_message
+    #          data_template:
+    #            target: !secret telegram_chat_adrian
+    #            message: "Bitte Kohle wenden."
+    #        - service: telegram_bot.send_message
+    #          data_template:
+    #            target: !secret telegram_chat_fabian
+    #            message: "Bitte Kohle wenden."
+    #        - service: notify.mobile_app_fabian_iphone
+    #          data:
+    #            message: "Bitte Kohle wenden"
+    #            data:
+    #              push:
+    #                sound:
+    #                  name: "default"
+    #                  critical: 1
+    #                  volume: 0.7
+    #    #  ELSE only notify fabian
+    #    - conditions:
+    #        - condition: and
+    #          conditions:
+    #            - condition: state
+    #              entity_id: person.samuel
+    #              state: home
+    #      sequence:
+    #        - service: telegram_bot.send_message
+    #          data_template:
+    #            target: !secret telegram_chat_samuel
+    #            message: "Bitte Kohle wenden."
+    #  default:
+    #    - service: telegram_bot.send_message
+    #      data_template:
+    #        target: !secret telegram_chat_fabian
+    #        message: "Bitte Kohle wenden."
+    #    - service: notify.mobile_app_fabian_iphone
+    #      data:
+    #        message: "Bitte Kohle wenden"
+    #        data:
+    #          push:
+    #            sound:
+    #              name: "default"
+    #              critical: 1
+    #              volume: 0.7
+    #- choose:
+    #    - conditions:
+    #        - condition: not
+    #          conditions:
+    #            - condition: state
+    #              entity_id: media_player.keller_tv
+    #              state: unavailable
+    #      sequence:
+    #        - service: androidtv.adb_command
+    #          continue_on_error: true
+    #          data:
+    #            entity_id: media_player.keller_tv
+    #            command: "pm clear com.tcl.videoplayer"
+    #        - service: androidtv.adb_command
+    #          continue_on_error: true
+    #          data:
+    #            entity_id: media_player.keller_tv
+    #            command: "am start -a android.intent.action.VIEW -d /sdcard/jonny_rozay_shisha_smoke.mp4 -t video/mp4"
+    #        #  - service: notify.keller_tv
+    #        #    continue_on_error: true
+    #        #    data:
+    #        #      message: "Bitte Kohle wenden."
     - delay: "00:06:00"
     #  - choose:
     #      - conditions:
@@ -9520,7 +9573,7 @@
     - service: switch.turn_on
       data:
         entity_id: switch.kuchengerate
-    - delay: 00:00:40
+    - delay: 00:01:00
     - service: switch.turn_on
       data:
         entity_id: switch.xiaomi_miio_cooker
@@ -10280,7 +10333,7 @@
 
 - id: notify_kai_adri_come_to_visit
   alias: "Notify Kai Adri come to visit"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: proximity.home_ka
@@ -10751,31 +10804,26 @@
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 36000 }}"
   action:
+    #- service: weather.get_forecast
+    #  data:
+    #    type: daily
+    #  target:
+    #    entity_id: sensor.weather_ebersberg_daily
+    #  response_variable: weather_forecast
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
         disable_notification: true
         message: >
-          Wettervorhersage für heute
-          {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
-          *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
-          {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
+          Wettervorhersage für heute {{ states.sensor.weather_ebersberg_daily.state }}  {{ states.sensor.weather_ebersberg_daily.attributes.temperature }}
+          *Momentan {{ weather_forecast.forecast.0.temperature }} °C*
 
-          Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: person.samuel
-                  state: "home"
-            - condition: state
-              entity_id: person.fabian
-              state: "home"
-          sequence:
-            - service: notify.telegram_fabian
-              data_template:
-                message: "Samuel ist nicht daheim."
+          {{ weather_forecast.forecast.0.templow }} °C {{ '\u21F5' }} {{ weather_forecast.forecast.0.temperature }} °C
+
+          Niederschlag: {{ weather_forecast.forecast.0.precipitation }} mm/h, Wahrscheinlichkeit: {{ weather_forecast.forecast.0.precipitation_probability }} %.
+
+
+          {% if states.person.samuel.state != "home" %}Samuel ist nicht daheim.{% endif %}
 
 - id: remind_for_volleyball
   alias: "remind for volleyball"
@@ -10840,11 +10888,11 @@
       - condition: or
         conditions:
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[2]['condition'] == 'sunny' }}"
+            value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'sunny' }}"
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[2]['condition'] == 'partlycloudy' }}"
+            value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'partlycloudy' }}"
       - condition: template
-        value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[2]['temperature'] | int >= 20 }}"
+        value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['temperature'] | int >= 20 }}"
       - condition: template
         value_template: "{{ now().month <= 10 and now().month >= 4 }}"
   action:
@@ -10857,8 +10905,8 @@
         target: !secret telegram_volleyball
         question:
           "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
-          {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].condition }}
-          bei {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].temperature }}° und {{ states.weather.dwd_weather_ebersberg.attributes.forecast[2].wind_speed }} km/h Wind.
+          {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+          bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
           Ich komme zum Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr?"
         options:
           - "Ja"
@@ -10876,6 +10924,8 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_volleyball
+                data:
+                  disable_web_page_preview: true
                 message: >
                   Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
 
@@ -10912,7 +10962,7 @@
         to: !secret whatsapp_chat_juz_group
         body:
           text:
-            "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
+            "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
             {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
     - choose:
         - conditions:
@@ -11117,6 +11167,21 @@
                               {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) € EUR', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= gesendet)', index=0, ignorecase=False) }}
 
                               #PayPal #PayPalAusgabe
+                - conditions:
+                    - condition: or
+                      conditions:
+                        - condition: template
+                          value_template: "{{'Einkaufsbetrag' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_chat_juz_leiter
+                        message: >
+                          Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
+
+                          {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(\d+\,?\d+) EUREmpfänger:', index=0, ignorecase=False) }} € an: {{ state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | regex_findall_index(find='(?<= EUR an ).*?(?= autorisiert)', index=0, ignorecase=False) }}
+
+                          #PayPal #PayPalAusgabe
               default:
                 - service: telegram_bot.send_message
                   data_template:

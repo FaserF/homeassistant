@@ -393,7 +393,7 @@
       value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.automation.lower_all_covers_when_sun_set.attributes.last_triggered) + 2700) | round(-2) }}"
   condition:
     - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.close_all_covers_when_sun_set.attributes.last_triggered) | int > 3200 }}"
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.lower_all_covers_when_sun_set.attributes.last_triggered) | int > 3200 }}"
   action:
     - parallel:
         - choose:
