@@ -394,16 +394,6 @@
                         target: !secret telegram_chat_samuel
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_kai
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %} abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_adrian
     - choose:
         - conditions:
             - condition: template
@@ -5733,6 +5723,22 @@
                 target: !secret telegram_chat_samuel
                 inline_keyboard:
                   - "Erledigt:/telegramwastedone"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.altpapier
+              state: "Morgen"
+          sequence:
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  Morgen wird das Altpapier abgeholt. Bitte rausstellen.
+                target: !secret telegram_chat_kai
+            - service: telegram_bot.send_message
+              data_template:
+                message: >
+                  Morgen wird das Altpapier abgeholt. Bitte rausstellen.
+                target: !secret telegram_chat_adrian
 
 - id: foodsharing_basket_available
   alias: "Foodsharing Basket Available"
@@ -6562,12 +6568,14 @@
           {%- set product_list_loop =  state_attr('sensor.rewe_440421', 'discounts') -%}
           {%- for product in product_list_loop -%}
             {% if 'Spezi' in product.product or 'Hell' in product.product or 'Chips' in product.product or 'Silenca' in product.product or 'Oettinger' in product.product %}
+              {% if 'Spezi' in product.product or 'Hell' in product.product or 'Chips' in product.product or 'Silenca' in product.product or 'Oettinger' in product.product %}
 
           {{product.price.price }} € - {{product.product }}
 
           {{ product.picture_link }}
             {%- endif -%}
           {%- endfor -%}
+
 
           ---
 
