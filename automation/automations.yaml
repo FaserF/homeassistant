@@ -4602,14 +4602,14 @@
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: "Thermostate wurden ausgeschaltet, da es {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} ° hat und sonnig ist."
+        message: "Thermostate wurden ausgeschaltet, da es {{ {{ states.weather.ebersberg_ebersberg.attributes.temperature }} }} ° hat und sonnig ist."
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_samuel
-        message: "Thermostate wurden ausgeschaltet, da es {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} ° hat und sonnig ist."
+        message: "Thermostate wurden ausgeschaltet, da es {{ {{ states.weather.ebersberg_ebersberg.attributes.temperature }} }} ° hat und sonnig ist."
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
@@ -4659,14 +4659,14 @@
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_fabian
-        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} °C und morgen {{state_attr("sensor.weather_ebersberg_daily", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
+        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ {{ states.weather.ebersberg_ebersberg.attributes.temperature }} }} °C und morgen {{state_attr("sensor.weather_ebersberg_daily", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
       data_template:
         target: !secret telegram_chat_samuel
-        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.sensor.weather_ebersberg_hourly.attributes.temperature }} °C und morgen {{state_attr("sensor.weather_ebersberg_daily", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
+        message: 'Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ {{ states.weather.ebersberg_ebersberg.attributes.temperature }} }} °C und morgen {{state_attr("sensor.weather_ebersberg_daily", "forecast")[1]["temperature"]}} °C hat. Dies wurde nicht automatisch gemacht!'
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
