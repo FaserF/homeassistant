@@ -518,7 +518,7 @@
           entity_id: person.fabian
           state: Einkaufen
         - condition: state
-          entity_id: device_tracker.fabian_iphone
+          entity_id: device_tracker.pixel_8_pro
           state: home
         - condition: numeric_state
           entity_id: person.fabian
@@ -708,7 +708,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data:
                 message: "Adri ist gleich da"
                 data:
@@ -810,7 +810,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data:
                 message: "Kai ist gleich da"
                 data:
@@ -915,7 +915,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data:
                 message: "Flo ist gleich da"
                 data:
@@ -2885,7 +2885,7 @@
                               entity_id: person.fabian
                               state: home
                           sequence:
-                            - service: notify.mobile_app_fabian_iphone
+                            - service: notify.mobile_app_pixel_8_pro
                               data:
                                 message: "Das Fenster im Bad kann wieder geschlossen werden."
                                 data:
@@ -2931,7 +2931,7 @@
                 - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster im Bad kann wieder geschlossen werden."
-                - service: notify.mobile_app_fabian_iphone
+                - service: notify.mobile_app_pixel_8_pro
                   data:
                     message: "Das Fenster im Bad kann wieder geschlossen werden."
                     data:
@@ -3171,7 +3171,7 @@
                               entity_id: person.fabian
                               state: home
                           sequence:
-                            - service: notify.mobile_app_fabian_iphone
+                            - service: notify.mobile_app_pixel_8_pro
                               data:
                                 message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
                                 data:
@@ -3375,7 +3375,7 @@
                               entity_id: person.fabian
                               state: home
                           sequence:
-                            - service: notify.mobile_app_fabian_iphone
+                            - service: notify.mobile_app_pixel_8_pro
                               data:
                                 message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
                                 data:
@@ -3593,7 +3593,7 @@
                                   entity_id: person.samuel
                                   state: home
                           sequence:
-                            - service: notify.mobile_app_fabian_iphone
+                            - service: notify.mobile_app_pixel_8_pro
                               data:
                                 message: "Das Fenster in Samuels Zimmer kann wieder geschlossen werden."
                                 data:
@@ -3784,7 +3784,7 @@
     - platform: numeric_state
       entity_id:
         - sensor.fabian_ipadpro_battery_state
-        - sensor.fabian_iphone_icloud_battery
+        - sensor.pixel_8_pro_battery_level
         - sensor.samuel_iphone_battery_state
       above: 90
   condition:
@@ -3807,7 +3807,7 @@
             entity_id: sensor.fabian_phone_battery_state
             state: "discharging"
           - condition: numeric_state
-            entity_id: sensor.fabian_iphone_icloud_battery
+            entity_id: sensor.pixel_8_pro_battery_level
             above: 80
       - condition: or
         conditions:
@@ -3852,7 +3852,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.fabian_iphone
+      entity_id: device_tracker.pixel_8_pro
       from: "not_home"
       to: "home"
     # - platform: state
@@ -4107,7 +4107,7 @@
             entity_id: device_tracker.redmi_note_10_pro
             state: home
           - condition: state
-            entity_id: device_tracker.fabian_iphone
+            entity_id: device_tracker.pixel_8_pro
             state: home
   action:
     - parallel:
@@ -4122,7 +4122,7 @@
                       entity_id: device_tracker.redmi_note_10_pro
                       state: home
                     - condition: state
-                      entity_id: device_tracker.fabian_iphone
+                      entity_id: device_tracker.pixel_8_pro
                       state: home
               sequence:
                 - service: media_player.volume_set
@@ -4215,7 +4215,7 @@
                       entity_id: device_tracker.redmi_note_10_pro
                       state: home
                     - condition: state
-                      entity_id: device_tracker.fabian_iphone
+                      entity_id: device_tracker.pixel_8_pro
                       state: home
               sequence:
                 - service: media_player.volume_set
@@ -5814,7 +5814,7 @@
                   entity_id: proximity.home_fabian
                   below: 5
           sequence:
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data_template:
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
@@ -6947,107 +6947,47 @@
               data:
                 entity_id: update.home_assistant_operating_system_update
 
-#  - id: incoming_call_fabian
-#    alias: 'Incoming Call Fabian'
-#    initial_state: true
-#    trigger:
-#      - platform: state
-#        entity_id: automation.incoming_call_fabian
-#        to: 'on'
-#    condition:
-#      - condition: state
-#        entity_id: 'input_boolean.leiser_modus'
-#        state: 'off'
-#    action:
-#      - service: media_player.volume_set
-#        data:
-#          volume_level: >
-#  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-#          entity_id: media_player.wohnzimmer_uhr
-#      - service: tts.google_say
-#        entity_id:
-#        - media_player.wohnzimmer_uhr
-#        - media_player.fabians_lautsprecher
-#        data_template:
-#          message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
-#      - service: media_player.media_pause
-#        data:
-#          entity_id: media_player.wohnzimmer_tv
-#      - delay: '00:00:09'
-#      - service: media_player.volume_set
-#        data:
-#          volume_level: >
-#  {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
-#          entity_id: media_player.wohnzimmer_uhr
-#      - service: automation.turn_off
-#        data:
-#          entity_id: automation.incoming_call_fabian
-#      - service: media_player.turn_off
-#        data:
-#          entity_id: media_player.wohnzimmer_uhr
-#      - service: media_player.turn_off
-#        data:
-#          entity_id: media_player.fabians_lautsprecher
-
-#  - id: incoming_call_samuel
-#    alias: 'Incoming Call samuel'
-#    initial_state: true
-#    trigger:
-#      - platform: state
-#        entity_id: automation.incoming_call_samuel
-#        to: 'on'
-#    condition:
-#      - condition: state
-#        entity_id: 'input_boolean.leiser_modus'
-#        state: 'off'
-#    action:
-#      - service: media_player.volume_set
-#        data:
-#          volume_level: 0.7
-#          entity_id: media_player.wohnzimmer_uhr
-#      - service: tts.google_say
-#        entity_id:
-#        - media_player.wohnzimmer_uhr
-#        - media_player.fabians_lautsprecher
-#        data:
-#          message: 'samuel wird soeben angerufen!'
-#      - delay: '00:00:10'
-#      - service: media_player.volume_set
-#        data:
-#          volume_level: 0.3
-#          entity_id: media_player.wohnzimmer_uhr
-#      - service: automation.turn_off
-#        data:
-#          entity_id: automation.incoming_call_samuel
-#      - service: media_player.turn_off
-#        data:
-#          entity_id: media_player.wohnzimmer_uhr
-#      - service: media_player.turn_off
-#        data:
-#          entity_id: media_player.fabians_lautsprecher
-
-#  not in use, as the attribute contains "EUR" which makes it unusable for numeric_state
-#   - id: coinbase_balance_high
-#     alias: 'Coinbase balance high'
-#     initial_state: true
-#     trigger:
-#       - platform: template
-#         value_template: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] |replace(“EUR”,"")|replace(“ ”,"")|float| int > 220 }}
-#       - platform: numeric_state
-#         entity_id: sensor.coinbase_btc_wallet
-#         attribute: "Balance in native currency"
-#         above: 220
-#     condition:
-#       condition: and
-#       conditions:
-#  Maximal einmal am Tag schreiben
-#         - condition: template
-#           value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.coinbase_balance_high.attributes.last_triggered) | int > 86400 }}"
-#     action:
-#       - service: telegram_bot.send_message
-#         data_template:
-#           target: !secret telegram_chat_fabian
-#           message: 'Aktueller Bitcoin Wert ist hoch: {{ states.sensor.coinbase_btc_wallet.attributes.["Balance in native currency"] }} .'
+- id: incoming_call_fabian
+  alias: 'Incoming Call Fabian'
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: automation.incoming_call_fabian
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: 'input_boolean.leiser_modus'
+      state: 'off'
+  action:
+    - service: media_player.volume_set
+      data:
+        volume_level: >
+          {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+        entity_id: media_player.wohnzimmer_uhr
+    - service: tts.google_say
+      entity_id:
+      - media_player.wohnzimmer_uhr
+      - media_player.fabians_lautsprecher
+      data_template:
+        message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
+    - service: media_player.media_pause
+      data:
+        entity_id: media_player.wohnzimmer_tv
+    - delay: '00:00:09'
+    - service: media_player.volume_set
+      data:
+        volume_level: >
+          {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
+        entity_id: media_player.wohnzimmer_uhr
+    - service: automation.turn_off
+      data:
+        entity_id: automation.incoming_call_fabian
+    - service: media_player.turn_off
+      data:
+        entity_id: media_player.wohnzimmer_uhr
+    - service: media_player.turn_off
+      data:
+        entity_id: media_player.fabians_lautsprecher
 
 - id: dwd_weather_warnings
   alias: "DWD Weather Warnings"
@@ -7335,7 +7275,7 @@
   initial_state: false
   trigger:
     - platform: numeric_state
-      entity_id: sensor.fabian_iphone_icloud_battery
+      entity_id: sensor.pixel_8_pro_battery_level
       below: 5
   condition:
     condition: and
@@ -8789,7 +8729,7 @@
     #          data_template:
     #            target: !secret telegram_chat_5friends
     #            message: "Bitte Kohle wenden."
-    #        - service: notify.mobile_app_fabian_iphone
+    #        - service: notify.mobile_app_pixel_8_pro
     #          data:
     #            message: "Bitte Kohle wenden"
     #            data:
@@ -8836,7 +8776,7 @@
     #          data_template:
     #            target: !secret telegram_chat_afk
     #            message: "Bitte Kohle wenden."
-    #        - service: notify.mobile_app_fabian_iphone
+    #        - service: notify.mobile_app_pixel_8_pro
     #          data:
     #            message: "Bitte Kohle wenden"
     #            data:
@@ -8868,7 +8808,7 @@
     #          data_template:
     #            target: !secret telegram_chat_fabian
     #            message: "Bitte Kohle wenden."
-    #        - service: notify.mobile_app_fabian_iphone
+    #        - service: notify.mobile_app_pixel_8_pro
     #          data:
     #            message: "Bitte Kohle wenden"
     #            data:
@@ -8894,7 +8834,7 @@
     #      data_template:
     #        target: !secret telegram_chat_fabian
     #        message: "Bitte Kohle wenden."
-    #    - service: notify.mobile_app_fabian_iphone
+    #    - service: notify.mobile_app_pixel_8_pro
     #      data:
     #        message: "Bitte Kohle wenden"
     #        data:
@@ -8991,7 +8931,7 @@
               data_template:
                 target: !secret telegram_chat_5friends
                 message: "Die Kohle sollte fertig sein!"
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data:
                 message: "Die Kohle sollte fertig sein!"
                 data:
@@ -9038,7 +8978,7 @@
               data_template:
                 target: !secret telegram_chat_afk
                 message: "Die Kohle sollte fertig sein! Strom ausschalten nicht vergessen."
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data:
                 message: "Die Kohle sollte fertig sein!"
                 data:
@@ -9070,7 +9010,7 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
-            - service: notify.mobile_app_fabian_iphone
+            - service: notify.mobile_app_pixel_8_pro
               data:
                 message: "Die Kohle sollte fertig sein!"
                 data:
@@ -9096,7 +9036,7 @@
           data_template:
             target: !secret telegram_chat_fabian
             message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
-        - service: notify.mobile_app_fabian_iphone
+        - service: notify.mobile_app_pixel_8_pro
           data:
             message: "Die Kohle sollte fertig sein!"
             data:
@@ -9755,7 +9695,7 @@
 #             - thu
 #             - sun
 #         - condition: state
-#           entity_id: device_tracker.fabian_iphone
+#           entity_id: device_tracker.pixel_8_pro
 #           state: home
 #         - condition: template
 #           value_template: >
@@ -9763,7 +9703,7 @@
 #             {% set state = 'off' %}
 #             {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
 #     action:
-#       - service: notify.mobile_app_fabian_iphone
+#       - service: notify.mobile_app_pixel_8_pro
 #         data_template:
 #           title: "Flugmodus"
 #           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
@@ -10246,7 +10186,7 @@
       - condition: or
         conditions:
           - condition: state
-            entity_id: device_tracker.fabian_iphone
+            entity_id: device_tracker.pixel_8_pro
             state: home
           - condition: state
             entity_id: device_tracker.redmi_note_10_pro
@@ -10261,7 +10201,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.fabian_iphone
+              entity_id: device_tracker.pixel_8_pro
               state: home
           sequence:
             - service: notify.telegram_fabian
@@ -10801,7 +10741,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: device_tracker.fabian_iphone
+      entity_id: device_tracker.pixel_8_pro
       from: "not_home"
       to: "home"
   condition:

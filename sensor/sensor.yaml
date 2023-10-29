@@ -249,8 +249,8 @@
       arg: /
     - type: memory_use_percent
     # - type: processor_temperature
-# - platform: template
-#  sensors:
-#    fs_caller:
-#      friendly_name: "Fabi Anrufer"
-#      value_template: "unbekannter"
+- platform: template
+  sensors:
+    fs_caller:
+      friendly_name: "Fabi Anrufer"
+      value_template: "unbekannter"

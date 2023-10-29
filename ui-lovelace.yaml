@@ -73,7 +73,7 @@ views:
     badges:
       - entity: person.fabian
       - entity: person.samuel
-      - entity: sensor.fabian_iphone_icloud_battery
+      - entity: sensor.pixel_8_pro_battery_level
       - entity: sensor.m2101k6g_battery_level
       - entity: sensor.washing_machine_finish_duration
       - entity: sensor.steckerleiste_samuel_energy_power
@@ -120,8 +120,10 @@ views:
             toggle: true
             type: custom:slider-entity-row
           - entity: light.lampe_samuel
+          - entity: light.samuel_leds
           - entity: light.deckenlampe_keller
           - entity: light.flutlicht_keller
+          - entity: light.keller_leds_flaschen
         show_header_toggle: true
         title: Licht
         type: entities
@@ -161,46 +163,46 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
           - entity: binary_sensor.wohnzimmer_open_window
             name: Fenster
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - entity: climate.fabian_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
           - entity: binary_sensor.fabian_s_zimmer_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - entity: climate.samuel_s_zimmer
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
           - entity: binary_sensor.samuel_s_zimmer_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - entity: climate.bad
         type: custom:simple-thermostat
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
           - entity: binary_sensor.bad_open_window
             name: Fenster
-        step_size: '1'
+        step_size: "1"
       - type: vertical-stack
         cards:
           - type: entities
@@ -229,18 +231,24 @@ views:
         cards:
           - type: custom:weather-card
             entity: weather.ebersberg_ebersberg
+            number_of_forecasts: "5"
+          - type: custom:weather-card
+            entity: sensor.weather_ebersberg_hourly
             hourly_forecast: true
             graph: false
-            forecastMaxColumn: '6'
-            number_of_forecasts: '8'
+            forecastMaxColumn: "6"
+            number_of_forecasts: "8"
+            current: false
+            details: false
+            forecast: true
           - type: custom:weather-card
-            entity: weather.ebersberg_ebersberg
-            number_of_forecasts: '6'
+            entity: sensor.weather_ebersberg_daily
+            number_of_forecasts: "6"
             hourly_forecast: false
             current: false
             details: false
             forecast: true
-            forecastMaxColumn: '5'
+            forecastMaxColumn: "5"
       - type: vertical-stack
         cards:
           - type: custom:mini-media-player
@@ -310,11 +318,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: '1'
+        step_size: "1"
       - type: grid
         square: false
         columns: 1
@@ -479,10 +487,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.fabians_lautsprecher
         type: custom:mini-media-player
@@ -509,11 +517,10 @@ views:
             toggle: true
             type: custom:slider-entity-row
           - entity: light.lampe_samuel
-          - entity: light.leds_samuel_s_zimmer
+          - entity: light.samuel_leds
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: number.leds_samuel_s_zimmer_effect_speed
         show_header_toggle: true
         title: Licht
         type: entities
@@ -532,10 +539,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - artwork: cover
         entity: media_player.samuels_lautsprecher
         type: custom:mini-media-player
@@ -562,6 +569,7 @@ views:
       - entities:
           - entity: light.deckenlampe_keller
           - entity: light.flutlicht_keller
+          - entity: light.keller_leds_flaschen
         show_header_toggle: true
         title: Licht
         type: entities
@@ -698,10 +706,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: '%'
+            unit: "%"
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: '1'
+        step_size: "1"
       - type: entities
         entities:
           - entity: sensor.kuche_lautsprecher_timers

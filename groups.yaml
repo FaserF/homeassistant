@@ -262,3 +262,4 @@ ignored_entities:
     - media_player.samuels_lautsprecher
     - light.deckenlampe_samuel
     - media_player.chromecast8917
+    - light.keller_leds_flaschen

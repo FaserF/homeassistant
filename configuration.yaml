@@ -505,8 +505,8 @@ google_assistant:
     light.lampe_samuel:
       expose: true
       room: Samuels Zimmer
-    light.leds_gastezimmer:
-      expose: false
+    light.samuel_leds:
+      expose: true
       room: Samuels Zimmer
     switch.fernseher_samuel:
       name: Fernseher Samuel
@@ -588,6 +588,10 @@ google_assistant:
       room: Keller
     light.deckenlampe_keller:
       name: Deckenlampe Keller
+      expose: true
+      room: Keller
+    light.keller_leds_flaschen:
+      name: Keller LEDs Flaschen
       expose: true
       room: Keller
     ## Küche
