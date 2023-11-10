@@ -577,7 +577,7 @@ google_assistant:
       expose: false
       room: Keller
     switch.keller_usb_ports:
-      name: USB Ports
+      name: USB Ports Keller
       expose: true
       room: Keller
     switch.fernseher_keller:
