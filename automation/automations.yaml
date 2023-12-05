@@ -650,7 +650,7 @@
 
 - id: open_door_for_adri
   alias: "Open the door for Adri if coming home"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.adri
@@ -722,7 +722,7 @@
                 volume_level: >
                   {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                 entity_id: media_player.wohnzimmer_uhr
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
@@ -752,7 +752,7 @@
 
 - id: open_door_for_kai
   alias: "Open the door for Kai if coming home"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: person.kai
@@ -824,7 +824,7 @@
                 volume_level: >
                   {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                 entity_id: media_player.wohnzimmer_uhr
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
@@ -929,7 +929,7 @@
                 volume_level: >
                   {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                 entity_id: media_player.wohnzimmer_uhr
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
@@ -1860,7 +1860,7 @@
             entity_id: device_tracker.c_pf38fwqx
             state: "home"
   action:
-    - service: tts.google_say
+    - service: tts.speak
       entity_id: media_player.fabians_lautsprecher
       data_template:
         message: >
@@ -2609,7 +2609,7 @@
               entity_id: person.fabian
               state: "home"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.samuels_lautsprecher
               data:
                 message: Es wurde vermutlich vergessen das Fenster im Bad zu schließen.
@@ -2627,7 +2627,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
@@ -2682,7 +2682,7 @@
               entity_id: person.fabian
               state: "home"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.samuels_lautsprecher
               data:
                 message: Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen.
@@ -2700,7 +2700,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
@@ -2754,7 +2754,7 @@
               entity_id: person.fabian
               state: "home"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.samuels_lautsprecher
               data:
                 message: Es wurde vermutlich vergessen das Fenster im Wohnzimmer zu schließen.
@@ -2769,7 +2769,7 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.kuche_lautsprecher
                 - media_player.fabians_lautsprecher
@@ -2822,7 +2822,7 @@
                   entity_id: input_boolean.leiser_modus
                   state: "off"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.wohnzimmer_uhr
                 - media_player.kuche_lautsprecher
@@ -2950,7 +2950,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.fabians_lautsprecher
                   data:
                     message: Das Fenster im Bad kann wieder geschlossen werden.
@@ -3002,7 +3002,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.samuels_lautsprecher
                   data:
                     message: Das Fenster im Bad kann wieder geschlossen werden.
@@ -3062,7 +3062,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.kuche_lautsprecher
                   data:
                     message: Das Fenster im Bad kann wieder geschlossen werden.
@@ -3102,7 +3102,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.wohnzimmer_uhr
                   data:
                     message: Das Fenster im Bad kann wieder geschlossen werden.
@@ -3208,7 +3208,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.samuels_lautsprecher
                   data:
                     message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
@@ -3274,7 +3274,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.kuche_lautsprecher
                   data:
                     message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
@@ -3302,7 +3302,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.wohnzimmer_uhr
                   data:
                     message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
@@ -3428,7 +3428,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.fabians_lautsprecher
                   data:
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
@@ -3467,7 +3467,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.samuels_lautsprecher
                   data:
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
@@ -3533,7 +3533,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.kuche_lautsprecher
                   data:
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
@@ -3649,7 +3649,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.fabians_lautsprecher
                   data:
                     message: Das Fenster in Samuels Zimmer kann wieder geschlossen werden.
@@ -3715,7 +3715,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.kuche_lautsprecher
                   data:
                     message: Das Fenster in Samuels Zimmer kann wieder geschlossen werden.
@@ -3743,7 +3743,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.wohnzimmer_uhr
                   data:
                     message: Das Fenster in Samuels Zimmer kann wieder geschlossen werden.
@@ -4132,7 +4132,7 @@
                     entity_id:
                       - media_player.wohnzimmer_uhr
                       - media_player.kuche_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id:
                     - media_player.wohnzimmer_uhr
                     - media_player.kuche_lautsprecher
@@ -4166,7 +4166,7 @@
                               state: "on"
                       sequence:
                         - parallel:
-                            - service: tts.google_say
+                            - service: tts.speak
                               entity_id: media_player.wohnzimmer_uhr
                               data_template:
                                 message: >
@@ -4183,7 +4183,7 @@
                                     Bad
                                   {% endif %}
                                   muss noch geschlossen werden.
-                            - service: tts.google_say
+                            - service: tts.speak
                               entity_id: media_player.kuche_lautsprecher
                               data_template:
                                 message: >
@@ -4223,7 +4223,7 @@
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.1 }}
                     entity_id: media_player.fabians_lautsprecher
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.fabians_lautsprecher
                   data_template:
                     message: >
@@ -4255,7 +4255,7 @@
                               state: "on"
                       sequence:
                         - parallel:
-                            - service: tts.google_say
+                            - service: tts.speak
                               entity_id: media_player.fabians_lautsprecher
                               data_template:
                                 message: >
@@ -4272,7 +4272,7 @@
                                     Bad
                                   {% endif %}
                                   muss noch geschlossen werden.
-                            - service: tts.google_say
+                            - service: tts.speak
                               entity_id: media_player.kuche_lautsprecher
                               data_template:
                                 message: >
@@ -5664,7 +5664,7 @@
       data:
         target: !secret telegram_chat_fabian
         message: "ACHTUNG! Es wurde ein Gerät eingeschaltet, obwohl der Abwesend Modus aktiviert ist!"
-    - service: tts.google_say
+    - service: tts.speak
       entity_id:
         - media_player.wohnzimmer_uhr
         - media_player.kuche_lautsprecher
@@ -6948,32 +6948,32 @@
                 entity_id: update.home_assistant_operating_system_update
 
 - id: incoming_call_fabian
-  alias: 'Incoming Call Fabian'
+  alias: "Incoming Call Fabian"
   initial_state: true
   trigger:
     - platform: state
       entity_id: automation.incoming_call_fabian
-      to: 'on'
+      to: "on"
   condition:
     - condition: state
-      entity_id: 'input_boolean.leiser_modus'
-      state: 'off'
+      entity_id: "input_boolean.leiser_modus"
+      state: "off"
   action:
     - service: media_player.volume_set
       data:
         volume_level: >
           {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
         entity_id: media_player.wohnzimmer_uhr
-    - service: tts.google_say
+    - service: tts.speak
       entity_id:
-      - media_player.wohnzimmer_uhr
-      - media_player.fabians_lautsprecher
+        - media_player.wohnzimmer_uhr
+        - media_player.fabians_lautsprecher
       data_template:
         message: "Fabian wird soeben von {{ states('sensor.fs_caller') }} angerufen!"
     - service: media_player.media_pause
       data:
         entity_id: media_player.wohnzimmer_tv
-    - delay: '00:00:09'
+    - delay: "00:00:09"
     - service: media_player.volume_set
       data:
         volume_level: >
@@ -7809,7 +7809,7 @@
     #    data:
     #      command: Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet.
     #      user: "homeassistant"
-    - service: tts.google_say
+    - service: tts.speak
       entity_id:
         - media_player.fabians_lautsprecher
         - media_player.wohnzimmer_uhr
@@ -7860,7 +7860,7 @@
             #    data:
             #      command: Die Internetverbindung ist wiederhergestellt.
             #      user: "homeassistant"
-            - service: tts.google_say
+            - service: tts.speak
               entity_id:
                 - media_player.fabians_lautsprecher
                 - media_player.wohnzimmer_uhr
@@ -8303,7 +8303,7 @@
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
                 - delay: 00:00:05
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.kuche_lautsprecher
                   data_template:
                     message: >
@@ -8348,7 +8348,7 @@
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
                 - delay: 00:00:05
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.fabians_lautsprecher
                   data_template:
                     message: >
@@ -8393,7 +8393,7 @@
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
                 - delay: 00:00:05
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.samuels_lautsprecher
                   data_template:
                     message: >
@@ -8442,7 +8442,7 @@
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
                 - delay: 00:00:05
-                - service: tts.google_say
+                - service: tts.speak
                   entity_id: media_player.wohnzimmer_uhr
                   data_template:
                     message: >
@@ -8561,8 +8561,8 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.keller_steckdose_energy_power
-      above: 470
-      below: 540
+      above: 380
+      below: 1000
       for:
         seconds: 35
     - platform: state
@@ -9378,7 +9378,7 @@
                   entity_id: media_player.wohnzimmer_uhr
                   state: "playing"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.wohnzimmer_uhr
               data:
                 message: "Die Waschmaschine ist fertig."
@@ -9393,7 +9393,7 @@
                   entity_id: media_player.kuche_lautsprecher
                   state: "playing"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.kuche_lautsprecher
               data:
                 message: "Die Waschmaschine ist fertig."
@@ -9408,7 +9408,7 @@
                   entity_id: media_player.fabians_lautsprecher
                   state: "playing"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.fabians_lautsprecher
               data:
                 message: "Die Waschmaschine ist fertig."
@@ -9498,11 +9498,11 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.wohnzimmer_uhr
               data_template:
                 message: "Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig."
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.kuche_lautsprecher
               data_template:
                 message: "Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig."
@@ -9636,7 +9636,7 @@
               entity_id: switch.fernseher
               state: "on"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.wohnzimmer_uhr
               data:
                 message: "Der Timer in der Küche ist in {{ states.sensor.kuche_lautsprecher_timers.state }} Minuten fertig."
@@ -9831,7 +9831,7 @@
               entity_id: person.samuel
               state: home
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.fabians_lautsprecher
               data:
                 message: "samuel, du hast die Pille vergessen"
@@ -9879,7 +9879,7 @@
               entity_id: person.samuel
               state: home
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.fabians_lautsprecher
               data:
                 message: "samuel, du hast die Pille vergessen"
@@ -10610,7 +10610,7 @@
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                             entity_id: media_player.kuche_lautsprecher
                         - delay: 00:00:02
-                        - service: tts.google_say
+                        - service: tts.speak
                           entity_id: media_player.kuche_lautsprecher
                           data_template:
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
@@ -10632,7 +10632,7 @@
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                             entity_id: media_player.samuels_lautsprecher
                         - delay: 00:00:02
-                        - service: tts.google_say
+                        - service: tts.speak
                           entity_id: media_player.samuels_lautsprecher
                           data_template:
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
@@ -10654,7 +10654,7 @@
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                             entity_id: media_player.wohnzimmer_uhr
                         - delay: 00:00:02
-                        - service: tts.google_say
+                        - service: tts.speak
                           entity_id: media_player.wohnzimmer_uhr
                           data_template:
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
@@ -10762,13 +10762,13 @@
       data_template:
         target: !secret telegram_chat_fabian
         disable_notification: true
+        #{{ states.sensor.sensor.ebersberg_temperature_2.attributes.templow }} °C {{ '\u21F5' }} {{ weather_forecast.forecast.0.temperature }} °C
         message: >
-          Wettervorhersage für heute {{ states.sensor.weather_ebersberg_daily.state }}  {{ states.sensor.weather_ebersberg_daily.attributes.temperature }}
-          *Momentan {{ weather_forecast.forecast.0.temperature }} °C*
+          Wettervorhersage für heute {{ states.weather.ebersberg_ebersberg.state }} bei {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C
+          *Momentan {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[0].temperature }} °C*
 
-          {{ weather_forecast.forecast.0.templow }} °C {{ '\u21F5' }} {{ weather_forecast.forecast.0.temperature }} °C
 
-          Niederschlag: {{ weather_forecast.forecast.0.precipitation }} mm/h, Wahrscheinlichkeit: {{ weather_forecast.forecast.0.precipitation_probability }} %.
+          Niederschlag: {{ states.sensor.ebersberg_precipitation_2.state }} mm/h, Wahrscheinlichkeit: {{ states.sensor.ebersberg_precipitation_probability_2.state }} %.
 
 
           {% if states.person.samuel.state != "home" %}Samuel ist nicht daheim.{% endif %}

@@ -780,12 +780,11 @@
         target: "{{ trigger.event.data.user_id }}"
         disable_notification: true
         message: >
-          Wettervorhersage für heute
-          {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition']}}
-          *Momentan {{ states.weather.dwd_weather_ebersberg_1h.attributes.temperature }} °C*
-          {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['templow']}} °C {{ '\u21F5' }} {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['temperature']}} °C
+          Wettervorhersage für heute {{ states.weather.ebersberg_ebersberg.state }} bei {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C
+          *Momentan {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[0].temperature }} °C*
 
-          Niederschlag: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation']}} mm/h, Wahrscheinlichkeit: {{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['precipitation_probability']}} %.
+
+          Niederschlag: {{ states.sensor.ebersberg_precipitation_2.state }} mm/h, Wahrscheinlichkeit: {{ states.sensor.ebersberg_precipitation_probability_2.state }} %.
 
 - id: turn_on_strom_kühlschrank
   alias: "Turn on Strom Kühlschrank"
@@ -923,7 +922,7 @@
       data:
         volume_level: 0.7
         entity_id: media_player.wohnzimmer_uhr
-    - service: tts.google_say
+    - service: tts.speak
       entity_id:
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
@@ -955,7 +954,7 @@
                   entity_id: input_boolean.gast_modus
                   state: "on"
           sequence:
-            - service: tts.google_say
+            - service: tts.speak
               entity_id: media_player.gastezimmer_mini
               data_template:
                 message: >
@@ -1059,7 +1058,7 @@
       data:
         volume_level: 0.7
         entity_id: media_player.wohnzimmer_uhr
-    - service: tts.google_say
+    - service: tts.speak
       entity_id:
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
