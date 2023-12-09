@@ -299,7 +299,7 @@ template:
       - platform: time_pattern
         hours: /1
     action:
-      - service: weather.get_forecast
+      - service: weather.get_forecasts
         data:
           type: hourly
         target:
@@ -315,7 +315,7 @@ template:
       - platform: time_pattern
         hours: /23
     action:
-      - service: weather.get_forecast
+      - service: weather.get_forecasts
         data:
           type: daily
         target:
@@ -499,6 +499,12 @@ google_assistant:
         - Samuel Licht
         - Deckenlicht Samuel
         - Deckenlampe Samuel
+    light.samuels_lichtschalter:
+      expose: true
+      room: Samuels Zimmer
+      aliases:
+        - Lichtschalter Samuel
+        - Schalter Samuel
     light.lampe_samuel:
       expose: true
       room: Samuels Zimmer
