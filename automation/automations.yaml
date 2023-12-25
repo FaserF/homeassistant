@@ -1835,7 +1835,7 @@
       for:
         hours: 4
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx
+      entity_id: device_tracker.c_pf38fwqx_pari
       to: "home"
       for:
         hours: 4
@@ -1857,7 +1857,7 @@
             entity_id: device_tracker.fabian_pc
             state: "home"
           - condition: state
-            entity_id: device_tracker.c_pf38fwqx
+            entity_id: device_tracker.c_pf38fwqx_pari
             state: "home"
   action:
     - service: tts.speak
@@ -1994,7 +1994,7 @@
       for:
         minutes: 1
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx
+      entity_id: device_tracker.c_pf38fwqx_pari
       from: "home"
       to: "not_home"
       for:
@@ -2011,7 +2011,7 @@
         for:
           minutes: 1
       - condition: state
-        entity_id: device_tracker.c_pf38fwqx
+        entity_id: device_tracker.c_pf38fwqx_pari
         state: "not_home"
         for:
           seconds: 20
@@ -2174,7 +2174,7 @@
       for:
         minutes: 10
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx
+      entity_id: device_tracker.c_pf38fwqx_pari
       from: "home"
       to: "not_home"
       for:
@@ -2920,7 +2920,7 @@
                           entity_id: device_tracker.fabian_pc
                           state: "home"
                         - condition: state
-                          entity_id: device_tracker.c_pf38fwqx
+                          entity_id: device_tracker.c_pf38fwqx_pari
                           state: "home"
                     - condition: not
                       conditions:
@@ -3234,7 +3234,7 @@
                       entity_id: device_tracker.fabian_pc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.c_pf38fwqx
+                      entity_id: device_tracker.c_pf38fwqx_pari
                       state: "home"
               sequence:
                 - service: notify.telegram_fabian
@@ -3403,7 +3403,7 @@
                   conditions:
                     - condition: state
                       entity_id:
-                        - device_tracker.c_pf38fwqx
+                        - device_tracker.c_pf38fwqx_pari
                       state: "home"
                     - condition: state
                       entity_id:
@@ -3493,7 +3493,7 @@
                       entity_id: device_tracker.fabian_pc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.c_pf38fwqx
+                      entity_id: device_tracker.c_pf38fwqx_pari
                       state: "home"
               sequence:
                 - service: notify.telegram_fabian
@@ -3621,7 +3621,7 @@
                   conditions:
                     - condition: state
                       entity_id:
-                        - device_tracker.c_pf38fwqx
+                        - device_tracker.c_pf38fwqx_pari
                       state: "home"
                     - condition: state
                       entity_id:
@@ -3675,7 +3675,7 @@
                       entity_id: device_tracker.fabian_pc
                       state: "home"
                     - condition: state
-                      entity_id: device_tracker.c_pf38fwqx
+                      entity_id: device_tracker.c_pf38fwqx_pari
                       state: "home"
               sequence:
                 - service: notify.telegram_fabian
@@ -3989,7 +3989,7 @@
               entity_id: device_tracker.fabian_pc
               state: "not_home"
             - condition: state
-              entity_id: "device_tracker.c_pf38fwqx"
+              entity_id: "device_tracker.c_pf38fwqx_pari"
               state: "not_home"
           sequence:
             - service: light.turn_off
@@ -4487,7 +4487,7 @@
             entity_id: "device_tracker.fabian_pc"
             state: "home"
           - condition: state
-            entity_id: "device_tracker.c_pf38fwqx"
+            entity_id: "device_tracker.c_pf38fwqx_pari"
             state: "home"
       - condition: or
         conditions:
@@ -4535,7 +4535,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: "device_tracker.c_pf38fwqx"
+              entity_id: "device_tracker.c_pf38fwqx_pari"
               state: "home"
           sequence:
             - service: light.turn_on
@@ -4728,6 +4728,8 @@
                 - condition: template
                   value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] | int >= 18 }}"
           sequence:
+            Wettervorhersage für heute {{ states.weather.ebersberg_ebersberg.state }} bei {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C
+          *Momentan {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].temperature }} °C*
             - service: telegram_bot.send_poll
               data_template:
                 target: !secret telegram_chat_5friends
@@ -10014,7 +10016,7 @@
       entity_id: device_tracker.md3f9bmc
       to: "home"
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx
+      entity_id: device_tracker.c_pf38fwqx_pari
       to: "home"
     - platform: state
       entity_id: device_tracker.md3f9bmc
@@ -10034,7 +10036,7 @@
             entity_id: device_tracker.fabian_pc
             state: "home"
           - condition: state
-            entity_id: device_tracker.c_pf38fwqx
+            entity_id: device_tracker.c_pf38fwqx_pari
             state: "home"
           - condition: not
             conditions:
@@ -10072,7 +10074,7 @@
       entity_id: device_tracker.md3f9bmc
       to: "not_home"
     - platform: state
-      entity_id: device_tracker.c_pf38fwqx
+      entity_id: device_tracker.c_pf38fwqx_pari
       to: "not_home"
     - platform: state
       entity_id: switch.schreibtisch_samuel

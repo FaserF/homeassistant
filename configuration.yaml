@@ -233,6 +233,8 @@ telegram_bot:
       - !secret telegram_chat_samuel
       - !secret telegram_chat_daniel
       - !secret telegram_chat_anna
+      - !secret telegram_chat_hannah
+      - !secret telegram_chat_janina
 
 media_source:
 
