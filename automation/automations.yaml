@@ -4728,8 +4728,6 @@
                 - condition: template
                   value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] | int >= 18 }}"
           sequence:
-            Wettervorhersage für heute {{ states.weather.ebersberg_ebersberg.state }} bei {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C
-          *Momentan {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].temperature }} °C*
             - service: telegram_bot.send_poll
               data_template:
                 target: !secret telegram_chat_5friends
