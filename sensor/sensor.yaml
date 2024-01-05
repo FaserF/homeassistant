@@ -245,12 +245,6 @@
           Inaktiv
         {% endif %}
       unit_of_measurement: "Minuten"
-- platform: systemmonitor
-  resources:
-    - type: disk_use_percent
-      arg: /
-    - type: memory_use_percent
-    # - type: processor_temperature
 - platform: template
   sensors:
     fs_caller:

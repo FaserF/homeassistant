@@ -310,9 +310,12 @@ template:
     sensor:
       - name: Weather Ebersberg Hourly
         unique_id: weather_ebersberg_hourly
-        state: "{{ hourly.forecast.temperature }}"
+        state: "{{ hourly['weather.ebersberg_ebersberg'].forecast[0].temperature }}"
+        availability: "{{ is_number(hourly['weather.ebersberg_ebersberg'].forecast[0].temperature) }}"
+        unit_of_measurement: °C
+        device_class: temperature
         attributes:
-          forecast: "{{ hourly.forecast }}"
+          forecast: "{{ hourly['weather.ebersberg_ebersberg'].forecast }}"
   - trigger:
       - platform: time_pattern
         hours: /23
@@ -324,11 +327,14 @@ template:
           entity_id: weather.ebersberg_ebersberg
         response_variable: daily
     sensor:
-      - name: Weather Ebersberg daily
+      - name: Weather Ebersberg Daily
         unique_id: weather_ebersberg_daily
-        state: "{{ daily.forecast.temperature }}"
+        state: "{{ daily['weather.ebersberg_ebersberg'].forecast[0].temperature }}"
+        availability: "{{ is_number(daily['weather.ebersberg_ebersberg'].forecast[0].temperature) }}"
+        unit_of_measurement: °C
+        device_class: temperature
         attributes:
-          forecast: "{{ daily.forecast }}"
+          forecast: "{{ daily['weather.ebersberg_ebersberg'].forecast }}"
 
 #command_line:
 #  - sensor:

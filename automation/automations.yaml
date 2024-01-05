@@ -4743,6 +4743,30 @@
                 is_anonymous: false
                 allows_multiple_answers: true
                 disable_notification: true
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: sensor.weather_ebersberg_hourly
+                  state: "unavailable"
+                - condition: state
+                  entity_id: sensor.weather_ebersberg_hourly
+                  state: "unknown"
+          sequence:
+            - service: telegram_bot.send_poll
+              data_template:
+                target: !secret telegram_chat_5friends
+                question: "Morgen ist {{ states.calendar.votgaming_kalender.attributes.message }}. {% if now().month <= 4 or now().month >= 10 %} Sonne bis {{ as_timestamp(states.sun.sun.attributes.next_dusk) |float| timestamp_custom('%H:%M', false)}}.{% endif %} Wo treffen wir uns?"
+                options:
+                  - "Fabi"
+                  - "Kai & Adri"
+                  - "Flo"
+                  - "Maxi"
+                  - "JUZ"
+                  - "Wo anders (Schreiben wo!)"
+                is_anonymous: false
+                allows_multiple_answers: true
+                disable_notification: true
       default:
         - service: telegram_bot.send_poll
           data_template:
@@ -4762,7 +4786,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_5friends
-        question: "Shisha (wenn Treffen in keinem geschlossenem Raum)?"
+        question: "Shisha?"
         options:
           - "Ja"
           - "Nein"
@@ -7023,8 +7047,12 @@
                 disable_notification: true
                 message: >
                   Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7046,8 +7074,12 @@
                 disable_notification: true
                 message: >
                   Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7057,12 +7089,16 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_jutta
+                target: !secret telegram_chat_5friends
                 disable_notification: true
                 message: >
                   Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7083,8 +7119,12 @@
                 target: !secret telegram_chat_fabian
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7105,8 +7145,12 @@
                 target: !secret telegram_chat_samuel
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7116,11 +7160,15 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_jutta
+                target: !secret telegram_chat_5friends
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7141,8 +7189,12 @@
                 target: !secret telegram_chat_fabian
                 message: >
                   ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
+
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
         - conditions:
@@ -7163,8 +7215,11 @@
                 target: !secret telegram_chat_samuel
                 message: >
                   ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
     - choose:
@@ -7175,11 +7230,14 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_jutta
+                target: !secret telegram_chat_5friends
                 message: >
                   ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+
                   {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
 
