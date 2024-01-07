@@ -6621,355 +6621,22 @@
 
 - id: automatic_ha_updates
   alias: "Automatic HA Updates"
-  initial_state: true
-  trigger:
-    - platform: time
-      at: "04:00:00"
-    - platform: time
-      at: "05:10:00"
-  condition:
-    condition: and
-    conditions:
-      - condition: time
-        weekday:
-          - sun
-      - condition: template
-        value_template: >
-          {% set domain = 'update' %}
-          {% set state = 'on' %}
-          {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
-  action:
-    - choose:
-        - conditions:
-            - condition: numeric_state
-              entity_id: sensor.hacs
-              above: 0
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: >
-                  {% if is_state("sensor.hacs", "1")%}
-                  Es gibt ein verfügbares HACS Update.
-                  {% else %}
-                  Es gibt {{ states.sensor.hacs.state }} verfügbare HACS Updates.
-                  {% endif %}
-                  Folgende Updates werden nun automatisch installiert:
-                  {% if states.update.waste_collection_schedule_update.state == "on" %}
-                  {{ states.update.waste_collection_schedule_update.attributes.friendly_name }} Changelog: {{ states.update.waste_collection_schedule_update.attributes.release_url }} - von Version {{state_attr('update.waste_collection_schedule_update', 'installed_version')}} zu Version {{state_attr('update.waste_collection_schedule_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.deutscher_wetterdienst_update.state == "on" %}
-                  {{ states.update.deutscher_wetterdienst_update.attributes.friendly_name }} Changelog: {{ states.update.deutscher_wetterdienst_update.attributes.release_url }} - von Version {{state_attr('update.deutscher_wetterdienst_update', 'installed_version')}} zu Version {{state_attr('update.deutscher_wetterdienst_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.foodsharing_de_update.state == "on" %}
-                  {{ states.update.foodsharing_de_update.attributes.friendly_name }} Changelog: {{ states.update.foodsharing_de_update.attributes.release_url }} - von Version {{state_attr('update.foodsharing_de_update', 'installed_version')}} zu Version {{state_attr('update.foodsharing_de_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.google_home_update.state == "on" %}
-                  {{ states.update.google_home_update.attributes.friendly_name }} Changelog: {{ states.update.google_home_update.attributes.release_url }} - von Version {{state_attr('update.google_home_update', 'installed_version')}} zu Version {{state_attr('update.google_home_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.hacs_update.state == "on" %}
-                  {{ states.update.hacs_update.attributes.friendly_name }}  Changelog: {{ states.update.hacs_update.attributes.release_url }} - von Version {{state_attr('update.hacs_update', 'installed_version')}} zu Version {{state_attr('update.hacs_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.local_tuya_update.state == "on" %}
-                  {{ states.update.local_tuya_update.attributes.friendly_name }} Changelog: {{ states.update.local_tuya_update.attributes.release_url }} - von Version {{state_attr('update.local_tuya_update', 'installed_version')}} zu Version {{state_attr('update.local_tuya_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.miwifi_update.state == "on" %}
-                  {{ states.update.miwifi_update.attributes.friendly_name }} Changelog: {{ states.update.miwifi_update.attributes.release_url }} - von Version {{state_attr('update.miwifi_update', 'installed_version')}} zu Version {{state_attr('update.miwifi_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.rki_covid_numbers_update.state == "on" %}
-                  {{ states.update.rki_covid_numbers_update.attributes.friendly_name }} Changelog: {{ states.update.rki_covid_numbers_update.attributes.release_url }} - von Version {{state_attr('update.rki_covid_numbers_update', 'installed_version')}} zu Version {{state_attr('update.rki_covid_numbers_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.ytube_music_player_update.state == "on" %}
-                  {{ states.update.ytube_music_player_update.attributes.friendly_name }} Changelog: {{ states.update.ytube_music_player_update.attributes.release_url }} - von Version {{state_attr('update.ytube_music_player_update', 'installed_version')}} zu Version {{state_attr('update.ytube_music_player_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.office_365_integration_update.state == "on" %}
-                  {{ states.update.office_365_integration_update.attributes.friendly_name }} Changelog: {{ states.update.office_365_integration_update.attributes.release_url }} - von Version {{state_attr('update.office_365_integration_update', 'installed_version')}} zu Version {{state_attr('update.office_365_integration_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.toogoodtogo_update.state == "on" %}
-                  {{ states.update.toogoodtogo_update.attributes.friendly_name }} Changelog: {{ states.update.toogoodtogo_update.attributes.release_url }} - von Version {{state_attr('update.toogoodtogo_update', 'installed_version')}} zu Version {{state_attr('update.toogoodtogo_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.adaptive_lighting_update.state == "on" %}
-                  {{ states.update.adaptive_lighting_update.attributes.friendly_name }} Changelog: {{ states.update.adaptive_lighting_update.attributes.release_url }} - von Version {{state_attr('update.adaptive_lighting_update', 'installed_version')}} zu Version {{state_attr('update.adaptive_lighting_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.rewe_discounts_update.state == "on" %}
-                  {{ states.update.rewe_discounts_update.attributes.friendly_name }} Changelog: {{ states.update.rewe_discounts_update.attributes.release_url }} - von Version {{state_attr('update.rewe_discounts_update', 'installed_version')}} zu Version {{state_attr('update.rewe_discounts_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.generic_remote_control_card_update.state == "on" %}
-                  {{ states.update.generic_remote_control_card_update.attributes.friendly_name }} Changelog: {{ states.update.generic_remote_control_card_update.attributes.release_url }} - von Version {{state_attr('update.generic_remote_control_card_update', 'installed_version')}} zu Version {{state_attr('update.generic_remote_control_card_update', 'latest_version')}}.
-                  {% endif %}
-                  {% if states.update.rademacher_homepilot_bridge_update.state == "on" %}
-                  {{ states.update.rademacher_homepilot_bridge_update.attributes.friendly_name }} Changelog: {{ states.update.rademacher_homepilot_bridge_update.attributes.release_url }} - von Version {{state_attr('update.rademacher_homepilot_bridge_update', 'installed_version')}} zu Version {{state_attr('update.rademacher_homepilot_bridge_update', 'latest_version')}}.
-                  {% endif %}
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.waste_collection_schedule_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.waste_collection_schedule_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.deutscher_wetterdienst_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.deutscher_wetterdienst_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.foodsharing_de_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.foodsharing_de_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.google_home_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.google_home_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.hacs_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.hacs_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.local_tuya_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.local_tuya_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.miwifi_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.miwifi_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.rki_covid_numbers_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.rki_covid_numbers_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.ytube_music_player_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.ytube_music_player_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.office_365_integration_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.office_365_integration_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.toogoodtogo_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.toogoodtogo_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.adaptive_lighting_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.adaptive_lighting_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.rewe_discounts_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.rewe_discounts_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.deutsche_bahn_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.deutsche_bahn_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.rademacher_homepilot_bridge_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.rademacher_homepilot_bridge_update
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: update.generic_remote_control_card_update
-                      state: "on"
-                  sequence:
-                    - service: update.install
-                      data:
-                        entity_id: update.generic_remote_control_card_update
-              #  default:
-              #  - service: update.install
-              #  data:
-              #  entity_id: all
-            - delay: "00:02:00"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: update.adguard_home_update
-              state: "on"
-            - condition: state
-              entity_id: "input_boolean.abwesend_modus"
-              state: "off"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: >
-                  Adguard Home Update {{ states.update.adguard_home_update.attributes.latest_version }} wird nun installiert.
-
-                  Changelog: {{ states.update.adguard_home_update.attributes.release_summary }}
-            - service: update.install
-              data:
-                entity_id: update.adguard_home_update
-            - delay: "00:02:00"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: update.home_assistant_supervisor_update
-              state: "on"
-          sequence:
-            - service: update.install
-              data:
-                entity_id: update.home_assistant_supervisor_update
-            - delay: "00:01:00"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: update.vaultwarden_bitwarden_update
-              state: "on"
-            - condition: state
-              entity_id: "input_boolean.abwesend_modus"
-              state: "off"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                disable_notification: true
-                message: >
-                  Vaultwarden Update {{ states.update.vaultwarden_bitwarden_update.attributes.latest_version }} wird nun installiert.
-
-                  Changelog: {{ states.update.vaultwarden_bitwarden_update.attributes.release_summary }}
-            - service: update.install
-              data:
-                entity_id: update.vaultwarden_bitwarden_update
-            - delay: "00:02:00"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: update.fritz_box_3490_fritz_os
-              state: "on"
-            - condition: state
-              entity_id: "input_boolean.abwesend_modus"
-              state: "off"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: >
-                  FritzBox Firmware Update {{ states.update.fritz_box_3490_fritz_os.attributes.latest_version }} wird nun installiert.
-
-                  Changelog: {{ states.update.fritz_box_3490_fritz_os.attributes.release_url }}
-            - service: update.install
-              data:
-                entity_id: update.fritz_box_3490_fritz_os
-            - delay: "00:12:00"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: update.home_assistant_core_update
-              state: "on"
-            - condition: state
-              entity_id: "input_boolean.abwesend_modus"
-              state: "off"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: >
-                  Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert.
-
-                  Changelog HA: {{ states.update.home_assistant_core_update.attributes.release_url }}
-            - service: hassio.addon_restart
-              data:
-                addon: a0d7b954-ssh
-            - delay: "00:00:30"
-            - service: update.install
-              data:
-                entity_id: update.home_assistant_core_update
-        - conditions:
-            - condition: state
-              entity_id: update.home_assistant_operating_system_update
-              state: "on"
-            - condition: state
-              entity_id: "input_boolean.abwesend_modus"
-              state: "off"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: >
-                  Home Assistant OS {{ states.update.home_assistant_operating_system_update.attributes.latest_version }} wird nun installiert.
-
-                  Changelog OS: {{ states.update.home_assistant_operating_system_update.attributes.release_url }}
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_chat_fabian
-                message: >
-                  Homeassistant OS wird automatisch aktualisiert. Vaultwarden wird daher zeitweise nicht verfügbar sein für ungefähr 15 Minuten.
-            - service: hassio.addon_restart
-              data:
-                addon: a0d7b954-ssh
-            - delay: "00:00:30"
-            - service: update.install
-              data:
-                entity_id: update.home_assistant_operating_system_update
+  use_blueprint:
+    path: edwardtfn/auto_update_scheduled.yaml
+    input:
+      schedule_entity: schedule.homeassistant_updates
+      restart_bool: true
+      actions_pre_restart:
+        - service: hassio.addon_restart
+          metadata: {}
+          data:
+            addon: a0d7b954_ssh
+      actions_pre_update:
+        - service: notify.telegram_fabian
+          metadata: {}
+          data:
+            title: Homeassistant Updates werden installiert
+            message: "{{ updates_list }}"
 
 - id: incoming_call_fabian
   alias: "Incoming Call Fabian"
@@ -9425,6 +9092,17 @@
                 data:
                   inline_keyboard:
                     - "Erledigt:/telegramwasherdone"
+    - service: automation.turn_on
+      data:
+        entity_id:
+          - automation.detect_if_washing_machine_is_currently_active
+          - automation.detect_if_coal_lighter_is_currently_active
+    - service: switch.turn_off
+      data:
+        entity_id: switch.waschmaschine
+    - service: automation.turn_off
+      data:
+        entity_id: automation.set_washing_machine_clean_when_power_drops
     - choose:
         - conditions:
             - condition: state
@@ -9470,17 +9148,6 @@
               entity_id: media_player.fabians_lautsprecher
               data:
                 message: "Die Waschmaschine ist fertig."
-    - service: automation.turn_on
-      data:
-        entity_id:
-          - automation.detect_if_washing_machine_is_currently_active
-          - automation.detect_if_coal_lighter_is_currently_active
-    - service: switch.turn_off
-      data:
-        entity_id: switch.waschmaschine
-    - service: automation.turn_off
-      data:
-        entity_id: automation.set_washing_machine_clean_when_power_drops
 
 - id: set_washing_machine_idle_after_timeout
   alias: Set washing machine idle after timeout
