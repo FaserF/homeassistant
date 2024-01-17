@@ -4804,6 +4804,22 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_chat_5friends
+        question: "Welcher Gast soll NÄCHSTE Woche mit dabei sein?"
+        options:
+          - "Niemand"
+          - "Daniel"
+          - "Kassandra"
+          - "Leon"
+          - "Lorenz"
+          - "Michelle"
+          - "Samuel"
+          - "Yannick"
+        is_anonymous: false
+        allows_multiple_answers: true
+        disable_notification: true
 
 - id: turn_on_fridge_for_meetings
   alias: "Turn on fridge for meetings"
@@ -8419,6 +8435,11 @@
                 - condition: state
                   entity_id: person.samuel
                   state: home
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: home
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -8549,6 +8570,11 @@
     #            - condition: state
     #              entity_id: person.samuel
     #              state: home
+    #        - condition: not
+    #          conditions:
+    #            - condition: state
+    #              entity_id: person.fabian
+    #              state: home
     #      sequence:
     #        - service: telegram_bot.send_message
     #          data_template:
@@ -8616,6 +8642,8 @@
                 - condition: state
                   entity_id: person.fabian
                   state: "Kai-Adri"
+                - condition: template
+                  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 14400 }}"
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -8626,6 +8654,13 @@
               conditions:
                 - condition: state
                   entity_id: person.samuel
+                  state: home
+                - condition: template
+                  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 14400 }}"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
                   state: home
           sequence:
             - service: telegram_bot.send_message
@@ -8749,6 +8784,11 @@
               conditions:
                 - condition: state
                   entity_id: person.samuel
+                  state: home
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
                   state: home
           sequence:
             - service: telegram_bot.send_message
@@ -9932,17 +9972,7 @@
             - service: notify.telegram_fabian
               data:
                 title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-                message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: device_tracker.redmi_note_10_pro
-              state: home
-          sequence:
-            - service: notify.telegram_samuel
-              data:
-                title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-                message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next }} Uhr"
+                message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next_1 }} Uhr"
 
 - id: notify_fabian_on_sbahn_delay_work_home
   alias: "Notify on Sbahn delay Work -> Home"
@@ -9981,7 +10011,7 @@
     - service: notify.telegram_fabian
       data:
         title: "Sbahn um {{ states.sensor.starnberg_nord_to_zorneding.attributes.departure }} Uhr nach Hause +{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min."
-        message: "Nächste Sbahn: {{ states.sensor.starnberg_nord_to_zorneding.attributes.next }} Uhr"
+        message: "Nächste Sbahn: {{ states.sensor.starnberg_nord_to_zorneding.attributes.next_1 }} Uhr"
 
 - id: notify_on_sbahn_delay_work_samuel_home
   alias: "Notify on Sbahn delay Work samuel -> Home"
