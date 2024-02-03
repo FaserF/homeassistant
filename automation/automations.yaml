@@ -4786,17 +4786,6 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_5friends
-        question: "Shisha?"
-        options:
-          - "Ja"
-          - "Nein"
-          - "Mir egal"
-        is_anonymous: false
-        allows_multiple_answers: false
-        disable_notification: true
-    - service: telegram_bot.send_poll
-      data_template:
-        target: !secret telegram_chat_5friends
         question: "Gemeinsam kochen?"
         options:
           - "Ja, esse mit"
@@ -4809,7 +4798,7 @@
         target: !secret telegram_chat_5friends
         question: "Welcher Gast soll NÄCHSTE Woche mit dabei sein?"
         options:
-          - "Niemand"
+          - "Niemand (sobald einer dafür stimmt gibts keinen Gast)"
           - "Daniel"
           - "Kassandra"
           - "Leon"
@@ -4817,6 +4806,7 @@
           - "Michelle"
           - "Samuel"
           - "Yannick"
+          - "Mir egal / wer anderes"
         is_anonymous: false
         allows_multiple_answers: true
         disable_notification: true
@@ -10573,6 +10563,8 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_volleyball
+                data:
+                  disable_web_page_preview: true
                 message: >
                   Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
 
