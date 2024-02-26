@@ -268,7 +268,7 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: proximity.home_fabian
+              entity_id: sensor.smart_life_fabian_distance
               below: 70
           sequence:
             - service: notify.telegram_fabian
@@ -287,7 +287,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 10
                 - condition: state
                   entity_id: person.samuel
@@ -304,7 +304,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 10
                 - condition: state
                   entity_id: person.fabian

@@ -112,24 +112,6 @@ history:
 
 # Example configuration.yaml entry
 alert:
-  gmaps_cookie:
-    name: Google Maps Homeassistant Coockie scheint abgelaufen zu sein (Fabian)
-    done_message: Maps Cookie wurde erneuert
-    entity_id: device_tracker.google_maps_112174659110860535869
-    #attribute: source_type
-    state: "unavailable"
-    repeat: 3200
-    can_acknowledge: true
-    skip_first: true
-  gmaps_cookie_votgaming:
-    name: Google Maps Homeassistant Coockie scheint abgelaufen zu sein (votgaming)
-    done_message: Maps Cookie wurde erneuert
-    entity_id: device_tracker.google_maps_108826716663847481627
-    #attribute: source_type
-    state: "unavailable"
-    repeat: 3200
-    can_acknowledge: true
-    skip_first: true
   james_stuck:
     name: James hat ein Problem!
     message: "James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }} - Die Reinigung wurde daher unterbrochen."
@@ -186,25 +168,6 @@ map:
 
 # Track the sun
 sun:
-
-proximity:
-  home_samuel:
-    zone: home
-    ignored_zones: zone.arbeit_samuel
-    devices: person.samuel
-    tolerance: 50
-  home_fabian:
-    zone: home
-    ignored_zones: zone.arbeit_fabi
-    devices: person.fabian
-    tolerance: 50
-  #home_ka:
-  #  zone: home
-  #  ignored_zones: kai_adri
-  #  devices:
-  #    - person.kai
-  #    - person.adri
-  #  tolerance: 50
 
 telegram_bot:
   - platform: polling

@@ -31,7 +31,7 @@
     - service: switch.turn_off
       data:
         area_id:
-          - "{{ area_id('Keller') }}"
+          - fd6f6d3c931e48348d9437fc4d103fb4 #Keller
     - service: switch.turn_off
       data:
         entity_id:
@@ -504,7 +504,7 @@
       from: "not_home"
       to: "home"
     - platform: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       below: 2
       for:
         seconds: 5
@@ -527,13 +527,12 @@
     - condition: or
       conditions:
         - condition: numeric_state
-          entity_id: proximity.home_fabian
+          entity_id: sensor.smart_life_fabian_distance
           below: 3
         - condition: not
           conditions:
             - condition: state
-              entity_id: proximity.home_fabian
-              attribute: dir_of_travel
+              entity_id: sensor.smart_life_fabian_direction_of_travel
               state: "away_from"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 300 }}"
@@ -559,7 +558,7 @@
       from: "not_home"
       to: "home"
     - platform: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 2
       for:
         seconds: 2
@@ -582,67 +581,17 @@
     - condition: or
       conditions:
         - condition: numeric_state
-          entity_id: proximity.home_samuel
+          entity_id: sensor.smart_life_samuel_distance
           below: 3
         - condition: not
           conditions:
             - condition: state
-              entity_id: proximity.home_samuel
-              attribute: dir_of_travel
+              entity_id: sensor.smart_life_samuel_direction_of_travel
               state: "away_from"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_samuel_if_coming_home.attributes.last_triggered) | int > 300 }}"
-  action:
-    - service: switch.turn_on
-      data:
-        entity_id: switch.schloss
-
-- id: open_door_for_anna
-  alias: "Open the door for anna if coming home"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: person.anna
-      from: "not_home"
-      to: "home"
-    - platform: numeric_state
-      entity_id: proximity.home_anna
-      below: 2
-      for:
-        seconds: 2
-  condition:
-    - condition: not
-      conditions:
-        #- condition: state
-        #  entity_id: device_tracker.redmi_note_10_pro
-        #  state: home
-        - condition: state
-          entity_id: person.anna
-          state: Volleyball
-        - condition: state
-          entity_id: person.anna
-          state: Einkaufen
-        - condition: numeric_state
-          entity_id: person.anna
-          attribute: gps_accuracy
-          above: 500
-    - condition: or
-      conditions:
-        - condition: numeric_state
-          entity_id: proximity.home_anna
-          below: 3
-        - condition: not
-          conditions:
-            - condition: state
-              entity_id: proximity.home_anna
-              attribute: dir_of_travel
-              state: "away_from"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_anna_if_coming_home.attributes.last_triggered) | int > 300 }}"
   action:
     - service: switch.turn_on
       data:
@@ -674,12 +623,6 @@
         - condition: state
           entity_id: person.samuel
           state: home
-    #  - condition: not
-    #    conditions:
-    #      - condition: state
-    #        entity_id: proximity.home_ka
-    #        attribute: dir_of_travel
-    #        state: 'away_from'
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
@@ -776,12 +719,6 @@
         - condition: state
           entity_id: person.samuel
           state: home
-    #  - condition: not
-    #    conditions:
-    #      - condition: state
-    #        entity_id: proximity.home_ka
-    #        attribute: dir_of_travel
-    #        state: 'away_from'
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
@@ -879,12 +816,6 @@
         - condition: state
           entity_id: person.samuel
           state: home
-    #  - condition: not
-    #    conditions:
-    #      - condition: state
-    #        entity_id: proximity.home_ka
-    #        attribute: dir_of_travel
-    #        state: 'away_from'
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.open_the_door_for_fabian_if_coming_home.attributes.last_triggered) | int > 180 }}"
     - condition: template
@@ -1139,7 +1070,7 @@
                           entity_id: person.fabian
                           state: "home"
                         - condition: numeric_state
-                          entity_id: proximity.home_fabian
+                          entity_id: sensor.smart_life_fabian_distance
                           below: 10
                   sequence:
                     - service: telegram_bot.send_message
@@ -1154,7 +1085,7 @@
                           entity_id: person.samuel
                           state: "home"
                         - condition: numeric_state
-                          entity_id: proximity.home_samuel
+                          entity_id: sensor.smart_life_samuel_distance
                           below: 10
                   sequence:
                     - service: telegram_bot.send_message
@@ -1177,7 +1108,7 @@
                           entity_id: person.fabian
                           state: "home"
                         - condition: numeric_state
-                          entity_id: proximity.home_fabian
+                          entity_id: sensor.smart_life_fabian_distance
                           below: 10
                   sequence:
                     - service: telegram_bot.send_message
@@ -1193,7 +1124,7 @@
                           entity_id: person.samuel
                           state: "home"
                         - condition: numeric_state
-                          entity_id: proximity.home_samuel
+                          entity_id: sensor.smart_life_samuel_distance
                           below: 10
                   sequence:
                     - service: telegram_bot.send_message
@@ -1206,7 +1137,7 @@
   initial_state: true
   trigger:
     platform: time
-    at: "04:30:00"
+    at: "03:30:00"
   condition:
     - condition: state
       entity_id: binary_sensor.workday_sensor
@@ -1233,7 +1164,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 10
                 - condition: state
                   entity_id: person.fabian
@@ -1250,7 +1181,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 5
                 - condition: state
                   entity_id: person.samuel
@@ -1305,7 +1236,7 @@
                     - condition: or
                       conditions:
                         - condition: numeric_state
-                          entity_id: proximity.home_fabian
+                          entity_id: sensor.smart_life_fabian_distance
                           below: 5
                         - condition: state
                           entity_id: person.fabian
@@ -1320,7 +1251,7 @@
                     - condition: or
                       conditions:
                         - condition: numeric_state
-                          entity_id: proximity.home_samuel
+                          entity_id: sensor.smart_life_samuel_distance
                           below: 5
                         - condition: state
                           entity_id: person.samuel
@@ -5619,12 +5550,12 @@
       for:
         minutes: 1440
     - platform: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       above: 100
       for:
         minutes: 5
     - platform: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       above: 100
       for:
         minutes: 5
@@ -5641,10 +5572,10 @@
         entity_id: "input_boolean.abwesend_modus"
         state: "off"
       - condition: numeric_state
-        entity_id: proximity.home_fabian
+        entity_id: sensor.smart_life_fabian_distance
         above: 80
       - condition: numeric_state
-        entity_id: proximity.home_samuel
+        entity_id: sensor.smart_life_samuel_distance
         above: 80
   action:
     - choose:
@@ -5841,7 +5772,7 @@
                   entity_id: person.fabian
                   state: "Kai-Adri"
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 5
           sequence:
             - service: notify.mobile_app_pixel_8_pro
@@ -5863,7 +5794,7 @@
                   entity_id: person.samuel
                   state: "home"
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 5
           sequence:
             - service: telegram_bot.send_message
@@ -5982,474 +5913,6 @@
 
           Google Maps Link: {{ state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['maps'] }}
         target: !secret telegram_foodsharing_wue
-
-- id: too_good_to_go_food_available_wue
-  alias: "Too good to go food Available WUE"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: sensor.tgtg_backwerk_wurzburg_hbf
-    - platform: state
-      entity_id: sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg
-    - platform: state
-      entity_id: sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend
-    - platform: state
-      entity_id: sensor.tgtg_dean_david_maulhardgasse
-    - platform: state
-      entity_id: sensor.tgtg_dean_david_maulhardgasse_vegetarisch
-    - platform: state
-      entity_id: sensor.tgtg_denns_biomarkt_wurzburg_backwaren
-    - platform: state
-      entity_id: sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse
-    - platform: state
-      entity_id: sensor.tgtg_edeka_didis_kurnach_obst_gemuse
-    - platform: state
-      entity_id: sensor.tgtg_edeka_didis_kurnach_uberraschungstute
-    - platform: state
-      entity_id: sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet
-    - platform: state
-      entity_id: sensor.tgtg_nordsee_domstrasse_hauptgerichte
-    - platform: state
-      entity_id: sensor.tgtg_nordsee_domstrasse_snacks
-    - platform: state
-      entity_id: sensor.tgtg_sumo_sushi_bar
-    - platform: state
-      entity_id: sensor.tgtg_ursprung_bioladen
-    - platform: state
-      entity_id: sensor.tgtg_webers_backerladen_augustinerstrasse
-    - platform: state
-      entity_id: sensor.tgtg_webers_backerladen_eichhornstrasse
-  condition:
-    - condition: template
-      value_template: "{{ (states.sensor.tgtg_backwerk_wurzburg_hbf.state | int) + (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state | int) + (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state | int) + (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state | int) + (states.sensor.tgtg_nordsee_domstrasse_snacks.state | int) + (states.sensor.tgtg_sumo_sushi_bar.state | int) + (states.sensor.tgtg_ursprung_bioladen.state | int) + (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state | int) + (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state | int) > 0 }}"
-    - condition: template
-      value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
-    - condition: or
-      conditions:
-        - condition: state
-          entity_id: person.fabian
-          state: "Anna"
-        - condition: state
-          entity_id: person.anna
-          state: "Anna"
-  action:
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "Anna"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Es gibt noch {{ (states.sensor.tgtg_backwerk_wurzburg_hbf.state | int) + (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state | int) + (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state | int) + (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state | int) + (states.sensor.tgtg_nordsee_domstrasse_snacks.state | int) + (states.sensor.tgtg_sumo_sushi_bar.state | int) + (states.sensor.tgtg_ursprung_bioladen.state | int) + (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state | int) + (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state | int) }} verfügbare Reservierungen bei TGTG Würzburg. Darunter:
-
-
-                  {% if (states.sensor.tgtg_backwerk_wurzburg_hbf.state)|int > 0 %}
-                  {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'item_price') }} statt {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'item_price') }} statt {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'item_price') }} statt {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_dean_david_maulhardgasse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'item_price') }} statt {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'item_price') }} statt {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'item_price') }} statt {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'item_price') }} statt {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'item_price') }} statt {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'item_price') }} statt {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'item_price') }} statt {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'item_price') }} statt {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_nordsee_domstrasse_snacks.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'item_price') }} statt {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_sumo_sushi_bar.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'item_price') }} statt {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_ursprung_bioladen.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_ursprung_bioladen', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_ursprung_bioladen', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_ursprung_bioladen', 'item_price') }} statt {{ state_attr('sensor.tgtg_ursprung_bioladen', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_ursprung_bioladen', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_ursprung_bioladen', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'item_price') }} statt {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'item_price') }} statt {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'pickup_end') }}
-
-                  {% endif %}
-                data:
-                  disable_web_page_preview: true
-                target: !secret telegram_chat_fabian
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.anna
-                  state: "Anna"
-                - condition: state
-                  entity_id: person.anna
-                  state: "Anna Schule"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Es gibt noch {{ (states.sensor.tgtg_backwerk_wurzburg_hbf.state | int) + (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse.state | int) + (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state | int) + (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state | int) + (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state | int) + (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state | int) + (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state | int) + (states.sensor.tgtg_nordsee_domstrasse_snacks.state | int) + (states.sensor.tgtg_sumo_sushi_bar.state | int) + (states.sensor.tgtg_ursprung_bioladen.state | int) + (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state | int) + (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state | int) }} verfügbare Reservierungen bei TGTG Würzburg. Darunter:
-
-
-                  {% if (states.sensor.tgtg_backwerk_wurzburg_hbf.state)|int > 0 %}
-                  {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'item_price') }} statt {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_backwerk_wurzburg_hbf', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'item_price') }} statt {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_bistro_vital_hem_station_mergentheimer_strasse_wurzburg', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'item_price') }} statt {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_cafe_bonjour_totalenergies_station_kantstrasse_wurzburg_uberraschungstute_abend', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_dean_david_maulhardgasse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'item_price') }} statt {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_dean_david_maulhardgasse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_dean_david_maulhardgasse_vegetarisch.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'item_price') }} statt {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_dean_david_maulhardgasse_vegetarisch', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_denns_biomarkt_wurzburg_backwaren.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'item_price') }} statt {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_backwaren', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'item_price') }} statt {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_denns_biomarkt_wurzburg_obst_gemuse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_edeka_didis_kurnach_obst_gemuse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'item_price') }} statt {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_edeka_didis_kurnach_obst_gemuse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_edeka_didis_kurnach_uberraschungstute.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'item_price') }} statt {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_edeka_didis_kurnach_uberraschungstute', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'item_price') }} statt {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_ghotel_hotel_living_wurzburg_fruhstucksbuffet', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_nordsee_domstrasse_hauptgerichte.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'item_price') }} statt {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_nordsee_domstrasse_hauptgerichte', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_nordsee_domstrasse_snacks.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'item_price') }} statt {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_nordsee_domstrasse_snacks', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_sumo_sushi_bar.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'item_price') }} statt {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_sumo_sushi_bar', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_ursprung_bioladen.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_ursprung_bioladen', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_ursprung_bioladen', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_ursprung_bioladen', 'item_price') }} statt {{ state_attr('sensor.tgtg_ursprung_bioladen', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_ursprung_bioladen', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_ursprung_bioladen', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_webers_backerladen_augustinerstrasse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'item_price') }} statt {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_webers_backerladen_augustinerstrasse', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_webers_backerladen_eichhornstrasse.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'item_price') }} statt {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_webers_backerladen_eichhornstrasse', 'pickup_end') }}
-
-                  {% endif %}
-                data:
-                  disable_web_page_preview: true
-                target: !secret telegram_chat_anna
 
 - id: too_good_to_go_food_available_zorneding
   alias: "Too good to go food Available Zorneding"
@@ -6708,7 +6171,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 20
                 - condition: state
                   entity_id: person.fabian
@@ -6735,7 +6198,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 20
                 - condition: state
                   entity_id: person.samuel
@@ -6781,7 +6244,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 20
                 - condition: state
                   entity_id: person.fabian
@@ -6807,7 +6270,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 30
                 - condition: state
                   entity_id: person.samuel
@@ -6851,7 +6314,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 40
                 - condition: state
                   entity_id: person.fabian
@@ -6877,7 +6340,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 40
                 - condition: state
                   entity_id: person.samuel
@@ -8259,7 +7722,7 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: proximity.home_fabian
+              entity_id: sensor.smart_life_fabian_distance
               below: 89
           sequence:
             - service: telegram_bot.send_message
@@ -8273,7 +7736,7 @@
     - choose:
         - conditions:
             - condition: numeric_state
-              entity_id: proximity.home_fabian
+              entity_id: sensor.smart_life_fabian_distance
               below: 89
           sequence:
             - service: telegram_bot.send_message
@@ -8994,7 +8457,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 89
                 - condition: state
                   entity_id: person.fabian
@@ -9011,7 +8474,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 55
                 - condition: state
                   entity_id: person.samuel
@@ -9093,7 +8556,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_fabian
+                  entity_id: sensor.smart_life_fabian_distance
                   below: 35
                 - condition: state
                   entity_id: person.fabian
@@ -9110,7 +8573,7 @@
             - condition: or
               conditions:
                 - condition: numeric_state
-                  entity_id: proximity.home_samuel
+                  entity_id: sensor.smart_life_samuel_distance
                   below: 35
                 - condition: state
                   entity_id: person.samuel
@@ -9906,27 +9369,6 @@
         entity_id: climate.wohnzimmer
         hvac_mode: auto
 
-- id: remind_for_checking_google_maps_ha_cookie
-  alias: "Remind for checking google maps ha cookie"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: device_tracker.google_maps_112174659110860535869
-      attribute: source_type
-      to: null
-      for:
-        minutes: 30
-    - platform: state
-      entity_id: device_tracker.google_maps_112056758146194246561
-      attribute: source_type
-      to: null
-      for:
-        minutes: 30
-  action:
-    - service: notify.telegram_fabian
-      data:
-        message: "Der Google Maps Homeassistant Coockie scheint abgelaufen zu sein. Bitte erneuern. In der Zwischenzeit funktionieren keine Google Maps Automationen."
-
 - id: notify_on_sbahn_delay_home_work
   alias: "Notify Fabi on sbahn delay Home -> Work"
   initial_state: true
@@ -9987,10 +9429,10 @@
         entity_id: binary_sensor.workday_sensor
         state: "on"
       - condition: numeric_state
-        entity_id: proximity.home_fabian
+        entity_id: sensor.smart_life_fabian_distance
         below: 89
       - condition: numeric_state
-        entity_id: proximity.home_fabian
+        entity_id: sensor.smart_life_fabian_distance
         above: 20
       - condition: not
         conditions:
@@ -10024,66 +9466,21 @@
       data:
         message: "Sbahn in Leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
 
-- id: notify_kai_adri_come_to_visit
-  alias: "Notify Kai Adri come to visit"
-  initial_state: false
-  trigger:
-    - platform: state
-      entity_id: proximity.home_ka
-      attribute: dir_of_travel
-      to: "towards"
-  condition:
-    - condition: numeric_state
-      entity_id: proximity.home_ka
-      below: 7
-    - condition: numeric_state
-      entity_id: proximity.home_ka
-      above: 1
-    - condition: state
-      entity_id: person.fabian
-      state: home
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_kai_adri_come_to_visit.attributes.last_triggered) | int > 1800 }}"
-    - condition: or
-      conditions:
-        - condition: not
-          conditions:
-            - condition: state
-              entity_id: person.kai
-              state: "Kai-Adri"
-            - condition: state
-              entity_id: person.adri
-              state: "Kai-Adri"
-    - condition: not
-      conditions:
-        - condition: and
-          conditions:
-            - condition: time
-              after: "18:00:00"
-              before: "22:30:00"
-              weekday: sun
-  action:
-    - service: notify.telegram_fabian
-      data_template:
-        message: >
-          {% if (not is_state("person.kai", "Kai-Adri")) -%}Kai {% endif %}{% if (not is_state("person.adri", "Kai-Adri")) -%} Adri{% endif %} ist auf dem Weg nach Zorneding und noch {{ states.proximity.home_ka.state }} km entfernt von zu Hause.
-
 - id: notify_samuel_fabian_on_way_home
   alias: "Notify samuel Fabian on way home"
   initial_state: false
   trigger:
     - platform: state
-      entity_id: proximity.home_fabian
-      attribute: dir_of_travel
+      entity_id: sensor.smart_life_fabian_direction_of_travel
       to: "towards"
       for:
         minutes: 6
   condition:
     - condition: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       above: 3
     - condition: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       below: 30
     - condition: state
       entity_id: person.samuel
@@ -10104,24 +9501,23 @@
   action:
     - service: notify.telegram_samuel
       data:
-        message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+        message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
 - id: notify_samuel_fabian_on_way_home_longer_distance
   alias: "Notify samuel Fabian on way home longer distance"
   initial_state: false
   trigger:
     - platform: state
-      entity_id: proximity.home_fabian
-      attribute: dir_of_travel
+      entity_id: sensor.smart_life_fabian_direction_of_travel
       to: "towards"
       for:
         minutes: 22
   condition:
     - condition: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       above: 29
     - condition: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       below: 90
     - condition: state
       entity_id: person.samuel
@@ -10142,21 +9538,20 @@
   action:
     - service: notify.telegram_samuel
       data:
-        message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+        message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
 - id: notify_samuel_fabian_on_way_home_long_distance
   alias: "Notify samuel Fabian on way home long distance"
   initial_state: false
   trigger:
     - platform: state
-      entity_id: proximity.home_fabian
-      attribute: dir_of_travel
+      entity_id: sensor.smart_life_fabian_direction_of_travel
       to: "towards"
       for:
         minutes: 50
   condition:
     - condition: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       above: 89
     - condition: state
       entity_id: person.samuel
@@ -10177,24 +9572,23 @@
   action:
     - service: notify.telegram_samuel
       data:
-        message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_fabian.state }} km entfernt von zu Hause."
+        message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
 - id: notify_fabian_samuel_on_way_home
   alias: "Notify Fabian samuel on way home"
   initial_state: true
   trigger:
     - platform: state
-      entity_id: proximity.home_samuel
-      attribute: dir_of_travel
+      entity_id: sensor.smart_life_fabian_direction_of_travel
       to: "towards"
       for:
         minutes: 8
   condition:
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       above: 3
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 30
     - condition: state
       entity_id: person.fabian
@@ -10223,24 +9617,23 @@
   action:
     - service: notify.telegram_fabian
       data:
-        message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_samuel.state }} km entfernt von zu Hause."
+        message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_samuel_distance.state }} km entfernt von zu Hause."
 
 - id: notify_fabian_samuel_on_way_home_longer_distance
   alias: "Notify Fabian samuel on way home longer distance"
   initial_state: true
   trigger:
     - platform: state
-      entity_id: proximity.home_samuel
-      attribute: dir_of_travel
+      entity_id: sensor.smart_life_samuel_direction_of_travel
       to: "towards"
       for:
         minutes: 15
   condition:
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       above: 29
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 90
     - condition: state
       entity_id: person.fabian
@@ -10266,21 +9659,20 @@
   action:
     - service: notify.telegram_fabian
       data:
-        message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_samuel.state }} km entfernt von zu Hause."
+        message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_samuel_distance.state }} km entfernt von zu Hause."
 
 - id: notify_fabian_samuel_on_way_home_long_distance
   alias: "Notify Fabian samuel on way home long distance"
   initial_state: true
   trigger:
     - platform: state
-      entity_id: proximity.home_samuel
-      attribute: dir_of_travel
+      entity_id: sensor.smart_life_samuel_direction_of_travel
       to: "towards"
       for:
         minutes: 30
   condition:
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       above: 89
     - condition: state
       entity_id: person.fabian
@@ -10306,7 +9698,7 @@
   action:
     - service: notify.telegram_fabian
       data:
-        message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.proximity.home_samuel.state }} km entfernt von zu Hause."
+        message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_samuel_distance.state }} km entfernt von zu Hause."
 
 - id: notify_samuel_fabian_on_way_home_from_sta
   alias: "Notify samuel Fabian on way home from STA"
@@ -10325,10 +9717,10 @@
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3600 }}"
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 35
     - condition: numeric_state
-      entity_id: proximity.home_fabian
+      entity_id: sensor.smart_life_fabian_distance
       above: 10
   action:
     - parallel:
@@ -10430,7 +9822,7 @@
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_gil.attributes.last_triggered) | int > 3600 }}"
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 35
   action:
     - service: notify.telegram_samuel
@@ -10452,7 +9844,7 @@
       entity_id: binary_sensor.workday_sensor
       state: "on"
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 35
   action:
     - service: notify.telegram_samuel
@@ -10474,7 +9866,7 @@
       entity_id: binary_sensor.workday_sensor
       state: "on"
     - condition: numeric_state
-      entity_id: proximity.home_samuel
+      entity_id: sensor.smart_life_samuel_distance
       below: 35
   action:
     - service: notify.telegram_samuel
