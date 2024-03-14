@@ -974,7 +974,13 @@
                     - service: telegram_bot.send_message
                       data_template:
                         target: !secret telegram_chat_fabian
-                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet, außer im Keller."
+                        message: >
+                          "Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+                          {% for state in states.light %}
+                            {% if state.state == 'on' %}
+                              - {{ state.name }}
+                            {% endif %}
+                          {% endfor %}"
                         inline_keyboard:
                           - "Abbruch:/cancellight, Okay:/telegramno"
             - choose:
@@ -988,10 +994,16 @@
                     - service: telegram_bot.send_message
                       data_template:
                         target: !secret telegram_chat_samuel
-                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet, außer im Keller."
+                        message: >
+                          "Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+                          {% for state in states.light %}
+                            {% if state.state == 'on' %}
+                              - {{ state.name }}
+                            {% endif %}
+                          {% endfor %}"
                         inline_keyboard:
                           - "Abbruch:/cancellight, Okay:/telegramno"
-    - choose:
+      default:
         - conditions:
             - condition: state
               entity_id: media_player.keller_tv
@@ -1008,7 +1020,13 @@
                     - service: telegram_bot.send_message
                       data_template:
                         target: !secret telegram_chat_fabian
-                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet."
+                        message: >
+                          "Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet:
+                          {% for state in states.light %}
+                            {% if state.state == 'on' %}
+                              - {{ state.name }}
+                            {% endif %}
+                          {% endfor %}"
                         inline_keyboard:
                           - "Abbruch:/cancellight, Okay:/telegramno"
             - choose:
@@ -1022,7 +1040,13 @@
                     - service: telegram_bot.send_message
                       data_template:
                         target: !secret telegram_chat_samuel
-                        message: "Alle Lichter werden in 20 Minuten ausgeschaltet."
+                        message: >
+                          "Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet:
+                          {% for state in states.light %}
+                            {% if state.state == 'on' %}
+                              - {{ state.name }}
+                            {% endif %}
+                          {% endfor %}"
                         inline_keyboard:
                           - "Abbruch:/cancellight, Okay:/telegramno"
 
@@ -1092,7 +1116,7 @@
                       data_template:
                         target: !secret telegram_chat_samuel
                         message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
-    - choose:
+      default:
         - conditions:
             - condition: state
               entity_id: media_player.keller_tv
@@ -1173,7 +1197,10 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_fabian
-                message: "Fernseher & Lichter werden in 20 Minuten ausgeschaltet."
+                message: >
+                  "Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+                  {% for state in states.light %}{% if state.state == 'on' %}- {{ state.name }}{% endif %}{% endfor %}
+                  {% for state in states.switch %}{% if state.state == 'on' and state.entity_id in ['switch.fernseher', 'switch.fernseher_samuel'] %}- {{ state.name }} ist eingeschaltet{% endif %}{% endfor %}"
                 inline_keyboard:
                   - "Abbruch:/cancellight, Okay:/telegramno"
     - choose:
@@ -1190,7 +1217,10 @@
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_samuel
-                message: "Fernseher & Lichter werden in 20 Minuten ausgeschaltet."
+                message: >
+                  "Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+                  {% for state in states.light %}{% if state.state == 'on' %}- {{ state.name }}{% endif %}{% endfor %}
+                  {% for state in states.switch %}{% if state.state == 'on' and state.entity_id in ['switch.fernseher', 'switch.fernseher_samuel'] %}- {{ state.name }} ist eingeschaltet{% endif %}{% endfor %}"
                 inline_keyboard:
                   - "Abbruch:/cancellight, Okay:/telegramno"
 
@@ -1221,6 +1251,8 @@
                     {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
             - condition: template
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_off_devices_at_night_notify.attributes.last_triggered) | int < 1800 }}"
           sequence:
             - service: switch.turn_off
               entity_id:
