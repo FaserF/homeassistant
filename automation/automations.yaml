@@ -5758,15 +5758,13 @@
           ------------
 
           {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
-          Bild: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }}
+          [Bild]({{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }})
           {% endif %}
-
           [Link](https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }})
 
           {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
           Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
           {% endif %}
-
           [Google Maps Link]({{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }})
         target: !secret telegram_foodsharing
 
@@ -5899,52 +5897,15 @@
           ------------
 
           {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] == 'unavailable' %}
-          Bild: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] }}
+          [Bild]({{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] }})
           {% endif %}
-
           [Link](https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['id'] }})
 
           {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] == 'unavailable' %}
           Adresse: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] }}
           {% endif %}
-
           [Google Maps Link]({{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['maps'] }})
         target: !secret telegram_foodsharing_muc
-
-- id: foodsharing_basket_available_wue
-  alias: "Foodsharing Basket Available WUE"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: sensor.foodsharing_49_7978382
-  condition:
-    condition: and
-    conditions:
-      - condition: numeric_state
-        entity_id: sensor.foodsharing_49_7978382
-        above: "0"
-      - condition: template
-        value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
-  action:
-    - service: telegram_bot.send_message
-      data_template:
-        message: >
-          {{ state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['description'] }}
-
-          ------------
-
-          {% if not state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['picture'] == 'unavailable' %}
-          Bild: {{ state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['picture'] }}
-          {% endif %}
-
-          Link: https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['id'] }}
-
-          {% if not state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['address'] == 'unavailable' %}
-          Adresse: {{ state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['address'] }}
-          {% endif %}
-
-          Google Maps Link: {{ state_attr('sensor.foodsharing_49_7978382', 'baskets')[0]['maps'] }}
-        target: !secret telegram_foodsharing_wue
 
 - id: too_good_to_go_food_available_zorneding
   alias: "Too good to go food Available Zorneding"
@@ -6015,57 +5976,6 @@
                 data:
                   disable_web_page_preview: true
                 target: !secret telegram_chat_fabian
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.anna
-                  state: "Anna"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Es gibt noch {{ (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state | int) + (states.sensor.tgtg_neylas_feine_kost.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantgtg_organic_garden_tagescafe_vaterstettentstrasse_wurzburg_uberraschungstute_abend.state | int) }} verfügbare Reservierungen bei TGTG. Darunter:
-
-
-                  {% if (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state)|int > 0 %}
-                  {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'item_price') }} statt {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_neylas_feine_kost.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_neylas_feine_kost', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_neylas_feine_kost', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_neylas_feine_kost', 'item_price') }} statt {{ state_attr('sensor.tgtg_neylas_feine_kost', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_neylas_feine_kost', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_neylas_feine_kost', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_organic_garden_tagescafe_vaterstetten.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'item_price') }} statt {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'pickup_end') }}
-
-                  {% endif %}
-                data:
-                  disable_web_page_preview: true
-                target: !secret telegram_chat_anna
 
 - id: rewe_discount_keyword_available
   alias: "Rewe Discount Keyword available"
