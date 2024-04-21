@@ -35,7 +35,7 @@
     - service: switch.turn_off
       data:
         entity_id:
-          - switch.bett_usb_ports
+          #- switch.bett_usb_ports
           - switch.kuchengerate
           - switch.fernseher
           - switch.fernseher_samuel
@@ -278,6 +278,9 @@
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
+            - condition: numeric_state
+              entity_id: sensor.smart_life_samuel_distance
+              below: 100
             - condition: state
               entity_id: person.fabian
               state: "home"
@@ -288,8 +291,7 @@
           sequence:
             - service: notify.telegram_fabian
               data_template:
-                message: "Welcome back.Samuel ist nicht daheim."
-
+                message: "Welcome back. Samuel ist nicht daheim."
     - choose:
         - conditions:
             - condition: numeric_state
@@ -3787,7 +3789,7 @@
 
 - id: turn_off_bett_after_x_hours
   alias: "Turn off bett after x hours"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: switch.bett_usb_ports
@@ -3805,6 +3807,10 @@
       - condition: state
         entity_id: switch.bett_usb_ports
         state: "on"
+      - condition: time
+        before: "20:30:00"
+      - condition: time
+        after: "06:30:00"
   action:
     - service: switch.turn_off
       data:
@@ -3837,11 +3843,6 @@
         state: "off"
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_on_lights_and_open_cover_in_morning.attributes.last_triggered) | int > 1800 }}"
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: person.anna
-            state: "home"
   action:
     - delay: "00:04:30"
     - choose:
@@ -4633,35 +4634,6 @@
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
-
-- id: remind_for_dnd_events
-  alias: "remind for DND Events"
-  initial_state: false
-  trigger:
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 172800) | round(-1) }}"
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 173800) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_polygon_events.attributes.last_triggered) | int > 86700 }}"
-      - condition: state
-        entity_id: calendar.votgaming_kalender
-        attribute: message
-        state: "Dungeons & Dragons Spieleabend"
-  action:
-    - service: telegram_bot.send_poll
-      data_template:
-        target: !secret telegram_spieletreff
-        question: "Es findet am {{ as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) | timestamp_custom('%d.%m.%Y %H:%M', true) }} Uhr {{ states.calendar.votgaming_kalender.attributes.message }} statt. Ich bin dabei?"
-        options:
-          - "Ja"
-          - "Nein (gibts eig nicht :P)"
-          - "Wahrscheinlich schon"
-        is_anonymous: false
-        allows_multiple_answers: false
 
 - id: remind_for_gruppentreffen
   alias: "remind for Gruppentreffen"
@@ -5921,9 +5893,6 @@
         - condition: state
           entity_id: person.fabian
           state: "home"
-        - condition: state
-          entity_id: person.anna
-          state: "home"
   action:
     - choose:
         - conditions:
@@ -6132,6 +6101,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6159,6 +6130,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6178,6 +6151,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6204,6 +6179,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6230,6 +6207,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6248,6 +6227,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6266,7 +6247,7 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: >
-                  ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
 
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
 
@@ -6274,6 +6255,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6292,7 +6275,7 @@
               data_template:
                 target: !secret telegram_chat_samuel
                 message: >
-                  ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
 
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
 
@@ -6300,6 +6283,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
@@ -6310,7 +6295,7 @@
               data_template:
                 target: !secret telegram_chat_5friends
                 message: >
-                  ACHTUNG!!!! Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
 
                   *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
 
@@ -6318,6 +6303,8 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
+                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
 
 - id: server_temp_warning
   alias: "Server Temp Warning"
@@ -9852,6 +9839,33 @@
 
           {% if states.person.samuel.state != "home" %}Samuel ist nicht daheim.{% endif %}
 
+- id: remind_for_dnd
+  alias: "remind for dnd"
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 198000) | round(-1) }}"
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 111600) | round(-1) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_dnd.attributes.last_triggered) | int > 518400 }}"
+      - condition: template
+        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 199000) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
+      - condition: state
+        entity_id: calendar.votgaming_kalender
+        attribute: message
+        state: "Dungeons & Dragons Spieleabend"
+  action:
+    - service: telegram_bot.send_message
+      data_template:
+        target: !secret telegram_spieletreff
+        disable_notification: true
+        message: >
+          Erinnerung: Am {%- set date = as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}{% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) | timestamp_custom('%H:%M', true) }} ist {{ states.calendar.votgaming_kalender.attributes.message }}.
+
 - id: remind_for_volleyball
   alias: "remind for volleyball"
   initial_state: true
@@ -9870,17 +9884,17 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 140200 }}"
   action:
-    - service: shell_command.unpin_all_telegram
-      data_template:
-        telegram_bot_api: !secret telegram_bot_api
-        chat_id: !secret telegram_volleyball
+    #- service: shell_command.unpin_all_telegram
+    #  data_template:
+    #    telegram_bot_api: !secret telegram_bot_api
+    #    chat_id: !secret telegram_volleyball
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_volleyball
         question:
           "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
           {% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
-          {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme?"
+          {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme? Kadermanagerabstimmung nicht vergessen."
         options:
           - "Ja"
           - "Nein"
@@ -9984,15 +9998,6 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
-    - service: whatsapp.send_message
-      continue_on_error: true
-      data_template:
-        clientId: default
-        to: !secret whatsapp_chat_juz_group
-        body:
-          text:
-            "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
-            {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
     - choose:
         - conditions:
             - condition: template
@@ -10002,14 +10007,24 @@
               data_template:
                 target: !secret telegram_chat_juz_group
                 message: >
-                  Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}
+                  Zusatzinfo: {{ states.calendar.juz_zorneding_public.attributes.description }}
             - service: whatsapp.send_message
               continue_on_error: true
               data_template:
                 clientId: default
                 to: !secret whatsapp_chat_juz_group
                 body:
-                  text: "Zusatzinfos: {{ states.calendar.juz_zorneding_public.attributes.description }}"
+                  text:
+                    "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
+                    Zusatzinfo: {{ states.calendar.juz_zorneding_public.attributes.description }}"
+      default:
+        - service: whatsapp.send_message
+          continue_on_error: true
+          data_template:
+            clientId: default
+            to: !secret whatsapp_chat_juz_group
+            body:
+              text: "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
 
 - id: send_juz_mails_to_telegram
   alias: "send juz mails to telegram"
