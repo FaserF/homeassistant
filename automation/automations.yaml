@@ -431,6 +431,39 @@
                           - "Erledigt:/telegramwasherdone"
     - choose:
         - conditions:
+            - condition: template
+              value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: home
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data:
+                        message: Bitte die Pflanzen gießen.
+                        target: !secret telegram_chat_fabian
+                        inline_keyboard:
+                          - "Erledigt:/telegrampouringdone"
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.samuel
+                      state: home
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data:
+                        message: Bitte die Pflanzen gießen.
+                        target: !secret telegram_chat_samuel
+                        inline_keyboard:
+                          - "Erledigt:/telegrampouringdone"
+    - choose:
+        - conditions:
             - condition: state
               entity_id: vacuum.valetudo_dreamez10pro
               state: "error"
@@ -507,7 +540,7 @@
       to: "home"
     - platform: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      below: 2
+      below: 100
       for:
         seconds: 5
   condition:
@@ -530,7 +563,7 @@
       conditions:
         - condition: numeric_state
           entity_id: sensor.smart_life_fabian_distance
-          below: 3
+          below: 20
         - condition: not
           conditions:
             - condition: state
@@ -561,7 +594,7 @@
       to: "home"
     - platform: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 2
+      below: 100
       for:
         seconds: 2
   condition:
@@ -584,7 +617,7 @@
       conditions:
         - condition: numeric_state
           entity_id: sensor.smart_life_samuel_distance
-          below: 3
+          below: 20
         - condition: not
           conditions:
             - condition: state
@@ -1097,7 +1130,7 @@
                           state: "home"
                         - condition: numeric_state
                           entity_id: sensor.smart_life_fabian_distance
-                          below: 10
+                          below: 100
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1135,7 +1168,7 @@
                           state: "home"
                         - condition: numeric_state
                           entity_id: sensor.smart_life_fabian_distance
-                          below: 10
+                          below: 100
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1151,7 +1184,7 @@
                           state: "home"
                         - condition: numeric_state
                           entity_id: sensor.smart_life_samuel_distance
-                          below: 10
+                          below: 100
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
@@ -1191,7 +1224,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 10
+                  below: 100
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
@@ -1271,7 +1304,7 @@
                       conditions:
                         - condition: numeric_state
                           entity_id: sensor.smart_life_fabian_distance
-                          below: 5
+                          below: 50
                         - condition: state
                           entity_id: person.fabian
                           state: "home"
@@ -1286,7 +1319,7 @@
                       conditions:
                         - condition: numeric_state
                           entity_id: sensor.smart_life_samuel_distance
-                          below: 5
+                          below: 50
                         - condition: state
                           entity_id: person.samuel
                           state: "home"
@@ -5555,12 +5588,12 @@
         minutes: 1440
     - platform: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      above: 100
+      above: 100000
       for:
         minutes: 5
     - platform: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      above: 100
+      above: 100000
       for:
         minutes: 5
   condition:
@@ -5577,10 +5610,10 @@
         state: "off"
       - condition: numeric_state
         entity_id: sensor.smart_life_fabian_distance
-        above: 80
+        above: 80000
       - condition: numeric_state
         entity_id: sensor.smart_life_samuel_distance
-        above: 80
+        above: 80000
   action:
     - choose:
         - conditions:
@@ -5638,6 +5671,48 @@
         - media_player.fabians_lautsprecher
       data:
         message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
+
+- id: remind_for_pouring
+  alias: "Remind for pouring"
+  initial_state: true
+  trigger:
+    platform: time
+    at: "16:30:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: "input_boolean.abwesend_modus"
+        state: "off"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) | int > 84600 }}"
+      - condition: template
+        value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) | int > 18000 }}"
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.fabian
+              state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                message: Bitte die Pflanzen gießen.
+                target: !secret telegram_chat_fabian
+                inline_keyboard:
+                  - "Erledigt:/telegrampouringdone"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.samuel
+              state: home
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                message: Bitte die Pflanzen gießen.
+                target: !secret telegram_chat_samuel
+                inline_keyboard:
+                  - "Erledigt:/telegrampouringdone"
 
 - id: remind_for_waste_collection
   alias: "Remind for waste collection"
@@ -5775,7 +5850,7 @@
                   state: "Kai-Adri"
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 5
+                  below: 1500
           sequence:
             - service: notify.mobile_app_pixel_8_pro
               data_template:
@@ -5797,7 +5872,7 @@
                   state: "home"
                 - condition: numeric_state
                   entity_id: sensor.smart_life_samuel_distance
-                  below: 5
+                  below: 1500
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -6083,7 +6158,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 20
+                  below: 20000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
@@ -6112,7 +6187,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_samuel_distance
-                  below: 20
+                  below: 20000
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
@@ -6152,6 +6227,7 @@
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
 
+
                   *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
     - choose:
         - conditions:
@@ -6162,7 +6238,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 20
+                  below: 20000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
@@ -6190,7 +6266,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_samuel_distance
-                  below: 30
+                  below: 30000
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
@@ -6228,6 +6304,7 @@
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
 
+
                   *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
     - choose:
         - conditions:
@@ -6238,7 +6315,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 40
+                  below: 40000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
@@ -6266,7 +6343,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_samuel_distance
-                  below: 40
+                  below: 40000
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
@@ -6303,6 +6380,7 @@
 
 
                   Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+
 
                   *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
 
@@ -7652,7 +7730,7 @@
         - conditions:
             - condition: numeric_state
               entity_id: sensor.smart_life_fabian_distance
-              below: 89
+              below: 89000
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -7666,7 +7744,7 @@
         - conditions:
             - condition: numeric_state
               entity_id: sensor.smart_life_fabian_distance
-              below: 89
+              below: 89000
           sequence:
             - service: telegram_bot.send_message
               data_template:
@@ -8387,7 +8465,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 89
+                  below: 89000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
@@ -8404,7 +8482,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_samuel_distance
-                  below: 55
+                  below: 55000
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
@@ -8486,7 +8564,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 35
+                  below: 35000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
@@ -8503,7 +8581,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_samuel_distance
-                  below: 35
+                  below: 35000
                 - condition: state
                   entity_id: person.samuel
                   state: "home"
@@ -9359,10 +9437,10 @@
         state: "on"
       - condition: numeric_state
         entity_id: sensor.smart_life_fabian_distance
-        below: 89
+        below: 89000
       - condition: numeric_state
         entity_id: sensor.smart_life_fabian_distance
-        above: 20
+        above: 20000
       - condition: not
         conditions:
           - condition: state
@@ -9407,10 +9485,10 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      above: 3
+      above: 3000
     - condition: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      below: 30
+      below: 30000
     - condition: state
       entity_id: person.samuel
       state: home
@@ -9444,10 +9522,10 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      above: 29
+      above: 29000
     - condition: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      below: 90
+      below: 90000
     - condition: state
       entity_id: person.samuel
       state: home
@@ -9481,7 +9559,7 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      above: 89
+      above: 89000
     - condition: state
       entity_id: person.samuel
       state: home
@@ -9515,10 +9593,10 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      above: 3
+      above: 3000
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 30
+      below: 30000
     - condition: state
       entity_id: person.fabian
       state: home
@@ -9560,10 +9638,10 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      above: 29
+      above: 29000
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 90
+      below: 90000
     - condition: state
       entity_id: person.fabian
       state: home
@@ -9602,7 +9680,7 @@
   condition:
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      above: 89
+      above: 89000
     - condition: state
       entity_id: person.fabian
       state: home
@@ -9647,10 +9725,10 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3600 }}"
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 35
+      below: 35000
     - condition: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      above: 10
+      above: 10000
   action:
     - parallel:
         - choose:
@@ -9752,7 +9830,7 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_gil.attributes.last_triggered) | int > 3600 }}"
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 35
+      below: 35000
   action:
     - service: notify.telegram_samuel
       data:
@@ -9774,7 +9852,7 @@
       state: "on"
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 35
+      below: 35000
   action:
     - service: notify.telegram_samuel
       data:
@@ -9796,7 +9874,7 @@
       state: "on"
     - condition: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 35
+      below: 35000
   action:
     - service: notify.telegram_samuel
       data:
@@ -9971,6 +10049,105 @@
                   disable_web_page_preview: true
                 message: >
                   Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
+    - service: whatsapp.send_message
+      continue_on_error: true
+      data_template:
+        clientId: default
+        to: !secret whatsapp_volleyball_zorro_group
+        body:
+          text:
+            "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+            {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+            bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind. Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }}?"
+
+- id: remind_for_volleyball_on_tuesdays
+  alias: "Remind for Volleyball on tuesdays"
+  initial_state: true
+  trigger:
+    - platform: time
+      at: "18:45:00"
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        weekday:
+          - sun
+  action:
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: template
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'sunny' }}"
+                - condition: template
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'partlycloudy' }}"
+            - condition: template
+              value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['temperature'] | int >= 20 }}"
+            - condition: template
+              value_template: "{{ now().month <= 10 and now().month >= 4 }}"
+          sequence:
+            - service: shell_command.unpin_all_telegram
+              data_template:
+                telegram_bot_api: !secret telegram_bot_api
+                chat_id: !secret telegram_volleyball
+            - service: telegram_bot.send_message
+              data_template:
+                target: !secret telegram_volleyball
+                message: >
+                  "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+                  {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                  bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                  Beachvolleyball ab {{ (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?"
+                disable_notification: true
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{not is_state_attr('calendar.volleyballtraining', 'description', '')}}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data_template:
+                        target: !secret telegram_volleyball
+                        data:
+                          disable_web_page_preview: true
+                        message: >
+                          Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
+            - service: whatsapp.send_message
+              continue_on_error: true
+              data_template:
+                clientId: default
+                to: !secret whatsapp_volleyball_zorro_group
+                body:
+                  text:
+                    "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+                    {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                    bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                    Beachvolleyball ab {{ (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?"
+            - service: whatsapp.send_message
+              continue_on_error: true
+              data_template:
+                clientId: default
+                to: !secret whatsapp_volleyball_group
+                body:
+                  text:
+                    "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+                    {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                    bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                    Beachvolleyball ab {{ (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 173000) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
+          sequence:
+            - service: whatsapp.send_message
+              continue_on_error: true
+              data_template:
+                clientId: default
+                to: !secret whatsapp_volleyball_group
+                body:
+                  text:
+                    "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
+                    {% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
+                    {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Stimmt fleißig im Kadermanager ab: https://tischabwischer.kadermanager.de/"
 
 - id: remind_for_juz
   alias: "remind for juz"
