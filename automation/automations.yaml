@@ -540,7 +540,7 @@
       to: "home"
     - platform: numeric_state
       entity_id: sensor.smart_life_fabian_distance
-      below: 100
+      below: 1700
       for:
         seconds: 5
   condition:
@@ -563,7 +563,7 @@
       conditions:
         - condition: numeric_state
           entity_id: sensor.smart_life_fabian_distance
-          below: 20
+          below: 300
         - condition: not
           conditions:
             - condition: state
@@ -594,7 +594,7 @@
       to: "home"
     - platform: numeric_state
       entity_id: sensor.smart_life_samuel_distance
-      below: 100
+      below: 1700
       for:
         seconds: 2
   condition:
@@ -617,7 +617,7 @@
       conditions:
         - condition: numeric_state
           entity_id: sensor.smart_life_samuel_distance
-          below: 20
+          below: 300
         - condition: not
           conditions:
             - condition: state
@@ -1304,7 +1304,7 @@
                       conditions:
                         - condition: numeric_state
                           entity_id: sensor.smart_life_fabian_distance
-                          below: 50
+                          below: 100
                         - condition: state
                           entity_id: person.fabian
                           state: "home"
@@ -1319,7 +1319,7 @@
                       conditions:
                         - condition: numeric_state
                           entity_id: sensor.smart_life_samuel_distance
-                          below: 50
+                          below: 100
                         - condition: state
                           entity_id: person.samuel
                           state: "home"

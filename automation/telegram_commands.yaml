@@ -643,9 +643,9 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
-      data:
-        message: "Die Pflanzen wurden gegossen."
+    #- service: notify.telegram_samuel
+    #  data:
+    #    message: "Die Pflanzen wurden gegossen."
     - service: notify.telegram_fabian
       data:
         message: "Die Pflanzen wurden gegossen."

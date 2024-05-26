@@ -14,11 +14,6 @@
       - condition: state
         entity_id: input_boolean.gast_modus
         state: "off"
-      - condition: not
-        conditions:
-          - condition: state
-            entity_id: person.anna
-            state: "home"
       # - condition: or
       #  conditions:
       #    - condition: state
