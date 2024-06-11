@@ -67,10 +67,10 @@
 #       - language
 #       - description
 #       - image
-- platform: tgtg
-  email: !secret defaultmail
-  access_token: !secret tgtg_access_token
-  refresh_token: !secret tgtg_refresh_token
-  user_id: "14731770"
-  cookie: !secret tgtg_cookie
-  scan_interval: 130
+#- platform: tgtg
+#  email: !secret defaultmail
+#  access_token: !secret tgtg_access_token
+#  refresh_token: !secret tgtg_refresh_token
+#  user_id: "14731770"
+#  cookie: !secret tgtg_cookie
+#  scan_interval: 130
