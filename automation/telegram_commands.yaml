@@ -93,12 +93,40 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
-      data:
-        message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
-    - service: notify.telegram_fabian
-      data:
-        message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              state: "2"
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_samuel_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data:
+                message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              state: "2"
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_fabian_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_20_degrees_feinwasche
   alias: "Telegram Washing mashine set program 20 degrees feinwasche"
@@ -646,9 +674,23 @@
     #- service: notify.telegram_samuel
     #  data:
     #    message: "Die Pflanzen wurden gegossen."
-    - service: notify.telegram_fabian
-      data:
-        message: "Die Pflanzen wurden gegossen."
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              state: "2"
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_fabian_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "Die Pflanzen wurden gegossen."
 
 - id: telegram_answer_cancel_light_turn_off
   alias: "Telegram answer cancel light turn off"
