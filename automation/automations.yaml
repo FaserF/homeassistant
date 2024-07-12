@@ -10117,117 +10117,117 @@
                             Stimmt bitte fleißig im Kadermanager ab:
 
                             {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}"
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: template
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'sunny' }}"
+                - condition: template
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'partlycloudy' }}"
+            - condition: template
+              value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['temperature'] | int >= 20 }}"
+            - condition: template
+              value_template: "{{ now().month <= 10 and now().month >= 4 }}"
+            - condition: template
+              value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] != 'Spiel' }}"
+          sequence:
             - choose:
                 - conditions:
-                    - condition: or
-                      conditions:
-                        - condition: template
-                          value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'sunny' }}"
-                        - condition: template
-                          value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['condition'] == 'partlycloudy' }}"
                     - condition: template
-                      value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[2]['temperature'] | int >= 20 }}"
-                    - condition: template
-                      value_template: "{{ now().month <= 10 and now().month >= 4 }}"
-                    - condition: template
-                      value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] != 'Spiel' }}"
+                      value_template: >
+                        {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                        {% set date = strptime(event['date'], '%Y-%m-%d') %}
+                        {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
+                        {% set weekday_number = date.weekday() %}
+                        {% set weekday_found = weekday[weekday_number] %}
+                        {{ weekday_found == 'Sonntag' }}
                   sequence:
-                    - choose:
-                        - conditions:
-                            - condition: template
-                              value_template: >
-                                {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
-                                {% set date = strptime(event['date'], '%Y-%m-%d') %}
-                                {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
-                                {% set weekday_number = date.weekday() %}
-                                {% set weekday_found = weekday[weekday_number] %}
-                                {{ weekday_found == 'Sonntag' }}
-                          sequence:
-                            - service: telegram_bot.send_poll
-                              data_template:
-                                target: !secret telegram_volleyball
-                                question:
-                                  "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                                  {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                                  {% set weekday_number = date.weekday() %}
-                                  {% set weekday_found = weekday[weekday_number] %}
-                                  {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                                  bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
-                                  Ich komme zum Beachvolleyball ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr?"
-                                options:
-                                  - "Ja"
-                                  - "Nein"
-                                  - "Vielleicht"
-                                  - "Nur zeitweise/verspätet"
-                                is_anonymous: false
-                                allows_multiple_answers: false
-                                disable_notification: true
-                      default:
-                        - service: telegram_bot.send_poll
-                          data_template:
-                            target: !secret telegram_volleyball
-                            question:
-                              "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                              {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                              {% set weekday_number = date.weekday() %}
-                              {% set weekday_found = weekday[weekday_number] %}
-                              {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}. Ich komme? "
-                            options:
-                              - "Ja"
-                              - "Nein"
-                              - "Vielleicht"
-                              - "Nur zeitweise/verspätet"
-                            is_anonymous: false
-                            allows_multiple_answers: false
-                            disable_notification: true
-                        - service: telegram_bot.send_message
-                          data_template:
-                            target: !secret telegram_volleyball
-                            data:
-                              disable_web_page_preview: true
-                            message: >
-                              {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                              {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                              {% set weekday_number = date.weekday() %}
-                              {% set weekday_found = weekday[weekday_number] %}
-                              {%- set event_time_str = state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] -%}
-                              {%- set event_date_str = states.calendar.volleyballtraining.attributes.start_time[:10] -%}
-                              {%- set event_datetime_str = event_date_str + ' ' + event_time_str -%}
-                              {%- set event_timestamp = as_timestamp(event_datetime_str) -%}
-                              Bitte im [Kadermanager]({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}) abstimmen nicht vergessen!
-
-                              {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                              bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
-                              Beachvolleyball vor dem Training ab {{ (event_timestamp - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?
-                    - service: whatsapp.send_message
-                      continue_on_error: true
+                    - service: telegram_bot.send_poll
                       data_template:
-                        clientId: default
-                        to: !secret whatsapp_volleyball_group
-                        body:
-                          text: >
-                            {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                            {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                            {% set weekday_number = date.weekday() %}
-                            {% set weekday_found = weekday[weekday_number] %}
-                            {% if weekday_found == "Sonntag" or weekday_found == "Samstag" %}
-                              {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                              bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
-                              Beachvolleyball ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr?
-                            {% else %}
-                              {%- set event_time_str = state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] -%}
-                              {%- set event_date_str = states.calendar.volleyballtraining.attributes.start_time[:10] -%}
-                              {%- set event_datetime_str = event_date_str + ' ' + event_time_str -%}
-                              {%- set event_timestamp = as_timestamp(event_datetime_str) -%}
-                              {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                              bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
-                              Beachvolleyball vor dem Training ab {{ (event_timestamp - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?
-                            {% endif %}
+                        target: !secret telegram_volleyball
+                        question:
+                          "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
+                          {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                          {% set weekday_number = date.weekday() %}
+                          {% set weekday_found = weekday[weekday_number] %}
+                          {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                          bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                          Ich komme zum Beachvolleyball ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr?"
+                        options:
+                          - "Ja"
+                          - "Nein"
+                          - "Vielleicht"
+                          - "Nur zeitweise/verspätet"
+                        is_anonymous: false
+                        allows_multiple_answers: false
+                        disable_notification: true
+              default:
+                - service: telegram_bot.send_poll
+                  data_template:
+                    target: !secret telegram_volleyball
+                    question:
+                      "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
+                      {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                      {% set weekday_number = date.weekday() %}
+                      {% set weekday_found = weekday[weekday_number] %}
+                      {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}. Ich komme? "
+                    options:
+                      - "Ja"
+                      - "Nein"
+                      - "Vielleicht"
+                      - "Nur zeitweise/verspätet"
+                    is_anonymous: false
+                    allows_multiple_answers: false
+                    disable_notification: true
+                - service: telegram_bot.send_message
+                  data_template:
+                    target: !secret telegram_volleyball
+                    data:
+                      disable_web_page_preview: true
+                    message: >
+                      {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
+                      {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                      {% set weekday_number = date.weekday() %}
+                      {% set weekday_found = weekday[weekday_number] %}
+                      {%- set event_time_str = state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] -%}
+                      {%- set event_date_str = states.calendar.volleyballtraining.attributes.start_time[:10] -%}
+                      {%- set event_datetime_str = event_date_str + ' ' + event_time_str -%}
+                      {%- set event_timestamp = as_timestamp(event_datetime_str) -%}
+                      Bitte im [Kadermanager]({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}) abstimmen nicht vergessen!
 
-                            Bisherige Kadermanager Zusagen für {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }}: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
-                            Stimmt bitte fleißig im Kadermanager ab:
+                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                      Beachvolleyball vor dem Training ab {{ (event_timestamp - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?
+            - service: whatsapp.send_message
+              continue_on_error: true
+              data_template:
+                clientId: default
+                to: !secret whatsapp_volleyball_group
+                body:
+                  text: >
+                    {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
+                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                    {% set weekday_number = date.weekday() %}
+                    {% set weekday_found = weekday[weekday_number] %}
+                    {% if weekday_found == "Sonntag" or weekday_found == "Samstag" %}
+                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                      Beachvolleyball ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr?
+                    {% else %}
+                      {%- set event_time_str = state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] -%}
+                      {%- set event_date_str = states.calendar.volleyballtraining.attributes.start_time[:10] -%}
+                      {%- set event_datetime_str = event_date_str + ' ' + event_time_str -%}
+                      {%- set event_timestamp = as_timestamp(event_datetime_str) -%}
+                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                      Beachvolleyball vor dem Training ab {{ (event_timestamp - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?
+                    {% endif %}
 
-                            {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
+                    Bisherige Kadermanager Zusagen für {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }}: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
+                    Stimmt bitte fleißig im Kadermanager ab:
+
+                    {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
       default:
         - service: telegram_bot.send_poll
           data_template:
