@@ -30,8 +30,9 @@
         entity_id: all
     - service: switch.turn_off
       data:
-        area_id:
-          - fd6f6d3c931e48348d9437fc4d103fb4 #Keller
+        entity_id:
+          - switch.keller_usb_ports
+          - switch.fernseher_keller
     - service: switch.turn_off
       data:
         entity_id:
@@ -1002,10 +1003,10 @@
                         message: >
                           Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
 
-                          {% for state in states.light %}
-                            {% if state.state == 'on' %}
-                              - {{ state.name }}
-                            {% endif %}
+                          {% set lights_on = states.light | selectattr('state', 'eq', 'on') | map(attribute='name') | list %}
+
+                          {% for light in lights_on %}
+                            - {{ light }}
                           {% endfor %}
                         inline_keyboard:
                           - "Abbruch:/cancellight, Okay:/telegramno"
@@ -1023,10 +1024,10 @@
                         message: >
                           Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
 
-                          {% for state in states.light %}
-                            {% if state.state == 'on' %}
-                              - {{ state.name }}
-                            {% endif %}
+                          {% set lights_on = states.light | selectattr('state', 'eq', 'on') | map(attribute='name') | list %}
+
+                          {% for light in lights_on %}
+                            - {{ light }}
                           {% endfor %}
                         inline_keyboard:
                           - "Abbruch:/cancellight, Okay:/telegramno"
@@ -1035,24 +1036,26 @@
           data_template:
             target: !secret telegram_chat_fabian
             message: >
-              "Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet:
-              {% for state in states.light %}
-                {% if state.state == 'on' %}
-                  - {{ state.name }}
-                {% endif %}
-              {% endfor %}"
+              Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+
+              {% set lights_on = states.light | selectattr('state', 'eq', 'on') | map(attribute='name') | list %}
+
+              {% for light in lights_on %}
+                - {{ light }}
+              {% endfor %}
             inline_keyboard:
               - "Abbruch:/cancellight, Okay:/telegramno"
         - service: telegram_bot.send_message
           data_template:
             target: !secret telegram_chat_samuel
             message: >
-              "Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet:
-              {% for state in states.light %}
-                {% if state.state == 'on' %}
-                  - {{ state.name }}
-                {% endif %}
-              {% endfor %}"
+              Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+
+              {% set lights_on = states.light | selectattr('state', 'eq', 'on') | map(attribute='name') | list %}
+
+              {% for light in lights_on %}
+                - {{ light }}
+              {% endfor %}
             inline_keyboard:
               - "Abbruch:/cancellight, Okay:/telegramno"
 
@@ -1201,11 +1204,21 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: >
-                  "Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
-                  {% for state in states.light %}{% if state.state == 'on' %}- {{ state.name }}{% endif %}{% endfor %}
-                  {% for state in states.switch %}{% if state.state == 'on' and state.entity_id in ['switch.fernseher', 'switch.fernseher_samuel'] %}- {{ state.name }} ist eingeschaltet{% endif %}{% endfor %}"
+                  Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+
+                  {% set lights_on = states.light | selectattr('state', 'eq', 'on') | map(attribute='name') | list %}
+                  {% set switches_on = states.switch | selectattr('state', 'eq', 'on') | selectattr('entity_id', 'in', ['switch.fernseher', 'switch.fernseher_samuel']) | map(attribute='name') | list %}
+
+                  {% for light in lights_on %}
+                    - {{ light }}
+                  {% endfor %}
+
+                  {% for switch in switches_on %}
+                    - {{ switch }} ist eingeschaltet
+                  {% endfor %}
                 inline_keyboard:
                   - "Abbruch:/cancellight, Okay:/telegramno"
+
     - choose:
         - conditions:
             - condition: or
@@ -1221,9 +1234,18 @@
               data_template:
                 target: !secret telegram_chat_samuel
                 message: >
-                  "Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
-                  {% for state in states.light %}{% if state.state == 'on' %}- {{ state.name }}{% endif %}{% endfor %}
-                  {% for state in states.switch %}{% if state.state == 'on' and state.entity_id in ['switch.fernseher', 'switch.fernseher_samuel'] %}- {{ state.name }} ist eingeschaltet{% endif %}{% endfor %}"
+                  Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
+
+                  {% set lights_on = states.light | selectattr('state', 'eq', 'on') | map(attribute='name') | list %}
+                  {% set switches_on = states.switch | selectattr('state', 'eq', 'on') | selectattr('entity_id', 'in', ['switch.fernseher', 'switch.fernseher_samuel']) | map(attribute='name') | list %}
+
+                  {% for light in lights_on %}
+                    - {{ light }}
+                  {% endfor %}
+
+                  {% for switch in switches_on %}
+                    - {{ switch }} ist eingeschaltet
+                  {% endfor %}
                 inline_keyboard:
                   - "Abbruch:/cancellight, Okay:/telegramno"
 
@@ -5927,7 +5949,7 @@
 
 - id: too_good_to_go_food_available_zorneding
   alias: "Too good to go food Available Zorneding"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: time
       at: "12:15:00"
@@ -5940,57 +5962,49 @@
           entity_id: person.fabian
           state: "home"
   action:
-    - choose:
-        - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: person.fabian
-                  state: "Anna"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Es gibt noch {{ (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state | int) + (states.sensor.tgtg_neylas_feine_kost.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantgtg_organic_garden_tagescafe_vaterstettentstrasse_wurzburg_uberraschungstute_abend.state | int) }} verfügbare Reservierungen bei TGTG. Darunter:
+    - service: telegram_bot.send_message
+      data_template:
+        message: >
+          Es gibt noch {{ (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state | int) + (states.sensor.tgtg_neylas_feine_kost.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantgtg_organic_garden_tagescafe_vaterstettentstrasse_wurzburg_uberraschungstute_abend.state | int) }} verfügbare Reservierungen bei TGTG. Darunter:
 
 
-                  {% if (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state)|int > 0 %}
-                  {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'friendly_name') }}
+          {% if (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state)|int > 0 %}
+          {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'friendly_name') }}
 
-                  {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'item_url') }}
+          {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'item_url') }}
 
-                  Preis: {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'item_price') }} statt {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'original_value') }}
+          Preis: {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'item_price') }} statt {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'original_value') }}
 
-                  Abholung: {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'pickup_end') }}
-
-
-                  {% endif %}
-                  {% if (states.sensor.tgtg_neylas_feine_kost.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_neylas_feine_kost', 'friendly_name') }}
-
-                  {{ state_attr('sensor.tgtg_neylas_feine_kost', 'item_url') }}
-
-                  Preis: {{ state_attr('sensor.tgtg_neylas_feine_kost', 'item_price') }} statt {{ state_attr('sensor.tgtg_neylas_feine_kost', 'original_value') }}
-
-                  Abholung: {{ state_attr('sensor.tgtg_neylas_feine_kost', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_neylas_feine_kost', 'pickup_end') }}
+          Abholung: {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute', 'pickup_end') }}
 
 
-                  {% endif %}
-                  {% if (states.sensor.tgtg_organic_garden_tagescafe_vaterstetten.state)|int > 0 %}
-                  ---
-                  {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'friendly_name') }}
+          {% endif %}
+          {% if (states.sensor.tgtg_neylas_feine_kost.state)|int > 0 %}
+          ---
+          {{ state_attr('sensor.tgtg_neylas_feine_kost', 'friendly_name') }}
 
-                  {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'item_url') }}
+          {{ state_attr('sensor.tgtg_neylas_feine_kost', 'item_url') }}
 
-                  Preis: {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'item_price') }} statt {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'original_value') }}
+          Preis: {{ state_attr('sensor.tgtg_neylas_feine_kost', 'item_price') }} statt {{ state_attr('sensor.tgtg_neylas_feine_kost', 'original_value') }}
 
-                  Abholung: {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'pickup_end') }}
+          Abholung: {{ state_attr('sensor.tgtg_neylas_feine_kost', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_neylas_feine_kost', 'pickup_end') }}
 
-                  {% endif %}
-                data:
-                  disable_web_page_preview: true
-                target: !secret telegram_chat_fabian
+
+          {% endif %}
+          {% if (states.sensor.tgtg_organic_garden_tagescafe_vaterstetten.state)|int > 0 %}
+          ---
+          {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'friendly_name') }}
+
+          {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'item_url') }}
+
+          Preis: {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'item_price') }} statt {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'original_value') }}
+
+          Abholung: {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'pickup_start') }} Uhr bis {{ state_attr('sensor.tgtg_organic_garden_tagescafe_vaterstetten', 'pickup_end') }}
+
+          {% endif %}
+        data:
+          disable_web_page_preview: true
+        target: !secret telegram_chat_fabian
 
 - id: rewe_discount_keyword_available
   alias: "Rewe Discount Keyword available"
@@ -6041,6 +6055,28 @@
     #       {{ product.picture_link }}
     #         {%- endif -%}
     #       {%- endfor -%}
+
+- id: turn_off_deckenlampe_keller
+  alias: "Turn off Deckenlampe Keller"
+  initial_state: false
+  trigger:
+    - platform: state
+      entity_id: switch.fernseher_keller
+      to: "off"
+    - platform: state
+      entity_id: light.flutlicht_keller
+      to: "off"
+  condition:
+    - condition: state
+      entity_id: switch.fernseher_keller
+      state: "off"
+    - condition: state
+      entity_id: light.flutlicht_keller
+      state: "off"
+  action:
+    - service: light.turn_off
+      data:
+        entity_id: light.deckenlampe_keller
 
 - id: automatic_ha_updates
   alias: "Automatic HA Updates"
@@ -7220,6 +7256,36 @@
             - service: switch.turn_on
               data:
                 entity_id: switch.fernseher
+
+- id: keller_power_strip_double_press
+  alias: Keller power strip double press
+  initial_state: true
+  trigger:
+    - platform: device
+      domain: tasmota
+      device_id: ebf8e0a468385963dc6561b555ce4e4f
+      type: button_double_press
+      subtype: button_1
+      discovery_id: 24A16007D751_button_1_DOUBLE
+  action:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: light.deckenlampe_keller
+              state: "on"
+          sequence:
+            - service: light.turn_off
+              data:
+                entity_id: light.deckenlampe_keller
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: light.deckenlampe_keller
+              state: "off"
+          sequence:
+            - service: light.turn_on
+              data:
+                entity_id: light.deckenlampe_keller
 
 - id: lichtschalter_button_hold
   alias: Lichtschalter Button Hold
@@ -8510,7 +8576,7 @@
       entity_id: sensor.keller_steckdose_energy_power
       below: 6
       for:
-        minutes: 2
+        minutes: 3
   condition:
     condition: and
     conditions:
@@ -8520,7 +8586,7 @@
       - condition: template
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 900 }}"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_active_when_power_detected.attributes.last_triggered) | int > 1020 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.set_washing_machine_active_when_power_detected.attributes.last_triggered) | int > 1680 }}"
   action:
     - service: input_select.select_option
       data:
@@ -10207,20 +10273,22 @@
                 body:
                   text: >
                     {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
+                    {%- set now_date = strptime(now().strftime('%Y-%m-%d'), '%Y-%m-%d') -%}
+                    {%- set days_until_event = (date - now_date).days -%}
                     {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
                     {% set weekday_number = date.weekday() %}
                     {% set weekday_found = weekday[weekday_number] %}
                     {% if weekday_found == "Sonntag" or weekday_found == "Samstag" %}
-                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[days_until_event].condition }}
+                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[days_until_event].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[days_until_event].wind_speed }} km/h Wind.
                       Beachvolleyball ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr?
                     {% else %}
                       {%- set event_time_str = state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] -%}
                       {%- set event_date_str = states.calendar.volleyballtraining.attributes.start_time[:10] -%}
                       {%- set event_datetime_str = event_date_str + ' ' + event_time_str -%}
                       {%- set event_timestamp = as_timestamp(event_datetime_str) -%}
-                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
+                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[days_until_event].condition }}
+                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[days_until_event].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[days_until_event].wind_speed }} km/h Wind.
                       Beachvolleyball vor dem Training ab {{ (event_timestamp - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?
                     {% endif %}
 
@@ -10418,6 +10486,10 @@
   action:
     - choose:
         - conditions:
+            - condition: template
+              value_template: >
+                {% set declined_players = state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] %}
+                {{ 'Fabian S.' not in declined_players }}
             - condition: or
               conditions:
                 - condition: numeric_state
@@ -10453,6 +10525,10 @@
                   {% endif %}
     - choose:
         - conditions:
+            - condition: template
+              value_template: >
+                {% set declined_players = state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] %}
+                {{ 'Samuel K' not in declined_players }}
             - condition: or
               conditions:
                 - condition: numeric_state
@@ -10496,6 +10572,10 @@
                 {% set weekday_number = date.weekday() %}
                 {% set weekday_found = weekday[weekday_number] %}
                 {{ weekday_found == 'Dienstag' }}
+            - condition: template
+              value_template: >
+                {% set declined_players = state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] %}
+                {{ 'Anton' not in declined_players }}
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
