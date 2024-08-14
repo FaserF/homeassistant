@@ -297,6 +297,18 @@ template:
         device_class: temperature
         attributes:
           forecast: "{{ daily['weather.ebersberg_ebersberg'].forecast }}"
+  - trigger:
+      - platform: event
+        event_type: "imap_content"
+        id: "reviewernetwork_mail"
+    sensor:
+      - name: reviewernetwork_mail
+        state: "{{ trigger.event.data['subject'] }}"
+        attributes:
+          Message: "{{ trigger.event.data['text'] }}"
+          Sender: "{{ trigger.event.data['sender'] }}"
+          Date: "{{ trigger.event.data['date'] }}"
+          To: "{{ trigger.event.data['headers'].get('Delivered-To', ['n/a'])[0] }}"
 
 #command_line:
 #  - sensor:

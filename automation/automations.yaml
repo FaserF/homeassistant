@@ -384,7 +384,7 @@
                     - service: telegram_bot.send_message
                       data_template:
                         message: >
-                          Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
+                          Morgen {% if states.sensor.bioabfall.state == "Morgen" %}wird die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}wird das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}wird die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}werden die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
                         target: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
@@ -399,7 +399,7 @@
                     - service: telegram_bot.send_message
                       data_template:
                         message: >
-                          Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
+                          Morgen {% if states.sensor.bioabfall.state == "Morgen" %}wird die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}wird das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}wird die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}werden die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
                         target: !secret telegram_chat_samuel
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
@@ -9985,10 +9985,13 @@
       entity_id: sensor.kadermanager_zorro
   condition:
     condition: template
+    #{% set old_comments = trigger.from_state.attributes.events[0].comments if trigger.from_state.attributes.events else [] %}
+    #{% set new_comments = trigger.to_state.attributes.events[0].comments if trigger.to_state.attributes.events else [] %}
+    #{{ new_comments | length > old_comments | length }}
     value_template: >
       {% set old_comments = trigger.from_state.attributes.events[0].comments if trigger.from_state.attributes.events else [] %}
       {% set new_comments = trigger.to_state.attributes.events[0].comments if trigger.to_state.attributes.events else [] %}
-      {{ new_comments | length > old_comments | length }}
+      {{ new_comments != old_comments }}
   action:
     - service: telegram_bot.send_message
       data_template:
