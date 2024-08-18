@@ -440,6 +440,8 @@
         - conditions:
             - condition: template
               value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_coming_home.attributes.last_triggered) | int > 10800 }}"
           sequence:
             - choose:
                 - conditions:
