@@ -232,7 +232,7 @@
                   sequence:
                     - service: light.turn_on
                       data:
-                        entity_id: light.yeelight_bslamp2_0x13fea10f
+                        entity_id: light.mibedsidelamp2_22e2
     - choose:
         - conditions:
             - condition: sun
@@ -1865,12 +1865,15 @@
   trigger:
     - platform: state
       entity_id: switch.fabian_schreibtisch
+      from: "off"
       to: "on"
       for:
         seconds: 10
   condition:
     condition: and
     conditions:
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_fabian_pc_starts.attributes.last_triggered) | int > 3200 }}"
       - condition: or
         conditions:
           - condition: state
@@ -1971,7 +1974,7 @@
               target:
                 entity_id: cover.fabians_zimmer_rollo
               data:
-                position: 50
+                position: 62
 
 - id: turn_off_tleds_and_climate_if_fpc_stops
   alias: "Turn off tleds and climate if fpc stops"
@@ -3904,7 +3907,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.yeelight_bslamp2_0x13fea10f
+                  - light.mibedsidelamp2_22e2
                 brightness: 2
             - delay: "00:02:30"
             - service: automation.trigger
@@ -3967,7 +3970,7 @@
     #  - service: light.turn_off
     #    data:
     #      entity_id:
-    #        - light.yeelight_bslamp2_0x13fea10f
+    #        - light.mibedsidelamp2_22e2
     - delay: "00:20:00"
     - service: switch.turn_on
       data:
@@ -4000,7 +4003,7 @@
       - condition: not
         conditions:
           - condition: state
-            entity_id: light.yeelight_bslamp2_0x13fea10f
+            entity_id: light.mibedsidelamp2_22e2
             state: "off"
           - condition: state
             entity_id: light.leds_tisch
@@ -4040,26 +4043,26 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: light.yeelight_bslamp2_0x13fea10f
+              entity_id: light.mibedsidelamp2_22e2
               state: "on"
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x13fea10f
+                  entity_id: light.mibedsidelamp2_22e2
                   attribute: brightness
                   state: "255"
           sequence:
             - service: light.turn_on
-              entity_id: light.yeelight_bslamp2_0x13fea10f
+              entity_id: light.mibedsidelamp2_22e2
               data_template:
-                brightness: "{{states.light.yeelight_bslamp2_0x13fea10f.attributes.brightness + 5}}"
+                brightness: "{{states.light.mibedsidelamp2_22e2.attributes.brightness + 5}}"
     - choose:
         - conditions:
             - condition: state
               entity_id: light.leds_tisch
               state: "on"
             - condition: state
-              entity_id: light.yeelight_bslamp2_0x13fea10f
+              entity_id: light.mibedsidelamp2_22e2
               state: "on"
             - condition: not
               conditions:
@@ -4068,7 +4071,7 @@
                   attribute: brightness
                   state: "255"
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x13fea10f
+                  entity_id: light.mibedsidelamp2_22e2
                   attribute: brightness
                   state: "255"
           sequence:
@@ -4323,12 +4326,12 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x13fea10f
+                  entity_id: light.mibedsidelamp2_22e2
                   state: unavailable
           sequence:
             - service: light.turn_on
               data:
-                entity_id: light.yeelight_bslamp2_0x13fea10f
+                entity_id: light.mibedsidelamp2_22e2
                 brightness: 255
                 color_temp: 279
     - service: light.turn_off
@@ -4519,7 +4522,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.yeelight_bslamp2_0x13fea10f
+                  - light.mibedsidelamp2_22e2
                 transition: 2
     - choose:
         - conditions:
@@ -4531,7 +4534,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.yeelight_bslamp2_0x13fea10f
+                  - light.mibedsidelamp2_22e2
                 transition: 2
 
 - id: turn_off_lights_in_rooms_when_bright_outside
@@ -5807,6 +5810,7 @@
           {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
           Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
           {% endif %}
+
           [Google Maps Link]({{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }})
         target: !secret telegram_foodsharing
 
@@ -5946,6 +5950,7 @@
           {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] == 'unavailable' %}
           Adresse: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] }}
           {% endif %}
+
           [Google Maps Link]({{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['maps'] }})
         target: !secret telegram_foodsharing_muc
 
@@ -6060,7 +6065,7 @@
 
 - id: turn_off_deckenlampe_keller
   alias: "Turn off Deckenlampe Keller"
-  initial_state: false
+  initial_state: true
   trigger:
     - platform: state
       entity_id: switch.fernseher_keller
@@ -6146,7 +6151,7 @@
   initial_state: true
   trigger:
     - platform: numeric_state
-      entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+      entity_id: sensor.gemeinde_zorneding_current_warning_level
       above: 1
   condition:
     condition: and
@@ -6158,7 +6163,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "2"
             - condition: or
               conditions:
@@ -6174,20 +6179,20 @@
                 target: !secret telegram_chat_fabian
                 disable_notification: true
                 message: >
-                  Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "2"
             - condition: or
               conditions:
@@ -6203,20 +6208,20 @@
                 target: !secret telegram_chat_samuel
                 disable_notification: true
                 message: >
-                  Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "2"
           sequence:
             - service: telegram_bot.send_message
@@ -6224,21 +6229,21 @@
                 target: !secret telegram_chat_5friends
                 disable_notification: true
                 message: >
-                  Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
-
-
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
+
+
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "3"
             - condition: or
               conditions:
@@ -6253,20 +6258,20 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: >
-                  Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "3"
             - condition: or
               conditions:
@@ -6281,41 +6286,41 @@
               data_template:
                 target: !secret telegram_chat_samuel
                 message: >
-                  Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "3"
           sequence:
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
                 message: >
-                  Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
-
-
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
+
+
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "4"
             - condition: or
               conditions:
@@ -6330,20 +6335,20 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: >
-                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "4"
             - condition: or
               conditions:
@@ -6358,41 +6363,41 @@
               data_template:
                 target: !secret telegram_chat_samuel
                 message: >
-                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Bitte alles vom Balkon rein holen!{% endif %}*
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "4"
           sequence:
             - service: telegram_bot.send_message
               data_template:
                 target: !secret telegram_chat_5friends
                 message: >
-                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.region_name }}.
+                  *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
-                  *{{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_headline }}*
+                  *{{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_headline }}*
 
-                  {{ states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description }}
-
-
-                  Voraussichtlich ab {{  states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_end }} Uhr.
+                  {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description }}
 
 
-                  *{% if 'böe' in states.sensor.dwd_weather_warnings_809175139_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
+                  Voraussichtlich ab {{  states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_end }} Uhr.
+
+
+                  *{% if 'böe' in states.sensor.gemeinde_zorneding_current_warning_level.attributes.warning_1_description %}Es wird empfohlen alles von der Terrasse/Balkon rein zu holen!{% endif %}*
 
 - id: server_temp_warning
   alias: "Server Temp Warning"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: numeric_state
       entity_id: sensor.processor_temperature
@@ -6455,10 +6460,11 @@
 
 - id: turn_on_keller_deckenlampe_on_steckerleiste
   alias: Turn on Keller Deckenlampe on Steckerleiste
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: switch.frei_keller
+      from: "off"
       to: "on"
   action:
     - service: light.turn_on
@@ -7319,10 +7325,10 @@
                 - condition: or
                   conditions:
                     - condition: state
-                      entity_id: light.yeelight_bslamp2_0x13fea10f
+                      entity_id: light.mibedsidelamp2_22e2
                       state: "off"
                     - condition: state
-                      entity_id: light.yeelight_bslamp2_0x13fea10f
+                      entity_id: light.mibedsidelamp2_22e2
                       state: "unavailable"
                 - condition: or
                   conditions:
@@ -7350,7 +7356,7 @@
               data:
                 entity_id:
                   - light.bett_gluhbirne
-                  - light.yeelight_bslamp2_0x13fea10f
+                  - light.mibedsidelamp2_22e2
                 brightness: 255
                 color_temp: 225
                 transition: 2
@@ -7376,7 +7382,7 @@
                   for:
                     seconds: 2
                 - condition: state
-                  entity_id: light.yeelight_bslamp2_0x13fea10f
+                  entity_id: light.mibedsidelamp2_22e2
                   state: "on"
                   for:
                     seconds: 2
@@ -8855,6 +8861,62 @@
               data:
                 entity_id: input_select.rice_cooker_program
                 option: "Sonstiges"
+
+- id: remind_for_finished_airfryer
+  alias: Remind for finished airfryer
+  initial_state: true
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.xiaomi_airfryer_remaining
+      below: 5
+  condition:
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_finished_airfryer.attributes.last_triggered) | int > 1200 }}"
+  action:
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data_template:
+                message: "Der Airfryer ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
+            - service: notify.telegram_fabian
+              data_template:
+                message: "Der Airfryer ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: input_boolean.leiser_modus
+              state: "off"
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.wohnzimmer_uhr
+                  state: "playing"
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: tts.speak
+              entity_id: media_player.wohnzimmer_uhr
+              data_template:
+                message: "Der Reiskocher ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
+            - service: tts.speak
+              entity_id: media_player.kuche_lautsprecher
+              data_template:
+                message: "Der Reiskocher ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
 
 - id: kitchen_timer_reminder
   alias: Kitchen Timer Reminder

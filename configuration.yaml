@@ -156,14 +156,15 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
-  # logs:
-  #   custom_components.xiaomi_airfryer: debug
-  #   custom_components.deutschebahn: debug
-  #   custom_components.rewe: debug
-  #   custom_components.foodsharing: debug
-  #   custom_components.dwd_illuminance: debug
-  #   custom_components.chefkoch: debug
-  #   custom_components.kadermanager: debug
+  logs:
+    #   custom_components.xiaomi_airfryer: debug
+    #   custom_components.deutschebahn: debug
+    #   custom_components.rewe: debug
+    #   custom_components.foodsharing: debug
+    #   custom_components.dwd_illuminance: debug
+    #   custom_components.chefkoch: debug
+    #   custom_components.kadermanager: debug
+    custom_components.mvg: debug
 
 # Track the sun
 sun:
@@ -457,7 +458,7 @@ google_assistant:
     light.leds_tisch:
       expose: true
       room: Fabians Zimmer
-    light.yeelight_bslamp2_0x13fea10f:
+    light.mibedsidelamp2_22e2:
       name: Bettlicht
       expose: true
       room: Fabians Zimmer
@@ -599,8 +600,10 @@ alexa:
     filter:
       exclude_entity_globs:
         - switch.*_internet_access
+        - switch.*_pre_release
         - switch.adguard_*
         - switch.adaptive_lighting_*
+        - sensor.weather*
       exclude_domains:
         - sensor
         - media_player
@@ -617,6 +620,7 @@ alexa:
         - device_tracker
         - remote
         - weather
+        - update
       exclude_entities:
         - light.stehlampe_oben
         - light.stehlampe_unten
@@ -627,6 +631,71 @@ alexa:
         - input_boolean.leiser_modus
         - input_boolean.thermostate_aus
         - camera.valetudo_dreamez10pro_map_data
+        - light.keller_gluhbirne
+        - light.lampe_gastezimmer
+        - light.prismatik
+        - light.smauel_leds_links
+        - light.smauel_leds_rechts
+        - light.stehlampe_oben
+        - light.stehlampe_unten
+        - switch.bett_gluhbirne
+        - switch.fernseher_old
+        - switch.leds_wohnzimmer
+        - switch.lenovo_uhr
+        - switch.rollo
+        - switch.ax3600_internet_access
+        - switch.c_pf38fwqx_internet_access
+        - switch.esp_3b62e5_internet_access
+        - switch.dreame_vacuum_p2028_internet_access
+        - switch.electricity_meter_6854_internet_access
+        - switch.esp_ef37a7_internet_access
+        - switch.esp_ef3fe9_internet_access
+        - switch.esp_efc698_internet_access
+        - switch.esp_fddeac_internet_access
+        - switch.fabian_pixel8pro_internet_access
+        - switch.google_nest_mini_internet_access
+        - switch.google_nest_mini_internet_access_2
+        - switch.homeassistant_internet_access
+        - switch.leds_wohnzimmer_internet_access
+        - switch.lenovo_internet_access
+        - switch.nest_audio_internet_access
+        - switch.rademacher_bridge_internet_access
+        - switch.strip_keller_internet_access
+        - switch.pc_192_168_178_49_internet_access
+        - switch.pc_192_168_178_37_internet_access
+        - switch.pc_192_168_178_45_internet_access
+        - switch.pc_192_168_178_45_internet_access_2
+        - switch.dell_internet_access
+        - switch.dell_internet_access_2
+        - switch.dell_internet_access_3
+        - switch.dell_internet_access_4
+        - switch.dell_internet_access_5
+        - switch.dell_internet_access_6
+        - switch.tado_internet_access
+        - switch.wlan0_internet_access
+        - switch.wlan0_internet_access_2
+        - switch.wlan0_internet_access_3
+        - switch.yeelink_light_bslamp2_mibt22e2_internet_access
+        - switch.fritz_box_3490_wi_fi_fritz_box_gastzugang
+        - switch.fritz_box_3490_wi_fi_smartlife_fb_2_4ghz
+        - switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
+        - switch.deutscher_wetterdienst_pre_release
+        - switch.foodsharing_de_pre_release
+        - switch.kadermanager_pre_release
+        - switch.rewe_discounts_pre_release
+        - camera.dreamez10pro_rendered_map
+        - media_player.alle_lautsprecher
+        - switch.fabians_lautsprecher_do_not_disturb
+        - switch.kuche_lautsprecher_do_not_disturb
+        - switch.samuels_lautsprecher_do_not_disturb
+        - switch.wohnzimmer_uhr_do_not_disturb
+        - switch.fabian_schreibtisch
+        - switch.flutlicht_keller
+        - switch.regal
+        - switch.leds_tisch_remote_access
+        - switch.bridge_auto_update
+        - switch.bridge_led_status
+        - switch.bridge_led_status_2
       #include_domains:
       #  - vacuum
       #  - cover
@@ -639,7 +708,7 @@ alexa:
       #  light.lichtschalter:
       #  light.bett_gluhbirne:
       #  light.leds_tisch:
-      #  light.yeelight_bslamp2_0x13fea10f:
+      #  light.mibedsidelamp2_22e2:
       #  cover.fabians_zimmer_rollo:
       #  ## Samuels Zimmer
       #  light.deckenlampe_samuel:
@@ -845,45 +914,29 @@ waste_collection_schedule:
         - type: Gelber Sack
           icon: mdi:recycle
 
-adaptive_lighting:
-  - name: "living_room"
-    lights:
-      - light.leds_wohnzimmer
-      - light.stehlampe
-      - light.stehlampe_oben
-      - light.stehlampe_unten
-    min_brightness: 60
-    min_color_temp: 3700
-  - name: "sleeping_room"
-    lights:
-      - light.yeelight_bslamp2_0x13fea10f
-      - light.bett_gluhbirne
-      # - light.leds_tisch
-    min_brightness: 25
-
 xiaomi_miio_cooker:
   name: Xiaomi Rice Cooker
-  host: 192.168.178.47
+  host: 192.168.178.61
   token: !secret rice_cooker_token
   model: chunmi.cooker.eh1
 
-o365:
-  accounts:
-    - account_name: 5Freunde
-      client_id: !secret O365_client_id
-      client_secret: !secret O365_client_secret
-      track_new_calendar: False
-      query_sensors:
-        - name: "5freunde Outlook"
-          max_items: 3
-          download_attachments: False
-    - account_name: JUZ
-      client_id: !secret O365_client_id
-      client_secret: !secret O365_client_secret
-      track_new_calendar: False
-      query_sensors:
-        - name: "JUZ Outlook"
-          max_items: 5
-          download_attachments: False
+#o365:
+#  accounts:
+#    - account_name: 5Freunde
+#      client_id: !secret O365_client_id
+#      client_secret: !secret O365_client_secret
+#      track_new_calendar: False
+#      query_sensors:
+#        - name: "5freunde Outlook"
+#          max_items: 3
+#          download_attachments: False
+#    - account_name: JUZ
+#      client_id: !secret O365_client_id
+#      client_secret: !secret O365_client_secret
+#      track_new_calendar: False
+#      query_sensors:
+#        - name: "JUZ Outlook"
+#          max_items: 5
+#          download_attachments: False
 
 whatsapp:

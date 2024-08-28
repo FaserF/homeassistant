@@ -1,7 +1,1 @@
 ---
-- name: "Fabian-PC"
-  platform: hass_agent_notifier
-  resource: http://192.168.178.33:5115/notify
-- name: "RGB-PC"
-  platform: hass_agent_notifier
-  resource: http://192.168.178.76:5115/notify

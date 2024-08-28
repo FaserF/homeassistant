@@ -85,19 +85,18 @@
       data: "/washerstart30"
   action:
     - service: telegram_bot.answer_callback_query
+      continue_on_error: true
       data_template:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data_template:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
     - choose:
         - conditions:
-            - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
-              state: "2"
             - condition: or
               conditions:
                 - condition: numeric_state
@@ -112,9 +111,6 @@
                 message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
         - conditions:
-            - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
-              state: "2"
             - condition: or
               conditions:
                 - condition: numeric_state
@@ -138,20 +134,44 @@
       data: "/washerstart20fw"
   action:
     - service: telegram_bot.answer_callback_query
+      continue_on_error: true
       data_template:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data_template:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
-      data:
-        message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
-    - service: notify.telegram_fabian
-      data:
-        message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_samuel_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data:
+                message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_fabian_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_60_degrees_koch_bunt
   alias: "Telegram Washing mashine set program 60 degrees koch bunt"
@@ -163,20 +183,44 @@
       data: "/washerstart60kb"
   action:
     - service: telegram_bot.answer_callback_query
+      continue_on_error: true
       data_template:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data_template:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
-      data:
-        message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
-    - service: notify.telegram_fabian
-      data:
-        message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_samuel_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data:
+                message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_fabian_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_40_degrees_pflegeleicht
   alias: "Telegram Washing mashine set program 40 degrees pflegeleicht"
@@ -188,20 +232,44 @@
       data: "/washerstart40"
   action:
     - service: telegram_bot.answer_callback_query
+      continue_on_error: true
       data_template:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data_template:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
-      data:
-        message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
-    - service: notify.telegram_fabian
-      data:
-        message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_samuel_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data:
+                message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_fabian_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_40_degrees_koch_bunt
   alias: "Telegram Washing mashine set program 40 degrees Koch Bunt"
@@ -213,20 +281,44 @@
       data: "/washerstart40kb"
   action:
     - service: telegram_bot.answer_callback_query
+      continue_on_error: true
       data_template:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data_template:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
-      data:
-        message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
-    - service: notify.telegram_fabian
-      data:
-        message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_samuel_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.samuel
+                  state: "home"
+          sequence:
+            - service: notify.telegram_samuel
+              data:
+                message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
+    - choose:
+        - conditions:
+            - condition: or
+              conditions:
+                - condition: numeric_state
+                  entity_id: sensor.smart_life_fabian_distance
+                  below: 20000
+                - condition: state
+                  entity_id: person.fabian
+                  state: "home"
+          sequence:
+            - service: notify.telegram_fabian
+              data:
+                message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_shutdown_fpc
   alias: "Telegram shutdown fpc"
@@ -677,7 +769,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: sensor.dwd_weather_warnings_809175139_current_warning_level
+              entity_id: sensor.gemeinde_zorneding_current_warning_level
               state: "2"
             - condition: or
               conditions:

@@ -69,15 +69,14 @@
             - choose:
                 - conditions:
                     - condition: numeric_state
-                      entity_id: weather.dwd_weather_ebersberg_1h
-                      attribute: temperature
+                      entity_id: sensor.weather_ebersberg_hourly
                       above: 22
                     - condition: or
                       conditions:
                         - condition: template
-                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+                          value_template: "{{state_attr('sensor.weather_ebersberg_hourly', 'forecast')[0]['condition'] == 'sunny' }}"
                         - condition: template
-                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'partlycloudy' }}"
+                          value_template: "{{state_attr('sensor.weather_ebersberg_hourly', 'forecast')[0]['condition'] == 'partlycloudy' }}"
                   sequence:
                     - service: cover.set_cover_position
                       target:
@@ -107,15 +106,14 @@
             - choose:
                 - conditions:
                     - condition: numeric_state
-                      entity_id: weather.dwd_weather_ebersberg_1h
-                      attribute: temperature
+                      entity_id: sensor.weather_ebersberg_hourly
                       above: 22
                     - condition: or
                       conditions:
                         - condition: template
-                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+                          value_template: "{{state_attr('sensor.weather_ebersberg_hourly', 'forecast')[0]['condition'] == 'sunny' }}"
                         - condition: template
-                          value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'partlycloudy' }}"
+                          value_template: "{{state_attr('sensor.weather_ebersberg_hourly', 'forecast')[0]['condition'] == 'partlycloudy' }}"
                   sequence:
                     - service: cover.set_cover_position
                       target:
@@ -187,7 +185,7 @@
                 - choose:
                     - conditions:
                         - condition: numeric_state
-                          entity_id: weather.dwd_weather_ebersberg_1h
+                          entity_id: sensor.weather_ebersberg_hourly
                           attribute: temperature
                           above: 20
                       sequence:
@@ -218,7 +216,8 @@
       - condition: not
         conditions:
           - condition: state
-            entity_id: weather.dwd_weather_ebersberg_1h
+            entity_id: sensor.weather_ebersberg_hourly
+            attribute: forecast[0].condition
             state: "rainy"
       - condition: time
         after: "13:30:00"
@@ -294,8 +293,7 @@
       - condition: sun
         before: sunset
       - condition: numeric_state
-        entity_id: weather.dwd_weather_ebersberg_1h
-        attribute: temperature
+        entity_id: sensor.weather_ebersberg_hourly
         below: 25
   action:
     - choose:
@@ -325,8 +323,7 @@
   alias: "lower covers when hot outside"
   trigger:
     - platform: numeric_state
-      entity_id: weather.dwd_weather_ebersberg_1h
-      attribute: temperature
+      entity_id: sensor.weather_ebersberg_hourly
       above: 23
   condition:
     condition: and
@@ -340,9 +337,9 @@
       - condition: or
         conditions:
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'sunny' }}"
+            value_template: "{{state_attr('sensor.weather_ebersberg_hourly', 'forecast')[0]['condition'] == 'sunny' }}"
           - condition: template
-            value_template: "{{state_attr('weather.dwd_weather_ebersberg', 'forecast')[0]['condition'] == 'partlycloudy' }}"
+            value_template: "{{state_attr('sensor.weather_ebersberg_hourly', 'forecast')[0]['condition'] == 'partlycloudy' }}"
   action:
     - choose:
         - conditions:
@@ -451,7 +448,7 @@
                           data:
                             entity_id:
                               - light.leds_tisch
-                              - light.yeelight_bslamp2_0x13fea10f
+                              - light.mibedsidelamp2_22e2
                             transition: 2
                         - service: light.turn_on
                           data:
@@ -467,8 +464,7 @@
                 - choose:
                     - conditions:
                         - condition: numeric_state
-                          entity_id: weather.dwd_weather_ebersberg_1h
-                          attribute: temperature
+                          entity_id: sensor.weather_ebersberg_hourly
                           above: 20
                         - condition: state
                           entity_id: binary_sensor.workday_sensor
