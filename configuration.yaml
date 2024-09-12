@@ -106,6 +106,9 @@ recorder:
       - sensor.icloud3_event_log
       - sensor.juz_outlook
       - sensor.5freunde_outlook
+      - sensor.chefkoch_random_recipe
+      - sensor.chefkoch_daily_recipe
+      - sensor.chefkoch_vegan_recipe
 
 # Enables support for tracking state changes over time
 history:
@@ -162,9 +165,11 @@ logger:
     #   custom_components.rewe: debug
     #   custom_components.foodsharing: debug
     #   custom_components.dwd_illuminance: debug
-    #   custom_components.chefkoch: debug
+    #   custom_components.chefkoch_ha: debug
     #   custom_components.kadermanager: debug
-    custom_components.mvg: debug
+    #   custom_components.boulderwelt: debug
+    #   custom_components.mvg: debug
+    custom_components.tasmota_fw_test: debug
 
 # Track the sun
 sun:
@@ -188,6 +193,8 @@ telegram_bot:
       - !secret telegram_chat_jutta
       - !secret telegram_chat_juz_group
       - !secret telegram_chat_juz_mail
+      - !secret telegram_chat_bouldern
+      - !secret telegram_spieletreff
       - !secret telegram_foodsharing
       - !secret telegram_foodsharing_muc
       - !secret telegram_foodsharing_wue
@@ -207,19 +214,6 @@ media_source:
 
 # speedtestdotnet:
 # server_id: 21514
-
-shell_command:
-  # create_keys: 'ssh-keygen -b 2048 -t rsa -f my.key -q -N "" && cp ~/.ssh/id_rsa.pub id_rsa.pub'
-  # ssh_command: /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /config/my.key test@192.168.1.3 'bash /home/admin/script.sh'
-  randomfood: !secret randomfood
-  foodyes: !secret foodyes
-  unpin_all_telegram: >
-    curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "{{ chat_id }}"}' https://api.telegram.org/bot{{ telegram_bot_api }}/unpinAllChatMessages
-  pin_telegram: >
-    curl -X POST -H 'Content-Type: application/json' -d '{"message_id": "{{ message_id }}", "chat_id": "{{ chat_id }}", "disable_notification": true}' https://api.telegram.org/bot{{ telegram_bot_api }}/pinChatMessage
-  hibernatefpc: "curl http://192.168.178.16:5001/hibernate"
-  hibernatenpc: "curl http://192.168.178.15:5001/hibernate"
-  # overtime_input: !secret overtime_input
 
 # coinbase:
 #   api_key: !secret coinbase_key

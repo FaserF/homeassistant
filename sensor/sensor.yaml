@@ -156,23 +156,25 @@
 
     coal_lighter_finish_duration:
       friendly_name_template: >-
-        {% if is_state("switch.kohleanzunder", "on") %}
+        {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
           {% if as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) %}
             Kohle
           {% elif as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) > as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) %}
             Pizzamaker
           {% else %}
-            Inaktiv
+            Kohleanzünder
           {% endif %}
         {% else %}
           Inaktiv
         {% endif %}
       value_template: >-
-        {% if is_state("switch.kohleanzunder", "on") %}
+        {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
           {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
-            {{ ((as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 600) - as_timestamp(now())) | timestamp_custom("%M", false) }}
+            {{ ((as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
           {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
-            {{ ((as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) + 300) - as_timestamp(now())) | timestamp_custom("%M", false) }}
+            {{ ((as_timestamp(states.automation.detect_if_pizzamaker_is_currently_active.attributes.last_triggered) + 300) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
+          {% elif (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600 %}
+            {{ ((as_timestamp(states.input_button.kohleanzunder_timer.last_changed) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
           {% else %}
             0
           {% endif %}
@@ -182,13 +184,13 @@
       unique_id: "coal_lighter_finish_duration"
       unit_of_measurement: "min"
       icon_template: >-
-        {% if is_state("switch.kohleanzunder", "on") %}
+        {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
           {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
             mdi:fire
           {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
             mdi:pizza
           {% else %}
-            mdi:fire-off
+            mdi:timer
           {% endif %}
         {% else %}
           mdi:fire-off
@@ -199,3 +201,96 @@
       unique_id: "fs_caller"
       value_template: "unbekannter"
       icon_template: "mdi:phone"
+
+- platform: template
+  sensors:
+    boulderwelt_ost_monday_avg:
+      unique_id: "boulderwelt_ost_monday_avg"
+      friendly_name: "Boulderwelt Ost Montag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_monday_avg') }}"
+
+    boulderwelt_ost_tuesday_avg:
+      unique_id: "boulderwelt_ost_tuesday_avg"
+      friendly_name: "Boulderwelt Ost Dienstag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_tuesday_avg') }}"
+
+    boulderwelt_ost_wednesday_avg:
+      unique_id: "boulderwelt_ost_wednesday_avg"
+      friendly_name: "Boulderwelt Ost Mittwoch Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_wednesday_avg') }}"
+
+    boulderwelt_ost_thursday_avg:
+      unique_id: "boulderwelt_ost_thursday_avg"
+      friendly_name: "Boulderwelt Ost Donnerstag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_thursday_avg') }}"
+
+    boulderwelt_ost_friday_avg:
+      unique_id: "boulderwelt_ost_friday_avg"
+      friendly_name: "Boulderwelt Ost Freitag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_friday_avg') }}"
+
+    #Sued
+    boulderwelt_sued_monday_avg:
+      unique_id: "boulderwelt_sued_monday_avg"
+      friendly_name: "Boulderwelt Sued Montag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_monday_avg') }}"
+
+    boulderwelt_sued_tuesday_avg:
+      unique_id: "boulderwelt_sued_tuesday_avg"
+      friendly_name: "Boulderwelt Sued Dienstag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_tuesday_avg') }}"
+
+    boulderwelt_sued_wednesday_avg:
+      unique_id: "boulderwelt_sued_wednesday_avg"
+      friendly_name: "Boulderwelt Sued Mittwoch Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_wednesday_avg') }}"
+
+    boulderwelt_sued_thursday_avg:
+      unique_id: "boulderwelt_sued_thursday_avg"
+      friendly_name: "Boulderwelt Sued Donnerstag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_thursday_avg') }}"
+
+    boulderwelt_sued_friday_avg:
+      unique_id: "boulderwelt_sued_friday_avg"
+      friendly_name: "Boulderwelt Sued Freitag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_friday_avg') }}"
+
+    boulderwelt_sued_saturday_avg:
+      unique_id: "boulderwelt_sued_saturday_avg"
+      friendly_name: "Boulderwelt Sued Samstag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_saturday_avg') }}"
+
+    boulderwelt_sued_sunday_avg:
+      unique_id: "boulderwelt_sued_sunday_avg"
+      friendly_name: "Boulderwelt Sued Sonntag Durchschnitt"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_sunday_avg') }}"
+
+- platform: statistics
+  name: "Boulderwelt München Ost Level Mean"
+  unique_id: "boulderwelt_munchen_ost_level_mean"
+  entity_id: sensor.boulderwelt_munchen_ost_level
+  state_characteristic: mean
+  max_age:
+    hours: 24
+  sampling_size: 24
+
+- platform: statistics
+  name: "Boulderwelt München Sued Level Mean"
+  unique_id: "boulderwelt_munchen_sued_level_mean"
+  entity_id: sensor.boulderwelt_munchen_sud_level
+  state_characteristic: mean
+  max_age:
+    hours: 24
+  sampling_size: 24

@@ -429,7 +429,7 @@
 
 - id: telegram_reboot
   alias: Telegram Reboot
-  initial_state: true
+  initial_state: false
   trigger:
     platform: event
     event_type: telegram_command
@@ -519,21 +519,60 @@
       event_type: telegram_command
       event_data:
         command: "/food@smartlife_ha_bot"
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: "/foodno"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "foodno@smartlife_ha_bot"
   action:
-    - service: shell_command.randomfood
+    - service: telegram_bot.answer_callback_query
+      continue_on_error: true
       data_template:
-        telegram_sender: "{{ trigger.event.data.user_id }}"
+        callback_query_id: "{{ trigger.event.data.id }}"
+        message: "Okay, neues Essen."
+    - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
+      data_template:
+        message_id: "{{ trigger.event.data.message.message_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
+        inline_keyboard: []
     - service: telegram_bot.send_message
       data_template:
-        title: "Gericht heute zubereiten?"
+        title: "Zufallsessensvorschlag: "
         target: "{{ trigger.event.data.user_id }}"
-        message: ""
+        message: >
+          **Rezept:** {{ states.sensor.chefkoch_random_recipe.state }}
+
+
+          {{ state_attr('sensor.chefkoch_random_recipe', 'url') }}
+
+          {% if state_attr('sensor.chefkoch_random_recipe', 'totalTime') %}
+          **Zubereitungszeit:** {{ state_attr('sensor.chefkoch_random_recipe', 'totalTime') }}
+          {% endif %}
+
+          {% if state_attr('sensor.chefkoch_random_recipe', 'ingredients') %}
+          **Zutaten:** {{ state_attr('sensor.chefkoch_random_recipe', 'ingredients') | join(', ') }}
+          {% endif %}
+
+          {% if state_attr('sensor.chefkoch_random_recipe', 'calories') %}
+          **Kalorien:** {{ state_attr('sensor.chefkoch_random_recipe', 'calories') }}
+          {% endif %}
+
+          {% if state_attr('sensor.chefkoch_random_recipe', 'category') %}
+          **Kategorie:** {{ state_attr('sensor.chefkoch_random_recipe', 'category') }}
+          {% endif %}
         disable_notification: true
         inline_keyboard:
           - "Ja:/foodyes, Nein:/foodno"
+    - service: homeassistant.reload_config_entry
+      data:
+        entity_id: 01J6EXEW32EBEDF3WV4VC0DA3C
 
-- id: telegram_essen_vegetarisch
-  alias: Telegram Essen Vegetarisch
+- id: telegram_essen_vegan
+  alias: Telegram Essen Vegan
   initial_state: true
   trigger:
     - platform: event
@@ -545,44 +584,37 @@
       event_data:
         command: "/foodv@smartlife_ha_bot"
   action:
-    - service: shell_command.randomfood
-      data_template:
-        telegram_sender: "{{ trigger.event.data.user_id }}"
-        vegetarisch: "j"
     - service: telegram_bot.send_message
       data_template:
-        title: "Gericht heute zubereiten?"
+        title: "Veganer Zufallsessensvorschlag: "
         target: "{{ trigger.event.data.user_id }}"
-        message: ""
-        disable_notification: true
-        inline_keyboard:
-          - "Ja:/foodyes, Nein:/foodno"
+        message: >
+          **Rezept:** {{ states.sensor.chefkoch_vegan_recipe.state }}
 
-- id: telegram_essen_fleisch
-  alias: Telegram Essen Fleisch
-  initial_state: true
-  trigger:
-    - platform: event
-      event_type: telegram_command
-      event_data:
-        command: "/foodn"
-    - platform: event
-      event_type: telegram_command
-      event_data:
-        command: "/foodn@smartlife_ha_bot"
-  action:
-    - service: shell_command.randomfood
-      data_template:
-        telegram_sender: "{{ trigger.event.data.user_id }}"
-        vegetarisch: "n"
-    - service: telegram_bot.send_message
-      data_template:
-        title: "Gericht heute zubereiten?"
-        target: "{{ trigger.event.data.user_id }}"
-        message: ""
+
+          {{ state_attr('sensor.chefkoch_vegan_recipe', 'url') }}
+
+          {% if state_attr('sensor.chefkoch_vegan_recipe', 'totalTime') %}
+          **Zubereitungszeit:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'totalTime') }}
+          {% endif %}
+
+          {% if state_attr('sensor.chefkoch_vegan_recipe', 'ingredients') %}
+          **Zutaten:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'ingredients') | join(', ') }}
+          {% endif %}
+
+          {% if state_attr('sensor.chefkoch_vegan_recipe', 'calories') %}
+          **Kalorien:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'calories') }}
+          {% endif %}
+
+          {% if state_attr('sensor.chefkoch_vegan_recipe', 'category') %}
+          **Kategorie:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'category') }}
+          {% endif %}
         disable_notification: true
         inline_keyboard:
           - "Ja:/foodyes, Nein:/foodno"
+    - service: homeassistant.reload_config_entry
+      data:
+        entity_id: 01J6EXEW32EBEDF3WV4VC0DA3C
 
 - id: telegram_food_yes
   alias: "Telegram food yes"
@@ -607,41 +639,6 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: !secret telegram_chat_fabian
         inline_keyboard: []
-    - service: shell_command.foodyes
-
-- id: telegram_food_no
-  alias: "Telegram food no"
-  initial_state: true
-  trigger:
-    - platform: event
-      event_type: telegram_callback
-      event_data:
-        data: "/foodno"
-    - platform: event
-      event_type: telegram_command
-      event_data:
-        command: "foodno@smartlife_ha_bot"
-  action:
-    - service: telegram_bot.answer_callback_query
-      data_template:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "Okay, neues Essen."
-    - service: telegram_bot.edit_replymarkup
-      data_template:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
-    - service: shell_command.randomfood
-      data_template:
-        telegram_sender: "{{ trigger.event.data.user_id }}"
-    - service: telegram_bot.send_message
-      data_template:
-        title: "Gericht heute zubereiten?"
-        target: "{{ trigger.event.data.user_id }}"
-        message: ""
-        disable_notification: true
-        inline_keyboard:
-          - "Ja:/foodyes, Nein:/foodno"
 
 - id: telegram_answer_no
   alias: "Telegram answer no"
