@@ -436,41 +436,41 @@
                         target: !secret telegram_chat_samuel
                         inline_keyboard:
                           - "Erledigt:/telegramwasherdone"
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
-            - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_coming_home.attributes.last_triggered) | int > 10800 }}"
-          sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: Bitte die Pflanzen gießen.
-                        target: !secret telegram_chat_fabian
-                        inline_keyboard:
-                          - "Erledigt:/telegrampouringdone"
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.samuel
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: Bitte die Pflanzen gießen.
-                        target: !secret telegram_chat_samuel
-                        inline_keyboard:
-                          - "Erledigt:/telegrampouringdone"
+    #- choose:
+    #    - conditions:
+    #        - condition: template
+    #          value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
+    #        - condition: template
+    #          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_coming_home.attributes.last_triggered) | int > 10800 }}"
+    #      sequence:
+    #        - choose:
+    #            - conditions:
+    #                - condition: state
+    #                  entity_id: person.fabian
+    #                  state: home
+    #                - condition: template
+    #                  value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
+    #              sequence:
+    #                - service: telegram_bot.send_message
+    #                  data:
+    #                    message: Bitte die Pflanzen gießen.
+    #                    target: !secret telegram_chat_fabian
+    #                    inline_keyboard:
+    #                      - "Erledigt:/telegrampouringdone"
+    #        - choose:
+    #            - conditions:
+    #                - condition: state
+    #                  entity_id: person.samuel
+    #                  state: home
+    #                - condition: template
+    #                  value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
+    #              sequence:
+    #                - service: telegram_bot.send_message
+    #                  data:
+    #                    message: Bitte die Pflanzen gießen.
+    #                    target: !secret telegram_chat_samuel
+    #                    inline_keyboard:
+    #                      - "Erledigt:/telegrampouringdone"
     - choose:
         - conditions:
             - condition: state
@@ -4732,7 +4732,6 @@
                   - "Kai & Adri"
                   - "Flo"
                   - "Maxi"
-                  - "JUZ"
                   - "Wo anders (Schreiben wo!)"
                 is_anonymous: false
                 allows_multiple_answers: true
@@ -4747,7 +4746,6 @@
               - "Kai & Adri"
               - "Flo"
               - "Maxi"
-              - "JUZ"
               - "Draußen trotz nicht so gutem Wetter"
               - "Wo anders (Schreiben wo!)"
             is_anonymous: false
@@ -4819,7 +4817,7 @@
           ] %}
           {% set sorted_days_weekend_sued = days_sued_wekend | sort(attribute='value') %}
 
-          Die besten Tage unter der Woche zum Bouldern basierend auf der Auslastung der aktuellen Woche:
+          Die besten Boulder-Tage unter der Woche basierend auf der Auslastung der aktuellen Woche:
 
           - **Ost**:
             1. {{ sorted_days_ost[0].day }} ({{ sorted_days_ost[0].value }} %)
@@ -4836,7 +4834,7 @@
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_bouldern
-        question: "Wann wollen wir diese Woche zum bouldern?"
+        question: "Wann wollen wir nächste Woche bouldern?"
         options:
           - "Montag"
           - "Dienstag"
@@ -4845,7 +4843,7 @@
           - "Freitag"
           - "Samstag"
           - "Sonntag"
-          - "Kann diese Woche gar nicht"
+          - "Kann in dieser Woche gar nicht"
         is_anonymous: false
         allows_multiple_answers: true
         disable_notification: true
@@ -5870,7 +5868,7 @@
 
 - id: remind_for_pouring
   alias: "Remind for pouring"
-  initial_state: true
+  initial_state: false
   trigger:
     platform: time
     at: "16:30:00"
@@ -7955,7 +7953,9 @@
               data_template:
                 target: !secret telegram_chat_fabian
                 message: >
-                  Achtung, sehr hohe Luftfeuchtigkeit.{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Samuels Zimmer{{ states.climate.samuel_s_zimmer.attributes.current_humidity }} %.{% endif %}
+                  Achtung, sehr hohe Luftfeuchtigkeit:{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %}
+
+                  Luftfeuchtigkeit Samuels Zimmer{{ states.climate.samuel_s_zimmer.attributes.current_humidity }} %.{% endif %}
                   {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer{{ states.climate.wohnzimmer.attributes.current_humidity }} %.{% endif %}
                   {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit fabian_s_zimmer{{ states.climate.fabian_s_zimmer.attributes.current_humidity }} %.{% endif %}
                   {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad{{ states.climate.bad.attributes.current_humidity }} %.{% endif %}
@@ -7969,7 +7969,9 @@
               data_template:
                 target: !secret telegram_chat_samuel
                 message: >
-                  Achtung, sehr hohe Luftfeuchtigkeit.{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Samuels Zimmer{{ states.climate.samuel_s_zimmer.attributes.current_humidity }} %.{% endif %}
+                  Achtung, sehr hohe Luftfeuchtigkeit:{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %}
+
+                  Luftfeuchtigkeit Samuels Zimmer{{ states.climate.samuel_s_zimmer.attributes.current_humidity }} %.{% endif %}
                   {% if (states.climate.wohnzimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Wohnzimmer{{ states.climate.wohnzimmer.attributes.current_humidity }} %.{% endif %}
                   {% if (states.climate.fabian_s_zimmer.attributes.current_humidity) > 67 %} Luftfeuchtigkeit fabian_s_zimmer{{ states.climate.fabian_s_zimmer.attributes.current_humidity }} %.{% endif %}
                   {% if (states.climate.bad.attributes.current_humidity) > 67 %} Luftfeuchtigkeit Bad{{ states.climate.bad.attributes.current_humidity }} %.{% endif %}
@@ -10240,13 +10242,6 @@
       {% set new_comments = trigger.to_state.attributes.events[0].comments if trigger.to_state.attributes.events else [] %}
       {{ new_comments != old_comments }}
   action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_volleyball
-        message: >
-          Neuer Kadermanager Kommentar von {{ states.sensor.kadermanager_zorro.attributes.events[0].comments[0].author }}:
-
-          {{ states.sensor.kadermanager_zorro.attributes.events[0].comments[0].text }}
     - service: whatsapp.send_message
       continue_on_error: true
       data_template:
@@ -10257,6 +10252,29 @@
             "Neuer Kadermanager Kommentar von {{ states.sensor.kadermanager_zorro.attributes.events[0].comments[0].author }}:
 
             {{ states.sensor.kadermanager_zorro.attributes.events[0].comments[0].text }}"
+
+- id: notification_on_new_kadermanager_comment_tischabwischer
+  alias: "Notification on New Kadermanager Comment Tischabwischer"
+  trigger:
+    - platform: state
+      entity_id: sensor.kadermanager_tischabwischer
+  condition:
+    condition: template
+    value_template: >
+      {% set old_comments = trigger.from_state.attributes.events[0].comments if trigger.from_state.attributes.events else [] %}
+      {% set new_comments = trigger.to_state.attributes.events[0].comments if trigger.to_state.attributes.events else [] %}
+      {{ new_comments != old_comments }}
+  action:
+    - service: whatsapp.send_message
+      continue_on_error: true
+      data_template:
+        clientId: default
+        to: !secret whatsapp_volleyball_tischabwischer
+        body:
+          text:
+            "Neuer Kadermanager Kommentar von {{ states.sensor.kadermanager_tischabwischer.attributes.events[0].comments[0].author }}:
+
+            {{ states.sensor.kadermanager_tischabwischer.attributes.events[0].comments[0].text }}"
 
 - id: remind_for_volleyball_by_kadermanager
   alias: "remind for volleyball by kadermanager"
@@ -10301,26 +10319,6 @@
             - condition: template
               value_template: "{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}"
           sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_volleyball
-                data:
-                  disable_web_page_preview: true
-                message: >
-                  {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
-                  {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                  {% set weekday_number = date.weekday() %}
-                  {% set weekday_found = weekday[weekday_number] %}
-                  {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}.
-                  Bitte im Kadermanager abstimmen nicht vergessen: ({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }})
-
-                  Außerdem hat die Mannschaft zwei ebenfalls ein Ligaspiel: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}
-
-
-                  {% if weekday_found == 'Dienstag' %}
-                  Es wird daher KEIN Training stattfinden!
-                  {% endif %}
-
             - service: whatsapp.send_message
               continue_on_error: true
               data_template:
@@ -10328,20 +10326,27 @@
                 to: !secret whatsapp_volleyball_group
                 body:
                   text:
-                    "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
-                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                    {% set weekday_number = date.weekday() %}
-                    {% set weekday_found = weekday[weekday_number] %}
-                    {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}.
-                    Bitte im Kadermanager abstimmen nicht vergessen: ({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }})
+                    "{%- set zorro_event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                    {%- set tischabwischer_event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                    {%- set zorro_date = strptime(zorro_event['date'], '%Y-%m-%d') %}
+                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] %}
+                    {%- set weekday_number = zorro_date.weekday() %}
+                    {%- set weekday_found = weekday[weekday_number] %}
 
+                    {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_event['title'] }} statt.
+                    Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.
+                    Bitte im Kadermanager abstimmen nicht vergessen: ({{ zorro_event['link'] }})
 
-                    Außerdem hat die zweite Mannschaft ebenfalls ein Ligaspiel: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}
+                    Außerdem hat die zweite Mannschaft ebenfalls ein Ligaspiel: {{ tischabwischer_event['title'] }}.
+                    Bisherige Kadermanager Zusagen: {{ tischabwischer_event['in_count'] }}.
 
-                    {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}{% if 'Heim' in event['title'] %}
-                    Bitte denkt daran, euch gegenseitig einen Schiedsrichter zu stellen, wenn noch nicht geschehen. Danke!
+                    {% if 'Heim' in zorro_event['title'] and 'Heim' in tischabwischer_event['title'] %}
+                    Bitte denkt daran, euch gegenseitig einen Schiedsrichter zu stellen, da es sich um zwei Heimspiele handelt, wenn noch nicht geschehen. Bitte meldet euch bei Verfügbarkeit! Danke!
+                    {% elif 'Heim' in zorro_event['title'] %}
+                    Mannschaft 3 hat ein Heimspiel. Bitte stellt sicher, dass ein Schiedsrichter gefunden wird und meldet euch bei Verfügbarkeit! Danke!
+                    {% elif 'Heim' in tischabwischer_event['title'] %}
+                    Mannschaft 2 hat ein Heimspiel. Bitte stellt sicher, dass ein Schiedsrichter gefunden wird und meldet euch bei Verfügbarkeit! Danke!
                     {% endif %}
-
 
                     {% if weekday_found == 'Dienstag' %}
                     Es wird daher KEIN Training stattfinden!
@@ -10350,30 +10355,6 @@
             - condition: template
               value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] == 'Spiel' }}"
           sequence:
-            - service: telegram_bot.send_poll
-              data_template:
-                target: !secret telegram_volleyball
-                question:
-                  "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
-                  {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                  {% set weekday_number = date.weekday() %}
-                  {% set weekday_found = weekday[weekday_number] %}
-                  {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}. Ich komme? "
-                options:
-                  - "Ja"
-                  - "Nein"
-                  - "Vielleicht"
-                  - "Nur zeitweise/verspätet"
-                is_anonymous: false
-                allows_multiple_answers: false
-                disable_notification: true
-            - service: telegram_bot.send_message
-              data_template:
-                target: !secret telegram_volleyball
-                data:
-                  disable_web_page_preview: true
-                message: >
-                  Bitte im [Kadermanager]({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}) abstimmen nicht vergessen!
             - service: whatsapp.send_message
               continue_on_error: true
               data_template:
@@ -10416,23 +10397,6 @@
                             {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }}.
 
                             Das Training findet somit bei Bedarf nur mit der 2. Mannschaft statt. {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}{% if 'Heim' in event['title'] %} Wenn es freiwillige als Schiedsrichter gibt, meldet euch bitte!{% endif %}"
-                    - service: whatsapp.send_message
-                      continue_on_error: true
-                      data_template:
-                        clientId: default
-                        to: !secret whatsapp_volleyball_zorro_group
-                        body:
-                          text:
-                            "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
-                            {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                            {% set weekday_number = date.weekday() %}
-                            {% set weekday_found = weekday[weekday_number] %}
-                            {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
-
-
-                            Stimmt bitte fleißig im Kadermanager ab:
-
-                            {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}"
     - choose:
         - conditions:
             - condition: or
@@ -10478,43 +10442,6 @@
                         is_anonymous: false
                         allows_multiple_answers: false
                         disable_notification: true
-              default:
-                - service: telegram_bot.send_poll
-                  data_template:
-                    target: !secret telegram_volleyball
-                    question:
-                      "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                      {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                      {% set weekday_number = date.weekday() %}
-                      {% set weekday_found = weekday[weekday_number] %}
-                      {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}. Ich komme? "
-                    options:
-                      - "Ja"
-                      - "Nein"
-                      - "Vielleicht"
-                      - "Nur zeitweise/verspätet"
-                    is_anonymous: false
-                    allows_multiple_answers: false
-                    disable_notification: true
-                - service: telegram_bot.send_message
-                  data_template:
-                    target: !secret telegram_volleyball
-                    data:
-                      disable_web_page_preview: true
-                    message: >
-                      {%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                      {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                      {% set weekday_number = date.weekday() %}
-                      {% set weekday_found = weekday[weekday_number] %}
-                      {%- set event_time_str = state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] -%}
-                      {%- set event_date_str = states.calendar.volleyballtraining.attributes.start_time[:10] -%}
-                      {%- set event_datetime_str = event_date_str + ' ' + event_time_str -%}
-                      {%- set event_timestamp = as_timestamp(event_datetime_str) -%}
-                      Bitte im [Kadermanager]({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}) abstimmen nicht vergessen!
-
-                      {{ weekday_found }} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                      bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
-                      Beachvolleyball vor dem Training ab {{ (event_timestamp - 2.5 * 3600) | timestamp_custom('%H:%M', true) }} Uhr?
             - service: whatsapp.send_message
               continue_on_error: true
               data_template:
@@ -10547,30 +10474,6 @@
 
                     {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
       default:
-        - service: telegram_bot.send_poll
-          data_template:
-            target: !secret telegram_volleyball
-            question:
-              "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
-              {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-              {% set weekday_number = date.weekday() %}
-              {% set weekday_found = weekday[weekday_number] %}
-              {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}. Ich komme? "
-            options:
-              - "Ja"
-              - "Nein"
-              - "Vielleicht"
-              - "Nur zeitweise/verspätet"
-            is_anonymous: false
-            allows_multiple_answers: false
-            disable_notification: true
-        - service: telegram_bot.send_message
-          data_template:
-            target: !secret telegram_volleyball
-            data:
-              disable_web_page_preview: true
-            message: >
-              Bitte im [Kadermanager]({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}) abstimmen nicht vergessen!
         - choose:
             - conditions:
                 - condition: template
@@ -10689,6 +10592,37 @@
                     {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['time'] }} Uhr {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }}.
 
                     Das Training findet somit bei Bedarf nur mit der 3. Mannschaft statt. {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}{% if 'Heim' in event['title'] %} Wenn es freiwillige als Schiedsrichter gibt, meldet euch bitte!{% endif %}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}"
+            - condition: template
+              value_template: >
+                {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                {% set date = strptime(event['date'], '%Y-%m-%d') %}
+                {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
+                {% set weekday_number = date.weekday() %}
+                {% set weekday_found = weekday[weekday_number] %}
+                {{ weekday_found != 'Dienstag' }}
+            - condition: template
+              value_template: >
+                {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                {{ 'Heim' in event['title'] }}
+          sequence:
+            - service: whatsapp.send_message
+              continue_on_error: true
+              data_template:
+                clientId: default
+                to: !secret whatsapp_volleyball_group
+                body:
+                  text:
+                    "Mannschaft 2 hat am {%- set date = strptime(state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['date'], '%Y-%m-%d') %}
+                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                    {% set weekday_number = date.weekday() %}
+                    {% set weekday_found = weekday[weekday_number] %}
+                    {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['time'] }} Uhr {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }}.
+
+                    Wer kann hier als Schiedsrichter pfeifen? Bitte melden!"
       default:
         - service: whatsapp.send_message
           continue_on_error: true
