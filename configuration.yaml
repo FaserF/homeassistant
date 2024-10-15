@@ -170,7 +170,7 @@ logger:
     #   custom_components.boulderwelt: debug
     #   custom_components.mvg: debug
     #   custom_components.tasmota_fw_test: debug
-    custom_components.gh_release_tracker: debug
+    custom_components.dieliga: debug
 
 # Track the sun
 sun:

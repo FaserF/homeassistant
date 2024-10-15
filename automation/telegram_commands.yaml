@@ -539,6 +539,10 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
+    - service: homeassistant.reload_config_entry
+      data:
+        entry_id: 01J6EXEW32EBEDF3WV4VC0DA3C
+    - delay: "00:00:01"
     - service: telegram_bot.send_message
       data_template:
         title: "Zufallsessensvorschlag: "
@@ -567,9 +571,6 @@
         disable_notification: true
         inline_keyboard:
           - "Ja:/foodyes, Nein:/foodno"
-    - service: homeassistant.reload_config_entry
-      data:
-        entity_id: 01J6EXEW32EBEDF3WV4VC0DA3C
 
 - id: telegram_essen_vegan
   alias: Telegram Essen Vegan
@@ -584,6 +585,10 @@
       event_data:
         command: "/foodv@smartlife_ha_bot"
   action:
+    - service: homeassistant.reload_config_entry
+      data:
+        entry_id: 01J6EXEW32EBEDF3WV4VC0DA3C
+    - delay: "00:00:01"
     - service: telegram_bot.send_message
       data_template:
         title: "Veganer Zufallsessensvorschlag: "
@@ -612,9 +617,6 @@
         disable_notification: true
         inline_keyboard:
           - "Ja:/foodyes, Nein:/foodno"
-    - service: homeassistant.reload_config_entry
-      data:
-        entity_id: 01J6EXEW32EBEDF3WV4VC0DA3C
 
 - id: telegram_food_yes
   alias: "Telegram food yes"

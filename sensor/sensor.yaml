@@ -40,6 +40,39 @@
 #     scan_interval: 86400
 - platform: template
   sensors:
+#    outdated_tasmota_devices:
+#      friendly_name: "Outdated Tasmota Devices"
+#      unique_id: "outdated_tasmota_devices"
+#      value_template: >
+#        {% set latest_tag = states('sensor.arendst_tasmota_latest_tag') %}
+#        {% if latest_tag != 'unavailable' and latest_tag is not none %}
+#          {% set latest_version = latest_tag[1:] %}  # "v" entfernen
+#          {% set latest_parts = latest_version.split('.') %}
+#          {% set outdated_count = 0 %}
+
+#          {%- for entity in integration_entities('tasmota') -%}
+#            {% if device_attr(entity, 'sw_version') %}
+#              {% set firmware_version = device_attr(entity, 'sw_version') %}
+#              {% if latest_version > firmware_version %}
+#                {% set outdated_count = outdated_count + 1 %}
+#              {% endif %}
+#            {% endif %}
+#          {% endfor %}
+
+#          {%- for entity in integration_entities('mqtt') -%}
+#            {% if device_attr(entity, 'sw_version') %}
+#              {% set firmware_version = device_attr(entity, 'sw_version') %}
+#              {% if latest_version > firmware_version %}
+#                {% set outdated_count = outdated_count + 1 %}
+#              {% endif %}
+#            {% endif %}
+#          {% endfor %}
+
+#          {{ outdated_count }}
+#        {% else %}
+#          0
+#        {% endif %}
+
     average_house_humidity:
       friendly_name: "Durchschn. Luftfeuchtigkeit"
       unique_id: "average_house_humidity_sensor"
@@ -210,11 +243,23 @@
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_ost_monday_avg') }}"
 
+    boulderwelt_ost_monday_avg_2h:
+      unique_id: "boulderwelt_ost_monday_avg_2h"
+      friendly_name: "Boulderwelt Ost Montag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_monday_avg_2h') }}"
+
     boulderwelt_ost_tuesday_avg:
       unique_id: "boulderwelt_ost_tuesday_avg"
       friendly_name: "Boulderwelt Ost Dienstag Durchschnitt"
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_ost_tuesday_avg') }}"
+
+    boulderwelt_ost_tuesday_avg_2h:
+      unique_id: "boulderwelt_ost_tuesday_avg_2h"
+      friendly_name: "Boulderwelt Ost Dienstag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_tuesday_avg_2h') }}"
 
     boulderwelt_ost_wednesday_avg:
       unique_id: "boulderwelt_ost_wednesday_avg"
@@ -222,17 +267,35 @@
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_ost_wednesday_avg') }}"
 
+    boulderwelt_ost_wednesday_avg_2h:
+      unique_id: "boulderwelt_ost_wednesday_avg_2h"
+      friendly_name: "Boulderwelt Ost Mittwoch Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_wednesday_avg_2h') }}"
+
     boulderwelt_ost_thursday_avg:
       unique_id: "boulderwelt_ost_thursday_avg"
       friendly_name: "Boulderwelt Ost Donnerstag Durchschnitt"
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_ost_thursday_avg') }}"
 
+    boulderwelt_ost_thursday_avg_2h:
+      unique_id: "boulderwelt_ost_thursday_avg_2h"
+      friendly_name: "Boulderwelt Ost Donnerstag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_thursday_avg_2h') }}"
+
     boulderwelt_ost_friday_avg:
       unique_id: "boulderwelt_ost_friday_avg"
       friendly_name: "Boulderwelt Ost Freitag Durchschnitt"
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_ost_friday_avg') }}"
+
+    boulderwelt_ost_friday_avg_2h:
+      unique_id: "boulderwelt_ost_friday_avg_2h"
+      friendly_name: "Boulderwelt Ost Freitag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_ost_friday_avg_2h') }}"
 
     #Sued
     boulderwelt_sued_monday_avg:
@@ -241,11 +304,23 @@
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_sued_monday_avg') }}"
 
+    boulderwelt_sued_monday_avg_2h:
+      unique_id: "boulderwelt_sued_monday_avg_2h"
+      friendly_name: "Boulderwelt Sued Montag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_monday_avg_2h') }}"
+
     boulderwelt_sued_tuesday_avg:
       unique_id: "boulderwelt_sued_tuesday_avg"
       friendly_name: "Boulderwelt Sued Dienstag Durchschnitt"
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_sued_tuesday_avg') }}"
+
+    boulderwelt_sued_tuesday_avg_2h:
+      unique_id: "boulderwelt_sued_tuesday_avg_2h"
+      friendly_name: "Boulderwelt Sued Dienstag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_tuesday_avg_2h') }}"
 
     boulderwelt_sued_wednesday_avg:
       unique_id: "boulderwelt_sued_wednesday_avg"
@@ -253,17 +328,35 @@
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_sued_wednesday_avg') }}"
 
+    boulderwelt_sued_wednesday_avg_2h:
+      unique_id: "boulderwelt_sued_wednesday_avg_2h"
+      friendly_name: "Boulderwelt Sued Mittwoch Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_wednesday_avg_2h') }}"
+
     boulderwelt_sued_thursday_avg:
       unique_id: "boulderwelt_sued_thursday_avg"
       friendly_name: "Boulderwelt Sued Donnerstag Durchschnitt"
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_sued_thursday_avg') }}"
 
+    boulderwelt_sued_thursday_avg_2h:
+      unique_id: "boulderwelt_sued_thursday_avg_2h"
+      friendly_name: "Boulderwelt Sued Donnerstag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_thursday_avg_2h') }}"
+
     boulderwelt_sued_friday_avg:
       unique_id: "boulderwelt_sued_friday_avg"
       friendly_name: "Boulderwelt Sued Freitag Durchschnitt"
       unit_of_measurement: "%"
       value_template: "{{ states('input_number.boulderwelt_sued_friday_avg') }}"
+
+    boulderwelt_sued_friday_avg_2h:
+      unique_id: "boulderwelt_sued_friday_avg_2h"
+      friendly_name: "Boulderwelt Sued Freitag Durchschnitt 2h"
+      unit_of_measurement: "%"
+      value_template: "{{ states('input_number.boulderwelt_sued_friday_avg_2h') }}"
 
     boulderwelt_sued_saturday_avg:
       unique_id: "boulderwelt_sued_saturday_avg"
@@ -287,6 +380,15 @@
   sampling_size: 24
 
 - platform: statistics
+  name: "Boulderwelt München Ost Level Mean 2h"
+  unique_id: "boulderwelt_munchen_ost_level_mean_2h"
+  entity_id: sensor.boulderwelt_munchen_ost_level
+  state_characteristic: mean
+  max_age:
+    hours: 2
+  sampling_size: 2
+
+- platform: statistics
   name: "Boulderwelt München Sued Level Mean"
   unique_id: "boulderwelt_munchen_sued_level_mean"
   entity_id: sensor.boulderwelt_munchen_sud_level
@@ -294,3 +396,12 @@
   max_age:
     hours: 24
   sampling_size: 24
+
+- platform: statistics
+  name: "Boulderwelt München Sued Level Mean 2h"
+  unique_id: "boulderwelt_munchen_sued_level_mean_2h"
+  entity_id: sensor.boulderwelt_munchen_sud_level
+  state_characteristic: mean
+  max_age:
+    hours: 2
+  sampling_size: 2
