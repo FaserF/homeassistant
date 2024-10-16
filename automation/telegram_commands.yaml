@@ -423,7 +423,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: "Restarting Homeassistant Container..."
     - service: homeassistant.restart
 
@@ -438,7 +438,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: "Rebooting Server..."
     - delay: 00:00:05
     - service: shell_command.restartha
@@ -458,7 +458,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: >
           Hier sind ein paar Befehle:
 
@@ -480,7 +480,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: >
           Hier sind ein paar Befehle:
 
@@ -504,7 +504,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: "System is online! Last system reboot was on {{ states('sensor.last_boot') }}."
 
 - id: telegram_essen
@@ -546,7 +546,7 @@
     - service: telegram_bot.send_message
       data_template:
         title: "Zufallsessensvorschlag: "
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: >
           **Rezept:** {{ states.sensor.chefkoch_random_recipe.state }}
 
@@ -592,7 +592,7 @@
     - service: telegram_bot.send_message
       data_template:
         title: "Veganer Zufallsessensvorschlag: "
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: >
           **Rezept:** {{ states.sensor.chefkoch_vegan_recipe.state }}
 
@@ -894,7 +894,7 @@
         entity_id: update.home_assistant_core_update
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: "HA Update gestartet."
     - service: telegram_bot.edit_replymarkup
       data_template:
@@ -916,7 +916,7 @@
         entity_id: update.home_assistant_operating_system_update
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: "OS Update gestartet."
     - service: telegram_bot.edit_replymarkup
       data_template:
@@ -939,7 +939,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         disable_notification: true
         message: >
           Wettervorhersage für heute {{ states.weather.ebersberg_ebersberg.state }} bei {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C
@@ -975,7 +975,7 @@
     - service: telegram_bot.send_message
       data_template:
         target: "{{ trigger.event.data.chat_id }}"
-        # target: "{{ trigger.event.data.user_id }}"
+        # target: "{{ trigger.event.data.chat_id }}"
         message: "Kühlschrank im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!"
 
 - id: turn_on_climates
@@ -1060,7 +1060,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.user_id }}"
+        target: "{{ trigger.event.data.chat_id }}"
         message: "Alle Google Homes werden Fabi/samuel über eine wichtige Nachricht bescheid geben."
     - service: notify.mobile_app_samuel_iphone
       data:
@@ -1173,7 +1173,7 @@
             - service: telegram_bot.send_message
               data_template:
                 target: "{{ trigger.event.data.chat_id }}"
-                # target: "{{ trigger.event.data.user_id }}"
+                # target: "{{ trigger.event.data.chat_id }}"
                 message: "Gartentor wurde geöffnet."
     - choose:
         - conditions:
@@ -1242,7 +1242,7 @@
     - service: telegram_bot.send_message
       data_template:
         target: "{{ trigger.event.data.chat_id }}"
-        # target: "{{ trigger.event.data.user_id }}"
+        # target: "{{ trigger.event.data.chat_id }}"
         message: "Klingel in Wohnung aktiviert. Gartentor wurde geöffnet."
     - service: media_player.volume_set
       data:
