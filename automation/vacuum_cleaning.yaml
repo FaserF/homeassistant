@@ -114,16 +114,14 @@
   alias: "Vacuum Cleaner Error"
   initial_state: true
   trigger:
-    # - platform: state
-    # entity_id: sensor.valetudo_dreamez10pro_error_description
-    # not_from:
-    # - "unavailable"
-    # - "unknown"
-    # - ""
-    # - "Unknown"
     - platform: state
       entity_id: vacuum.valetudo_dreamez10pro
       to: "error"
+  condition:
+    - condition: template
+      value_template: "{{ trigger.from_state.state != 'unavailable' }}"
+    - condition: template
+      value_template: "{{ trigger.from_state.state != 'unknown' }}"
   action:
     - delay: "00:00:30"
     - choose:
