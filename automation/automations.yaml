@@ -1685,7 +1685,7 @@
 
 - id: remind_for_unavailable_device
   alias: "Remind for unavailable device"
-  initial_state: true
+  initial_state: false
   mode: single
   trigger:
     platform: time
@@ -4710,6 +4710,8 @@
         entity_id: calendar.votgaming_kalender
         attribute: message
         state: "Gruppentreffen"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_gruppentreffen.attributes.last_triggered) | int > 180000 }}"
   action:
     - choose:
         - conditions:
@@ -10498,6 +10500,20 @@
                 {% endif %}
             - condition: template
               value_template: "{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}"
+            - condition: template
+              value_template: >
+                {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                {% set date = strptime(event['date'], '%Y-%m-%d') %}
+                {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
+                {% set weekday_number = date.weekday() %}
+                {% set weekday_found = weekday[weekday_number] %}
+                {%- set weekday_number = date.weekday() %}
+                {%- set weekday_found = weekday[weekday_number] %}
+                {%- set tischabwischer_event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                {%- set tischabwischer_date = strptime(tischabwischer_event['date'], '%Y-%m-%d') %}
+                {%- set weekday_number_tischabwischer = tischabwischer_date.weekday() %}
+                {%- set weekday_found_tischabwischer = weekday[weekday_number_tischabwischer] %}
+                {{ weekday_found == weekday_found_tischabwischer }}
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
@@ -10540,7 +10556,7 @@
 
                     {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_event['title'] }} statt.
                     Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.
-                    {% if zorro_event['in_count'] < 9 %}
+                    {% if zorro_event['in_count'] < 8 %}
 
 
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ zorro_event['link'] }}
@@ -10552,7 +10568,7 @@
 
                     Außerdem hat die zweite Mannschaft ebenfalls ein Ligaspiel am {{ weekday_found_tischabwischer }}: {{ tischabwischer_event['title'] }}.
                     Bisherige Kadermanager Zusagen: {{ tischabwischer_event['in_count'] }}.
-                    {% if tischabwischer_event['in_count'] < 9 %}
+                    {% if tischabwischer_event['in_count'] < 8 %}
 
 
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ tischabwischer_event['link'] }}
@@ -10633,7 +10649,7 @@
                     {% set weekday_found = weekday[weekday_number] %}
                     {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_event['title'] }} statt. Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.
 
-                    {% if zorro_event['in_count'] < 9 %}
+                    {% if zorro_event['in_count'] < 8 %}
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ zorro_event['link'] }}
                     {% else %}
                     Stimmt bitte fleißig im Kadermanager ab: {{ zorro_event['link'] }}
@@ -10700,36 +10716,6 @@
             - condition: template
               value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] != 'Spiel' }}"
           sequence:
-            - choose:
-                - conditions:
-                    - condition: template
-                      value_template: >
-                        {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
-                        {% set date = strptime(event['date'], '%Y-%m-%d') %}
-                        {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
-                        {% set weekday_number = date.weekday() %}
-                        {% set weekday_found = weekday[weekday_number] %}
-                        {{ weekday_found == 'Sonntag' }}
-                  sequence:
-                    - service: telegram_bot.send_poll
-                      data_template:
-                        target: !secret telegram_volleyball
-                        question:
-                          "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') -%}
-                          {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                          {% set weekday_number = date.weekday() %}
-                          {% set weekday_found = weekday[weekday_number] %}
-                          {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-                          bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind.
-                          Ich komme zum Beachvolleyball ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr?"
-                        options:
-                          - "Ja"
-                          - "Nein"
-                          - "Vielleicht"
-                          - "Nur zeitweise/verspätet"
-                        is_anonymous: false
-                        allows_multiple_answers: false
-                        disable_notification: true
             - service: whatsapp.send_message
               continue_on_error: true
               data_template:
@@ -10762,36 +10748,23 @@
 
                     {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
       default:
-        - choose:
-            - conditions:
-                - condition: template
-                  value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] == 'Training' }}"
-                - condition: template
-                  value_template: >
-                    {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
-                    {% set date = strptime(event['date'], '%Y-%m-%d') %}
-                    {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
-                    {% set weekday_number = date.weekday() %}
-                    {% set weekday_found = weekday[weekday_number] %}
-                    {{ weekday_found == 'Dienstag' }}
-              sequence:
-                - service: whatsapp.send_message
-                  continue_on_error: true
-                  data_template:
-                    clientId: default
-                    to: !secret whatsapp_volleyball_group
-                    body:
-                      text:
-                        "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
-                        {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
-                        {% set weekday_number = date.weekday() %}
-                        {% set weekday_found = weekday[weekday_number] %}
-                        {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
+        - service: whatsapp.send_message
+          continue_on_error: true
+          data_template:
+            clientId: default
+            to: !secret whatsapp_volleyball_group
+            body:
+              text:
+                "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d') %}
+                {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                {% set weekday_number = date.weekday() %}
+                {% set weekday_found = weekday[weekday_number] %}
+                {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
 
 
-                        Stimmt bitte fleißig im Kadermanager ab:
+                Stimmt bitte fleißig im Kadermanager ab:
 
-                        {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}"
+                {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}"
 
 - id: remind_for_volleyball_by_kadermanager_2_mannschaft
   alias: "remind for volleyball by kadermanager 2. Mannschaft"
@@ -10862,7 +10835,7 @@
                     {% set weekday_found = weekday[weekday_number] %}
                     {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}
 
-                    {% if state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < 9 %}
+                    {% if state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < 8 %}
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
                     {% else %}
                     Stimmt bitte fleißig im Kadermanager ab: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
@@ -10949,7 +10922,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 20000
+                  below: 30000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"

@@ -1062,24 +1062,15 @@
       data_template:
         target: "{{ trigger.event.data.chat_id }}"
         message: "Alle Google Homes werden Fabi/samuel über eine wichtige Nachricht bescheid geben."
-    - service: notify.mobile_app_samuel_iphone
-      data:
-        message: "Wichtige Nachricht, schau auf dein Handy!"
-        data:
-          push:
-            sound:
-              name: "default"
-              critical: 1
-              volume: 0.4
-    - service: notify.mobile_app_fabian_iphone
-      data:
-        message: "Wichtige Nachricht, schau auf dein Handy!"
-        data:
-          push:
-            sound:
-              name: "default"
-              critical: 1
-              volume: 0.4
+    #- service: notify.mobile_app_fabian_iphone
+    #  data:
+    #    message: "Wichtige Nachricht, schau auf dein Handy!"
+    #    data:
+    #      push:
+    #        sound:
+    #          name: "default"
+    #          critical: 1
+    #          volume: 0.4
     - service: media_player.volume_set
       data:
         volume_level: 0.7
@@ -1088,7 +1079,7 @@
       entity_id:
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
-        - media_player.schlafzimmer_speaker
+        - media_player.fabians_lautsprecher
       data_template:
         message: >
           Wichtige Nachricht von

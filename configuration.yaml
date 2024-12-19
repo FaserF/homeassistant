@@ -31,7 +31,6 @@ http:
   # server_port: !secret port
   trusted_proxies:
     - 127.0.0.1
-    - 192.168.0.0/16
     - 172.30.0.0/18 # NGINX Proxy Manager
     - 172.30.33.0/24 # NGINX Proxy Manager
     - 172.30.33.7
