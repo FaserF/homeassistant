@@ -172,7 +172,7 @@ logger:
     #   custom_components.dieliga: debug
     #   custom_components.phoenix_bad: debug
     #   custom_components.keyforsteam: debug
-    custom_components.openwrt: debug
+    #   custom_components.openwrt: debug
 
 # Track the sun
 sun:
