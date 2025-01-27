@@ -537,25 +537,25 @@
     #             entity_id: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
     #  - service: switch.turn_off
     #  data:
-    #  entity_id: switch.fritzbox_3490_portforward_ssh
+    #  entity_id: switch.fritzbox_7490_portforward_ssh
 
-- id: notify_for_cod_bo6_price_drop
-  alias: "Notify on CoD Bo6 Price Drop"
-  initial_state: true
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.keyforsteam_166331
-      attribute: priceCard
-      below: 52
-  condition:
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_on_cod_bo6_price_drop.attributes.last_triggered) | int > 86400 }}" #86400 seconds = 7 days -> Do not trigger the automation more than once a week
-  action:
-    - service: telegram_bot.send_message
-      data:
-        message: >
-          Call of Duty Black Ops 6 {{ state_attr('sensor.keyforsteam_166331', 'edition') }} hat den Preis {{ state_attr('sensor.keyforsteam_166331', 'priceCard') }} € bei {{ state_attr('sensor.keyforsteam_166331', 'merchant') }} mit dem Code {{ state_attr('sensor.keyforsteam_166331', 'coupon') }} - Jetzt prüfen: https://www.keyforsteam.de/
-        target: !secret telegram_chat_fabian
+#- id: notify_for_cod_bo6_price_drop
+#  alias: "Notify on CoD Bo6 Price Drop"
+#  initial_state: true
+#  trigger:
+#    - platform: numeric_state
+#      entity_id: sensor.keyforsteam_166331
+#      attribute: priceCard
+#      below: 52
+#  condition:
+#    - condition: template
+#      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_on_cod_bo6_price_drop.attributes.last_triggered) | int > 86400 }}" #86400 seconds = 7 days -> Do not trigger the automation more than once a week
+#  action:
+#    - service: telegram_bot.send_message
+#      data:
+#        message: >
+#          Call of Duty Black Ops 6 {{ state_attr('sensor.keyforsteam_166331', 'edition') }} hat den Preis {{ state_attr('sensor.keyforsteam_166331', 'priceCard') }} € bei {{ state_attr('sensor.keyforsteam_166331', 'merchant') }} mit dem Code {{ state_attr('sensor.keyforsteam_166331', 'coupon') }} - Jetzt prüfen: https://www.keyforsteam.de/
+#        target: !secret telegram_chat_fabian
 
 - id: open_door_for_fabian
   alias: "Open the door for Fabian if coming home"
@@ -1350,7 +1350,7 @@
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.zorneding_to_leuchtenbergring.last_updated) | int > 16400 }}"
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.sensor.zorneding_departures_via_starnberg_nord.last_updated) | int > 16400 }}"
           sequence:
             - choose:
                 - conditions:
@@ -4188,11 +4188,11 @@
                       - media_player.kuche_lautsprecher
                     message: >
                       Es ist {{ now().hour }} Uhr {{ now().minute }} .
-                      Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich
-                      {% if state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') == 1 %}
+                      Die Sbahn um {{ states.sensor.zorneding_departures_via_starnberg_nord.attributes.departure }} Uhr hat voraussichtlich
+                      {% if state_attr('sensor.zorneding_departures_via_starnberg_nord', 'delay') == 1 %}
                       eine Minute
-                      {% elif state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') >= 1 %}
-                      {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten
+                      {% elif state_attr('sensor.zorneding_departures_via_starnberg_nord', 'delay') >= 1 %}
+                      {{ states.sensor.zorneding_departures_via_starnberg_nord.attributes.delay }} Minuten
                       {% else %}
                       keine
                       {% endif %} Verspätung.
@@ -4268,11 +4268,11 @@
                     media_player_entity_id: media_player.fabians_lautsprecher
                     message: >
                       Es ist {{ now().hour }} Uhr {{ now().minute }} .
-                      Die Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} Uhr hat voraussichtlich
-                      {% if state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') == 1 %}
+                      Die Sbahn um {{ states.sensor.zorneding_departures_via_starnberg_nord.attributes.departure }} Uhr hat voraussichtlich
+                      {% if state_attr('sensor.zorneding_departures_via_starnberg_nord', 'delay') == 1 %}
                       eine Minute
-                      {% elif state_attr('sensor.zorneding_to_leuchtenbergring', 'delay') >= 1 %}
-                      {{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} Minuten
+                      {% elif state_attr('sensor.zorneding_departures_via_starnberg_nord', 'delay') >= 1 %}
+                      {{ states.sensor.zorneding_departures_via_starnberg_nord.attributes.delay }} Minuten
                       {% else %}
                       keine
                       {% endif %} Verspätung.
@@ -4701,6 +4701,8 @@
   trigger:
     - platform: template
       value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 111600) | round(-1) }}"
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 54000) | round(-1) }}"
   condition:
     condition: and
     conditions:
@@ -4737,6 +4739,7 @@
                   - "Kai & Adri"
                   - "Flo"
                   - "Maxi"
+                  - "Bar (z.B. Tropic Bar)"
                   - "Wo anders (Schreiben wo!)"
                 is_anonymous: false
                 allows_multiple_answers: true
@@ -4760,6 +4763,7 @@
                   - "Kai & Adri"
                   - "Flo"
                   - "Maxi"
+                  - "Bar (z.B. Tropic Bar)"
                   - "Wo anders (Schreiben wo!)"
                 is_anonymous: false
                 allows_multiple_answers: true
@@ -4774,6 +4778,7 @@
               - "Kai & Adri"
               - "Flo"
               - "Maxi"
+              - "Bar (z.B. Tropic Bar)"
               - "Draußen trotz nicht so gutem Wetter"
               - "Wo anders (Schreiben wo!)"
             is_anonymous: false
@@ -4807,6 +4812,72 @@
         allows_multiple_answers: true
         disable_notification: true
 
+- id: remind_for_board_game_events
+  alias: "remind for Board Game events"
+  trigger:
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 111600) | round(-1) }}"
+    - platform: template
+      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 54000) | round(-1) }}"
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 112600) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
+      - condition: state
+        entity_id: calendar.votgaming_kalender
+        attribute: message
+        state: "Brettspieltreff"
+      - condition: template
+        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_board_game_events.attributes.last_triggered) | int > 180000 }}"
+  action:
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_spieletreff
+        question:
+          "{%- set date = as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) -%}
+          {% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
+          {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.votgaming_kalender.attributes.message }} statt. Ich bin dabei?"
+        options:
+          - "Ja"
+          - "Nein"
+          - "Vermutlich ja"
+        is_anonymous: false
+        allows_multiple_answers: false
+        disable_notification: false
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_spieletreff
+        question: "Was wollen wir spielen?"
+        options:
+          - "Catan (max 6)"
+          - "Carcassonne (max 5)"
+          - "Zombicide (max 10)"
+          - "Kemet - Blut & Sand (max 5)"
+          - "Wizard (max 6)"
+          - "Phase 10 (max 6)"
+          - "6 nimmt/Hornochsen (max 10)"
+          - "Saboteur (max 10)"
+          - "Ticket to ride (max 5)"
+          - "Ein anderes Spiel aus der angepinnten Liste"
+        is_anonymous: false
+        allows_multiple_answers: true
+        disable_notification: true
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_spieletreff
+        question: "Wo treffen wir uns?"
+        options:
+          - "Fabi & Samuel"
+          - "Kai & Adri"
+          - "Kassandra"
+          - "JUZ (sofern frei)"
+          - "Tropic Bar Zorneding"
+          - "Wo anders (Schreiben wo!)"
+        is_anonymous: false
+        allows_multiple_answers: true
+        disable_notification: true
+
 - id: remind_for_bouldern
   alias: "remind for Bouldern"
   trigger:
@@ -4828,22 +4899,28 @@
             {'day': 'Donnerstag', 'value': states('sensor.boulderwelt_ost_thursday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_thursday_avg') | float(70)},
             {'day': 'Freitag', 'value': states('sensor.boulderwelt_ost_friday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_friday_avg') | float(70)}
           ] %}
-          {% set sorted_days_ost = days_ost | sort(attribute='value') %}
+
+          {% set filtered_days_ost = days_ost | selectattr('value', '>', 0) | list %}
+          {% set sorted_days_ost = filtered_days_ost | sort(attribute='value') %}
 
           {% set days_sued = [
-            {'day': 'Montag', 'value': states('sensor.boulderwelt_sued_monday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_monday_avg') | float(70)},
-            {'day': 'Dienstag', 'value': states('sensor.boulderwelt_sued_tuesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_tuesday_avg') | float(70)},
-            {'day': 'Mittwoch', 'value': states('sensor.boulderwelt_sued_wednesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_wednesday_avg') | float(70)},
-            {'day': 'Donnerstag', 'value': states('sensor.boulderwelt_sued_thursday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_thursday_avg') | float(70)},
-            {'day': 'Freitag', 'value': states('sensor.boulderwelt_sued_friday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_friday_avg') | float(70)}
-          ] %}
-          {% set sorted_days_sued = days_sued | sort(attribute='value') %}
+                      {'day': 'Montag', 'value': states('sensor.boulderwelt_sued_monday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_monday_avg') | float(70)},
+                      {'day': 'Dienstag', 'value': states('sensor.boulderwelt_sued_tuesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_tuesday_avg') | float(70)},
+                      {'day': 'Mittwoch', 'value': states('sensor.boulderwelt_sued_wednesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_wednesday_avg') | float(70)},
+                      {'day': 'Donnerstag', 'value': states('sensor.boulderwelt_sued_thursday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_thursday_avg') | float(70)},
+                      {'day': 'Freitag', 'value': states('sensor.boulderwelt_sued_friday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_friday_avg') | float(70)}
+                    ] %}
+
+          {% set filtered_days_sued = days_sued | selectattr('value', '>', 0) | list %}
+          {% set sorted_days_sued = filtered_days_sued | sort(attribute='value') %}
 
           {% set days_sued_wekend = [
-            {'day': 'Samstag', 'value': states('sensor.boulderwelt_sued_saturday_avg') | float(70)},
-            {'day': 'Sonntag', 'value': states('sensor.boulderwelt_sued_sunday_avg') | float(70)}
-          ] %}
-          {% set sorted_days_weekend_sued = days_sued_wekend | sort(attribute='value') %}
+                      {'day': 'Samstag', 'value': states('sensor.boulderwelt_sued_saturday_avg') | float(70)},
+                      {'day': 'Sonntag', 'value': states('sensor.boulderwelt_sued_sunday_avg') | float(70)}
+                    ] %}
+
+          {% set filtered_days_weekend_sued = days_sued_wekend | selectattr('value', '>', 0) | list %}
+          {% set sorted_days_weekend_sued = filtered_days_weekend_sued | sort(attribute='value') %}
 
           Die besten Boulder-Tage unter der Woche basierend auf der Auslastung der aktuellen Woche (Zeiten 17 - 19h für Statistiken, dahinter gesamter Tag):
 
@@ -5226,6 +5303,10 @@
                   entity_id: calendar.fabianseitz98_gmail_com
                   attribute: message
                   state: "Karten- / Brettspieleabend"
+                - condition: state
+                  entity_id: calendar.fabianseitz98_gmail_com
+                  attribute: message
+                  state: "Brettspieltreff"
                 - condition: state
                   entity_id: calendar.fabianseitz98_gmail_com
                   attribute: message
@@ -6127,16 +6208,18 @@
 
           ------------
 
-          {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] == 'unavailable' %}
+          {% if state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] %}
           [Bild]({{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['picture'] }})
           {% endif %}
           [Link](https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['id'] }})
 
-          {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] == 'unavailable' %}
+          {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] in ['unavailable', 'none'] %}
           Adresse: {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['address'] }}
           {% endif %}
 
+          {% if not state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] == 'unavailable' %}
           [Google Maps Link]({{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['maps'] }})
+          {% endif %}
         target: !secret telegram_foodsharing
 
 - id: foodsharing_basket_available_zorneding
@@ -6267,7 +6350,7 @@
 
           ------------
 
-          {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] == 'unavailable' %}
+          {% if state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] %}
           [Bild]({{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['picture'] }})
           {% endif %}
           [Link](https://foodsharing.de/essenskoerbe/{{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['id'] }})
@@ -6276,7 +6359,9 @@
           Adresse: {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['address'] }}
           {% endif %}
 
+          {% if not state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['maps'] == 'unavailable' %}
           [Google Maps Link]({{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['maps'] }})
+          {% endif %}
         target: !secret telegram_foodsharing_muc
 
 - id: too_good_to_go_food_available_zorneding
@@ -9811,10 +9896,8 @@
   alias: "Notify Fabi on sbahn delay Home -> Work"
   initial_state: true
   trigger:
-    - platform: numeric_state
-      entity_id: "sensor.zorneding_to_leuchtenbergring"
-      attribute: delay
-      above: 5
+    - platform: template
+      value_template: "{{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[0]['delayArrival'] | int > 5 }}"
   condition:
     condition: and
     conditions:
@@ -9841,17 +9924,15 @@
           sequence:
             - service: notify.telegram_fabian
               data:
-                title: "Sbahn um {{ states.sensor.zorneding_to_leuchtenbergring.attributes.departure }} hat +{{ states.sensor.zorneding_to_leuchtenbergring.attributes.delay }} min Verspätung."
-                message: "Nächste Sbahn: {{ states.sensor.zorneding_to_leuchtenbergring.attributes.next_1 }} Uhr"
+                title: "Sbahn um {{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[0]['scheduledDeparture'] }} hat +{{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[0]['delayDeparture'] }} min Verspätung."
+                message: "Nächste Sbahn: {{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[1]['scheduledDeparture'] }} Uhr"
 
 - id: notify_fabian_on_sbahn_delay_work_home
   alias: "Notify on Sbahn delay Work -> Home"
   initial_state: true
   trigger:
-    - platform: numeric_state
-      entity_id: "sensor.starnberg_nord_to_zorneding"
-      attribute: delay
-      above: 3
+    - platform: template
+      value_template: "{{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayArrival'] | int > 3 }}"
   condition:
     condition: and
     conditions:
@@ -9880,29 +9961,8 @@
   action:
     - service: notify.telegram_fabian
       data:
-        title: "Sbahn um {{ states.sensor.starnberg_nord_to_zorneding.attributes.departure }} Uhr nach Hause +{{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min."
-        message: "Nächste Sbahn: {{ states.sensor.starnberg_nord_to_zorneding.attributes.next_1 }} Uhr"
-
-- id: notify_on_sbahn_delay_work_samuel_home
-  alias: "Notify on Sbahn delay Work samuel -> Home"
-  initial_state: false
-  trigger:
-    - platform: state
-      entity_id: person.samuel
-      from: "Arbeit samuel"
-      to: "not_home"
-  condition:
-    - condition: numeric_state
-      entity_id: "sensor.leuchtenbergring_to_zorneding"
-      attribute: delay
-      above: 3
-    - condition: state
-      entity_id: binary_sensor.workday_sensor
-      state: "on"
-  action:
-    - service: notify.telegram_samuel
-      data:
-        message: "Sbahn in Leuchtenbergring um {{ states.sensor.leuchtenbergring_to_zorneding.attributes.departure }} Uhr hat voraussichtlich {{ states.sensor.leuchtenbergring_to_zorneding.attributes.delay }} min Verspätung."
+        title: "Sbahn um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['scheduledDeparture'] }} hat +{{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung."
+        message: "Nächste Sbahn: {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[1]['scheduledDeparture'] }} Uhr"
 
 - id: notify_samuel_fabian_on_way_home
   alias: "Notify samuel Fabian on way home"
@@ -10191,7 +10251,7 @@
                             entity_id: tts.google_de_de
                           data_template:
                             media_player_entity_id: media_player.kuche_lautsprecher
-                            message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+                            message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
                         - delay: 00:00:08
                         - service: media_player.volume_set
                           data:
@@ -10216,7 +10276,7 @@
                             entity_id: tts.google_de_de
                           data_template:
                             media_player_entity_id: media_player.samuels_lautsprecher
-                            message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+                            message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
                         - delay: 00:00:08
                         - service: media_player.volume_set
                           data:
@@ -10241,7 +10301,7 @@
                             entity_id: tts.google_de_de
                           data_template:
                             media_player_entity_id: media_player.wohnzimmer_uhr
-                            message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+                            message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
                         - delay: 00:00:08
                         - service: media_player.volume_set
                           data:
@@ -10250,7 +10310,7 @@
                             entity_id: media_player.wohnzimmer_uhr
     - service: notify.telegram_samuel
       data:
-        message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ states.sensor.starnberg_nord_to_zorneding.attributes.arrival }} Uhr mit {{ states.sensor.starnberg_nord_to_zorneding.attributes.delay }} min Verspätung in Zorneding an."
+        message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
 
 - id: notify_samuel_fabian_on_way_home_from_gil
   alias: "Notify samuel Fabian on way home from GIL"
@@ -10356,33 +10416,6 @@
 
 
           {% if states.person.samuel.state != "home" %}Samuel ist nicht daheim.{% endif %}
-
-- id: remind_for_dnd
-  alias: "remind for dnd"
-  initial_state: true
-  trigger:
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 198000) | round(-1) }}"
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - 111600) | round(-1) }}"
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_dnd.attributes.last_triggered) | int > 518400 }}"
-      - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) < 199000) and ((as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) - as_timestamp(now())) > 0) }}"
-      - condition: state
-        entity_id: calendar.votgaming_kalender
-        attribute: message
-        state: "Dungeons & Dragons Spieleabend"
-  action:
-    - service: telegram_bot.send_message
-      data_template:
-        target: !secret telegram_spieletreff
-        disable_notification: true
-        message: >
-          Erinnerung: Am {%- set date = as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}{% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.votgaming_kalender.attributes.start_time) | timestamp_custom('%H:%M', true) }} ist {{ states.calendar.votgaming_kalender.attributes.message }}.
 
 - id: notification_on_new_kadermanager_comment
   alias: "Notification on New Kadermanager Comment"
@@ -10606,7 +10639,7 @@
                       false
                     {% endif %}
                   {% else %}
-                    true
+                    {{ event_0['type'] == 'Spiel' }}
                   {% endif %}
                 {% elif event_0 is not none %}
                   {{ event_0['type'] == 'Spiel' }}
@@ -10652,7 +10685,7 @@
                     {% if zorro_event['in_count'] < 8 %}
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ zorro_event['link'] }}
                     {% else %}
-                    Stimmt bitte fleißig im Kadermanager ab: {{ zorro_event['link'] }}
+                    Stimmt bitte zeitnah im Kadermanager ab: {{ zorro_event['link'] }}
                     {% endif %}"
             - choose:
                 - conditions:
@@ -10671,37 +10704,76 @@
                         clientId: default
                         to: !secret whatsapp_volleyball_group
                         body:
-                          text:
-                            "{% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                          text: >
+                            {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
                             {% set event_0 = events[0] if events | length > 0 else None %}
-                            {% if events | length > 1 %}
-                            {% set event_1 = events[1] %}
-                            {% if event_0['date'] == event_1['date'] %}
-                            {% if event_0['type'] == 'Spiel' %}
-                            {%- set zorro_event = event_0 %}
-                            {% elif event_1['type'] == 'Spiel' %}
-                            {%- set zorro_event = event_1 %}
-                            {% elif event_0['type'] == 'Sonstiges' %}
-                            {%- set zorro_event = event_0 %}
-                            {% elif event_1['type'] == 'Sonstiges' %}
-                            {%- set zorro_event = event_1 %}
+                            {% set event_1 = events[1] if events | length > 1 else None %}
+
+                            {% if event_0 and event_1 and event_0['date'] == event_1['date'] %}
+                              {% if event_0['type'] == 'Spiel' %}
+                                {% set zorro_event = event_1 if event_1['type'] != 'Spiel' else event_0 %}
+                              {% elif event_1['type'] == 'Spiel' %}
+                                {% set zorro_event = event_0 if event_0['type'] != 'Spiel' else event_1 %}
+                              {% else %}
+                                {% set zorro_event = event_0 %}
+                              {% endif %}
                             {% else %}
-                            {%- set zorro_event = event_0 %}
+                              {% set zorro_event = event_0 %}
                             {% endif %}
-                            {% else %}
-                            {%- set zorro_event = event_0 %}
-                            {% endif %}
-                            {% else %}
-                            {%- set zorro_event = event_0 %}
-                            {% endif %}
-                            {%- set date = strptime(zorro_event['date'], '%Y-%m-%d') %}
-                            {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+
+                            {% set date = strptime(zorro_event['date'], '%Y-%m-%d') %}
+                            {% set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] %}
                             {% set weekday_number = date.weekday() %}
                             {% set weekday_found = weekday[weekday_number] %}
 
-                            Mannschaft 3 hat am {{ strptime(zorro_event['date'], '%Y-%m-%d') }} {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr {{ zorro_event['type'] }} {{ zorro_event['title'] }}.
+                            Mannschaft 3 hat am {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr {{ zorro_event['type'] }} {{ zorro_event['title'] }}.
 
-                            Das Training findet somit bei Bedarf nur mit der 2. Mannschaft statt. {% if 'Heim' in zorro_event['title'] %} Wenn es freiwillige als Schiedsrichter gibt, meldet euch bitte!{% endif %}"
+                            Das Training findet somit bei Bedarf nur mit der 2. Mannschaft statt. {% if 'Heim' in zorro_event['title'] %} Wenn es freiwillige als Schiedsrichter gibt, meldet euch bitte!{% endif %}
+
+                            {% if event_0 and event_0['type'] != 'Spiel' %}
+                            Klickt euch bitte dennoch zum Training rein für die Übersicht:
+
+                              {{ event_0['link'] }}
+                            {% elif event_1 and event_1['type'] != 'Spiel' %}
+                            Klickt euch bitte dennoch zum Training rein für die Übersicht:
+
+                              {{ event_1['link'] }}
+                            {% else %}
+                            Kein gültiger Link verfügbar.
+                            {% endif %}
+
+                - conditions:
+                    - condition: template
+                      value_template: >
+                        {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                        {% if events | length > 1 %}
+                          {% set event_0 = events[0] %}
+                          {% set event_1 = events[1] %}
+                          {% set event_0_date = strptime(event_0['date'], '%Y-%m-%d') %}
+                          {% set event_1_date = strptime(event_1['date'], '%Y-%m-%d') %}
+                          {% set date_difference = (event_1_date - event_0_date).days %}
+                          {{ event_0['type'] != 'Training' and event_1['type'] == 'Training' and date_difference in [1, 2] }}
+                        {% else %}
+                          false
+                        {% endif %}
+                  sequence:
+                    - service: whatsapp.send_message
+                      continue_on_error: true
+                      data_template:
+                        clientId: default
+                        to: !secret whatsapp_volleyball_group
+                        body:
+                          text:
+                            "{%- set date = strptime(state_attr('sensor.kadermanager_zorro', 'events')[1]['date'], '%Y-%m-%d') %}
+                            {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+                            {% set weekday_number = date.weekday() %}
+                            {% set weekday_found = weekday[weekday_number] %}
+                            {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[1]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[1]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[1]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[1]['in_count'] }}
+
+
+                            Stimmt bitte zeitnah im Kadermanager ab:
+
+                            {{ state_attr('sensor.kadermanager_zorro', 'events')[1]['link'] }}"
         - conditions:
             - condition: or
               conditions:
@@ -10744,7 +10816,7 @@
                     {% endif %}
 
                     Bisherige Kadermanager Zusagen für {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }}: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
-                    Stimmt bitte fleißig im Kadermanager ab:
+                    Stimmt bitte zeitnah im Kadermanager ab:
 
                     {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
       default:
@@ -10762,7 +10834,7 @@
                 {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
 
 
-                Stimmt bitte fleißig im Kadermanager ab:
+                Stimmt bitte zeitnah im Kadermanager ab:
 
                 {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}"
 
@@ -10803,22 +10875,37 @@
   action:
     - choose:
         - conditions:
-            - condition: template
-              value_template: >
-                {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
-                {% set event_0 = events[0] if events | length > 0 else None %}
-                {% if events | length > 1 %}
-                  {% set event_1 = events[1] %}
-                  {% if event_0['date'] == event_1['date'] %}
-                    {{ event_0['type'] != 'Spiel' and event_1['type'] != 'Spiel' }}
-                  {% else %}
-                    {{ event_0['type'] != 'Spiel' }}
-                  {% endif %}
-                {% elif event_0 is not none %}
-                  {{ event_0['type'] != 'Spiel' }}
-                {% else %}
-                  true
-                {% endif %}
+            - condition: or
+              conditions:
+                - condition: template
+                  value_template: >
+                    {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                    {% set event_0 = events[0] if events | length > 0 else None %}
+                    {% if events | length > 1 %}
+                      {% set event_1 = events[1] %}
+                      {% if event_0['date'] == event_1['date'] %}
+                        {{ event_0['type'] != 'Spiel' and event_1['type'] != 'Spiel' }}
+                      {% else %}
+                        {{ event_0['type'] != 'Spiel' }}
+                      {% endif %}
+                    {% elif event_0 is not none %}
+                      {{ event_0['type'] != 'Spiel' }}
+                    {% else %}
+                      true
+                    {% endif %}
+                - condition: template
+                  value_template: >
+                    {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                    {% if events | length > 1 %}
+                      {% set event_0 = events[0] %}
+                      {% set event_1 = events[1] %}
+                      {% set event_0_date = strptime(event_0['date'], '%Y-%m-%d') %}
+                      {% set event_1_date = strptime(event_1['date'], '%Y-%m-%d') %}
+                      {% set date_difference = (event_1_date - event_0_date).days %}
+                      {{ event_0['type'] != 'Training' and event_1['type'] == 'Training' and date_difference in [1, 2] }}
+                    {% else %}
+                      false
+                    {% endif %}
             - condition: template
               value_template: "{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}"
           sequence:
@@ -10838,7 +10925,7 @@
                     {% if state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < 8 %}
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
                     {% else %}
-                    Stimmt bitte fleißig im Kadermanager ab: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
+                    Stimmt bitte zeitnah im Kadermanager ab: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
                     {% endif %}"
             - choose:
                 - conditions:
@@ -10884,9 +10971,68 @@
                 Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}
 
 
-                Stimmt bitte fleißig im Kadermanager ab:
+                Stimmt bitte zeitnah im Kadermanager ab:
 
                 {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}"
+
+- id: remind_for_volleyball_by_kadermanager_low_participants
+  alias: "Remind for Volleyball: Low Participants Alert"
+  initial_state: true
+  trigger:
+    - platform: template
+      value_template: >
+        {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+        {% set event_date = event['date'] %}
+        {% set event_time = event['time'] %}
+        {% set event_type = event['type'] %}
+        {% set event_datetime = strptime(event_date + ' ' + event_time, '%Y-%m-%d %H:%M') %}
+        {% set reminder_datetime = event_datetime - timedelta(days=2) %}
+        {% set rounded_reminder_datetime = reminder_datetime.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1 if reminder_datetime.minute >= 30 else 0) %}
+        {% set now = now() %}
+        {% set rounded_now = (now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1 if now.minute >= 30 else 0)).replace(tzinfo=None) %}
+        {{ rounded_reminder_datetime == rounded_now }}
+  condition:
+    condition: and
+    conditions:
+      - condition: template
+        value_template: >
+          {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}
+      - condition: template
+        value_template: >
+          {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < 7 }}
+  action:
+    - service: whatsapp.send_message
+      continue_on_error: true
+      data_template:
+        clientId: default
+        to: !secret whatsapp_volleyball_tischabwischer
+        body:
+          text: >
+            Achtung! Es sind nur {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }} Zusagen für das Ligaspiel am
+            {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+            {%- set date = strptime(event['date'], '%Y-%m-%d') %}
+            {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
+            {% set weekday_number = date.weekday() %}
+            {{ weekday[weekday_number] }} um {{ event['time'] }} Uhr hinterlegt.
+            {% set accepted_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['accepted_players'] %}
+            {% if accepted_players %}
+
+            Zugesagt haben:
+
+            {{ accepted_players | join(', ') }}
+            {% endif %}
+
+            {% set declined_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['declined_players'] %}
+            {% if declined_players %}
+
+            Abgesagt haben:
+
+            {{ declined_players | join(', ') }}
+            {% endif %}
+
+            Bitte tragt euch dringend ein, ansonsten müssen wir das Spiel verschieben:
+
+            {{ event['link'] }}
 
 - id: kadermanager_participant_count_reminder
   alias: "Remind for Kadermanager participant count"
@@ -10922,7 +11068,7 @@
               conditions:
                 - condition: numeric_state
                   entity_id: sensor.smart_life_fabian_distance
-                  below: 30000
+                  below: 40000
                 - condition: state
                   entity_id: person.fabian
                   state: "home"
