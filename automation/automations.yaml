@@ -10857,15 +10857,16 @@
         {{ rounded_reminder_datetime == rounded_now }}
     - platform: template
       value_template: >
-        {% set event_date = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['date'] %}
-        {% set event_time = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['time'] %}
+        {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+        {% set event_date = event['date'] %}
+        {% set event_time = event['time'] %}
+        {% set event_type = event['type'] %}
         {% set event_datetime = strptime(event_date + ' ' + event_time, '%Y-%m-%d %H:%M') %}
-        {% set reminder_datetime = event_datetime - timedelta(days=1, hours=12) %}
+        {% set reminder_days = 1 if event_type != 'Spiel' else 3 %}
+        {% set reminder_datetime = event_datetime - timedelta(days=reminder_days) %}
         {% set rounded_reminder_datetime = reminder_datetime.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1 if reminder_datetime.minute >= 30 else 0) %}
-
         {% set now = now() %}
         {% set rounded_now = (now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1 if now.minute >= 30 else 0)).replace(tzinfo=None) %}
-
         {{ rounded_reminder_datetime == rounded_now }}
   condition:
     condition: and
@@ -11295,7 +11296,7 @@
 
 - id: remind_for_juz
   alias: "remind for juz"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: template
       value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - 111600) | round(-2) }}"
@@ -11349,7 +11350,7 @@
 
 - id: send_juz_mails_to_telegram
   alias: "send juz mails to telegram"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: sensor.juz_outlook
@@ -11411,7 +11412,7 @@
 
 - id: send_5freunde_mails_to_telegram
   alias: "send 5freunde mails to telegram"
-  initial_state: true
+  initial_state: false
   trigger:
     - platform: state
       entity_id: sensor.5freunde_outlook
