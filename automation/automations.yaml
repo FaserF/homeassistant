@@ -10586,10 +10586,25 @@
                     {%- set weekday_found = weekday[weekday_number] %}
                     {%- set weekday_number_tischabwischer = tischabwischer_date.weekday() %}
                     {%- set weekday_found_tischabwischer = weekday[weekday_number_tischabwischer] %}
+                    {% if states('sensor.dieliga_schedule_tsv_zorneding_ii') not in ['unknown', 'unavailable'] %}
+                    {%- set tischabwischer_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'completed_games') | default(0)) + 1 %}
+                    {%- set tischabwischer_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') | default(0) %}
+                    {%- set tischabwischer_schedule_text = tischabwischer_completed_games ~ ' von ' ~ tischabwischer_total_games %}
+                    {% endif %}
+                    {% if states('sensor.dieliga_schedule_tsv_zorneding_3') not in ['unknown', 'unavailable'] %}
+                    {%- set zorro_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'completed_games') | default(0)) + 1 %}
+                    {%- set zorro_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'total_games') | default(0) %}
+                    {%- set zorro_schedule_text = zorro_completed_games ~ ' von ' ~ zorro_total_games %}
+                    {% endif %}
 
-                    {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_event['title'] }} statt.
+                    {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_schedule_text }} {{ zorro_event['title'] }} statt.
                     Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.
-                    {% if zorro_event['in_count'] < 8 %}
+                    {% if 'Heim' in zorro_event['title'] %}
+                    {%- set min_player = 6 %}
+                    {% else %}
+                    {%- set min_player = 8 %}
+                    {% endif %}
+                    {% if zorro_event['in_count'] < min_player %}
 
 
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ zorro_event['link'] }}
@@ -10599,9 +10614,14 @@
                     {% endif %}
 
 
-                    Außerdem hat die zweite Mannschaft ebenfalls ein Ligaspiel am {{ weekday_found_tischabwischer }}: {{ tischabwischer_event['title'] }}.
+                    Außerdem hat die zweite Mannschaft ebenfalls ein Ligaspiel ({{tischabwischer_schedule_text}}) am {{ weekday_found_tischabwischer }}: {{ tischabwischer_event['title'] }}.
                     Bisherige Kadermanager Zusagen: {{ tischabwischer_event['in_count'] }}.
-                    {% if tischabwischer_event['in_count'] < 8 %}
+                    {% if 'Heim' in tischabwischer_event['title'] %}
+                    {%- set min_player = 6 %}
+                    {% else %}
+                    {%- set min_player = 7 %}
+                    {% endif %}
+                    {% if tischabwischer_event['in_count'] < min_player %}
 
 
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ tischabwischer_event['link'] }}
@@ -10680,13 +10700,30 @@
                     {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
                     {% set weekday_number = date.weekday() %}
                     {% set weekday_found = weekday[weekday_number] %}
-                    {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_event['title'] }} statt. Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.
+                    {% if states('sensor.dieliga_schedule_tsv_zorneding_3') not in ['unknown', 'unavailable'] %}
+                    {%- set zorro_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'completed_games') | default(0)) + 1 %}
+                    {%- set zorro_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'total_games') | default(0) %}
+                    {%- set zorro_schedule_text = zorro_completed_games ~ ' von ' ~ zorro_total_games %}
+                    {% endif %}
+                    {% if states('sensor.dieliga_scoreboard_tsv_zorneding_3') not in ['unknown', 'unavailable'] %}
+                    {%- set zorro_scoreboard = states('sensor.dieliga_scoreboard_tsv_zorneding_3') %}
+                    {%- set zorro_number_of_teams = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_3', 'teams') | length %}
+                    {%- set zorro_scoreboard_text = 'Unsere derzeitige Ligaplatzierung: ' ~ zorro_scoreboard ~ ' von ' ~ zorro_number_of_teams %}
+                    {% endif %}
+                    {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_schedule_text }} {{ zorro_event['title'] }} statt. Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.
 
-                    {% if zorro_event['in_count'] < 8 %}
+                    {% if 'Heim' in zorro_event['title'] %}
+                    {%- set min_player = 6 %}
+                    {% else %}
+                    {%- set min_player = 7 %}
+                    {% endif %}
+                    {% if zorro_event['in_count'] < min_player %}
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ zorro_event['link'] }}
                     {% else %}
                     Stimmt bitte zeitnah im Kadermanager ab: {{ zorro_event['link'] }}
-                    {% endif %}"
+                    {% endif %}
+
+                    {{ zorro_scoreboard_text }}"
             - choose:
                 - conditions:
                     - condition: template
@@ -10921,13 +10958,30 @@
                     {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
                     {% set weekday_number = date.weekday() %}
                     {% set weekday_found = weekday[weekday_number] %}
-                    {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] }} {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}
+                    {% if states('sensor.dieliga_schedule_tsv_zorneding_ii') not in ['unknown', 'unavailable'] %}
+                    {%- set tischabwischer_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'completed_games') | default(0)) + 1 %}
+                    {%- set tischabwischer_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') | default(0) %}
+                    {%- set tischabwischer_schedule_text = tischabwischer_completed_games ~ ' von ' ~ tischabwischer_total_games %}
+                    {% endif %}
+                    {% if states('sensor.dieliga_scoreboard_tsv_zorneding_ii') not in ['unknown', 'unavailable'] %}
+                    {%- set tischabwischer_scoreboard = states('sensor.dieliga_scoreboard_tsv_zorneding_ii') %}
+                    {%- set tischabwischer_number_of_teams = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_ii', 'teams') | length %}
+                    {%- set tischabwischer_scoreboard_text = 'Unsere derzeitige Ligaplatzierung: ' ~ tischabwischer_scoreboard ~ ' von ' ~ tischabwischer_number_of_teams %}
+                    {% endif %}
+                    {{ weekday_found }} ab {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['time'] }} Uhr findet {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] }} {{ tischabwischer_schedule_text }} {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] }} statt. Bisherige Kadermanager Zusagen: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}
 
-                    {% if state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < 8 %}
+                    {% if 'Heim' in state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['title'] %}
+                    {%- set min_player = 6 %}
+                    {% else %}
+                    {%- set min_player = 7 %}
+                    {% endif %}
+                    {% if state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < min_player %}
                     Es sind derzeit zu wenige Spieler mit Zusagen hinterlegt für ein Ligaspiel! Bitte tragt euch daher zeitnah ein: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
                     {% else %}
                     Stimmt bitte zeitnah im Kadermanager ab: {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['link'] }}
-                    {% endif %}"
+                    {% endif %}
+
+                    {{ tischabwischer_scoreboard_text }}"
             - choose:
                 - conditions:
                     - condition: template
@@ -11150,7 +11204,7 @@
             - condition: template
               value_template: >
                 {% set declined_players = state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] %}
-                {{ 'Anton' not in declined_players }}
+                {{ 'Anton Z' not in declined_players }}
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
