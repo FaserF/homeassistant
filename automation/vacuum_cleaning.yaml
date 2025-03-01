@@ -277,7 +277,7 @@
   alias: "Trigger a full dust bin reminder"
   trigger:
     - platform: state
-      entity_id: automation.trigger_full_dust_bin_reminder
+      entity_id: automation.trigger_a_full_dust_bin_reminder
       to: "on"
   action:
     - choose:
@@ -375,7 +375,7 @@
               value_template: "{{ states('counter.vacuum_runs')|float % 30 == 0 }}"
           sequence:
             - service: automation.trigger
-              entity_id: automation.trigger_full_dust_bin_reminder
+              entity_id: automation.trigger_a_full_dust_bin_reminder
         - conditions:
             - condition: template
               value_template: "{{ states('counter.vacuum_runs')|float % 30 != 0 }}"
