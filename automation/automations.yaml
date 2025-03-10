@@ -232,7 +232,7 @@
                   sequence:
                     - service: light.turn_on
                       data:
-                        entity_id: light.mibedsidelamp2_22e2
+                        entity_id: light.yeelink_bslamp2_22e2_light
     - choose:
         - conditions:
             - condition: sun
@@ -3961,7 +3961,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.mibedsidelamp2_22e2
+                  - light.yeelink_bslamp2_22e2_light
                 brightness: 2
             - delay: "00:02:30"
             - service: automation.trigger
@@ -4024,7 +4024,7 @@
     #  - service: light.turn_off
     #    data:
     #      entity_id:
-    #        - light.mibedsidelamp2_22e2
+    #        - light.yeelink_bslamp2_22e2_light
     - delay: "00:20:00"
     - service: switch.turn_on
       data:
@@ -4057,7 +4057,7 @@
       - condition: not
         conditions:
           - condition: state
-            entity_id: light.mibedsidelamp2_22e2
+            entity_id: light.yeelink_bslamp2_22e2_light
             state: "off"
           - condition: state
             entity_id: light.leds_tisch
@@ -4097,26 +4097,26 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: light.mibedsidelamp2_22e2
+              entity_id: light.yeelink_bslamp2_22e2_light
               state: "on"
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: light.mibedsidelamp2_22e2
+                  entity_id: light.yeelink_bslamp2_22e2_light
                   attribute: brightness
                   state: "255"
           sequence:
             - service: light.turn_on
-              entity_id: light.mibedsidelamp2_22e2
+              entity_id: light.yeelink_bslamp2_22e2_light
               data_template:
-                brightness: "{{states.light.mibedsidelamp2_22e2.attributes.brightness + 5}}"
+                brightness: "{{states.light.yeelink_bslamp2_22e2_light.attributes.brightness + 5}}"
     - choose:
         - conditions:
             - condition: state
               entity_id: light.leds_tisch
               state: "on"
             - condition: state
-              entity_id: light.mibedsidelamp2_22e2
+              entity_id: light.yeelink_bslamp2_22e2_light
               state: "on"
             - condition: not
               conditions:
@@ -4125,7 +4125,7 @@
                   attribute: brightness
                   state: "255"
                 - condition: state
-                  entity_id: light.mibedsidelamp2_22e2
+                  entity_id: light.yeelink_bslamp2_22e2_light
                   attribute: brightness
                   state: "255"
           sequence:
@@ -4362,12 +4362,12 @@
             - condition: not
               conditions:
                 - condition: state
-                  entity_id: light.mibedsidelamp2_22e2
+                  entity_id: light.yeelink_bslamp2_22e2_light
                   state: unavailable
           sequence:
             - service: light.turn_on
               data:
-                entity_id: light.mibedsidelamp2_22e2
+                entity_id: light.yeelink_bslamp2_22e2_light
                 brightness: 255
                 color_temp: 279
     - service: light.turn_off
@@ -4558,7 +4558,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.mibedsidelamp2_22e2
+                  - light.yeelink_bslamp2_22e2_light
                 transition: 2
     - choose:
         - conditions:
@@ -4570,7 +4570,7 @@
               data:
                 entity_id:
                   - light.leds_tisch
-                  - light.mibedsidelamp2_22e2
+                  - light.yeelink_bslamp2_22e2_light
                 transition: 2
 
 - id: turn_off_lights_in_rooms_when_bright_outside
@@ -4935,7 +4935,6 @@
             3. {{ sorted_days_sued[2].day }} ({{ sorted_days_sued[2].value }}% - Tag: {{ sorted_days_sued[2].day_avg }}%)
 
           - **Wochenende Süd**: {{ sorted_days_weekend_sued[0].day }} (Tag: {{ sorted_days_weekend_sued[0].value }}%)
-
     - service: telegram_bot.send_poll
       data_template:
         target: !secret telegram_chat_bouldern
@@ -7778,10 +7777,10 @@
                 - condition: or
                   conditions:
                     - condition: state
-                      entity_id: light.mibedsidelamp2_22e2
+                      entity_id: light.yeelink_bslamp2_22e2_light
                       state: "off"
                     - condition: state
-                      entity_id: light.mibedsidelamp2_22e2
+                      entity_id: light.yeelink_bslamp2_22e2_light
                       state: "unavailable"
                 - condition: or
                   conditions:
@@ -7809,7 +7808,7 @@
               data:
                 entity_id:
                   - light.bett_gluhbirne
-                  - light.mibedsidelamp2_22e2
+                  - light.yeelink_bslamp2_22e2_light
                 brightness: 255
                 color_temp: 225
                 transition: 2
@@ -7835,7 +7834,7 @@
                   for:
                     seconds: 2
                 - condition: state
-                  entity_id: light.mibedsidelamp2_22e2
+                  entity_id: light.yeelink_bslamp2_22e2_light
                   state: "on"
                   for:
                     seconds: 2
@@ -9298,7 +9297,7 @@
   initial_state: true
   trigger:
     - platform: numeric_state
-      entity_id: sensor.xiaomi_airfryer_remaining
+      entity_id: sensor.careli_maf05a_d482_left_time
       below: 5
   condition:
     - condition: template
@@ -9317,10 +9316,10 @@
           sequence:
             - service: notify.telegram_samuel
               data_template:
-                message: "Der Airfryer ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
+                message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
             - service: notify.telegram_fabian
               data_template:
-                message: "Der Airfryer ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
+                message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
     - choose:
         - conditions:
             - condition: state
@@ -9348,7 +9347,7 @@
                 media_player_entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_lautsprecher
-                message: "Der Airfryer ist in {{ states.sensor.xiaomi_airfryer_remaining.state }} Minuten fertig."
+                message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
 
 - id: kitchen_timer_reminder
   alias: Kitchen Timer Reminder

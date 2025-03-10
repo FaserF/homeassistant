@@ -139,8 +139,6 @@ logger:
     custom_components.prismatik.prismatik:
       - "Could not connect to Prismatik at*"
       - "Could not connect to Prismatik at 192.168.178.16:3636"
-    custom_components.xiaomi_miio_cooker:
-      - "Got exception while fetching the state: Unable to discover the device 192.168.178.220"
     custom_components.miwifi.updater:
       - "connecting to router (attempt #10 of 10): LuciConnectionException*"
       - "Error connecting to router (attempt #$ of 10): LuciConnectionException*"
@@ -455,7 +453,7 @@ google_assistant:
     light.leds_tisch:
       expose: true
       room: Fabians Zimmer
-    light.mibedsidelamp2_22e2:
+    light.yeelink_bslamp2_22e2_light:
       name: Bettlicht
       expose: true
       room: Fabians Zimmer
@@ -578,7 +576,7 @@ google_assistant:
       expose: true
       room: Keller
     ## Küche
-    switch.xiaomi_miio_cooker:
+    switch.chunmi_eh1_f9ef_auto_keep_warm:
       expose: true
       room: Küche
     switch.kuchengerate:
@@ -587,6 +585,11 @@ google_assistant:
       aliases:
         - Toaster
         - Wasserkocher
+    button.careli_maf05a_d482_start_cook:
+      expose: false
+      room: Küche
+      aliases:
+        - Heißluftfriteuse
 
 alexa:
   smart_home:
@@ -911,11 +914,11 @@ waste_collection_schedule:
         - type: Gelber Sack
           icon: mdi:recycle
 
-xiaomi_miio_cooker:
-  name: Xiaomi Rice Cooker
-  host: 192.168.178.61
-  token: !secret rice_cooker_token
-  model: chunmi.cooker.eh1
+#xiaomi_miio_cooker:
+#  name: Xiaomi Rice Cooker
+#  host: 192.168.178.61
+#  token: !secret rice_cooker_token
+#  model: chunmi.cooker.eh1
 
 #o365:
 #  accounts:
