@@ -40,38 +40,38 @@
 #     scan_interval: 86400
 - platform: template
   sensors:
-#    outdated_tasmota_devices:
-#      friendly_name: "Outdated Tasmota Devices"
-#      unique_id: "outdated_tasmota_devices"
-#      value_template: >
-#        {% set latest_tag = states('sensor.arendst_tasmota_latest_tag') %}
-#        {% if latest_tag != 'unavailable' and latest_tag is not none %}
-#          {% set latest_version = latest_tag[1:] %}  # "v" entfernen
-#          {% set latest_parts = latest_version.split('.') %}
-#          {% set outdated_count = 0 %}
+    #    outdated_tasmota_devices:
+    #      friendly_name: "Outdated Tasmota Devices"
+    #      unique_id: "outdated_tasmota_devices"
+    #      value_template: >
+    #        {% set latest_tag = states('sensor.arendst_tasmota_latest_tag') %}
+    #        {% if latest_tag != 'unavailable' and latest_tag is not none %}
+    #          {% set latest_version = latest_tag[1:] %}  # "v" entfernen
+    #          {% set latest_parts = latest_version.split('.') %}
+    #          {% set outdated_count = 0 %}
 
-#          {%- for entity in integration_entities('tasmota') -%}
-#            {% if device_attr(entity, 'sw_version') %}
-#              {% set firmware_version = device_attr(entity, 'sw_version') %}
-#              {% if latest_version > firmware_version %}
-#                {% set outdated_count = outdated_count + 1 %}
-#              {% endif %}
-#            {% endif %}
-#          {% endfor %}
+    #          {%- for entity in integration_entities('tasmota') -%}
+    #            {% if device_attr(entity, 'sw_version') %}
+    #              {% set firmware_version = device_attr(entity, 'sw_version') %}
+    #              {% if latest_version > firmware_version %}
+    #                {% set outdated_count = outdated_count + 1 %}
+    #              {% endif %}
+    #            {% endif %}
+    #          {% endfor %}
 
-#          {%- for entity in integration_entities('mqtt') -%}
-#            {% if device_attr(entity, 'sw_version') %}
-#              {% set firmware_version = device_attr(entity, 'sw_version') %}
-#              {% if latest_version > firmware_version %}
-#                {% set outdated_count = outdated_count + 1 %}
-#              {% endif %}
-#            {% endif %}
-#          {% endfor %}
+    #          {%- for entity in integration_entities('mqtt') -%}
+    #            {% if device_attr(entity, 'sw_version') %}
+    #              {% set firmware_version = device_attr(entity, 'sw_version') %}
+    #              {% if latest_version > firmware_version %}
+    #                {% set outdated_count = outdated_count + 1 %}
+    #              {% endif %}
+    #            {% endif %}
+    #          {% endfor %}
 
-#          {{ outdated_count }}
-#        {% else %}
-#          0
-#        {% endif %}
+    #          {{ outdated_count }}
+    #        {% else %}
+    #          0
+    #        {% endif %}
 
     average_house_humidity:
       friendly_name: "Durchschn. Luftfeuchtigkeit"
