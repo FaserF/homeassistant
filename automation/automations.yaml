@@ -674,10 +674,37 @@
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_bouldering_parking.attributes.last_triggered) | int > 18000 }}"
   action:
-    - service: telegram_bot.send_message
-      data:
-        target: !secret telegram_chat_bouldern
-        message: "Denkt an den [Check-In zum parken](https://fwd.qr-fwd-qr.com/?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjZlYTgwNTA1LWE0ZTMtNGE3NC1hNzA5LWQwZjM1NmI2YzVhNCJ9.mfY_qEfn6VYYZrG8yLUcEH4djoYoAlwXC9Ih1BoPdp8)"
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: person.fabian
+              state: "Boulderwelt München Süd"
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
+                message: >
+                  Denkt an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
+        - conditions:
+            - condition: state
+              entity_id: person.kai
+              state: "Boulderwelt München Süd"
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_kai
+                message: >
+                  Denkt an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
+        - conditions:
+            - condition: state
+              entity_id: person.adrian
+              state: "Boulderwelt München Süd"
+          sequence:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_adrian
+                message: >
+                  Denkt an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
 
 #  - id: notify_if_someone_joined_lan_play_server
 #    alias: Notify if someone joined lan play server
@@ -874,21 +901,6 @@
                       data_template:
                         target: !secret telegram_chat_fabian
                         message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
-            - choose:
-                - conditions:
-                    - condition: or
-                      conditions:
-                        - condition: state
-                          entity_id: person.samuel
-                          state: "home"
-                        - condition: numeric_state
-                          entity_id: sensor.smart_life_samuel_distance
-                          below: 10
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data_template:
-                        target: !secret telegram_chat_samuel
-                        message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
       default:
         - service: light.turn_off
           data:
@@ -910,20 +922,6 @@
                 - service: telegram_bot.send_message
                   data_template:
                     target: !secret telegram_chat_fabian
-                    message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
-            - conditions:
-                - condition: or
-                  conditions:
-                    - condition: state
-                      entity_id: person.samuel
-                      state: "home"
-                    - condition: numeric_state
-                      entity_id: sensor.smart_life_samuel_distance
-                      below: 100
-              sequence:
-                - service: telegram_bot.send_message
-                  data_template:
-                    target: !secret telegram_chat_samuel
                     message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
 
 - id: turn_off_devices_at_night_notify
