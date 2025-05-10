@@ -657,54 +657,56 @@
       data:
         entity_id: switch.schloss
 
-- id: remind_for_bouldering_parking
-  alias: "Remind for bouldering parking"
+- id: remind_for_bouldering_parking_fabian
+  alias: "Remind for bouldering parking (Fabian)"
   initial_state: true
   trigger:
     - platform: state
       entity_id: person.fabian
       to: "Boulderwelt München Süd"
+  condition:
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_bouldering_parking_fabian.attributes.last_triggered) | int > 18000 }}"
+  action:
+    - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_fabian
+        message: >
+          Denk an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
+
+- id: remind_for_bouldering_parking_kai
+  alias: "Remind for bouldering parking (Kai)"
+  initial_state: true
+  trigger:
     - platform: state
       entity_id: person.kai
       to: "Boulderwelt München Süd"
+  condition:
+    - condition: template
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_bouldering_parking_kai.attributes.last_triggered) | int > 18000 }}"
+  action:
+    - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_kai
+        message: >
+          Denk an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
+
+- id: remind_for_bouldering_parking_adrian
+  alias: "Remind for bouldering parking (Adrian)"
+  initial_state: true
+  trigger:
     - platform: state
       entity_id: person.adrian
       to: "Boulderwelt München Süd"
   condition:
     - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_bouldering_parking.attributes.last_triggered) | int > 18000 }}"
+      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_bouldering_parking_adrian.attributes.last_triggered) | int > 18000 }}"
   action:
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.fabian
-              state: "Boulderwelt München Süd"
-          sequence:
-            - service: telegram_bot.send_message
-              data:
-                target: !secret telegram_chat_fabian
-                message: >
-                  Denkt an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
-        - conditions:
-            - condition: state
-              entity_id: person.kai
-              state: "Boulderwelt München Süd"
-          sequence:
-            - service: telegram_bot.send_message
-              data:
-                target: !secret telegram_chat_kai
-                message: >
-                  Denkt an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
-        - conditions:
-            - condition: state
-              entity_id: person.adrian
-              state: "Boulderwelt München Süd"
-          sequence:
-            - service: telegram_bot.send_message
-              data:
-                target: !secret telegram_chat_adrian
-                message: >
-                  Denkt an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
+    - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_adrian
+        message: >
+          Denk an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
 
 #  - id: notify_if_someone_joined_lan_play_server
 #    alias: Notify if someone joined lan play server
