@@ -4603,9 +4603,11 @@
         target: !secret telegram_spieletreff
         question: "Wo treffen wir uns?"
         options:
-          - "Fabi & Samuel"
-          - "Kai & Adri"
+          - "Fabi"
+          - "Adri & Kai"
           - "Kassandra"
+          - "Jani & Samuel"
+          - "Daniel & Michelle"
           - "JUZ (sofern frei)"
           - "Tropic Bar Zorneding"
           - "Wo anders (Schreiben wo!)"
