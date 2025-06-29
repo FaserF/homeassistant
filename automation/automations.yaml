@@ -351,7 +351,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
-                        target: !secret telegram_chat_samuel
+                        target: !secret telegram_chat_samuel_dummy
                         inline_keyboard:
                           - "Erledigt:/telegramdustbindone"
     - choose:
@@ -400,7 +400,7 @@
                       data_template:
                         message: >
                           Morgen {% if states.sensor.bioabfall.state == "Morgen" %}wird die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}wird das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}wird die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}werden die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
-                        target: !secret telegram_chat_samuel
+                        target: !secret telegram_chat_samuel_dummy
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
     - choose:
@@ -433,7 +433,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: Die Waschmaschine muss noch ausgeräumt werden.
-                        target: !secret telegram_chat_samuel
+                        target: !secret telegram_chat_samuel_dummy
                         inline_keyboard:
                           - "Erledigt:/telegramwasherdone"
     #- choose:
@@ -468,7 +468,7 @@
     #                - service: telegram_bot.send_message
     #                  data:
     #                    message: Bitte die Pflanzen gießen.
-    #                    target: !secret telegram_chat_samuel
+    #                    target: !secret telegram_chat_samuel_dummy
     #                    inline_keyboard:
     #                      - "Erledigt:/telegrampouringdone"
     - choose:
@@ -506,7 +506,7 @@
                           James hatte ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
                           Die Reinigung wurde daher unterbrochen.
-                        target: !secret telegram_chat_samuel
+                        target: !secret telegram_chat_samuel_dummy
 
     # - choose:
     #     - conditions:
@@ -813,7 +813,7 @@
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
-                        target: !secret telegram_chat_samuel
+                        target: !secret telegram_chat_samuel_dummy
                         message: >
                           Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
 
@@ -840,7 +840,7 @@
               - "Abbruch:/cancellight, Okay:/telegramno"
         - service: telegram_bot.send_message
           data_template:
-            target: !secret telegram_chat_samuel
+            target: !secret telegram_chat_samuel_dummy
             message: >
               Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
 
@@ -996,7 +996,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: >
                   Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
 
@@ -1080,7 +1080,7 @@
                   sequence:
                     - service: telegram_bot.send_message
                       data_template:
-                        target: !secret telegram_chat_samuel
+                        target: !secret telegram_chat_samuel_dummy
                         message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
         - conditions:
@@ -1497,7 +1497,7 @@
         message: "Gast Modus wuremand vermutlich übernachtet. Automationen in Samuels Zimmer sind dadurch eingeschränkt."
     - service: telegram_bot.send_message
       data_template:
-        target: !secret telegram_chat_samuel
+        target: !secret telegram_chat_samuel_dummy
         message: "Gast Modus wurde aktiviert, da jemand vermutlich übernachtet. Automationen in Samuels Zimmer sind dadurch eingeschränkt."
 
 - id: deactivate_guest_mode_if_no_guest_is_here
@@ -4368,7 +4368,7 @@
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
       data_template:
-        target: !secret telegram_chat_samuel
+        target: !secret telegram_chat_samuel_dummy
         message: "Thermostate wurden ausgeschaltet, da es {{ states.weather.ebersberg_ebersberg.attributes.temperature }}° hat und sonnig ist."
         disable_notification: true
         inline_keyboard:
@@ -4425,7 +4425,7 @@
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
       data_template:
-        target: !secret telegram_chat_samuel
+        target: !secret telegram_chat_samuel_dummy
         message: "Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C und morgen {{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] }} °C hat. Dies wurde nicht automatisch gemacht!"
         disable_notification: true
         inline_keyboard:
@@ -4611,6 +4611,34 @@
           - "JUZ (sofern frei)"
           - "Tropic Bar Zorneding"
           - "Wo anders (Schreiben wo!)"
+        is_anonymous: false
+        allows_multiple_answers: true
+        disable_notification: true
+
+- id: telegram_squash
+  alias: "remind for Squash"
+  initial_state: false
+  trigger:
+    - platform: time
+      at: "19:01:00"
+  condition:
+    - condition: time
+      weekday:
+        - sun
+  action:
+    - service: telegram_bot.send_poll
+      data_template:
+        target: !secret telegram_squash
+        question: "Wann wollen wir nächste Woche Squash spielen?"
+        options:
+          - "Montag"
+          - "Dienstag"
+          - "Mittwoch"
+          - "Donnerstag"
+          - "Freitag"
+          - "Samstag"
+          - "Sonntag"
+          - "Kann in dieser Woche gar nicht"
         is_anonymous: false
         allows_multiple_answers: true
         disable_notification: true
@@ -5150,7 +5178,7 @@
                 message: Die Zeitumstellung ist morgen! Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: Die Zeitumstellung ist morgen! Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
         - conditions:
@@ -5164,7 +5192,7 @@
                 message: Die Zeitumstellung ist morgen! Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: Die Zeitumstellung ist morgen! Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
 
@@ -5188,7 +5216,7 @@
           {%- endif -%}
     - service: telegram_bot.send_message
       data_template:
-        target: !secret telegram_chat_samuel
+        target: !secret telegram_chat_samuel_dummy
         disable_notification: true
         message: >
           Die Zeitumstellung hat stattgefunden!
@@ -5844,7 +5872,7 @@
             - service: telegram_bot.send_message
               data:
                 message: Bitte die Pflanzen gießen.
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 inline_keyboard:
                   - "Erledigt:/telegrampouringdone"
 
@@ -5900,7 +5928,7 @@
               data_template:
                 message: >
                   Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 inline_keyboard:
                   - "Erledigt:/telegramwastedone"
     - choose:
@@ -6019,7 +6047,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
                   {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
@@ -6384,7 +6412,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: >
                   Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6463,7 +6491,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
@@ -6540,7 +6568,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: >
                   *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
@@ -6682,7 +6710,7 @@
     - service: telegram_bot.send_message
       data_template:
         title: "Fabi Akku unter 5%"
-        target: !secret telegram_chat_samuel
+        target: !secret telegram_chat_samuel_dummy
         message: ""
 
 - id: mute_cast_spotify_ads
@@ -7945,7 +7973,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: >
                   Achtung, sehr hohe Luftfeuchtigkeit:{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %}
 
@@ -8102,7 +8130,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
                   - "Dauer:/remaining_time"
@@ -8237,7 +8265,7 @@
     #      sequence:
     #        - service: telegram_bot.send_message
     #          data_template:
-    #            target: !secret telegram_chat_samuel
+    #            target: !secret telegram_chat_samuel_dummy
     #            message: "Bitte Kohle wenden."
     #  default:
     #    - service: telegram_bot.send_message
@@ -8324,7 +8352,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: "Der Eisschlauch kann schon mal geholt werden."
     - delay: "00:02:00"
     - service: switch.turn_off
@@ -8452,7 +8480,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
       #  ELSE only notify fabian
       default:
@@ -9601,7 +9629,7 @@
         message: "Übernachtet heute ein Gast? Gast Modus wurde automatisch eingeschaltet."
     - service: telegram_bot.send_message
       data_template:
-        target: !secret telegram_chat_samuel
+        target: !secret telegram_chat_samuel_dummy
         message: "Übernachtet heute ein Gast? Gast Modus wurde automatisch eingeschaltet."
 
 - id: set_climate_living_room_if_keller_left
@@ -10905,7 +10933,7 @@
           sequence:
             - service: telegram_bot.send_message
               data_template:
-                target: !secret telegram_chat_samuel
+                target: !secret telegram_chat_samuel_dummy
                 data:
                   disable_web_page_preview: true
                 message: >

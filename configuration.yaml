@@ -206,6 +206,7 @@ telegram_bot:
       - !secret telegram_chat_anna
       - !secret telegram_chat_hannah
       - !secret telegram_chat_janina
+      - !secret telegram_squash
 
 media_source:
 
