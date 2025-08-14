@@ -10355,9 +10355,9 @@
                     {%- set tischabwischer_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') | default(0) %}
                     {%- set tischabwischer_schedule_text = tischabwischer_completed_games ~ ' von ' ~ tischabwischer_total_games %}
                     {% endif %}
-                    {% if states('sensor.dieliga_schedule_tsv_zorneding_3') not in ['unknown', 'unavailable'] %}
-                    {%- set zorro_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'completed_games') | default(0)) + 1 %}
-                    {%- set zorro_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'total_games') | default(0) %}
+                    {% if states('sensor.dieliga_schedule_tsv_zorneding_iii') not in ['unknown', 'unavailable'] %}
+                    {%- set zorro_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'completed_games') | default(0)) + 1 %}
+                    {%- set zorro_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') | default(0) %}
                     {%- set zorro_schedule_text = zorro_completed_games ~ ' von ' ~ zorro_total_games %}
                     {% endif %}
 
@@ -10464,14 +10464,14 @@
                     {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'] -%}
                     {% set weekday_number = date.weekday() %}
                     {% set weekday_found = weekday[weekday_number] %}
-                    {% if states('sensor.dieliga_schedule_tsv_zorneding_3') not in ['unknown', 'unavailable'] %}
-                    {%- set zorro_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'completed_games') | default(0)) + 1 %}
-                    {%- set zorro_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_3', 'total_games') | default(0) %}
+                    {% if states('sensor.dieliga_schedule_tsv_zorneding_iii') not in ['unknown', 'unavailable'] %}
+                    {%- set zorro_completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'completed_games') | default(0)) + 1 %}
+                    {%- set zorro_total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') | default(0) %}
                     {%- set zorro_schedule_text = zorro_completed_games ~ ' von ' ~ zorro_total_games %}
                     {% endif %}
-                    {% if states('sensor.dieliga_scoreboard_tsv_zorneding_3') not in ['unknown', 'unavailable'] %}
-                    {%- set zorro_scoreboard = states('sensor.dieliga_scoreboard_tsv_zorneding_3') %}
-                    {%- set zorro_number_of_teams = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_3', 'teams') | length %}
+                    {% if states('sensor.dieliga_scoreboard_tsv_zorneding_iii') not in ['unknown', 'unavailable'] %}
+                    {%- set zorro_scoreboard = states('sensor.dieliga_scoreboard_tsv_zorneding_iii') %}
+                    {%- set zorro_number_of_teams = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_iii', 'teams') | length %}
                     {%- set zorro_scoreboard_text = 'Unsere derzeitige Ligaplatzierung: ' ~ zorro_scoreboard ~ ' von ' ~ zorro_number_of_teams %}
                     {% endif %}
                     {{ weekday_found }} ab {{ zorro_event['time'] }} Uhr findet {{ zorro_event['type'] }} {{ zorro_schedule_text }} {{ zorro_event['title'] }} statt. Bisherige Kadermanager Zusagen: {{ zorro_event['in_count'] }}.

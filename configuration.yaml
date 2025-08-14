@@ -156,13 +156,13 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
-  # logs:
+  logs:
+    custom_components.chefkoch_ha: debug
   #   custom_components.xiaomi_airfryer: debug
   #   custom_components.deutschebahn: debug
   #   custom_components.rewe: debug
   #   custom_components.foodsharing: debug
   #   custom_components.dwd_illuminance: debug
-  #   custom_components.chefkoch_ha: debug
   #   custom_components.kadermanager: debug
   #   custom_components.boulderwelt: debug
   #   custom_components.mvg: debug
@@ -174,39 +174,6 @@ logger:
 
 # Track the sun
 sun:
-
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_bot_api
-    allowed_chat_ids:
-      - !secret telegram_chat_fabian
-      - !secret telegram_chat_adrian
-      - !secret telegram_chat_kai
-      - !secret telegram_chat_flo
-      - !secret telegram_chat_maxi
-      - !secret telegram_chat_fabio
-      - !secret telegram_chat_yannick
-      - !secret telegram_chat_lars
-      - !secret telegram_chat_5friends
-      - !secret telegram_chat_juz_leiter
-      - !secret telegram_chat_afk
-      - !secret telegram_chat_polygon
-      - !secret telegram_chat_jutta
-      - !secret telegram_chat_juz_group
-      - !secret telegram_chat_juz_mail
-      - !secret telegram_chat_bouldern
-      - !secret telegram_spieletreff
-      - !secret telegram_foodsharing
-      - !secret telegram_foodsharing_muc
-      - !secret telegram_foodsharing_wue
-      - !secret telegram_volleyball
-      - !secret telegram_chat_michelle
-      - !secret telegram_chat_samuel
-      - !secret telegram_chat_daniel
-      - !secret telegram_chat_anna
-      - !secret telegram_chat_hannah
-      - !secret telegram_chat_janina
-      - !secret telegram_squash
 
 media_source:
 
