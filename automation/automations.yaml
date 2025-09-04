@@ -73,7 +73,7 @@
                 # data:
                 #   inline_keyboard:
                 #     - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
-            # - service: notify.telegram_samuel
+            # - service: notify.telegram_fabian
             #   data:
             #     message: "Keiner ist mehr zu Hause. samuel-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
             #     data:
@@ -318,7 +318,7 @@
                     - condition: template
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
                   sequence:
-                    - service: notify.telegram_samuel
+                    - service: notify.telegram_fabian
                       data_template:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
     - choose:
@@ -2410,7 +2410,7 @@
         - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
-        - service: notify.telegram_samuel
+        - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
 
@@ -2466,7 +2466,7 @@
         - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen."
-        - service: notify.telegram_samuel
+        - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster in Fabians Zimmer zu schließen."
 
@@ -2541,7 +2541,7 @@
         - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
-        - service: notify.telegram_samuel
+        - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster im Bad zu schließen."
 
@@ -2598,7 +2598,7 @@
         - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster in Samuels Zimmer zu schließen."
-        - service: notify.telegram_samuel
+        - service: notify.telegram_fabian
           data:
             message: "Es wurde vermutlich vergessen das Fenster in Samuels Zimmer zu schließen."
 
@@ -2668,7 +2668,7 @@
                               entity_id: person.samuel
                               state: home
                           sequence:
-                            - service: notify.telegram_samuel
+                            - service: notify.telegram_fabian
                               data:
                                 message: "Das Fenster im Bad kann wieder geschlossen werden."
       default:
@@ -2746,7 +2746,7 @@
                       entity_id: media_player.samuels_lautsprecher
                       state: "off"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster im Bad kann wieder geschlossen werden."
             - conditions:
@@ -2812,7 +2812,7 @@
                       entity_id: media_player.kuche_lautsprecher
                       state: "idle"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster im Bad kann wieder geschlossen werden."
             - conditions:
@@ -2939,7 +2939,7 @@
                                   entity_id: person.fabian
                                   state: home
                           sequence:
-                            - service: notify.telegram_samuel
+                            - service: notify.telegram_fabian
                               data:
                                 message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
                     - choose:
@@ -2972,7 +2972,7 @@
                       entity_id: person.fabian
                       state: "home"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
         - choose:
@@ -3011,7 +3011,7 @@
                       entity_id: media_player.kuche_lautsprecher
                       state: "idle"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster in Fabians Zimmer kann wieder geschlossen werden."
             - conditions:
@@ -3157,7 +3157,7 @@
                               entity_id: person.samuel
                               state: home
                           sequence:
-                            - service: notify.telegram_samuel
+                            - service: notify.telegram_fabian
                               data:
                                 message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
       default:
@@ -3218,7 +3218,7 @@
                       entity_id: media_player.samuels_lautsprecher
                       state: "off"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
             - conditions:
@@ -3282,7 +3282,7 @@
                       entity_id: media_player.kuche_lautsprecher
                       state: "idle"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
             - conditions:
@@ -3384,7 +3384,7 @@
                               entity_id: person.samuel
                               state: home
                           sequence:
-                            - service: notify.telegram_samuel
+                            - service: notify.telegram_fabian
                               data:
                                 message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
       default:
@@ -3470,7 +3470,7 @@
                       entity_id: media_player.kuche_lautsprecher
                       state: "idle"
               sequence:
-                - service: notify.telegram_samuel
+                - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster in Samuels Zimmer kann wieder geschlossen werden."
             - conditions:
@@ -5713,7 +5713,7 @@
                   entity_id: sensor.steckerleiste_samuel_energy_power
                   above: 20
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "Der PC war noch an, obwohl du nicht mehr zu Hause bist. Der Schreibtischstrom wurde nun dennoch ausgeschaltet."
     - service: switch.turn_off
@@ -5783,14 +5783,14 @@
             - service: notify.telegram_fabian
               data:
                 message: "Abwesend Modus wurde aktiviert, da keiner daheim ist. Der Kühlschrank ist allerdings noch an, bitte ausschalten, falls 7 Tage oder mehr nicht in Verwendung."
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "Abwesend Modus wurde aktiviert, da keiner daheim ist. Der Kühlschrank ist allerdings noch an, bitte ausschalten, falls 7 Tage oder mehr nicht in Verwendung."
       default:
         - service: notify.telegram_fabian
           data:
             message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
-        - service: notify.telegram_samuel
+        - service: notify.telegram_fabian
           data:
             message: "Abwesend Modus wurde aktiviert, da keiner daheim ist."
     - service: input_boolean.turn_on
@@ -7107,7 +7107,7 @@
           KOMPLETT
           {% endif %}
           leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen & Temperatureinstellungen funktionieren so lange nur eingeschränkt.
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data_template:
         message: >
           Die Batterie im Thermostat
@@ -7349,7 +7349,7 @@
 #        entity_id: device_tracker.md3f9bmc
 #        state: home
 #    action:
-#      - service: notify.telegram_samuel
+#      - service: notify.telegram_fabian
 #        data:
 #          message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
@@ -8647,7 +8647,7 @@
         entity_id: switch.waschmaschine
         state: "on"
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Die Waschmaschine wurde vor 6 Stunden eingeschaltet aber die Automation nicht gestartet. Fehler und Wäsche wurde vergessen?"
     - service: notify.telegram_fabian
@@ -8714,7 +8714,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "Die Waschmaschine wurde gestartet. Wähle das Waschprogramm aus um eine Zeit zu erhalten, wann die Waschmaschine fertig ist:"
                 data:
@@ -8813,7 +8813,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "Die Waschmaschine ist fertig. Bitte ausräumen."
                 data:
@@ -8934,7 +8934,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data_template:
                 message: "Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig."
             - service: notify.telegram_fabian
@@ -8987,7 +8987,7 @@
     - service: switch.turn_on
       data:
         entity_id: switch.xiaomi_miio_cooker
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data_template:
         message: "Der Reiskocher wurde automatisch angeschaltet im Programm {{ states.input_select.rice_cooker_program.state }}."
     - service: notify.telegram_fabian
@@ -9079,7 +9079,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data_template:
                 message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
             - service: notify.telegram_fabian
@@ -9146,7 +9146,7 @@
               entity_id: person.samuel
               state: home
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "Der Timer in der Küche ist in {{ states.sensor.kuche_lautsprecher_timers.state }} Minuten fertig."
     - choose:
@@ -9360,7 +9360,7 @@
               data_template:
                 media_player_entity_id: media_player.fabians_lautsprecher
                 message: "Samuel, du hast die Pille vergessen"
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Du hast die Pille vergessen!"
     - service: notify.mobile_app_samuel_iphone
@@ -9411,7 +9411,7 @@
               data_template:
                 media_player_entity_id: media_player.fabians_lautsprecher
                 message: "Samuel, du hast die Pille vergessen"
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Du hast die Pille vergessen!"
     - service: notify.mobile_app_samuel_iphone
@@ -9761,7 +9761,7 @@
           entity_id: person.fabian
           state: "Arbeit Fabi"
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
@@ -9798,7 +9798,7 @@
           entity_id: person.fabian
           state: "Arbeit Fabi"
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
@@ -9832,7 +9832,7 @@
           entity_id: person.fabian
           state: "Arbeit Fabi"
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
@@ -10072,7 +10072,7 @@
                             volume_level: >
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                             entity_id: media_player.wohnzimmer_uhr
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause von Starnberg und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
 
@@ -10096,7 +10096,7 @@
       entity_id: sensor.smart_life_samuel_distance
       below: 35000
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause von Gilching und kommt voraussichtlich in 1,25 Stunden nach Hause."
 
@@ -10118,7 +10118,7 @@
       entity_id: sensor.smart_life_samuel_distance
       below: 35000
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause von Gräfelfing und kommt voraussichtlich in einer Stunde in Zorneding an."
 
@@ -10140,7 +10140,7 @@
       entity_id: sensor.smart_life_samuel_distance
       below: 35000
   action:
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich. Voraussichtlich daheim in ca. 1,5 Stunden."
 

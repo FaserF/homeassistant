@@ -22,7 +22,7 @@
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
     - delay: "00:60:00"
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Pille nehmen nicht vergessen!"
         data:
@@ -106,7 +106,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
@@ -155,7 +155,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
@@ -204,7 +204,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
@@ -253,7 +253,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
@@ -302,7 +302,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data:
                 message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
@@ -733,7 +733,7 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_samuel
+    - service: notify.telegram_fabian
       data:
         message: "Die Waschmaschine wurde ausgeräumt."
     - service: notify.telegram_fabian
@@ -762,7 +762,7 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    #- service: notify.telegram_samuel
+    #- service: notify.telegram_fabian
     #  data:
     #    message: "Die Pflanzen wurden gegossen."
     - choose:

@@ -30,7 +30,7 @@
               entity_id: person.samuel
               state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data_template:
                 message: "Die geplante Staubsauger Reinigung startet in 30 Minuten. Bitte alle Türen öffnen."
     - choose:
@@ -357,7 +357,7 @@
                       entity_id: person.samuel
                       state: home
                   sequence:
-                    - service: notify.telegram_samuel
+                    - service: notify.telegram_fabian
                       data_template:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
             - choose:
@@ -414,7 +414,7 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_samuel
+            - service: notify.telegram_fabian
               data_template:
                 message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
     - choose:
