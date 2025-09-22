@@ -4529,23 +4529,23 @@
         is_anonymous: false
         allows_multiple_answers: false
         disable_notification: true
-    - service: telegram_bot.send_poll
-      data_template:
-        target: !secret telegram_chat_5friends
-        question: "Welcher Gast soll NÄCHSTE Woche mit dabei sein?"
-        options:
-          - "Niemand (sobald einer dafür stimmt gibts keinen Gast)"
-          - "Daniel"
-          - "Kassandra"
-          - "Leon"
-          - "Lorenz"
-          - "Michelle"
-          - "Samuel"
-          - "Yannick"
-          - "Mir egal / wer anderes"
-        is_anonymous: false
-        allows_multiple_answers: true
-        disable_notification: true
+    #- service: telegram_bot.send_poll
+    #  data_template:
+    #    target: !secret telegram_chat_5friends
+    #    question: "Welcher Gast soll NÄCHSTE Woche mit dabei sein?"
+    #    options:
+    #      - "Niemand (sobald einer dafür stimmt gibts keinen Gast)"
+    #      - "Daniel"
+    #      - "Kassandra"
+    #      - "Leon"
+    #      - "Lorenz"
+    #      - "Michelle"
+    #      - "Samuel"
+    #      - "Yannick"
+    #      - "Mir egal / wer anderes"
+    #    is_anonymous: false
+   #     allows_multiple_answers: true
+   #     disable_notification: true
 
 - id: remind_for_board_game_events
   alias: "remind for Board Game events"
