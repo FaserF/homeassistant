@@ -157,7 +157,7 @@ logger:
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
   logs:
-    custom_components.chefkoch_ha: debug
+  #   custom_components.chefkoch_ha: debug
   #   custom_components.xiaomi_airfryer: debug
   #   custom_components.deutschebahn: debug
   #   custom_components.rewe: debug
@@ -171,6 +171,7 @@ logger:
   #   custom_components.phoenix_bad: debug
   #   custom_components.keyforsteam: debug
   #   custom_components.openwrt: debug
+  #   custom_components.eversports: debug
 
 # Track the sun
 sun:
