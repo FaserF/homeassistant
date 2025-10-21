@@ -540,8 +540,8 @@
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
     - service: homeassistant.reload_config_entry
-      data:
-        entry_id: 01J6EXEW32EBEDF3WV4VC0DA3C
+      target:
+        entity_id: sensor.chefkoch_random_recipe
     - delay: "00:00:01"
     - service: telegram_bot.send_message
       data_template:
@@ -586,8 +586,8 @@
         command: "/foodv@smartlife_ha_bot"
   action:
     - service: homeassistant.reload_config_entry
-      data:
-        entry_id: 01J6EXEW32EBEDF3WV4VC0DA3C
+      target:
+        entity_id: sensor.chefkoch_vegan_recipe
     - delay: "00:00:01"
     - service: telegram_bot.send_message
       data_template:
@@ -1297,3 +1297,38 @@
                     Jemand
                   {% endif %}
                   ist da.
+
+- id: "squash_detailed_informations"
+  alias: "Squash - Detailed Slot Notification"
+  description: "Sends a notification with the count and list of all free slots."
+  trigger:
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/squash"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/squash@smartlife_ha_bot"
+  condition:
+    - condition: template
+      value_template: "{{ states.ssensor.eversports_squash_next_available.state != 'Keine freien Slots' }}"
+  action:
+    - service: telegram_bot.send_message
+      data_template:
+        target: "{{ trigger.event.data.chat_id }}"
+        message: >
+          Der nächste Freie Platz ist um {{ states('sensor.eversports_squash_next_available') }} Uhr verfügbar.
+          Insgesamt sind heute {{ state_attr('sensor.eversports_squash_next_available', 'available_slots_count') }} buchbare Platzzeiten verfügbar.
+
+          Alle freien Zeiten: {{ state_attr('sensor.eversports_squash_next_available', 'available_slots_list') | join(', ') }}
+        data:
+          inline_keyboard:
+            - "Website|https://www.eversports.de/widget/w/hwhk63"
+    - service: notify.telegram_fabian
+      data:
+        message: "Pille nehmen nicht vergessen!"
+        data:
+          inline_keyboard:
+            - "Erledigt:/pilldone, Erinnern1h:/pill1h"
+  mode: single

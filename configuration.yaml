@@ -156,7 +156,7 @@ logger:
       - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
       - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
-  logs:
+  # logs:
   #   custom_components.chefkoch_ha: debug
   #   custom_components.xiaomi_airfryer: debug
   #   custom_components.deutschebahn: debug
