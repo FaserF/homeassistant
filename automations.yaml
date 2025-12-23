@@ -1,4 +1,4 @@
----
+
 - id: turn_off_everything_if_nobody_is_at_home
   alias: "Turn off everything if nobody is at home"
   initial_state: true
@@ -11271,7 +11271,7 @@
 
                   *✅ Dabei:* {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['accepted_players'] | join(', ') }}
                   *❌ Nicht dabei:* {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] | join(', ') }}
----
+
 - id: open_covers_when_sunrise
   alias: "Open all covers when sun rise"
   trigger:
@@ -11762,7 +11762,7 @@
                         entity_id: cover.fabians_zimmer_rollo
                       data:
                         position: 23
----
+
 - id: telegram_pill_1h
   alias: "Telegram pill 1h"
   initial_state: false
@@ -13096,7 +13096,7 @@
           inline_keyboard:
             - "Erledigt:/pilldone, Erinnern1h:/pill1h"
   mode: single
----
+
 - id: remind_to_open_doors_for_vacuum
   alias: "Remind to open doors for vacuum"
   initial_state: true

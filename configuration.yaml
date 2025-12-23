@@ -761,8 +761,8 @@ intent_script:
       text: James gibt nun einen Ton von sich.
     action:
       - action: vacuum.locate
-      target:
-        entity_id: vacuum.valetudo_dreamez10pro
+        target:
+          entity_id: vacuum.valetudo_dreamez10pro
   LocateIntent:
     speech:
       text: >
