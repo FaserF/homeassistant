@@ -73,43 +73,45 @@
     #          0
     #        {% endif %}
 
-    average_house_humidity:
-      friendly_name: "Durchschn. Luftfeuchtigkeit"
-      unique_id: "average_house_humidity_sensor"
-      unit_of_measurement: "%"
-      value_template: >-
-        {% set humidity_values = [
-            states.climate.samuel_s_zimmer.attributes.current_humidity | float(0),
-            states.climate.wohnzimmer.attributes.current_humidity | float(0),
-            states.climate.fabian_s_zimmer.attributes.current_humidity | float(0),
-            states.climate.bad.attributes.current_humidity | float(0)
-        ] %}
-        {% set count = humidity_values | select('gt', 0) | list | length %}
-        {% if count > 0 %}
-          {{ (humidity_values | sum) / count | round(2) }}
-        {% else %}
-          0
-        {% endif %}
-      icon_template: "mdi:water-percent"
+    # MIGRATED TO UI (Modern YAML) 2025-12-23
+    # average_house_humidity:
+    #   friendly_name: "Durchschn. Luftfeuchtigkeit"
+    #   unique_id: "average_house_humidity_sensor"
+    #   unit_of_measurement: "%"
+    #   value_template: >-
+    #     {% set humidity_values = [
+    #         states.climate.samuel_s_zimmer.attributes.current_humidity | float(0),
+    #         states.climate.wohnzimmer.attributes.current_humidity | float(0),
+    #         states.climate.fabian_s_zimmer.attributes.current_humidity | float(0),
+    #         states.climate.bad.attributes.current_humidity | float(0)
+    #     ] %}
+    #     {% set count = humidity_values | select('gt', 0) | list | length %}
+    #     {% if count > 0 %}
+    #       {{ (humidity_values | sum) / count | round(2) }}
+    #     {% else %}
+    #       0
+    #     {% endif %}
+    #   icon_template: "mdi:water-percent"
 
-    average_house_temp:
-      friendly_name: "Durchschn. Temp."
-      unique_id: "average_house_temp"
-      unit_of_measurement: "°C"
-      value_template: >-
-        {% set temp_values = [
-            states.climate.samuel_s_zimmer.attributes.current_temperature | float(0),
-            states.climate.wohnzimmer.attributes.current_temperature | float(0),
-            states.climate.fabian_s_zimmer.attributes.current_temperature | float(0),
-            states.climate.bad.attributes.current_temperature | float(0)
-        ] %}
-        {% set count = temp_values | select('gt', 0) | list | length %}
-        {% if count > 0 %}
-          {{ (temp_values | sum) / count | round(2) }}
-        {% else %}
-          0
-        {% endif %}
-      icon_template: "mdi:thermometer-auto"
+    # MIGRATED TO UI (Modern YAML) 2025-12-23
+    # average_house_temp:
+    #   friendly_name: "Durchschn. Temp."
+    #   unique_id: "average_house_temp"
+    #   unit_of_measurement: "°C"
+    #   value_template: >-
+    #     {% set temp_values = [
+    #         states.climate.samuel_s_zimmer.attributes.current_temperature | float(0),
+    #         states.climate.wohnzimmer.attributes.current_temperature | float(0),
+    #         states.climate.fabian_s_zimmer.attributes.current_temperature | float(0),
+    #         states.climate.bad.attributes.current_temperature | float(0)
+    #     ] %}
+    #     {% set count = temp_values | select('gt', 0) | list | length %}
+    #     {% if count > 0 %}
+    #       {{ (temp_values | sum) / count | round(2) }}
+    #     {% else %}
+    #       0
+    #     {% endif %}
+    #   icon_template: "mdi:thermometer-auto"
 
     washing_machine_state:
       friendly_name: "Waschmaschine Status"

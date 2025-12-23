@@ -228,7 +228,7 @@ template:
       - platform: time_pattern
         hours: /1
     action:
-      - service: weather.get_forecasts
+      - action: weather.get_forecasts
         data:
           type: hourly
         target:
@@ -247,7 +247,7 @@ template:
       - platform: time_pattern
         hours: /23
     action:
-      - service: weather.get_forecasts
+      - action: weather.get_forecasts
         data:
           type: daily
         target:
@@ -274,6 +274,43 @@ template:
           Sender: "{{ trigger.event.data['sender'] }}"
           Date: "{{ trigger.event.data['date'] }}"
           To: "{{ trigger.event.data['headers'].get('Delivered-To', ['n/a'])[0] }}"
+
+  - sensor:
+      - name: "Durchschn. Luftfeuchtigkeit"
+        unique_id: "average_house_humidity_sensor"
+        unit_of_measurement: "%"
+        state: >-
+          {% set humidity_values = [
+              states.climate.samuel_s_zimmer.attributes.current_humidity | float(0),
+              states.climate.wohnzimmer.attributes.current_humidity | float(0),
+              states.climate.fabian_s_zimmer.attributes.current_humidity | float(0),
+              states.climate.bad.attributes.current_humidity | float(0)
+          ] %}
+          {% set count = humidity_values | select('gt', 0) | list | length %}
+          {% if count > 0 %}
+            {{ (humidity_values | sum) / count | round(2) }}
+          {% else %}
+            0
+          {% endif %}
+        icon: "mdi:water-percent"
+
+      - name: "Durchschn. Temp."
+        unique_id: "average_house_temp"
+        unit_of_measurement: "°C"
+        state: >-
+          {% set temp_values = [
+              states.climate.samuel_s_zimmer.attributes.current_temperature | float(0),
+              states.climate.wohnzimmer.attributes.current_temperature | float(0),
+              states.climate.fabian_s_zimmer.attributes.current_temperature | float(0),
+              states.climate.bad.attributes.current_temperature | float(0)
+          ] %}
+          {% set count = temp_values | select('gt', 0) | list | length %}
+          {% if count > 0 %}
+            {{ (temp_values | sum) / count | round(2) }}
+          {% else %}
+            0
+          {% endif %}
+        icon: "mdi:thermometer-auto"
 
 #command_line:
 #  - sensor:
@@ -723,7 +760,7 @@ intent_script:
     speech:
       text: James gibt nun einen Ton von sich.
     action:
-      service: vacuum.locate
+      - action: vacuum.locate
       target:
         entity_id: vacuum.valetudo_dreamez10pro
   LocateIntent:
@@ -745,7 +782,7 @@ intent_script:
           Leider kann ich das Handy von {{ given-name }} nicht suchen.
         {%- endif -%}
     action:
-      - service: automation.trigger
+      - action: automation.trigger
         entity_id: automation.find_phone_fabian
       # - service: automation.trigger
       # entity_id: >
@@ -759,7 +796,7 @@ intent_script:
               - condition: template
                 value_template: "{{ ((Room)) == 'Wohnzimmer' }}"
             sequence:
-              - service: mqtt.publish
+              - action: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                   payload: '{"segment_ids": ["6"]}'
@@ -767,7 +804,7 @@ intent_script:
               - condition: template
                 value_template: "{{ ((Room)) == 'Küche' }}"
             sequence:
-              - service: mqtt.publish
+              - action: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                   payload: '{"segment_ids": ["4"]}'
@@ -775,7 +812,7 @@ intent_script:
               - condition: template
                 value_template: "{{ ((Room)) == 'Fabians Zimmer' }}"
             sequence:
-              - service: mqtt.publish
+              - action: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                   payload: '{"segment_ids": ["2"]}'
@@ -783,7 +820,7 @@ intent_script:
               - condition: template
                 value_template: "{{ ((Room)) == 'Samuels Zimmer' }}"
             sequence:
-              - service: mqtt.publish
+              - action: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                   payload: '{"segment_ids": ["5"]}'
@@ -791,7 +828,7 @@ intent_script:
               - condition: template
                 value_template: "{{ ((Room)) == 'Bad' }}"
             sequence:
-              - service: mqtt.publish
+              - action: mqtt.publish
                 data:
                   topic: valetudo/dreamez10pro/MapSegmentationCapability/clean/set
                   payload: '{"segment_ids": ["1"]}'
@@ -844,9 +881,9 @@ input_datetime:
 frontend:
   themes: !include_dir_merge_named themes
   extra_module_url:
-    - /local/antigravity-ui.js
+    - /local/antigravity-ui-pro.js
 group: !include groups.yaml
-automation: !include_dir_merge_list automation
+automation: !include automations.yaml
 script: !include scripts.yaml
 
 ## Custom Components - has to be the end of the file due to GitHub Actions being unable to handle custom components stuff and will be removed there
