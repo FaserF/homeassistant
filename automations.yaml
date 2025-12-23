@@ -9863,10 +9863,6 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_longer_distance.attributes.last_triggered) | int > 1800 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_long_distance.attributes.last_triggered) | int > 1800 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
     - condition: not
       conditions:
         - condition: state
@@ -9908,10 +9904,6 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_longer_distance.attributes.last_triggered) | int > 1800 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_long_distance.attributes.last_triggered) | int > 1800 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
     - condition: not
       conditions:
         - condition: state
@@ -9947,10 +9939,6 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_longer_distance.attributes.last_triggered) | int > 1800 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_long_distance.attributes.last_triggered) | int > 1800 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_from_work.attributes.last_triggered) | int > 3600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_fabian_samuel_on_way_home_from_berufsschule.attributes.last_triggered) | int > 3600 }}"
     - condition: not
       conditions:
         - condition: state
@@ -12269,7 +12257,7 @@
     - service: telegram_bot.send_message
       data_template:
         target: "{{ trigger.event.data.chat_id }}"
-        message: "System is online! Last system reboot was on {{ states('sensor.last_boot') }}."
+        message: "System is online! Current time: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}."
 
 - id: telegram_essen
   alias: Telegram Essen

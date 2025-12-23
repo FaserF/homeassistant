@@ -312,6 +312,241 @@ template:
           {% endif %}
         icon: "mdi:thermometer-auto"
 
+      # MIGRATED FROM sensor/sensor.yaml 2025-12-23
+      - name: "Waschmaschine Status"
+        unique_id: washing_machine_state
+        state: "{{ states('input_select.washing_machine_status') }}"
+        icon: "mdi:washing-machine"
+
+      - name: "Waschmaschinen Modus"
+        unique_id: washing_machine_mode
+        state: >-
+          {% if is_state("switch.waschmaschine", "on") %}
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered)) < 10000 %}
+              30° Pflegeleicht
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) < 10000 %}
+              40° Pflegeleicht
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered)) < 2800 %}
+              20° Feinschwäsche
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered)) < 5500 %}
+              40° Koch/Bunt
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered)) < 13000 %}
+              60° Koch/Bunt
+            {% else %}
+              Unbekannt
+            {% endif %}
+          {% else %}
+            Läuft nicht
+          {% endif %}
+        icon: "mdi:washing-machine"
+
+      - name: "Waschmaschine Uhrzeit ca. fertig"
+        unique_id: washing_machine_finish_time
+        state: >-
+          {% if is_state("switch.waschmaschine", "on") %}
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered)) < 9780 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 9780) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) < 9780 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 9780) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered)) < 2400 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 2400) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered)) < 5220 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 5220) | timestamp_custom("%H:%M", true) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered)) < 12660 %}
+              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 12660) | timestamp_custom("%H:%M", true) }}
+            {% else %}
+              {{ (as_timestamp(states.switch.waschmaschine.last_changed) + 9780) | timestamp_custom("%H:%M", true) }}
+            {% endif %}
+          {% else %}
+            Läuft nicht
+          {% endif %}
+        icon: "mdi:home-clock"
+
+      - name: "Waschmaschine Dauer ca. fertig"
+        unique_id: washing_machine_finish_duration
+        unit_of_measurement: "min"
+        state: >-
+          {% if is_state("switch.waschmaschine", "on") %}
+            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered)) < 7200 %}
+              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 9780) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) < 7200 %}
+              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 9780) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered)) < 3200 %}
+              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 2400) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered)) < 7200 %}
+              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 5220) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered)) < 14400 %}
+              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 13560) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
+            {% else %}
+              0
+            {% endif %}
+          {% else %}
+            0
+          {% endif %}
+        icon: "mdi:home-clock"
+
+      - name: >-
+          {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
+            {% set coal_triggered = state_attr('automation.detect_if_coal_lighter_is_currently_active', 'last_triggered') %}
+            {% set pizza_triggered = state_attr('automation.detect_if_pizzamaker_is_currently_active', 'last_triggered') %}
+            {% if coal_triggered and pizza_triggered and as_timestamp(coal_triggered) > as_timestamp(pizza_triggered) %}
+              Kohle
+            {% elif coal_triggered and pizza_triggered and as_timestamp(pizza_triggered) > as_timestamp(coal_triggered) %}
+              Pizzamaker
+            {% else %}
+              Kohleanzünder
+            {% endif %}
+          {% else %}
+            Inaktiv
+          {% endif %}
+        unique_id: coal_lighter_finish_duration
+        state: >-
+          {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
+            {% set coal_last = state_attr('automation.detect_if_coal_lighter_is_currently_active', 'last_triggered') %}
+            {% set pizza_last = state_attr('automation.detect_if_pizzamaker_is_currently_active', 'last_triggered') %}
+
+            {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' and coal_last %}
+              {{ ((as_timestamp(coal_last) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
+            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' and pizza_last %}
+              {{ ((as_timestamp(pizza_last) + 300) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
+            {% elif (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600 %}
+              {{ ((as_timestamp(states.input_button.kohleanzunder_timer.last_changed) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
+            {% else %}
+              00:00
+            {% endif %}
+          {% else %}
+            00:00
+          {% endif %}
+        icon: >-
+          {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
+            {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
+              mdi:fire
+            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
+              mdi:pizza
+            {% else %}
+              mdi:timer
+            {% endif %}
+          {% else %}
+            mdi:fire-off
+          {% endif %}
+
+      - name: "Fabi Anrufer"
+        unique_id: fs_caller
+        state: "unbekannter"
+        icon: "mdi:phone"
+
+      # Boulderwelt Ost sensors
+      - name: "Boulderwelt Ost Montag Durchschnitt"
+        unique_id: boulderwelt_ost_monday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_monday_avg') }}"
+
+      - name: "Boulderwelt Ost Montag Durchschnitt 2h"
+        unique_id: boulderwelt_ost_monday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_monday_avg_2h') }}"
+
+      - name: "Boulderwelt Ost Dienstag Durchschnitt"
+        unique_id: boulderwelt_ost_tuesday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_tuesday_avg') }}"
+
+      - name: "Boulderwelt Ost Dienstag Durchschnitt 2h"
+        unique_id: boulderwelt_ost_tuesday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_tuesday_avg_2h') }}"
+
+      - name: "Boulderwelt Ost Mittwoch Durchschnitt"
+        unique_id: boulderwelt_ost_wednesday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_wednesday_avg') }}"
+
+      - name: "Boulderwelt Ost Mittwoch Durchschnitt 2h"
+        unique_id: boulderwelt_ost_wednesday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_wednesday_avg_2h') }}"
+
+      - name: "Boulderwelt Ost Donnerstag Durchschnitt"
+        unique_id: boulderwelt_ost_thursday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_thursday_avg') }}"
+
+      - name: "Boulderwelt Ost Donnerstag Durchschnitt 2h"
+        unique_id: boulderwelt_ost_thursday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_thursday_avg_2h') }}"
+
+      - name: "Boulderwelt Ost Freitag Durchschnitt"
+        unique_id: boulderwelt_ost_friday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_friday_avg') }}"
+
+      - name: "Boulderwelt Ost Freitag Durchschnitt 2h"
+        unique_id: boulderwelt_ost_friday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_ost_friday_avg_2h') }}"
+
+      # Boulderwelt Sued sensors
+      - name: "Boulderwelt Sued Montag Durchschnitt"
+        unique_id: boulderwelt_sued_monday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_monday_avg') }}"
+
+      - name: "Boulderwelt Sued Montag Durchschnitt 2h"
+        unique_id: boulderwelt_sued_monday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_monday_avg_2h') }}"
+
+      - name: "Boulderwelt Sued Dienstag Durchschnitt"
+        unique_id: boulderwelt_sued_tuesday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_tuesday_avg') }}"
+
+      - name: "Boulderwelt Sued Dienstag Durchschnitt 2h"
+        unique_id: boulderwelt_sued_tuesday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_tuesday_avg_2h') }}"
+
+      - name: "Boulderwelt Sued Mittwoch Durchschnitt"
+        unique_id: boulderwelt_sued_wednesday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_wednesday_avg') }}"
+
+      - name: "Boulderwelt Sued Mittwoch Durchschnitt 2h"
+        unique_id: boulderwelt_sued_wednesday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_wednesday_avg_2h') }}"
+
+      - name: "Boulderwelt Sued Donnerstag Durchschnitt"
+        unique_id: boulderwelt_sued_thursday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_thursday_avg') }}"
+
+      - name: "Boulderwelt Sued Donnerstag Durchschnitt 2h"
+        unique_id: boulderwelt_sued_thursday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_thursday_avg_2h') }}"
+
+      - name: "Boulderwelt Sued Freitag Durchschnitt"
+        unique_id: boulderwelt_sued_friday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_friday_avg') }}"
+
+      - name: "Boulderwelt Sued Freitag Durchschnitt 2h"
+        unique_id: boulderwelt_sued_friday_avg_2h
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_friday_avg_2h') }}"
+
+      - name: "Boulderwelt Sued Samstag Durchschnitt"
+        unique_id: boulderwelt_sued_saturday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_saturday_avg') }}"
+
+      - name: "Boulderwelt Sued Sonntag Durchschnitt"
+        unique_id: boulderwelt_sued_sunday_avg
+        unit_of_measurement: "%"
+        state: "{{ states('input_number.boulderwelt_sued_sunday_avg') }}"
+
 #command_line:
 #  - sensor:
 #    name: "processor_temperature"
@@ -880,8 +1115,6 @@ input_datetime:
 
 frontend:
   themes: !include_dir_merge_named themes
-  extra_module_url:
-    - /local/antigravity-ui-pro.js
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
@@ -921,7 +1154,6 @@ waste_collection_schedule:
           icon: mdi:trash-can-outline
         - type: Gelber Sack
           icon: mdi:recycle
-
 #xiaomi_miio_cooker:
 #  name: Xiaomi Rice Cooker
 #  host: 192.168.178.61
@@ -947,4 +1179,4 @@ waste_collection_schedule:
 #          max_items: 5
 #          download_attachments: False
 
-whatsapp:
+#whatsapp:
