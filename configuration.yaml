@@ -843,6 +843,8 @@ input_datetime:
 
 frontend:
   themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /local/antigravity-ui.js
 group: !include groups.yaml
 automation: !include_dir_merge_list automation
 script: !include scripts.yaml

@@ -80,15 +80,29 @@ views:
       - entity: sensor.fabian_schreibtisch_power
       - entity: sensor.keller_steckdose_energy_power
       - entity: sensor.steckerleiste_keller_energy_power
-      - entity: sensor.zorneding_to_leuchtenbergring
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.zorneding_departures_via_starnberg_nord
+        color: ''
       - entity: sensor.fabian_s_zuhause_solar_percentage
       - entity: sensor.dwd_illuminance
       - entity: sensor.average_house_humidity
       - entity: sensor.average_house_temp
       - entity: sensor.foodsharing_48_082236
-      - entity: sensor.rewe_440421
-      - entity: sensor.chefkoch_daily_recommendations
-      - entity: sensor.chefkoch_random_recommendations
+      - entity: sensor.kadermanager_zorro
+      - entity: sensor.kadermanager_tischabwischer
+      - type: entity
+        entity: sensor.boulderwelt_munchen_ost_level
+      - type: entity
+        entity: sensor.boulderwelt_munchen_sud_level
+      - type: entity
+        entity: sensor.chefkoch_daily_recipe
+      - type: entity
+        entity: sensor.chefkoch_random_recipe
+      - type: entity
+        entity: sensor.chefkoch_vegan_recipe
     cards:
       - entities:
           - entity: light.deckenlampe
@@ -106,7 +120,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_bslamp2_0x13fea10f
+          - entity: light.yeelink_bslamp2_22e2_light
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -115,6 +129,7 @@ views:
             toggle: true
             type: custom:slider-entity-row
           - entity: light.regal
+          - entity: light.samuels_lichtschalter
           - entity: light.deckenlampe_samuel
             group: true
             toggle: true
@@ -158,57 +173,168 @@ views:
         show_header_toggle: false
         title: Weiteres
         type: entities
-      - entity: climate.wohnzimmer
-        type: custom:simple-thermostat
-        sensors:
-          - attribute: current_humidity
-            name: Luftfeuchtigkeit
-            unit: "%"
-          - entity: sensor.wohnzimmer_heating
-            name: Heizleistung
-          - entity: binary_sensor.wohnzimmer_open_window
-            name: Fenster
-        step_layout: column
-        step_size: "1"
-      - entity: climate.fabian_s_zimmer
-        type: custom:simple-thermostat
-        sensors:
-          - attribute: current_humidity
-            name: Luftfeuchtigkeit
-            unit: "%"
-          - entity: sensor.fabian_s_zimmer_heating
-            name: Heizleistung
-          - entity: binary_sensor.fabian_s_zimmer_open_window
-            name: Fenster
-        step_size: "1"
-      - entity: climate.samuel_s_zimmer
-        type: custom:simple-thermostat
-        sensors:
-          - attribute: current_humidity
-            name: Luftfeuchtigkeit
-            unit: "%"
-          - entity: sensor.samuel_s_zimmer_heating
-            name: Heizleistung
-          - entity: binary_sensor.samuel_s_zimmer_open_window
-            name: Fenster
-        step_size: "1"
-      - entity: climate.bad
-        type: custom:simple-thermostat
-        sensors:
-          - attribute: current_humidity
-            name: Luftfeuchtigkeit
-            unit: "%"
-          - entity: sensor.bad_heating
-            name: Heizleistung
-          - entity: binary_sensor.bad_open_window
-            name: Fenster
-        step_size: "1"
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            entity: media_player.fabians_lautsprecher
+          - type: custom:mini-media-player
+            entity: media_player.kuche_lautsprecher
+          - type: custom:mini-media-player
+            entity: media_player.samuels_lautsprecher
+          - type: custom:mini-media-player
+            source: full
+            entity: media_player.wohnzimmer_tv_group
+          - type: custom:mini-media-player
+            entity: media_player.wohnzimmer_uhr
+          - type: custom:mini-media-player
+            entity: media_player.keller_tv_group
+        title: Lautsprecher
+      - type: entities
+        entities:
+          - entity: cover.fabians_zimmer_rollo
+          - entity: cover.wohnzimmer_rollo_fenster
+          - entity: cover.wohnzimmer_rollo_tur
+        title: Rolladen
+        show_header_toggle: false
+      - type: vertical-stack
+        cards:
+          - type: custom:weather-card
+            entity: weather.ebersberg_ebersberg
+            number_of_forecasts: '5'
+          - type: custom:weather-card
+            entity: sensor.weather_ebersberg_hourly
+            hourly_forecast: true
+            graph: false
+            forecastMaxColumn: '6'
+            number_of_forecasts: '8'
+            current: false
+            details: false
+            forecast: true
+          - type: custom:weather-card
+            entity: sensor.weather_ebersberg_daily
+            number_of_forecasts: '6'
+            hourly_forecast: false
+            current: false
+            details: false
+            forecast: true
+            forecastMaxColumn: '5'
       - type: vertical-stack
         cards:
           - type: entities
             title: Reiskocher
             state_color: false
             entities:
+              - entity: switch.chunmi_eh1_f9ef_auto_keep_warm
+              - entity: input_select.rice_cooker_program
+              - entity: input_datetime.cooker_start_time
+              - entity: button.chunmi_eh1_f9ef_cancel_cooking
+              - entity: sensor.chunmi_eh1_f9ef_cooker
+                secondary_info: last-changed
+              - entity: sensor.chunmi_eh1_f9ef_left_time
+                secondary_info: last-changed
+              - entity: sensor.chunmi_eh1_f9ef_temperature
+              - entity: automation.turn_off_kitchen_devices_after_x_minutes
+            show_header_toggle: false
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Heißluftfriteuse
+            state_color: false
+            entities:
+              - entity: button.careli_maf05a_d482_start_cook
+              - entity: sensor.careli_maf05a_d482_left_time
+              - entity: button.careli_maf05a_d482_cancel_cooking
+              - entity: button.careli_maf05a_d482_pause
+              - entity: select.careli_maf05a_d482_turn_pot
+            show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: sensor.bioabfall
+          - entity: sensor.altpapier
+          - entity: sensor.gelber_sack
+          - entity: sensor.restmull
+      - entity: climate.wohnzimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.wohnzimmer_heating
+            name: Heizleistung
+          - entity: binary_sensor.wohnzimmer_open_window
+            name: Fenster
+        step_layout: column
+        step_size: '1'
+      - entity: climate.fabian_s_zimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.fabian_s_zimmer_heating
+            name: Heizleistung
+          - entity: binary_sensor.fabian_s_zimmer_open_window
+            name: Fenster
+        step_size: '1'
+      - entity: climate.bad
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.bad_heating
+            name: Heizleistung
+          - entity: binary_sensor.bad_open_window
+            name: Fenster
+        step_size: '1'
+      - entity: climate.samuel_s_zimmer
+        type: custom:simple-thermostat
+        sensors:
+          - attribute: current_humidity
+            name: Luftfeuchtigkeit
+            unit: '%'
+          - entity: sensor.samuel_s_zimmer_heating
+            name: Heizleistung
+          - entity: binary_sensor.samuel_s_zimmer_open_window
+            name: Fenster
+        step_size: '1'
+      - type: custom:departure-card
+        title: Zorneding Abfahrten
+        entity: sensor.zorneding_departures
+        connections_attribute: next_departures
+        displayed_connections: 4
+        unix_time: false
+        connection_properties:
+          targets: null
+          train: train
+          platform: platform
+          show_platform: true
+          departure: scheduledDeparture
+          delay: delayDeparture
+      - type: custom:departure-card
+        title: Starnberg Nord Abfahrten
+        entity: sensor.starnberg_nord_departures_via_zorneding
+        connections_attribute: next_departures
+        displayed_connections: 4
+        unix_time: false
+        connection_properties:
+          targets: null
+          train: train
+          platform: platform
+          show_platform: true
+          departure: scheduledDeparture
+          delay: delayDeparture
+  - title: Küche
+    path: kueche
+    icon: mdi:countertop-outline
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Reiskocher
+            state_color: false
+            entities:
+              - entity: switch.kuchengerate
               - entity: switch.xiaomi_miio_cooker
               - entity: input_select.rice_cooker_program
               - entity: input_datetime.cooker_start_time
@@ -229,58 +355,22 @@ views:
             show_header_toggle: false
       - type: vertical-stack
         cards:
-          - type: custom:weather-card
-            entity: weather.ebersberg_ebersberg
-            number_of_forecasts: "5"
-          - type: custom:weather-card
-            entity: sensor.weather_ebersberg_hourly
-            hourly_forecast: true
-            graph: false
-            forecastMaxColumn: "6"
-            number_of_forecasts: "8"
-            current: false
-            details: false
-            forecast: true
-          - type: custom:weather-card
-            entity: sensor.weather_ebersberg_daily
-            number_of_forecasts: "6"
-            hourly_forecast: false
-            current: false
-            details: false
-            forecast: true
-            forecastMaxColumn: "5"
-      - type: vertical-stack
-        cards:
-          - type: custom:mini-media-player
-            source: full
-            entity: media_player.wohnzimmer_tv_group
-          - type: custom:mini-media-player
-            entity: media_player.wohnzimmer_uhr
-      - type: vertical-stack
-        cards:
-          - type: custom:mini-media-player
-            entity: media_player.keller_tv_group
-      - type: entities
-        entities:
-          - entity: cover.fabians_zimmer_rollo
-          - entity: cover.wohnzimmer_rollo_fenster
-          - entity: cover.wohnzimmer_rollo_tur
-        title: Rolladen
-        show_header_toggle: false
-      - type: entities
-        entities:
-          - entity: sensor.bioabfall
-          - entity: sensor.altpapier
-          - entity: sensor.gelber_sack
-          - entity: sensor.restmull
-      - type: vertical-stack
-        cards:
-          - type: custom:mini-media-player
-            entity: media_player.fabians_lautsprecher
-          - type: custom:mini-media-player
-            entity: media_player.kuche_lautsprecher
-          - type: custom:mini-media-player
-            entity: media_player.samuels_lautsprecher
+          - type: entities
+            title: Heißluftfriteuse
+            state_color: false
+            entities:
+              - entity: button.careli_maf05a_d482_start_cook
+              - entity: sensor.xiaomi_airfryer_appoint_time_left
+              - entity: sensor.xiaomi_airfryer_apponit_time
+              - entity: sensor.xiaomi_airfryer_food_quanty
+              - entity: sensor.xiaomi_airfryer_preheat_phase
+              - entity: sensor.xiaomi_airfryer_recipe_id
+              - entity: sensor.xiaomi_airfryer_remaining
+              - entity: sensor.xiaomi_airfryer_status
+              - entity: sensor.xiaomi_airfryer_target_temperature
+              - entity: sensor.xiaomi_airfryer_target_time
+              - entity: sensor.xiaomi_airfryer_turn_pot
+            show_header_toggle: false
   - icon: mdi:television
     path: wohnzimmer
     title: Wohnzimmer
@@ -289,7 +379,7 @@ views:
       - type: area
         area: 7c05afe47efd44f5a0a064769ad6e105
       - entities:
-          - entity: switch.adaptive_lighting_living_room
+          - entity: switch.adaptive_lighting_wohnzimmer
             name: Adaptives Licht
           - entity: light.deckenlampe
           - entity: light.leds_wohnzimmer_tv
@@ -318,11 +408,11 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.wohnzimmer_heating
             name: Heizleistung
         step_layout: column
-        step_size: "1"
+        step_size: '1'
       - type: grid
         square: false
         columns: 1
@@ -445,10 +535,10 @@ views:
       - type: area
         area: 33e9a108bf1948e5848f156e0851d50c
       - entities:
-          - entity: switch.adaptive_lighting_sleeping_room
+          - entity: switch.adaptive_lighting_schlafzimmer
             name: Adaptives Licht
           - entity: light.lichtschalter
-          - entity: light.yeelight_bslamp2_0x13fea10f
+          - entity: light.yeelink_bslamp2_22e2_light
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -462,7 +552,7 @@ views:
             type: custom:slider-entity-row
           - entity: light.regal
           - entity: switch.bett_usb_ports
-          - entity: switch.bett_steckdose
+          - entity: light.steckerleiste_bett_bett_steckdose
         show_header_toggle: true
         title: Licht & Strom
         type: entities
@@ -472,7 +562,7 @@ views:
           - entity: light.prismatik
           - entity: device_tracker.fabian_pc
             secondary_info: last-changed
-          - entity: device_tracker.c_pf38fwqx_2
+          - entity: device_tracker.c_pf38fwqx_pari
             secondary_info: last-changed
           - entity: sensor.fabian_schreibtisch_power
           - entity: sensor.fabian_pc_cpu_load
@@ -487,10 +577,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.fabian_s_zimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.fabians_lautsprecher
         type: custom:mini-media-player
@@ -501,6 +591,11 @@ views:
           - type: cover-open-close
         type: tile
         entity: cover.fabians_zimmer_rollo
+      - type: entities
+        entities:
+          - sensor.hp_laserjet_mfp_m426fdw
+          - sensor.hp_laserjet_mfp_m426fdw_black_cartridge_hp_cf226x
+        title: HP Drucker & Scanner
   - theme: Backend-selected
     icon: mdi:table-furniture
     path: samuel
@@ -510,8 +605,7 @@ views:
       - type: area
         area: b67ac5462e454381aa87f812161d8578
       - entities:
-          - entity: switch.adaptive_lighting_guest_room
-            name: Adaptives Licht
+          - entity: light.samuels_lichtschalter
           - entity: light.deckenlampe_samuel
             group: true
             toggle: true
@@ -539,10 +633,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.samuel_s_zimmer_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - artwork: cover
         entity: media_player.samuels_lautsprecher
         type: custom:mini-media-player
@@ -706,10 +800,10 @@ views:
         sensors:
           - attribute: current_humidity
             name: Luftfeuchtigkeit
-            unit: "%"
+            unit: '%'
           - entity: sensor.bad_heating
             name: Heizleistung
-        step_size: "1"
+        step_size: '1'
       - type: entities
         entities:
           - entity: sensor.kuche_lautsprecher_timers
@@ -763,37 +857,32 @@ views:
         min: 0
         type: gauge
       - entities:
-          - entity: button.miwifi_28_d1_27_fc_ab_d8_reboot
-          - entity: light.miwifi_28_d1_27_fc_ab_d8_led
-          - entity: switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_uptime
-          - entity: sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
-          - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-          - entity: select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
+          - entity: binary_sensor.openwrt_ax3600
+          - entity: sensor.openwrt_ax3600_wireless_total_clients
+          - entity: sensor.openwrt_ax3600_wireless_phy2_ap0_clients
+          - entity: sensor.openwrt_ax3600_wireless_phy2_ap1_clients
+          - entity: sensor.openwrt_ax3600_wireless_phy1_ap0_clients
+          - entity: sensor.openwrt_ax3600_mesh_phy2_mesh0_signal
         title: Xiaomi AX3600 Verwaltung
         type: entities
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: button.miwifi_9c_9d_7e_30_89_fb_reboot
-          - entity: light.miwifi_9c_9d_7e_30_89_fb_led
-          - entity: switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
-          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_uptime
-          - entity: sensor.miwifi_9c_9d_7e_30_89_fb_memory_usage
-          - entity: update.miwifi_9c_9d_7e_30_89_fb_firmware_update
-        title: Xiaomi AX1800 Verwaltung
+          - entity: binary_sensor.openwrt_ax3000t
+          - entity: sensor.openwrt_ax3000t_wireless_total_clients
+        title: Xiaomi AX3000T Verwaltung
         type: entities
         show_header_toggle: false
         state_color: true
       - entities:
-          - entity: button.fritz_box_3490_restart
-          - entity: button.fritz_box_3490_reconnect
-          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_2_4ghz
-          - entity: switch.fritz_box_3490_wi_fi_smartlife_fb_5ghz
-          - entity: sensor.fritz_box_3490_last_restart
-          - entity: sensor.fritz_box_3490_connection_uptime
-          - entity: sensor.fritz_box_3490_download_throughput
-          - entity: sensor.fritz_box_3490_upload_throughput
+          - entity: button.fritz_box_7490_restart
+          - entity: button.fritz_box_7490_reconnect
+          - entity: switch.fritz_box_7490_wi_fi_smartlife_fb_2_4ghz
+          - entity: switch.fritz_box_7490_wi_fi_smartlife_fb_5ghz
+          - entity: sensor.fritz_box_7490_last_restart
+          - entity: sensor.fritz_box_7490_connection_uptime
+          - entity: sensor.fritz_box_7490_download_throughput
+          - entity: sensor.fritz_box_7490_upload_throughput
         title: FritzBox 3490 Verwaltung
         type: entities
         show_header_toggle: false
@@ -828,14 +917,10 @@ views:
     cards:
       - type: entities
         entities:
-          - entity: sensor.processor_temperature
           - entity: sensor.memory_use_percent
           - entity: sensor.disk_use_percent
           - entity: sensor.unavailable_entities
-      - type: sensor
-        entity: sensor.processor_temperature
-        graph: line
-        icon: mdi:cpu-64-bit
+          - entity: sensor.arendst_tasmota_latest_release
       - type: sensor
         entity: sensor.memory_use_percent
         graph: line
@@ -885,7 +970,7 @@ views:
             group: true
             toggle: true
             type: custom:slider-entity-row
-          - entity: light.yeelight_bslamp2_0x13fea10f
+          - entity: light.yeelink_bslamp2_22e2_light
             group: true
             toggle: true
             type: custom:slider-entity-row
@@ -896,3 +981,56 @@ views:
         show_header_toggle: true
         title: fabian_s_zimmer
         type: entities
+  - icon: mdi:volleyball
+    path: sport
+    title: Sport
+    cards:
+      - type: entities
+        entities:
+          - entity: sensor.boulderwelt_munchen_ost_level
+          - entity: sensor.boulderwelt_munchen_ost_level_mean
+          - entity: sensor.boulderwelt_munchen_ost_level_mean_2h
+          - entity: sensor.boulderwelt_ost_monday_avg
+          - entity: sensor.boulderwelt_ost_tuesday_avg
+          - entity: sensor.boulderwelt_ost_wednesday_avg
+          - entity: sensor.boulderwelt_ost_thursday_avg
+          - entity: sensor.boulderwelt_ost_friday_avg
+          - entity: sensor.boulderwelt_ost_monday_avg_2h
+          - entity: sensor.boulderwelt_ost_tuesday_avg_2h
+          - entity: sensor.boulderwelt_ost_wednesday_avg_2h
+          - entity: sensor.boulderwelt_ost_thursday_avg_2h
+          - entity: sensor.boulderwelt_ost_friday_avg_2h
+        title: Boulderwelt Ost
+      - type: entities
+        entities:
+          - entity: sensor.boulderwelt_munchen_sud_level
+          - entity: sensor.boulderwelt_munchen_sued_level_mean
+          - entity: sensor.boulderwelt_munchen_sued_level_mean_2h
+          - entity: sensor.boulderwelt_sued_monday_avg
+          - entity: sensor.boulderwelt_sued_tuesday_avg
+          - entity: sensor.boulderwelt_sued_wednesday_avg
+          - entity: sensor.boulderwelt_sued_thursday_avg
+          - entity: sensor.boulderwelt_sued_friday_avg
+          - entity: sensor.boulderwelt_sued_monday_avg_2h
+          - entity: sensor.boulderwelt_sued_tuesday_avg_2h
+          - entity: sensor.boulderwelt_sued_wednesday_avg_2h
+          - entity: sensor.boulderwelt_sued_thursday_avg_2h
+          - entity: sensor.boulderwelt_sued_friday_avg_2h
+        title: Boulderwelt Süd
+      - type: entities
+        entities:
+          - entity: sensor.kadermanager_zorro
+          - entity: sensor.kadermanager_tischabwischer
+          - entity: sensor.dieliga_schedule_tsv_zorneding_ii
+          - entity: sensor.dieliga_scoreboard_tsv_zorneding_ii
+          - entity: sensor.dieliga_schedule_tsv_zorneding_3
+          - entity: sensor.dieliga_scoreboard_tsv_zorneding_3
+        title: Volleyball
+      - type: entities
+        entities:
+          - sensor.pool_occupancy
+          - sensor.sauna_occupancy
+        title: Phönix-Bad
+      - type: entities
+        entities:
+          - sensor.eversports_squash_next_available
