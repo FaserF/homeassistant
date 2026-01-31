@@ -1,4 +1,3 @@
-
 - id: turn_off_everything_if_nobody_is_at_home
   alias: "Turn off everything if nobody is at home"
   initial_state: true
@@ -291,7 +290,7 @@
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 3600 }}"
           sequence:
             - service: notify.telegram_fabian
-              data_template:
+              data:
                 message: "Welcome back. Samuel ist nicht daheim."
     - choose:
         - conditions:
@@ -308,7 +307,7 @@
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
                   sequence:
                     - service: notify.telegram_fabian
-                      data_template:
+                      data:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
             - choose:
                 - conditions:
@@ -319,7 +318,7 @@
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
                   sequence:
                     - service: notify.telegram_fabian
-                      data_template:
+                      data:
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
     - choose:
         - conditions:
@@ -340,36 +339,10 @@
                         target: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegramdustbindone"
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.samuel
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
-                        target: !secret telegram_chat_samuel_dummy
-                        inline_keyboard:
-                          - "Erledigt:/telegramdustbindone"
     - choose:
         - conditions:
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: sensor.bioabfall
-                  state: "Morgen"
-                - condition: state
-                  entity_id: sensor.altpapier
-                  state: "Morgen"
-                - condition: state
-                  entity_id: sensor.restmull
-                  state: "Morgen"
-                - condition: state
-                  entity_id: sensor.gelber_sack
-                  state: "Morgen"
+            - condition: template
+              value_template: "{{ (state_attr('sensor.nachste_abholungen', (now() + timedelta(days=1)).strftime('%Y-%m-%d')) != None) }}"
             - condition: template
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_waste_put_outside.attributes.last_triggered) | int > 86400 }}"
           sequence:
@@ -382,25 +355,23 @@
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         message: >
-                          Morgen {% if states.sensor.bioabfall.state == "Morgen" %}wird die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}wird das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}wird die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}werden die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
+                          {% set tomorrow = (now() + timedelta(days=1)).strftime('%Y-%m-%d') %}
+                          {% set pickup = state_attr('sensor.nachste_abholungen', tomorrow) %}
+                          {% set weekdays = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+                          {% set day_name = weekdays[strptime(tomorrow, '%Y-%m-%d').strftime('%A')] %}
+                          {% set date_german = as_timestamp(tomorrow) | timestamp_custom('%d.%m.%Y') %}
+                          {% set verb = 'werden' if ',' in pickup or ' und ' in pickup else 'wird' %}
+                          {% set items = pickup | replace('Restmüll', '🗑️ *Restmüll*')
+                                                | replace('Biotonne', '🌿 *Biotonne*')
+                                                | replace('Gelber Sack', '♻️ *Gelber Sack*')
+                                                | replace('Altpapier', '📄 *Altpapier*')
+                                                | replace('Papiersamml', '📄 *Papiersammlung*')
+                                                | replace('Problemmüll', '⚠️ *Problemmüll*')
+                                                | replace('Gartenabfall', '🍂 *Gartenabfall*') %}
+                          📣 {{ day_name }}, {{ date_german }} (morgen) {{ verb }} {{ items }} abgeholt. Bitte rechtzeitig rausstellen! 🚛
                         target: !secret telegram_chat_fabian
-                        inline_keyboard:
-                          - "Erledigt:/telegramwastedone"
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.samuel
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data_template:
-                        message: >
-                          Morgen {% if states.sensor.bioabfall.state == "Morgen" %}wird die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}wird das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}wird die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}werden die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
-                        target: !secret telegram_chat_samuel_dummy
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
     - choose:
@@ -449,28 +420,41 @@
     #                  entity_id: person.fabian
     #                  state: home
     #                - condition: template
-    #                  value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
-    #              sequence:
-    #                - service: telegram_bot.send_message
-    #                  data:
-    #                    message: Bitte die Pflanzen gießen.
-    #                    target: !secret telegram_chat_fabian
-    #                    inline_keyboard:
-    #                      - "Erledigt:/telegrampouringdone"
-    #        - choose:
-    #            - conditions:
-    #                - condition: state
-    #                  entity_id: person.samuel
-    #                  state: home
-    #                - condition: template
-    #                  value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
-    #              sequence:
-    #                - service: telegram_bot.send_message
-    #                  data:
-    #                    message: Bitte die Pflanzen gießen.
-    #                    target: !secret telegram_chat_samuel_dummy
-    #                    inline_keyboard:
-    #                      - "Erledigt:/telegrampouringdone"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
+            - condition: template
+              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_coming_home.attributes.last_triggered) | int > 10800 }}"
+          sequence:
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.fabian
+                      state: home
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data:
+                        message: Bitte die Pflanzen gießen.
+                        target: !secret telegram_chat_fabian
+                        inline_keyboard:
+                          - "Erledigt:/telegrampouringdone"
+            - choose:
+                - conditions:
+                    - condition: state
+                      entity_id: person.samuel
+                      state: home
+                    - condition: template
+                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
+                  sequence:
+                    - service: telegram_bot.send_message
+                      data:
+                        message: Bitte die Pflanzen gießen.
+                        target: !secret telegram_chat_samuel_dummy
+                        inline_keyboard:
+                          - "Erledigt:/telegrampouringdone"
     - choose:
         - conditions:
             - condition: state
@@ -486,7 +470,7 @@
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         message: >
                           James hatte ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
@@ -501,7 +485,7 @@
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         message: >
                           James hatte ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
@@ -719,7 +703,7 @@
 #        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_if_someone_joined_lan_play_server.attributes.last_triggered) | int > 300 }}"
 #    action:
 #      - service: telegram_bot.send_message
-#        data_template:
+#        data:
 #          target: !secret telegram_chat_fabian
 #          message: 'Jemand ist dem LAN-Play Server beigetreten. Spieleranzahl: {{ states.sensor.switch_lan_play_online.state }}'
 
@@ -791,7 +775,7 @@
                           state: "home"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_fabian
                         message: >
                           Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
@@ -812,7 +796,7 @@
                           state: "home"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_samuel_dummy
                         message: >
                           Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
@@ -826,7 +810,7 @@
                           - "Abbruch:/cancellight, Okay:/telegramno"
       default:
         - service: telegram_bot.send_message
-          data_template:
+          data:
             target: !secret telegram_chat_fabian
             message: >
               Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
@@ -839,7 +823,7 @@
             inline_keyboard:
               - "Abbruch:/cancellight, Okay:/telegramno"
         - service: telegram_bot.send_message
-          data_template:
+          data:
             target: !secret telegram_chat_samuel_dummy
             message: >
               Es sind noch nachfolgende Lichter an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
@@ -900,7 +884,7 @@
                           below: 100
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_fabian
                         message: "Alle Lichter (außer im Keller) wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
       default:
@@ -922,7 +906,7 @@
                       below: 100
               sequence:
                 - service: telegram_bot.send_message
-                  data_template:
+                  data:
                     target: !secret telegram_chat_fabian
                     message: "Alle Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
 
@@ -965,7 +949,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: >
                   Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
@@ -995,7 +979,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: >
                   Es sind noch nachfolgende Geräte an, diese werden in 20 Minuten ausgeschaltet, außer im Keller:
@@ -1064,7 +1048,7 @@
                           state: "home"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_fabian
                         message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
             - choose:
@@ -1079,7 +1063,7 @@
                           state: "home"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_samuel_dummy
                         message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
@@ -1094,7 +1078,7 @@
                       state: "on"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_fabian
                         message: >
                           Home Assistant {{ states.update.home_assistant_core_update.attributes.latest_version }} wird nun installiert um HA neuzustarten, da DB API Verbindung verloren wurde.
@@ -1105,7 +1089,7 @@
                         entity_id: update.home_assistant_core_update
               default:
                 - service: telegram_bot.send_message
-                  data_template:
+                  data:
                     target: !secret telegram_chat_fabian
                     message: "Starte Homeassistant neu, da DB API Verbindung verloren wurde."
                 - service: homeassistant.restart
@@ -1492,11 +1476,11 @@
       data:
         entity_id: input_boolean.gast_modus
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "Gast Modus wuremand vermutlich übernachtet. Automationen in Samuels Zimmer sind dadurch eingeschränkt."
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_samuel_dummy
         message: "Gast Modus wurde aktiviert, da jemand vermutlich übernachtet. Automationen in Samuels Zimmer sind dadurch eingeschränkt."
 
@@ -1531,7 +1515,7 @@
       data:
         entity_id: input_boolean.gast_modus
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "Gast Modus wurde deaktiviert, da niemand mehr zu Besuch ist."
 
@@ -1581,7 +1565,7 @@
         state: "off"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "Der Leise Modus sollte deaktiviert werden, da er bereits seit 12 Stunden aktiv ist."
 
@@ -2650,7 +2634,7 @@
                               entity_id: person.fabian
                               state: home
                           sequence:
-                            - service: notify.mobile_app_pixel_8_pro
+                            - service: notify.mobile_app_pixel_10_pro
                               data:
                                 message: "Das Fenster im Bad kann wieder geschlossen werden."
                                 data:
@@ -2696,7 +2680,7 @@
                 - service: notify.telegram_fabian
                   data:
                     message: "Das Fenster im Bad kann wieder geschlossen werden."
-                - service: notify.mobile_app_pixel_8_pro
+                - service: notify.mobile_app_pixel_10_pro
                   data:
                     message: "Das Fenster im Bad kann wieder geschlossen werden."
                     data:
@@ -2711,7 +2695,7 @@
                   state: "off"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
@@ -2723,7 +2707,7 @@
                     media_player_entity_id: media_player.fabians_lautsprecher
                     message: Das Fenster im Bad kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.fabians_lautsprecher
@@ -2766,7 +2750,7 @@
                       state: "home"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
@@ -2778,7 +2762,7 @@
                     media_player_entity_id: media_player.samuels_lautsprecher
                     message: Das Fenster im Bad kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.samuels_lautsprecher
@@ -2829,7 +2813,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
@@ -2841,7 +2825,7 @@
                     media_player_entity_id: media_player.kuche_lautsprecher
                     message: Das Fenster im Bad kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.kuche_lautsprecher
@@ -2872,7 +2856,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -2884,7 +2868,7 @@
                     media_player_entity_id: media_player.wohnzimmer_uhr
                     message: Das Fenster im Bad kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -2948,7 +2932,7 @@
                               entity_id: person.fabian
                               state: home
                           sequence:
-                            - service: notify.mobile_app_pixel_8_pro
+                            - service: notify.mobile_app_pixel_10_pro
                               data:
                                 message: "Das Fenster in deinem Zimmer kann wieder geschlossen werden."
                                 data:
@@ -3028,7 +3012,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
@@ -3040,7 +3024,7 @@
                     media_player_entity_id: media_player.kuche_lautsprecher
                     message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.kuche_lautsprecher
@@ -3059,7 +3043,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -3071,7 +3055,7 @@
                     media_player_entity_id: media_player.wohnzimmer_uhr
                     message: Das Fenster in Fabians Zimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -3139,7 +3123,7 @@
                               entity_id: person.fabian
                               state: home
                           sequence:
-                            - service: notify.mobile_app_pixel_8_pro
+                            - service: notify.mobile_app_pixel_10_pro
                               data:
                                 message: "Das Fenster im Wohnzimmer kann wieder geschlossen werden."
                                 data:
@@ -3188,7 +3172,7 @@
                   state: "off"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
@@ -3200,7 +3184,7 @@
                     media_player_entity_id: media_player.fabians_lautsprecher
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.fabians_lautsprecher
@@ -3230,7 +3214,7 @@
                   state: "off"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.samuels_lautsprecher
@@ -3242,7 +3226,7 @@
                     media_player_entity_id: media_player.samuels_lautsprecher
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.samuels_lautsprecher
@@ -3299,7 +3283,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
@@ -3311,7 +3295,7 @@
                     media_player_entity_id: media_player.kuche_lautsprecher
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.kuche_lautsprecher
@@ -3366,7 +3350,7 @@
                                   entity_id: person.samuel
                                   state: home
                           sequence:
-                            - service: notify.mobile_app_pixel_8_pro
+                            - service: notify.mobile_app_pixel_10_pro
                               data:
                                 message: "Das Fenster in Samuels Zimmer kann wieder geschlossen werden."
                                 data:
@@ -3418,7 +3402,7 @@
                   state: "off"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
@@ -3430,7 +3414,7 @@
                     media_player_entity_id: media_player.fabians_lautsprecher
                     message: Das Fenster im Wohnzimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.fabians_lautsprecher
@@ -3487,7 +3471,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
@@ -3499,7 +3483,7 @@
                     media_player_entity_id: media_player.kuche_lautsprecher
                     message: Das Fenster in Samuels Zimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.kuche_lautsprecher
@@ -3518,7 +3502,7 @@
                       state: "idle"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -3530,7 +3514,7 @@
                     media_player_entity_id: media_player.wohnzimmer_uhr
                     message: Das Fenster in Samuels Zimmer kann wieder geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -3824,7 +3808,7 @@
           sequence:
             - service: light.turn_on
               entity_id: light.leds_tisch
-              data_template:
+              data:
                 brightness: "{{states.light.leds_tisch.attributes.brightness + 5}}"
             - service: light.turn_on
               data:
@@ -3843,7 +3827,7 @@
           sequence:
             - service: light.turn_on
               entity_id: light.yeelink_bslamp2_22e2_light
-              data_template:
+              data:
                 brightness: "{{states.light.yeelink_bslamp2_22e2_light.attributes.brightness + 5}}"
     - choose:
         - conditions:
@@ -3907,7 +3891,7 @@
                       state: home
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.1 }}
                     entity_id:
@@ -3917,7 +3901,7 @@
                   continue_on_error: true
                   target:
                     entity_id: tts.google_de_de
-                  data_template:
+                  data:
                     media_player_entity_id:
                       - media_player.wohnzimmer_uhr
                       - media_player.kuche_lautsprecher
@@ -3954,7 +3938,7 @@
                               continue_on_error: true
                               target:
                                 entity_id: tts.google_de_de
-                              data_template:
+                              data:
                                 media_player_entity_id:
                                   - media_player.wohnzimmer_uhr
                                   - media_player.kuche_lautsprecher
@@ -3973,7 +3957,7 @@
                                   {% endif %}
                                   muss noch geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id:
@@ -3991,7 +3975,7 @@
                       state: home
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.1 }}
                     entity_id: media_player.fabians_lautsprecher
@@ -3999,7 +3983,7 @@
                   continue_on_error: true
                   target:
                     entity_id: tts.google_de_de
-                  data_template:
+                  data:
                     media_player_entity_id: media_player.fabians_lautsprecher
                     message: >
                       Es ist {{ now().hour }} Uhr {{ now().minute }} .
@@ -4034,7 +4018,7 @@
                               continue_on_error: true
                               target:
                                 entity_id: tts.google_de_de
-                              data_template:
+                              data:
                                 media_player_entity_id:
                                   - media_player.fabians_lautsprecher
                                   - media_player.kuche_lautsprecher
@@ -4053,7 +4037,7 @@
                                   {% endif %}
                                   muss noch geschlossen werden.
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) | float - 0.2 }}
                     entity_id: media_player.fabians_lautsprecher
@@ -4360,14 +4344,14 @@
       data:
         entity_id: input_boolean.thermostate_aus
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "Thermostate wurden ausgeschaltet, da es {{ states.weather.ebersberg_ebersberg.attributes.temperature }}° hat und sonnig ist."
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_samuel_dummy
         message: "Thermostate wurden ausgeschaltet, da es {{ states.weather.ebersberg_ebersberg.attributes.temperature }}° hat und sonnig ist."
         disable_notification: true
@@ -4417,14 +4401,14 @@
                 value_template: "{{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] <= 14 }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C und morgen {{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] }} °C hat. Dies wurde nicht automatisch gemacht!"
         disable_notification: true
         inline_keyboard:
           - "Einschalten:/climateson"
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_samuel_dummy
         message: "Thermostate sollten wieder eingeschaltet werden, da es jetzt nur noch {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C und morgen {{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] }} °C hat. Dies wurde nicht automatisch gemacht!"
         disable_notification: true
@@ -4463,7 +4447,7 @@
             - "{{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] | int >= 18 }}"
           sequence:
             - service: telegram_bot.send_poll
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 question: >
                   {% set greetings = ["Obacht!", "Aufgepasst!", "Wohoo!"] %}
@@ -4490,7 +4474,7 @@
                 - "{{ states('sensor.weather_ebersberg_hourly') == 'unknown' }}"
           sequence:
             - service: telegram_bot.send_poll
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 question: >
                   {% set greetings = ["Obacht!", "Aufgepasst!", "Wohoo!"] %}
@@ -4509,7 +4493,7 @@
                 disable_notification: true
       default:
         - service: telegram_bot.send_poll
-          data_template:
+          data:
             target: !secret telegram_chat_5friends
             question: >
               {% set greetings = ["Obacht!", "Aufgepasst!", "Wohoo!"] %}
@@ -4529,7 +4513,7 @@
             allows_multiple_answers: true
             disable_notification: true
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_chat_5friends
         question: >
           {% set cooking_questions = ["Sollen wir was Leckeres zusammen kochen?", "Wer hat Hunger und Lust auf eine gemeinsame Koch-Action?", "Wie wär's mit Kochen?"] %}
@@ -4562,7 +4546,7 @@
           value_template: "{{ as_timestamp(now()) - as_timestamp(this.attributes.last_triggered) | int(0) > 180000 }}"
   action:
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_spieletreff
         question: >
           {% set date = state_attr('calendar.votgaming_kalender', 'start_time') | as_timestamp %}
@@ -4575,7 +4559,7 @@
         allows_multiple_answers: false
         disable_notification: false
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_spieletreff
         question: >
           {% set game_questions = ["Worauf habt ihr Lust? 🃏", "Was wird gespielt? 🎲"] %}
@@ -4595,7 +4579,7 @@
         allows_multiple_answers: true
         disable_notification: true
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_spieletreff
         question: >
           {% set location_questions = ["Und wo treffen wir uns? 🏠", "Wo wird gespielt? 🏠"] %}
@@ -4624,12 +4608,12 @@
         - sun
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_squash
         message: "🏸 Neue Woche, neues Glück. Wann habt ihr Zeit für ein Match?"
         disable_notification: true
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_squash
         question: "🏸 Neue Woche, neues Glück. Wann habt ihr Zeit für ein Match?"
         options:
@@ -4692,7 +4676,7 @@
           ] | selectattr('value', '>', 0) | sort(attribute='value') | list %}
           - {{ days_weekend_sued[0].day }} (Tag: {{ days_weekend_sued[0].value }}%)
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_chat_bouldern
         question: "Wann wird gebouldert? 🧗"
         options:
@@ -4708,7 +4692,7 @@
         allows_multiple_answers: true
         disable_notification: true
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_chat_bouldern
         question: "In welche Halle gehen wir?"
         options:
@@ -4979,7 +4963,7 @@
                       below: 6
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: "Erinnerung: Heute steht {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an."
                 disable_notification: true
@@ -5007,7 +4991,7 @@
                   above: 5
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: "Anscheinend steht heute {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an, soll der Kühlschrank im Keller eingeschaltet werden?"
                 disable_notification: true
@@ -5079,7 +5063,7 @@
                   state: "Kartenspieleabend"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Anscheinend steht heute {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an, soll der Kühlschrank im Keller eingeschaltet werden?"
                 disable_notification: true
@@ -5155,7 +5139,7 @@
                   state: "Kartenspieleabend"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Demnächst steht {{ states.calendar.fabianseitz98_gmail_com.attributes.message }} an. Tür im Keller öffnen um die Wärme vom Heizraum zu nutzen?"
 
@@ -5206,7 +5190,7 @@
       value_template: "{{ now().timetuple().tm_isdst }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         disable_notification: true
         message: >
@@ -5217,7 +5201,7 @@
             Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
           {%- endif -%}
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_samuel_dummy
         disable_notification: true
         message: >
@@ -5261,7 +5245,7 @@
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automatic_ha_update.attributes.last_triggered) | int > 500 }}"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Homeassistant wurde soeben gestartet."
 
@@ -5887,68 +5871,39 @@
   condition:
     condition: and
     conditions:
-      - condition: or
-        conditions:
-          - condition: state
-            entity_id: sensor.bioabfall
-            state: "Morgen"
-          - condition: state
-            entity_id: sensor.altpapier
-            state: "Morgen"
-          - condition: state
-            entity_id: sensor.restmull
-            state: "Morgen"
-          - condition: state
-            entity_id: sensor.gelber_sack
-            state: "Morgen"
-      - condition: state
-        entity_id: "input_boolean.abwesend_modus"
-        state: "off"
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_waste_put_outside.attributes.last_triggered) | int > 86400 }}"
+        value_template: "{{ (state_attr('sensor.nachste_abholungen', (now() + timedelta(days=1)).strftime('%Y-%m-%d')) != None) }}"
+      #- condition: template
+      #  value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_waste_put_outside.attributes.last_triggered) | int > 86400 }}"
   action:
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.fabian
-              state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_fabian
-                inline_keyboard:
-                  - "Erledigt:/telegramwastedone"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.samuel
-              state: home
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Morgen wird {% if states.sensor.bioabfall.state == "Morgen" %}die Biomülltonne{% endif %}{% if states.sensor.altpapier.state == "Morgen" %}das Altpapier{% endif %}{% if states.sensor.restmull.state == "Morgen" %}die schwarze Tonne{% endif %}{% if states.sensor.gelber_sack.state == "Morgen" %}die gelben Säcke{% endif %} abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_samuel_dummy
-                inline_keyboard:
-                  - "Erledigt:/telegramwastedone"
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: sensor.altpapier
-              state: "Morgen"
-          sequence:
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Morgen wird das Altpapier abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_kai
-            - service: telegram_bot.send_message
-              data_template:
-                message: >
-                  Morgen wird das Altpapier abgeholt. Bitte rausstellen.
-                target: !secret telegram_chat_adrian
+    - service: whatsapp.send_buttons
+      data:
+        target: !secret whatsapp_vermieter
+        message: >
+          {% set tomorrow = (now() + timedelta(days=1)).strftime('%Y-%m-%d') %}
+          {% set pickup = state_attr('sensor.nachste_abholungen', tomorrow) %}
+
+          {% if pickup is not none %}
+            {% set weekdays = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+            {% set day_name = weekdays[strptime(tomorrow, '%Y-%m-%d').strftime('%A')] %}
+            {% set date_german = as_timestamp(tomorrow) | timestamp_custom('%d.%m.%Y') %}
+            {% set verb = 'werden' if ',' in pickup or ' und ' in pickup else 'wird' %}
+            {% set items = pickup | replace('Restmüll', '🗑️ *Restmüll*')
+                                  | replace('Biotonne', '🌿 *Biotonne*')
+                                  | replace('Gelber Sack', '♻️ *Gelber Sack*')
+                                  | replace('Altpapier', '📄 *Altpapier*')
+                                  | replace('Papiersamml', '📄 *Papiersammlung*')
+                                  | replace('Problemmüll', '⚠️ *Problemmüll*')
+                                  | replace('Gartenabfall', '🍂 *Gartenabfall*') %}
+            📣 {{ day_name }}, {{ date_german }} (morgen) {{ verb }} {{ items }} abgeholt. Bitte rechtzeitig rausstellen! 🚛
+          {% else %}
+            Keine Abholung morgen.
+          {% endif %}
+        buttons:
+          - text: "✅ Erledigt"
+            callback_data: "müll_erledigt"
+          - text: "🗓️ Alle Abholungen"
+            callback_data: "müllabholung"
 
 - id: foodsharing_basket_available
   alias: "Foodsharing Basket Available"
@@ -5968,7 +5923,7 @@
         value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         message: >
           {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
 
@@ -6025,8 +5980,8 @@
                   entity_id: sensor.smart_life_fabian_distance
                   below: 1500
           sequence:
-            - service: notify.mobile_app_pixel_8_pro
-              data_template:
+            - service: notify.mobile_app_pixel_10_pro
+              data:
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
                   {{ state_attr('sensor.foodsharing_48_082236', 'baskets')[0]['description'] }}
@@ -6048,7 +6003,7 @@
                   below: 1500
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
@@ -6068,7 +6023,7 @@
                   state: "JUZ"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_kai
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
@@ -6088,7 +6043,7 @@
                   state: "JUZ"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_adrian
                 title: "Neuer Foodsharing Korb in Zorneding"
                 message: >
@@ -6110,7 +6065,7 @@
         value_template: "{{ trigger.to_state.state|int > trigger.from_state.state|int }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         message: >
           {{ state_attr('sensor.foodsharing_48_117971', 'baskets')[0]['description'] }}
 
@@ -6146,7 +6101,7 @@
           state: "home"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         message: >
           Es gibt noch {{ (states.sensor.tgtg_fruchtehaus_vaterstetten_uberraschungstute.state | int) + (states.sensor.tgtg_neylas_feine_kost.state | int) + (states.sensor.tgtg_cafe_bonjour_totalenergies_station_kantgtg_organic_garden_tagescafe_vaterstettentstrasse_wurzburg_uberraschungstute_abend.state | int) }} verfügbare Reservierungen bei TGTG. Darunter:
 
@@ -6206,7 +6161,7 @@
           state: "unavailable"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_juz_leiter
         data:
           disable_web_page_preview: true
@@ -6275,7 +6230,7 @@
           - sun
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         disable_notification: true
         message: >
@@ -6331,7 +6286,7 @@
       continue_on_error: true
       target:
         entity_id: tts.google_de_de
-      data_template:
+      data:
         media_player_entity_id:
           #- media_player.wohnzimmer_uhr
           - media_player.fabians_lautsprecher
@@ -6384,7 +6339,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 disable_notification: true
                 message: >
@@ -6413,7 +6368,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: >
@@ -6434,7 +6389,7 @@
               state: "2"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 disable_notification: true
                 message: >
@@ -6464,7 +6419,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6492,7 +6447,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6512,7 +6467,7 @@
               state: "3"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6541,7 +6496,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: >
                   *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6569,7 +6524,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: >
                   *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6589,7 +6544,7 @@
               state: "4"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: >
                   *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -6621,7 +6576,7 @@
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.server_temp_warning.attributes.last_triggered) | int > 3600 }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "ACHTUNG! Server Temperatur sehr hoch: {{ states.sensor.processor_temperature.state }}"
 
@@ -6639,7 +6594,7 @@
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.server_ram_load_warning.attributes.last_triggered) | int > 3600 }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "ACHTUNG! Server RAM Auslastung sehr hoch: {{ states.sensor.memory_use_percent.state }}"
 
@@ -6710,7 +6665,7 @@
         value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.fabi_phone_battery_low.attributes.last_triggered) | int > 3600 }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         title: "Fabi Akku unter 5%"
         target: !secret telegram_chat_samuel_dummy
         message: ""
@@ -7087,7 +7042,7 @@
         state: "unavailable"
   action:
     - service: notify.telegram_fabian
-      data_template:
+      data:
         message: >
           Die Batterie im Thermostat
           {% if is_state('climate.wohnzimmer', 'unavailable') %}
@@ -7110,7 +7065,7 @@
           {% endif %}
           leer. Bitte auswechseln! Luftfeuchtigkeitsautomationen & Temperatureinstellungen funktionieren so lange nur eingeschränkt.
     - service: notify.telegram_fabian
-      data_template:
+      data:
         message: >
           Die Batterie im Thermostat
           {% if is_state('climate.wohnzimmer', 'unavailable') %}
@@ -7239,7 +7194,7 @@
       continue_on_error: true
       target:
         entity_id: tts.google_de_de
-      data_template:
+      data:
         media_player_entity_id:
           - media_player.fabians_lautsprecher
           - media_player.wohnzimmer_uhr
@@ -7293,7 +7248,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id:
                   - media_player.fabians_lautsprecher
                   - media_player.wohnzimmer_uhr
@@ -7760,7 +7715,7 @@
                   state: "off"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.kuche_lautsprecher
@@ -7769,7 +7724,7 @@
                   continue_on_error: true
                   target:
                     entity_id: tts.google_de_de
-                  data_template:
+                  data:
                     media_player_entity_id: media_player.kuche_lautsprecher
                     message: >
                       {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
@@ -7808,7 +7763,7 @@
                   value_template: "{{ as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240 }}"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.fabians_lautsprecher
@@ -7817,7 +7772,7 @@
                   continue_on_error: true
                   target:
                     entity_id: tts.google_de_de
-                  data_template:
+                  data:
                     media_player_entity_id: media_player.fabians_lautsprecher
                     message: >
                       {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
@@ -7860,7 +7815,7 @@
                   state: "off"
               sequence:
                 - service: media_player.volume_set
-                  data_template:
+                  data:
                     volume_level: >
                       {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                     entity_id: media_player.wohnzimmer_uhr
@@ -7869,7 +7824,7 @@
                   continue_on_error: true
                   target:
                     entity_id: tts.google_de_de
-                  data_template:
+                  data:
                     media_player_entity_id: media_player.wohnzimmer_uhr
                     message: >
                       {% if (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) and (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) %}
@@ -7908,7 +7863,7 @@
               sequence:
                 - service: notify.wohnzimmer_tv
                   continue_on_error: true
-                  data_template:
+                  data:
                     message: >
                       Die Luftfeuchtigkeit ist zu hoch im Raum
                       {% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 60 %}
@@ -7958,7 +7913,7 @@
               below: 89000
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: >
                   Achtung, sehr hohe Luftfeuchtigkeit:{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %}
@@ -7974,7 +7929,7 @@
               below: 89000
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: >
                   Achtung, sehr hohe Luftfeuchtigkeit:{% if (states.climate.samuel_s_zimmer.attributes.current_humidity) > 67 %}
@@ -8048,7 +8003,7 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: "Kohleanzünder wurde eingeschaltet."
         #  ELSEIF only K&A are there
@@ -8086,7 +8041,7 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_afk
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
@@ -8107,13 +8062,13 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_adrian
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
                   - "Dauer:/remaining_time"
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
@@ -8131,7 +8086,7 @@
                   state: home
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: "Kohleanzünder wurde eingeschaltet."
                 inline_keyboard:
@@ -8139,7 +8094,7 @@
       #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
-          data_template:
+          data:
             target: !secret telegram_chat_fabian
             message: "Kohleanzünder wurde eingeschaltet."
             inline_keyboard:
@@ -8161,10 +8116,10 @@
     #              state: "JUZ"
     #      sequence:
     #        - service: telegram_bot.send_message
-    #          data_template:
+    #          data:
     #            target: !secret telegram_chat_5friends
     #            message: "Bitte Kohle wenden."
-    #        - service: notify.mobile_app_pixel_8_pro
+    #        - service: notify.mobile_app_pixel_10_pro
     #          data:
     #            message: "Bitte Kohle wenden"
     #            data:
@@ -8208,10 +8163,10 @@
     #                  state: "Kai-Adri"
     #      sequence:
     #        - service: telegram_bot.send_message
-    #          data_template:
+    #          data:
     #            target: !secret telegram_chat_afk
     #            message: "Bitte Kohle wenden."
-    #        - service: notify.mobile_app_pixel_8_pro
+    #        - service: notify.mobile_app_pixel_10_pro
     #          data:
     #            message: "Bitte Kohle wenden"
     #            data:
@@ -8236,14 +8191,14 @@
     #                  state: "Kai-Adri"
     #      sequence:
     #        - service: telegram_bot.send_message
-    #          data_template:
+    #          data:
     #            target: !secret telegram_chat_adrian
     #            message: "Bitte Kohle wenden."
     #        - service: telegram_bot.send_message
-    #          data_template:
+    #          data:
     #            target: !secret telegram_chat_fabian
     #            message: "Bitte Kohle wenden."
-    #        - service: notify.mobile_app_pixel_8_pro
+    #        - service: notify.mobile_app_pixel_10_pro
     #          data:
     #            message: "Bitte Kohle wenden"
     #            data:
@@ -8266,15 +8221,15 @@
     #              state: home
     #      sequence:
     #        - service: telegram_bot.send_message
-    #          data_template:
+    #          data:
     #            target: !secret telegram_chat_samuel_dummy
     #            message: "Bitte Kohle wenden."
     #  default:
     #    - service: telegram_bot.send_message
-    #      data_template:
+    #      data:
     #        target: !secret telegram_chat_fabian
     #        message: "Bitte Kohle wenden."
-    #    - service: notify.mobile_app_pixel_8_pro
+    #    - service: notify.mobile_app_pixel_10_pro
     #      data:
     #        message: "Bitte Kohle wenden"
     #        data:
@@ -8335,7 +8290,7 @@
                   value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.detect_if_coal_lighter_is_currently_active.attributes.last_triggered) | int > 14400 }}"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Der Eisschlauch kann schon mal geholt werden."
         - conditions:
@@ -8353,7 +8308,7 @@
                   state: home
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: "Der Eisschlauch kann schon mal geholt werden."
     - delay: "00:02:00"
@@ -8377,10 +8332,10 @@
                   state: "JUZ"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: "Die Kohle sollte fertig sein! Strom ausschalten nicht vergessen."
-            - service: notify.mobile_app_pixel_8_pro
+            - service: notify.mobile_app_pixel_10_pro
               data:
                 message: "Die Kohle sollte fertig sein! Strom ausschalten nicht vergessen."
                 data:
@@ -8424,10 +8379,10 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_afk
                 message: "Die Kohle sollte fertig sein! Strom ausschalten nicht vergessen."
-            - service: notify.mobile_app_pixel_8_pro
+            - service: notify.mobile_app_pixel_10_pro
               data:
                 message: "Die Kohle sollte fertig sein!"
                 data:
@@ -8452,14 +8407,14 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_adrian
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
-            - service: notify.mobile_app_pixel_8_pro
+            - service: notify.mobile_app_pixel_10_pro
               data:
                 message: "Die Kohle sollte fertig sein!"
                 data:
@@ -8481,16 +8436,16 @@
                   state: home
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_samuel_dummy
                 message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
       #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
-          data_template:
+          data:
             target: !secret telegram_chat_fabian
             message: "Die Kohle sollte fertig sein! Strom wurde ausgeschaltet."
-        - service: notify.mobile_app_pixel_8_pro
+        - service: notify.mobile_app_pixel_10_pro
           data:
             message: "Die Kohle sollte fertig sein!"
             data:
@@ -8560,7 +8515,7 @@
                   state: "JUZ"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_5friends
                 message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
         #  ELSEIF only K&A are there
@@ -8598,7 +8553,7 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_afk
                 message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
         - conditions:
@@ -8617,17 +8572,17 @@
                       state: "Kai-Adri"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_adrian
                 message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
       #  ELSE only notify fabian
       default:
         - service: telegram_bot.send_message
-          data_template:
+          data:
             target: !secret telegram_chat_fabian
             message: "Der Kohleanzunder wurde vor 25 Minuten eingeschaltet aber die Automationen nicht gestartet. Ggf. Fehler und die Kohle ist fertig."
 
@@ -8847,7 +8802,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id: media_player.wohnzimmer_uhr
                 message: "Die Waschmaschine ist fertig."
     - choose:
@@ -8865,7 +8820,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id: media_player.kuche_lautsprecher
                 message: "Die Waschmaschine ist fertig."
     - choose:
@@ -8883,7 +8838,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id: media_player.fabians_lautsprecher
                 message: "Die Waschmaschine ist fertig."
 
@@ -8937,10 +8892,10 @@
                   state: "home"
           sequence:
             - service: notify.telegram_fabian
-              data_template:
+              data:
                 message: "Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig."
             - service: notify.telegram_fabian
-              data_template:
+              data:
                 message: "Der Reiskocher ist in {{ states.sensor.xiaomi_miio_cooker_remaining.state }} Minuten fertig."
     - choose:
         - conditions:
@@ -8965,7 +8920,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_lautsprecher
@@ -8990,10 +8945,10 @@
       data:
         entity_id: switch.xiaomi_miio_cooker
     - service: notify.telegram_fabian
-      data_template:
+      data:
         message: "Der Reiskocher wurde automatisch angeschaltet im Programm {{ states.input_select.rice_cooker_program.state }}."
     - service: notify.telegram_fabian
-      data_template:
+      data:
         message: "Der Reiskocher wurde automatisch angeschaltet im Programm {{ states.input_select.rice_cooker_program.state }}."
 
 - id: set_rice_cooker_menu_state
@@ -9082,10 +9037,10 @@
                   state: "home"
           sequence:
             - service: notify.telegram_fabian
-              data_template:
+              data:
                 message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
             - service: notify.telegram_fabian
-              data_template:
+              data:
                 message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
     - choose:
         - conditions:
@@ -9110,7 +9065,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id:
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_lautsprecher
@@ -9161,7 +9116,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id: media_player.wohnzimmer_uhr
                 message: "Der Timer in der Küche ist in {{ states.sensor.kuche_lautsprecher_timers.state }} Minuten fertig."
 
@@ -9227,8 +9182,8 @@
 #             {% set state = 'off' %}
 #             {{ states[domain] | count == states[domain] | selectattr('state','eq', state) | list | count }}
 #     action:
-#       - service: notify.mobile_app_pixel_8_pro
-#         data_template:
+#       - service: notify.mobile_app_pixel_10_pro
+#         data:
 #           title: "Flugmodus"
 #           message: "Flugmodus wurde vergessen und wird nun automatisch aktiviert!"
 #         data:
@@ -9299,7 +9254,7 @@
               below: "21"
           sequence:
             - service: notify.telegram_fabian
-              data_template:
+              data:
                 message: "Pille nehmen nicht vergessen! Heute ist Tag {{ states.counter.pille.state }} von {{ (states.counter.pille.attributes.maximum) - 1 }}."
                 data:
                   inline_keyboard:
@@ -9359,7 +9314,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id: media_player.fabians_lautsprecher
                 message: "Samuel, du hast die Pille vergessen"
     - service: notify.telegram_fabian
@@ -9410,7 +9365,7 @@
               continue_on_error: true
               target:
                 entity_id: tts.google_de_de
-              data_template:
+              data:
                 media_player_entity_id: media_player.fabians_lautsprecher
                 message: "Samuel, du hast die Pille vergessen"
     - service: notify.telegram_fabian
@@ -9477,7 +9432,7 @@
             state: "on"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: >
           Es ist noch Licht oder Strom an im
@@ -9626,11 +9581,11 @@
       data:
         entity_id: input_boolean.gast_modus
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: "Übernachtet heute ein Gast? Gast Modus wurde automatisch eingeschaltet."
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_samuel_dummy
         message: "Übernachtet heute ein Gast? Gast Modus wurde automatisch eingeschaltet."
 
@@ -9994,7 +9949,7 @@
                           state: "off"
                       sequence:
                         - service: media_player.volume_set
-                          data_template:
+                          data:
                             volume_level: >
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                             entity_id: media_player.kuche_lautsprecher
@@ -10003,7 +9958,7 @@
                           continue_on_error: true
                           target:
                             entity_id: tts.google_de_de
-                          data_template:
+                          data:
                             media_player_entity_id: media_player.kuche_lautsprecher
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
                         - delay: 00:00:08
@@ -10019,7 +9974,7 @@
                           state: "off"
                       sequence:
                         - service: media_player.volume_set
-                          data_template:
+                          data:
                             volume_level: >
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                             entity_id: media_player.samuels_lautsprecher
@@ -10028,7 +9983,7 @@
                           continue_on_error: true
                           target:
                             entity_id: tts.google_de_de
-                          data_template:
+                          data:
                             media_player_entity_id: media_player.samuels_lautsprecher
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
                         - delay: 00:00:08
@@ -10044,7 +9999,7 @@
                           state: "off"
                       sequence:
                         - service: media_player.volume_set
-                          data_template:
+                          data:
                             volume_level: >
                               {{ ((states.input_number.lautstarke_ansagen.state) | float * 0.1) | round(1) }}
                             entity_id: media_player.wohnzimmer_uhr
@@ -10053,7 +10008,7 @@
                           continue_on_error: true
                           target:
                             entity_id: tts.google_de_de
-                          data_template:
+                          data:
                             media_player_entity_id: media_player.wohnzimmer_uhr
                             message: "Fabian ist auf dem Weg nach Hause und kommt voraussichtlich um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['arrival'] }} Uhr mit {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung in Zorneding an."
                         - delay: 00:00:08
@@ -10157,7 +10112,7 @@
     #    entity_id: sensor.weather_ebersberg_daily
     #  response_variable: weather_forecast
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         disable_notification: true
         #{{ states.sensor.sensor.ebersberg_temperature_2.attributes.templow }} °C {{ '\u21F5' }} {{ weather_forecast.forecast.0.temperature }} °C
@@ -10194,7 +10149,7 @@
     #    telegram_bot_api: !secret telegram_bot_api
     #    chat_id: !secret telegram_volleyball
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_volleyball
         question:
           "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
@@ -10214,7 +10169,7 @@
               value_template: "{{not is_state_attr('calendar.volleyballtraining', 'description', '')}}"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_volleyball
                 data:
                   disable_web_page_preview: true
@@ -10245,11 +10200,11 @@
         value_template: "{{ now().month <= 10 and now().month >= 4 }}"
   action:
     - service: shell_command.unpin_all_telegram
-      data_template:
+      data:
         telegram_bot_api: !secret telegram_bot_api
         chat_id: !secret telegram_volleyball
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_volleyball
         question:
           "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
@@ -10270,7 +10225,7 @@
               value_template: "{{not is_state_attr('calendar.volleyballtraining', 'description', '')}}"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_volleyball
                 data:
                   disable_web_page_preview: true
@@ -10278,14 +10233,12 @@
                   Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
     - service: whatsapp.send_message
       continue_on_error: true
-      data_template:
-        clientId: default
-        to: !secret whatsapp_volleyball_group
-        body:
-          text:
-            "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
-            {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
-            bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind. Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }}?"
+      data:
+        target: !secret whatsapp_volleyball_group
+        message:
+          "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
+          {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
+          bei {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].temperature }}° und {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].wind_speed }} km/h Wind. Beachvolleyball ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }}?"
 
 - id: remind_for_juz
   alias: "remind for juz"
@@ -10300,7 +10253,7 @@
         value_template: "{{ ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) < 112600) and ((as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) - as_timestamp(now())) > 0) }}"
   action:
     - service: telegram_bot.send_poll
-      data_template:
+      data:
         target: !secret telegram_chat_juz_group
         question:
           "Das JUZ hat {%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
@@ -10319,27 +10272,23 @@
               value_template: "{{not is_state_attr('calendar.juz_zorneding_public', 'description', '')}}"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_juz_group
                 message: >
                   Zusatzinfo: {{ states.calendar.juz_zorneding_public.attributes.description }}
             - service: whatsapp.send_message
               continue_on_error: true
-              data_template:
-                clientId: default
-                to: !secret whatsapp_chat_juz_group
-                body:
-                  text:
-                    "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
-                    Zusatzinfo: {{ states.calendar.juz_zorneding_public.attributes.description }}"
+              data:
+                target: !secret whatsapp_chat_juz_group
+                message:
+                  "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!
+                  Zusatzinfo: {{ states.calendar.juz_zorneding_public.attributes.description }}"
       default:
         - service: whatsapp.send_message
           continue_on_error: true
-          data_template:
-            clientId: default
-            to: !secret whatsapp_chat_juz_group
-            body:
-              text: "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
+          data:
+            target: !secret whatsapp_chat_juz_group
+            message: "Das JUZ hat{%- set date = as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.juz_zorneding_public.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr für {{ states.calendar.juz_zorneding_public.attributes.message }} geöffnet. Wir freuen uns auf euren Besuch!"
 
 - id: send_juz_mails_to_telegram
   alias: "send juz mails to telegram"
@@ -10391,7 +10340,7 @@
             value_template: "{{'Undeliverable: ' in state_attr('sensor.juz_outlook', 'data')[0]['subject'] }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_juz_mail
         message: >
           Neue Mail vom {{ as_timestamp(state_attr('sensor.juz_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10462,7 +10411,7 @@
                                   value_template: "{{'Mitteilung von' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
                           sequence:
                             - service: telegram_bot.send_message
-                              data_template:
+                              data:
                                 target: !secret telegram_chat_juz_leiter
                                 message: >
                                   Neue PayPal *Einnahme* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10474,7 +10423,7 @@
                                   #PayPal #PayPalEinnahme
                       default:
                         - service: telegram_bot.send_message
-                          data_template:
+                          data:
                             target: !secret telegram_chat_juz_leiter
                             message: >
                               Neue PayPal *Einnahme* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10488,7 +10437,7 @@
                               value_template: "{{'Gebühr' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
                           sequence:
                             - service: telegram_bot.send_message
-                              data_template:
+                              data:
                                 target: !secret telegram_chat_juz_leiter
                                 message: >
                                   Achtung! Person hat nicht per PayPal Freunde bezahlt, daher sind Gebühren angefallen!
@@ -10506,7 +10455,7 @@
                                   value_template: "{{'Ihre Mitteilung an' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
                           sequence:
                             - service: telegram_bot.send_message
-                              data_template:
+                              data:
                                 target: !secret telegram_chat_juz_leiter
                                 message: >
                                   Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10518,7 +10467,7 @@
                                   #PayPal #PayPalAusgabe
                       default:
                         - service: telegram_bot.send_message
-                          data_template:
+                          data:
                             target: !secret telegram_chat_juz_leiter
                             message: >
                               Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10533,7 +10482,7 @@
                           value_template: "{{'Einkaufsbetrag' in state_attr('sensor.5freunde_outlook', 'data')[0]['body'] }}"
                   sequence:
                     - service: telegram_bot.send_message
-                      data_template:
+                      data:
                         target: !secret telegram_chat_juz_leiter
                         message: >
                           Neue PayPal *Ausgabe* vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10543,7 +10492,7 @@
                           #PayPal #PayPalAusgabe
               default:
                 - service: telegram_bot.send_message
-                  data_template:
+                  data:
                     target: !secret telegram_chat_juz_leiter
                     message: >
                       Neue PayPal Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10558,7 +10507,7 @@
                   value_template: "{{'juzzorneding@gmail.com' in state_attr('sensor.5freunde_outlook', 'data')[0]['to'] }}"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_juz_leiter
                 message: >
                   Neue JUZ Gmail Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10571,7 +10520,7 @@
                   *Inhalt:* {{state_attr('sensor.5freunde_outlook', 'data')[0]['body'] | truncate(400)}}
       default:
         - service: telegram_bot.send_message
-          data_template:
+          data:
             target: !secret telegram_chat_5friends
             message: >
               Neue Mail vom {{ as_timestamp(state_attr('sensor.5freunde_outlook', 'data')[0]['received']) | timestamp_custom("%d.%m.%Y %H:%M", true) }}:
@@ -10600,7 +10549,7 @@
       value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: >
           New CTGP-DX Version **{{ states.sensor.ctgp_dx_latest_version.state }}** is now available!
@@ -10621,7 +10570,7 @@
       value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: >
           New GSA Windows Version **{{ states.sensor.global_secure_access_client_windows.state }}** is now available!
@@ -10642,7 +10591,7 @@
       value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: !secret telegram_chat_fabian
         message: >
           New GSA MacOS Version **{{ states.sensor.global_secure_access_client_macos.state }}** is now available!
@@ -10662,21 +10611,19 @@
   action:
     - service: whatsapp.send_message
       continue_on_error: true
-      data_template:
-        clientId: default
-        to: !secret whatsapp_volleyball_group
-        body:
-          text: >
-            {% set latest_comment = states.sensor.kadermanager_zorro.attributes.events[0].comments[0] %}
-            {% set author = latest_comment.author %}
-            {% set text = latest_comment.text %}
-            {% set messages = [
-              "📣 *Neuer Kommentar von " ~ author ~ ":*\n\n" ~ text,
-              "💬 *" ~ author ~ " hat geschrieben:*\n\n" ~ text,
-              "*Neues von " ~ author ~ ":*\n\n" ~ text,
-              "👀 *Ein neuer Kommentar von " ~ author ~ ":*\n\n" ~ text
-            ] %}
-            {{ messages | random }}
+      data:
+        target: !secret whatsapp_volleyball_group
+        message: >
+          {% set latest_comment = states.sensor.kadermanager_zorro.attributes.events[0].comments[0] %}
+          {% set author = latest_comment.author %}
+          {% set text = latest_comment.text %}
+          {% set messages = [
+            "📣 *Neuer Kommentar von " ~ author ~ ":*\n\n" ~ text,
+            "💬 *" ~ author ~ " hat geschrieben:*\n\n" ~ text,
+            "*Neues von " ~ author ~ ":*\n\n" ~ text,
+            "👀 *Ein neuer Kommentar von " ~ author ~ ":*\n\n" ~ text
+          ] %}
+          {{ messages | random }}
 
 - id: notification_on_new_kadermanager_comment_tischabwischer
   alias: "Benachrichtigung bei neuem Kadermanager Kommentar 2. Mannschaft"
@@ -10692,21 +10639,19 @@
   action:
     - service: whatsapp.send_message
       continue_on_error: true
-      data_template:
-        clientId: default
-        to: !secret whatsapp_volleyball_tischabwischer
-        body:
-          text: >
-            {% set latest_comment = states.sensor.kadermanager_tischabwischer.attributes.events[0].comments[0] %}
-            {% set author = latest_comment.author %}
-            {% set text = latest_comment.text %}
-            {% set messages = [
-              "📣 *Neuer Kommentar von " ~ author ~ ":*\n\n" ~ text,
-              "💬 *" ~ author ~ " hat geschrieben:*\n\n" ~ text,
-              "*Neues von " ~ author ~ ":*\n\n" ~ text,
-              "👀 *Ein neuer Kommentar von " ~ author ~ ":*\n\n" ~ text
-            ] %}
-            {{ messages | random }}
+      data:
+        target: !secret whatsapp_volleyball_tischabwischer
+        message: >
+          {% set latest_comment = states.sensor.kadermanager_tischabwischer.attributes.events[0].comments[0] %}
+          {% set author = latest_comment.author %}
+          {% set text = latest_comment.text %}
+          {% set messages = [
+            "📣 *Neuer Kommentar von " ~ author ~ ":*\n\n" ~ text,
+            "💬 *" ~ author ~ " hat geschrieben:*\n\n" ~ text,
+            "*Neues von " ~ author ~ ":*\n\n" ~ text,
+            "👀 *Ein neuer Kommentar von " ~ author ~ ":*\n\n" ~ text
+          ] %}
+          {{ messages | random }}
 
 - id: remind_for_volleyball_by_kadermanager
   alias: "Erinnerung für Volleyball via Kadermanager"
@@ -10783,66 +10728,64 @@
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
-              data_template:
-                clientId: default
-                to: !secret whatsapp_volleyball_group
-                body:
-                  text: >
-                    {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
-                    {% set event_0 = events[0] if events | length > 0 else None %}
-                    {% if events | length > 1 and events[0]['date'] == events[1]['date'] %}
-                      {% set zorro_event = events | selectattr('type', 'eq', 'Spiel') | first | default(events[0]) %}
-                    {% else %}
-                      {% set zorro_event = event_0 %}
-                    {% endif %}
-                    {%- set tischabwischer_event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
-                    {%- set zorro_date = strptime(zorro_event['date'], '%Y-%m-%d') %}
-                    {%- set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][zorro_date.weekday()] %}
-                    {% set tischabwischer_schedule_text = "" %}
-                    {% if states('sensor.dieliga_schedule_tsv_zorneding_ii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
-                      {%- set t_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
-                      {%- set t_completed = (state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'completed_games') | default(0)) + 1 %}
-                      {%- set tischabwischer_schedule_text = '(' ~ t_completed ~ '. von ' ~ t_games ~ ')' %}
-                    {% endif %}
-                    {% set zorro_schedule_text = "" %}
-                    {% if states('sensor.dieliga_schedule_tsv_zorneding_iii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
-                      {%- set z_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
-                      {%- set z_completed = (state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'completed_games') | default(0)) + 1 %}
-                      {%- set zorro_schedule_text = '(' ~ z_completed ~ '. von ' ~ z_games ~ ')' %}
-                    {% endif %}
-                    *🏐 Doppelter Spieltag am {{ weekday }}! 🏐*
+              data:
+                target: !secret whatsapp_volleyball_group
+                message: >
+                  {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                  {% set event_0 = events[0] if events | length > 0 else None %}
+                  {% if events | length > 1 and events[0]['date'] == events[1]['date'] %}
+                    {% set zorro_event = events | selectattr('type', 'eq', 'Spiel') | first | default(events[0]) %}
+                  {% else %}
+                    {% set zorro_event = event_0 %}
+                  {% endif %}
+                  {%- set tischabwischer_event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                  {%- set zorro_date = strptime(zorro_event['date'], '%Y-%m-%d') %}
+                  {%- set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][zorro_date.weekday()] %}
+                  {% set tischabwischer_schedule_text = "" %}
+                  {% if states('sensor.dieliga_schedule_tsv_zorneding_ii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
+                    {%- set t_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
+                    {%- set t_completed = (state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'completed_games') | default(0)) + 1 %}
+                    {%- set tischabwischer_schedule_text = '(' ~ t_completed ~ '. von ' ~ t_games ~ ')' %}
+                  {% endif %}
+                  {% set zorro_schedule_text = "" %}
+                  {% if states('sensor.dieliga_schedule_tsv_zorneding_iii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
+                    {%- set z_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
+                    {%- set z_completed = (state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'completed_games') | default(0)) + 1 %}
+                    {%- set zorro_schedule_text = '(' ~ z_completed ~ '. von ' ~ z_games ~ ')' %}
+                  {% endif %}
+                  *🏐 Doppelter Spieltag am {{ weekday }}! 🏐*
 
-                    *Mannschaft 3:*
-                    {{ zorro_event['type'] }} {{ zorro_schedule_text }} "{{ zorro_event['title'] }}" um ⏰ {{ zorro_event['time'] }} Uhr.
-                    *Zusagen:* {{ zorro_event['in_count'] }}
-                    {% set z_min = 6 if 'Heim' in zorro_event['title'] else 8 %}
-                    {% if zorro_event['in_count'] < z_min -%}
-                    Wir brauchen noch Verstärkung! Bitte tragt euch zeitnah ein: {{ zorro_event['link'] }}
-                    {% else -%}
-                    Bitte alle im Kadermanager abstimmen: {{ zorro_event['link'] }}
-                    {% endif %}
+                  *Mannschaft 3:*
+                  {{ zorro_event['type'] }} {{ zorro_schedule_text }} "{{ zorro_event['title'] }}" um ⏰ {{ zorro_event['time'] }} Uhr.
+                  *Zusagen:* {{ zorro_event['in_count'] }}
+                  {% set z_min = 6 if 'Heim' in zorro_event['title'] else 8 %}
+                  {% if zorro_event['in_count'] < z_min -%}
+                  Wir brauchen noch Verstärkung! Bitte tragt euch zeitnah ein: {{ zorro_event['link'] }}
+                  {% else -%}
+                  Bitte alle im Kadermanager abstimmen: {{ zorro_event['link'] }}
+                  {% endif %}
 
-                    ---
-                    *Mannschaft 2:*
-                    {{ tischabwischer_event['type'] }} {{ tischabwischer_schedule_text }} am selben Tag um ⏰ {{ tischabwischer_event['time'] }} Uhr: "{{ tischabwischer_event['title'] }}".
-                    *Zusagen:* {{ tischabwischer_event['in_count'] }}
-                    {% set t_min = 6 if 'Heim' in tischabwischer_event['title'] else 7 %}
-                    {% if tischabwischer_event['in_count'] < t_min -%}
-                    Auch hier fehlen noch Zusagen! Bitte eintragen: {{ tischabwischer_event['link'] }}
-                    {% endif %}
+                  ---
+                  *Mannschaft 2:*
+                  {{ tischabwischer_event['type'] }} {{ tischabwischer_schedule_text }} am selben Tag um ⏰ {{ tischabwischer_event['time'] }} Uhr: "{{ tischabwischer_event['title'] }}".
+                  *Zusagen:* {{ tischabwischer_event['in_count'] }}
+                  {% set t_min = 6 if 'Heim' in tischabwischer_event['title'] else 7 %}
+                  {% if tischabwischer_event['in_count'] < t_min -%}
+                  Auch hier fehlen noch Zusagen! Bitte eintragen: {{ tischabwischer_event['link'] }}
+                  {% endif %}
 
-                    ---
-                    {% if 'Heim' in zorro_event['title'] and 'Heim' in tischabwischer_event['title'] %}
-                    *🛎️ Schiri-Info:* Beide Teams haben ein Heimspiel! Bitte denkt daran, euch gegenseitig Schiedsrichter zu stellen und meldet euch bei Verfügbarkeit! Danke!
-                    {% elif 'Heim' in zorro_event['title'] %}
-                    *🛎️ Schiri-Info:* Mannschaft 3 hat ein Heimspiel und braucht einen Schiedsrichter. Wer kann pfeifen? Bitte melden!
-                    {% elif 'Heim' in tischabwischer_event['title'] %}
-                    *🛎️ Schiri-Info:* Mannschaft 2 hat ein Heimspiel und braucht einen Schiedsrichter. Wer kann pfeifen? Bitte melden!
-                    {% endif %}
+                  ---
+                  {% if 'Heim' in zorro_event['title'] and 'Heim' in tischabwischer_event['title'] %}
+                  *🛎️ Schiri-Info:* Beide Teams haben ein Heimspiel! Bitte denkt daran, euch gegenseitig Schiedsrichter zu stellen und meldet euch bei Verfügbarkeit! Danke!
+                  {% elif 'Heim' in zorro_event['title'] %}
+                  *🛎️ Schiri-Info:* Mannschaft 3 hat ein Heimspiel und braucht einen Schiedsrichter. Wer kann pfeifen? Bitte melden!
+                  {% elif 'Heim' in tischabwischer_event['title'] %}
+                  *🛎️ Schiri-Info:* Mannschaft 2 hat ein Heimspiel und braucht einen Schiedsrichter. Wer kann pfeifen? Bitte melden!
+                  {% endif %}
 
-                    {% if zorro_date.weekday() == 1 %}
-                    *Wichtig:* Wegen der beiden Spiele findet an diesem Tag KEIN Training statt!
-                    {% endif %}
+                  {% if zorro_date.weekday() == 1 %}
+                  *Wichtig:* Wegen der beiden Spiele findet an diesem Tag KEIN Training statt!
+                  {% endif %}
         - conditions:
             - condition: template
               value_template: >
@@ -10863,50 +10806,48 @@
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
-              data_template:
-                clientId: default
-                to: !secret whatsapp_volleyball_zorro_group
-                body:
-                  text: >
-                    {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
-                    {% if events | length > 1 and events[0]['date'] == events[1]['date'] %}
-                      {% set zorro_event = events | selectattr('type', 'eq', 'Spiel') | first | default(events[0]) %}
-                    {% else %}
-                      {% set zorro_event = events[0] %}
+              data:
+                target: !secret whatsapp_volleyball_zorro_group
+                message: >
+                  {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                  {% if events | length > 1 and events[0]['date'] == events[1]['date'] %}
+                    {% set zorro_event = events | selectattr('type', 'eq', 'Spiel') | first | default(events[0]) %}
+                  {% else %}
+                    {% set zorro_event = events[0] %}
+                  {% endif %}
+                  {%- set date = strptime(zorro_event['date'], '%Y-%m-%d') %}
+                  {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
+                  {% set zorro_schedule_text = "" %}
+                  {% if states('sensor.dieliga_schedule_tsv_zorneding_iii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
+                    {%- set z_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
+                    {%- set z_completed = (state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'completed_games') | default(0)) + 1 %}
+                    {%- set zorro_schedule_text = '(' ~ z_completed ~ '. von ' ~ z_games ~ ')' %}
+                  {% endif %}
+                  {% set zorro_scoreboard_text = "" %}
+                  {% if states('sensor.dieliga_scoreboard_tsv_zorneding_iii') not in ['unknown', 'unavailable'] %}
+                    {%- set score = states('sensor.dieliga_scoreboard_tsv_zorneding_iii') | int(0) %}
+                    {% if score > 0 and score <= 5 and state_attr('sensor.dieliga_scoreboard_tsv_zorneding_iii', 'teams') %}
+                      {%- set teams_count = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_iii', 'teams') | length %}
+                      {%- set zorro_scoreboard_text = '\n📊 *Aktuelle Ligaplatzierung:* Platz ' ~ score ~ ' von ' ~ teams_count %}
                     {% endif %}
-                    {%- set date = strptime(zorro_event['date'], '%Y-%m-%d') %}
-                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-                    {% set zorro_schedule_text = "" %}
-                    {% if states('sensor.dieliga_schedule_tsv_zorneding_iii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
-                      {%- set z_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'total_games') %}
-                      {%- set z_completed = (state_attr('sensor.dieliga_schedule_tsv_zorneding_iii', 'completed_games') | default(0)) + 1 %}
-                      {%- set zorro_schedule_text = '(' ~ z_completed ~ '. von ' ~ z_games ~ ')' %}
-                    {% endif %}
-                    {% set zorro_scoreboard_text = "" %}
-                    {% if states('sensor.dieliga_scoreboard_tsv_zorneding_iii') not in ['unknown', 'unavailable'] %}
-                      {%- set score = states('sensor.dieliga_scoreboard_tsv_zorneding_iii') | int(0) %}
-                      {% if score > 0 and score <= 5 and state_attr('sensor.dieliga_scoreboard_tsv_zorneding_iii', 'teams') %}
-                        {%- set teams_count = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_iii', 'teams') | length %}
-                        {%- set zorro_scoreboard_text = '\n📊 *Aktuelle Ligaplatzierung:* Platz ' ~ score ~ ' von ' ~ teams_count %}
-                      {% endif %}
-                    {% endif %}
+                  {% endif %}
 
-                    *🏐 SPIELTAGS-ALARM! 🏐*
+                  *🏐 SPIELTAGS-ALARM! 🏐*
 
-                    *Was:* {{ zorro_event['type'] }} {{ zorro_schedule_text }} "{{ zorro_event['title'] }}"
-                    *Wann:* 📅 {{ weekday }}, {{ date.strftime('%d.%m.') }} um ⏰ {{ zorro_event['time'] }} Uhr
-                    *Zusagen:* {{ zorro_event['in_count'] }}
-                    {% set min_player = 6 if 'Heim' in zorro_event['title'] else 7 %}
-                    {% if zorro_event['in_count'] < min_player %}
+                  *Was:* {{ zorro_event['type'] }} {{ zorro_schedule_text }} "{{ zorro_event['title'] }}"
+                  *Wann:* 📅 {{ weekday }}, {{ date.strftime('%d.%m.') }} um ⏰ {{ zorro_event['time'] }} Uhr
+                  *Zusagen:* {{ zorro_event['in_count'] }}
+                  {% set min_player = 6 if 'Heim' in zorro_event['title'] else 7 %}
+                  {% if zorro_event['in_count'] < min_player %}
 
-                    Wir brauchen noch Verstärkung für den Spieltag! Bitte tragt euch zeitnah ein, damit wir planen können:
-                    {{ zorro_event['link'] }}
-                    {% else %}
+                  Wir brauchen noch Verstärkung für den Spieltag! Bitte tragt euch zeitnah ein, damit wir planen können:
+                  {{ zorro_event['link'] }}
+                  {% else %}
 
-                    Nicht vergessen, im Kadermanager abzustimmen:
-                    {{ zorro_event['link'] }}
-                    {% endif %}
-                    {{ zorro_scoreboard_text }}
+                  Nicht vergessen, im Kadermanager abzustimmen:
+                  {{ zorro_event['link'] }}
+                  {% endif %}
+                  {{ zorro_scoreboard_text }}
             - choose:
                 - conditions:
                     - condition: template
@@ -10914,16 +10855,14 @@
                   sequence:
                     - service: whatsapp.send_message
                       continue_on_error: true
-                      data_template:
-                        clientId: default
-                        to: !secret whatsapp_volleyball_group
-                        body:
-                          text: >
-                            *💡 Info:* Wegen des Spiels von Mannschaft 3 findet das Training heute nur mit Mannschaft 2 statt.
-                            {% set zorro_event = state_attr('sensor.kadermanager_zorro', 'events') | selectattr('type', 'eq', 'Spiel') | first %}
-                            {% if 'Heim' in zorro_event['title'] %}
-                            Freiwillige Schiedsrichter sind herzlich willkommen!
-                            {% endif %}
+                      data:
+                        target: !secret whatsapp_volleyball_group
+                        message: >
+                          *💡 Info:* Wegen des Spiels von Mannschaft 3 findet das Training heute nur mit Mannschaft 2 statt.
+                          {% set zorro_event = state_attr('sensor.kadermanager_zorro', 'events') | selectattr('type', 'eq', 'Spiel') | first %}
+                          {% if 'Heim' in zorro_event['title'] %}
+                          Freiwillige Schiedsrichter sind herzlich willkommen!
+                          {% endif %}
         - conditions: # Beachvolleyball
             - condition: or
               conditions:
@@ -10940,56 +10879,52 @@
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
-              data_template:
-                clientId: default
-                to: !secret whatsapp_volleyball_group
-                body:
-                  text: >
-                    {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
-                    {%- set date = strptime(event['date'], '%Y-%m-%d') -%}
-                    {%- set days_until_event = (date - now().date()).days -%}
-                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-                    *☀️ Beach-Wetter am {{ weekday }}! ☀️*
+              data:
+                target: !secret whatsapp_volleyball_group
+                message: >
+                  {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                  {%- set date = strptime(event['date'], '%Y-%m-%d') -%}
+                  {%- set days_until_event = (date - now().date()).days -%}
+                  {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
+                  *☀️ Beach-Wetter am {{ weekday }}! ☀️*
 
-                    Die Vorhersage meldet {{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[days_until_event].temperature }}°C!
-                    {% if weekday in ["Samstag", "Sonntag"] %}
-                    Wer ist ab ⏰ {{ event['time'] }} Uhr für eine Runde im Sand dabei?
-                    {% else %}
-                    Wer hat Lust, vor dem Hallentraining (⏰ {{ (as_timestamp(event.date + ' ' + event.time) - 7200) | timestamp_custom('%H:%M', true) }} Uhr) zu beachen?
-                    {% endif %}
+                  Die Vorhersage meldet {{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[days_until_event].temperature }}°C!
+                  {% if weekday in ["Samstag", "Sonntag"] %}
+                  Wer ist ab ⏰ {{ event['time'] }} Uhr für eine Runde im Sand dabei?
+                  {% else %}
+                  Wer hat Lust, vor dem Hallentraining (⏰ {{ (as_timestamp(event.date + ' ' + event.time) - 7200) | timestamp_custom('%H:%M', true) }} Uhr) zu beachen?
+                  {% endif %}
 
-                    *Wichtig:* Bitte trotzdem für die Halle eintragen, damit wir wissen, wer später noch kommt:
-                    {{ event['link'] }}
+                  *Wichtig:* Bitte trotzdem für die Halle eintragen, damit wir wissen, wer später noch kommt:
+                  {{ event['link'] }}
       default:
         - service: whatsapp.send_message
           continue_on_error: true
-          data_template:
-            clientId: default
-            to: !secret whatsapp_volleyball_group
-            body:
-              text: >
-                {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
-                {%- set date = strptime(event['date'], '%Y-%m-%d') %}
-                {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-                {%- set date_formatted = date.strftime('%d.%m.') %}
-                {%- set in_count = event['in_count'] %}
-                {%- set event_type = event['type'] %}
-                {%- set event_title = event['title'] %}
-                {%- set event_time = event['time'] %}
-                {%- set event_link = event['link'] %}
-                {%- set motivation_text = "" %}
-                {% if event_type == 'Training' and in_count in [10, 11] %}
-                {% set motivation_text = "\n\n*Super!* Wir sind schon " ~ in_count ~ "! Wer macht die 12 voll für ein perfektes 6 gegen 6? 💪" %}
-                {% elif event_type == 'Training' and in_count < 10 %}
-                {% set motivation_text = "\n\nDa geht noch was! Bitte tragt euch fleißig ein, damit wir gut planen können." %}
-                {% endif %}
+          data:
+            target: !secret whatsapp_volleyball_group
+            message: >
+              {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+              {%- set date = strptime(event['date'], '%Y-%m-%d') %}
+              {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
+              {%- set date_formatted = date.strftime('%d.%m.') %}
+              {%- set in_count = event['in_count'] %}
+              {%- set event_type = event['type'] %}
+              {%- set event_title = event['title'] %}
+              {%- set event_time = event['time'] %}
+              {%- set event_link = event['link'] %}
+              {%- set motivation_text = "" %}
+              {% if event_type == 'Training' and in_count in [10, 11] %}
+              {% set motivation_text = "\n\n*Super!* Wir sind schon " ~ in_count ~ "! Wer macht die 12 voll für ein perfektes 6 gegen 6? 💪" %}
+              {% elif event_type == 'Training' and in_count < 10 %}
+              {% set motivation_text = "\n\nDa geht noch was! Bitte tragt euch fleißig ein, damit wir gut planen können." %}
+              {% endif %}
 
-                {% set messages = [
-                  "👋 *Hey Team, kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen." ~ motivation_text ~ "\n\nHier geht's zum Feedback:\n" ~ event_link,
-                  "🏐 *Nicht vergessen: " ~ event_type ~ " am " ~ weekday ~ "!*\n\nAlle Infos im Überblick:\n*Was:* \"" ~ event_title ~ "\"\n*Wann:* " ~ date_formatted ~ " um " ~ event_time ~ " Uhr\n\nBisher sind wir " ~ in_count ~ " Leute." ~ motivation_text ~ "\n\nBitte hier eintragen:\n" ~ event_link,
-                  "🗣️ *Aufgepasst, Volleyball-Freunde!* \n\nUnser nächstes Event steht an:\n" ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ "\n⏰ " ~ event_time ~ " Uhr\n\n" ~ in_count ~ " sind schon dabei." ~ motivation_text ~ "\n\nTragt euch hier ein:\n" ~ event_link
-                ] %}
-                {{ messages | random }}
+              {% set messages = [
+                "👋 *Hey Team, kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen." ~ motivation_text ~ "\n\nHier geht's zum Feedback:\n" ~ event_link,
+                "🏐 *Nicht vergessen: " ~ event_type ~ " am " ~ weekday ~ "!*\n\nAlle Infos im Überblick:\n*Was:* \"" ~ event_title ~ "\"\n*Wann:* " ~ date_formatted ~ " um " ~ event_time ~ " Uhr\n\nBisher sind wir " ~ in_count ~ " Leute." ~ motivation_text ~ "\n\nBitte hier eintragen:\n" ~ event_link,
+                "🗣️ *Aufgepasst, Volleyball-Freunde!* \n\nUnser nächstes Event steht an:\n" ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ "\n⏰ " ~ event_time ~ " Uhr\n\n" ~ in_count ~ " sind schon dabei." ~ motivation_text ~ "\n\nTragt euch hier ein:\n" ~ event_link
+              ] %}
+              {{ messages | random }}
 
 - id: remind_for_volleyball_by_kadermanager_2_mannschaft
   alias: "Erinnerung für Volleyball via Kadermanager (Mannschaft 2)"
@@ -11050,45 +10985,43 @@
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
-              data_template:
-                clientId: default
-                to: !secret whatsapp_volleyball_tischabwischer
-                body:
-                  text: >
-                    {%- set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
-                    {%- set date = strptime(event['date'], '%Y-%m-%d') %}
-                    {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-                    {% set schedule_text = "" %}
-                    {% if states('sensor.dieliga_schedule_tsv_zorneding_ii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
-                      {%- set completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'completed_games') | default(0)) + 1 %}
-                      {%- set total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
-                      {%- set schedule_text = '(' ~ completed_games ~ '. von ' ~ total_games ~ ')' %}
+              data:
+                target: !secret whatsapp_volleyball_tischabwischer
+                message: >
+                  {%- set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                  {%- set date = strptime(event['date'], '%Y-%m-%d') %}
+                  {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
+                  {% set schedule_text = "" %}
+                  {% if states('sensor.dieliga_schedule_tsv_zorneding_ii') not in ['unknown', 'unavailable'] and state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
+                    {%- set completed_games = (state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'completed_games') | default(0)) + 1 %}
+                    {%- set total_games = state_attr('sensor.dieliga_schedule_tsv_zorneding_ii', 'total_games') %}
+                    {%- set schedule_text = '(' ~ completed_games ~ '. von ' ~ total_games ~ ')' %}
+                  {% endif %}
+                  {% set scoreboard_text = "" %}
+                  {% if states('sensor.dieliga_scoreboard_tsv_zorneding_ii') not in ['unknown', 'unavailable'] %}
+                    {%- set score = states('sensor.dieliga_scoreboard_tsv_zorneding_ii') | int(0) %}
+                    {% if score > 0 and score <= 5 and state_attr('sensor.dieliga_scoreboard_tsv_zorneding_ii', 'teams') %}
+                      {%- set teams_count = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_ii', 'teams') | length %}
+                      {%- set scoreboard_text = '\n📊 *Aktuelle Ligaplatzierung:* Platz ' ~ score ~ ' von ' ~ teams_count %}
                     {% endif %}
-                    {% set scoreboard_text = "" %}
-                    {% if states('sensor.dieliga_scoreboard_tsv_zorneding_ii') not in ['unknown', 'unavailable'] %}
-                      {%- set score = states('sensor.dieliga_scoreboard_tsv_zorneding_ii') | int(0) %}
-                      {% if score > 0 and score <= 5 and state_attr('sensor.dieliga_scoreboard_tsv_zorneding_ii', 'teams') %}
-                        {%- set teams_count = state_attr('sensor.dieliga_scoreboard_tsv_zorneding_ii', 'teams') | length %}
-                        {%- set scoreboard_text = '\n📊 *Aktuelle Ligaplatzierung:* Platz ' ~ score ~ ' von ' ~ teams_count %}
-                      {% endif %}
-                    {% endif %}
+                  {% endif %}
 
-                    *🏐 SPIELTAGS-ALARM (Mannschaft 2)! 🏐*
+                  *🏐 SPIELTAGS-ALARM (Mannschaft 2)! 🏐*
 
-                    *Was:* {{ event['type'] }} {{ schedule_text }} "{{ event['title'] }}"
-                    *Wann:* 📅 {{ weekday }}, {{ date.strftime('%d.%m.') }} um ⏰ {{ event['time'] }} Uhr
-                    *Zusagen:* {{ event['in_count'] }}
-                    {% set min_player = 6 if 'Heim' in event['title'] else 7 %}
-                    {% if event['in_count'] < min_player %}
+                  *Was:* {{ event['type'] }} {{ schedule_text }} "{{ event['title'] }}"
+                  *Wann:* 📅 {{ weekday }}, {{ date.strftime('%d.%m.') }} um ⏰ {{ event['time'] }} Uhr
+                  *Zusagen:* {{ event['in_count'] }}
+                  {% set min_player = 6 if 'Heim' in event['title'] else 7 %}
+                  {% if event['in_count'] < min_player %}
 
-                    Auf geht's, wir brauchen noch Mitspieler! Bitte tragt euch zeitnah ein:
-                    {{ event['link'] }}
-                    {% else %}
+                  Auf geht's, wir brauchen noch Mitspieler! Bitte tragt euch zeitnah ein:
+                  {{ event['link'] }}
+                  {% else %}
 
-                    Stimmt bitte zeitnah im Kadermanager ab:
-                    {{ event['link'] }}
-                    {% endif %}
-                    {{ scoreboard_text }}
+                  Stimmt bitte zeitnah im Kadermanager ab:
+                  {{ event['link'] }}
+                  {% endif %}
+                  {{ scoreboard_text }}
             - choose:
                 - conditions:
                     - condition: template
@@ -11096,38 +11029,34 @@
                   sequence:
                     - service: whatsapp.send_message
                       continue_on_error: true
-                      data_template:
-                        clientId: default
-                        to: !secret whatsapp_volleyball_group
-                        body:
-                          text: >
-                            *💡 Info:* Wegen des Spiels von Mannschaft 2 findet das Training heute nur mit Mannschaft 3 statt.
-                            {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
-                            {% if 'Heim' in event['title'] %}
-                            Freiwillige Schiedsrichter sind herzlich willkommen!
-                            {% endif %}
+                      data:
+                        target: !secret whatsapp_volleyball_group
+                        message: >
+                          *💡 Info:* Wegen des Spiels von Mannschaft 2 findet das Training heute nur mit Mannschaft 3 statt.
+                          {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+                          {% if 'Heim' in event['title'] %}
+                          Freiwillige Schiedsrichter sind herzlich willkommen!
+                          {% endif %}
       default:
         - service: whatsapp.send_message
           continue_on_error: true
-          data_template:
-            clientId: default
-            to: !secret whatsapp_volleyball_tischabwischer
-            body:
-              text: >
-                {%- set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
-                {%- set date = strptime(event['date'], '%Y-%m-%d') %}
-                {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-                {%- set date_formatted = date.strftime('%d.%m.') %}
-                {%- set in_count = event['in_count'] %}
-                {%- set event_type = event['type'] %}
-                {%- set event_title = event['title'] %}
-                {%- set event_time = event['time'] %}
-                {%- set event_link = event['link'] %}
-                {% set messages = [
-                  "👋 *Hey Team, kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen.\n\nHier geht's zur Abstimmung:\n" ~ event_link,
-                  "🏐 *Nicht vergessen: " ~ event_type ~ " am " ~ weekday ~ "!*\n\nAlle Infos im Überblick:\n*Was:* \"" ~ event_title ~ "\"\n*Wann:* " ~ date_formatted ~ " um " ~ event_time ~ " Uhr\n\nBisher sind wir " ~ in_count ~ " Leute.\n\nBitte hier abstimmen:\n" ~ event_link
-                ] %}
-                {{ messages | random }}
+          data:
+            target: !secret whatsapp_volleyball_tischabwischer
+            message: >
+              {%- set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+              {%- set date = strptime(event['date'], '%Y-%m-%d') %}
+              {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
+              {%- set date_formatted = date.strftime('%d.%m.') %}
+              {%- set in_count = event['in_count'] %}
+              {%- set event_type = event['type'] %}
+              {%- set event_title = event['title'] %}
+              {%- set event_time = event['time'] %}
+              {%- set event_link = event['link'] %}
+              {% set messages = [
+                "👋 *Hey Team, kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen.\n\nHier geht's zur Abstimmung:\n" ~ event_link,
+                "🏐 *Nicht vergessen: " ~ event_type ~ " am " ~ weekday ~ "!*\n\nAlle Infos im Überblick:\n*Was:* \"" ~ event_title ~ "\"\n*Wann:* " ~ date_formatted ~ " um " ~ event_time ~ " Uhr\n\nBisher sind wir " ~ in_count ~ " Leute.\n\nBitte hier abstimmen:\n" ~ event_link
+              ] %}
+              {{ messages | random }}
 
 - id: remind_for_volleyball_by_kadermanager_low_participants
   alias: "Kadermanager Erinnerung bei zu wenigen Spielern (Mannschaft 2)"
@@ -11156,33 +11085,31 @@
   action:
     - service: whatsapp.send_message
       continue_on_error: true
-      data_template:
-        clientId: default
-        to: !secret whatsapp_volleyball_tischabwischer
-        body:
-          text: >
-            *🚨 Team-Alarm für Mannschaft 2! 🚨*
+      data:
+        target: !secret whatsapp_volleyball_tischabwischer
+        message: >
+          *🚨 Team-Alarm für Mannschaft 2! 🚨*
 
-            Für das Ligaspiel am
-            {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
-            {%- set date = strptime(event['date'], '%Y-%m-%d') %}
-            {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-            {{ weekday }} um ⏰ {{ event['time'] }} Uhr haben wir erst *{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}* Zusagen.
+          Für das Ligaspiel am
+          {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
+          {%- set date = strptime(event['date'], '%Y-%m-%d') %}
+          {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
+          {{ weekday }} um ⏰ {{ event['time'] }} Uhr haben wir erst *{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}* Zusagen.
 
-            {% set accepted_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['accepted_players'] %}
-            {% if accepted_players %}
-            *✅ Zugesagt haben:*
-            {{ accepted_players | join(', ') }}
-            {% endif %}
+          {% set accepted_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['accepted_players'] %}
+          {% if accepted_players %}
+          *✅ Zugesagt haben:*
+          {{ accepted_players | join(', ') }}
+          {% endif %}
 
-            {% set declined_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['declined_players'] %}
-            {% if declined_players %}
-            *❌ Abgesagt haben:*
-            {{ declined_players | join(', ') }}
-            {% endif %}
+          {% set declined_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['declined_players'] %}
+          {% if declined_players %}
+          *❌ Abgesagt haben:*
+          {{ declined_players | join(', ') }}
+          {% endif %}
 
-            Bitte tragt euch dringend ein, ansonsten müssen wir das Spiel verschieben:
-            {{ event['link'] }}
+          Bitte tragt euch dringend ein, ansonsten müssen wir das Spiel verschieben:
+          {{ event['link'] }}
 
 - id: kadermanager_participant_count_reminder
   alias: "Kadermanager Teilnehmer-Erinnerung für Trainer"
@@ -11221,21 +11148,19 @@
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
-              data_template:
-                clientId: default
-                to: !secret whatsapp_volleyball_orga
-                body:
-                  text: >
-                    *🏐 Übersicht für heute:*
-                    *Zusagen:* {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
+              data:
+                target: !secret whatsapp_volleyball_orga
+                message: >
+                  *🏐 Übersicht für heute:*
+                  *Zusagen:* {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}
 
-                    *✅ Dabei:*
-                    {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['accepted_players'] | join(', ') }}
+                  *✅ Dabei:*
+                  {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['accepted_players'] | join(', ') }}
 
-                    *❌ Nicht dabei:*
-                    {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] | join(', ') }}
+                  *❌ Nicht dabei:*
+                  {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] | join(', ') }}
 
-                    *Link:* {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
+                  *Link:* {{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }}
     - choose:
         - conditions:
             - condition: template
@@ -11251,7 +11176,7 @@
                   state: "home"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: !secret telegram_chat_fabian
                 message: >
                   *🏐 Übersicht für heute:* [Kadermanager]({{ state_attr('sensor.kadermanager_zorro', 'events')[0]['link'] }})
@@ -11765,11 +11690,11 @@
         action: pill1h
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, eine Stunde"
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -11795,11 +11720,11 @@
         action: pilldone
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -11814,11 +11739,11 @@
       data: "/pillreset"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay. Du nimmst die Pille durch."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -11838,12 +11763,12 @@
   action:
     - service: telegram_bot.answer_callback_query
       continue_on_error: true
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
       continue_on_error: true
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -11887,12 +11812,12 @@
   action:
     - service: telegram_bot.answer_callback_query
       continue_on_error: true
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
       continue_on_error: true
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -11936,12 +11861,12 @@
   action:
     - service: telegram_bot.answer_callback_query
       continue_on_error: true
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
       continue_on_error: true
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -11985,12 +11910,12 @@
   action:
     - service: telegram_bot.answer_callback_query
       continue_on_error: true
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
       continue_on_error: true
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12034,12 +11959,12 @@
   action:
     - service: telegram_bot.answer_callback_query
       continue_on_error: true
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, Programm gesetzt."
     - service: telegram_bot.edit_replymarkup
       continue_on_error: true
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12082,11 +12007,11 @@
       data: "/shutdownfpc"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "PC wird heruntergefahren, Strom wird ausgeschaltet."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12109,11 +12034,11 @@
         command: shutdown
         arguments: "/h /t 0"
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "OK, PC wird in Ruhezustand gestellt."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12128,11 +12053,11 @@
       data: "/shutdownnpc"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "PC wird heruntergefahren, Strom wird ausgeschaltet."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12155,11 +12080,11 @@
         command: shutdown
         arguments: "/h /t 0"
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "OK, PC wird in Ruhezustand gestellt."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12174,7 +12099,7 @@
       command: "/rebootha"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "Restarting Homeassistant Container..."
     - service: homeassistant.restart
@@ -12189,7 +12114,7 @@
       command: "/reboot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "Rebooting Server..."
     - delay: 00:00:05
@@ -12209,7 +12134,7 @@
         command: "/help@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: >
           Hier sind ein paar Befehle:
@@ -12231,7 +12156,7 @@
         command: "/admin@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: >
           Hier sind ein paar Befehle:
@@ -12255,7 +12180,7 @@
         command: "/status@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "System is online! Current time: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}."
 
@@ -12282,12 +12207,12 @@
   action:
     - service: telegram_bot.answer_callback_query
       continue_on_error: true
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, neues Essen."
     - service: telegram_bot.edit_replymarkup
       continue_on_error: true
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12296,7 +12221,7 @@
         entity_id: sensor.chefkoch_random_recipe
     - delay: "00:00:01"
     - service: telegram_bot.send_message
-      data_template:
+      data:
         title: "Zufallsessensvorschlag: "
         target: "{{ trigger.event.data.chat_id }}"
         message: >
@@ -12342,7 +12267,7 @@
         entity_id: sensor.chefkoch_vegan_recipe
     - delay: "00:00:01"
     - service: telegram_bot.send_message
-      data_template:
+      data:
         title: "Veganer Zufallsessensvorschlag: "
         target: "{{ trigger.event.data.chat_id }}"
         message: >
@@ -12380,16 +12305,16 @@
       data: "/foodyes"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: !secret telegram_chat_samuel
         inline_keyboard: []
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: !secret telegram_chat_fabian
         inline_keyboard: []
@@ -12408,14 +12333,33 @@
         command: "/telegramno@smartlife_ha_bot"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
+
+- id: whatsapp_waste_put_outside
+  alias: "WhatsApp waste put outside"
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: >
+        {{ ('müll' in trigger.event.data.content | lower and ('erledigt' in trigger.event.data.content | lower or 'raus' in trigger.event.data.content | lower))
+           or trigger.event.data.content | lower == 'müll_erledigt' }}
+  action:
+    - service: automation.trigger
+      entity_id: automation.telegram_waste_put_outside
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: "Spitze! 🚛💨 Der Müll wurde rausgestellt."
 
 - id: telegram_waste_put_outside
   alias: "Telegram waste put outside"
@@ -12430,15 +12374,19 @@
       event_data:
         command: "/telegramwastedone@smartlife_ha_bot"
   action:
-    - service: telegram_bot.answer_callback_query
-      data_template:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "Spitze!"
-    - service: telegram_bot.edit_replymarkup
-      data_template:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
+    - if:
+        - condition: template
+          value_template: "{{ trigger is defined and trigger.platform == 'event' }}"
+      then:
+        - service: telegram_bot.answer_callback_query
+          data:
+            callback_query_id: "{{ trigger.event.data.id }}"
+            message: "Spitze! 🚛💨 Der Müll wurde rausgestellt."
+        - service: telegram_bot.edit_replymarkup
+          data:
+            message_id: "{{ trigger.event.data.message.message_id }}"
+            chat_id: "{{ trigger.event.data.chat_id }}"
+            inline_keyboard: []
 
 - id: telegram_dust_bin_emptied
   alias: "Telegram dust bin emptied"
@@ -12454,11 +12402,11 @@
         command: "/telegramdustbindone@smartlife_ha_bot"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Spitze!"
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12477,11 +12425,11 @@
         command: "/telegramwasherdone@smartlife_ha_bot"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Spitze!"
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12506,11 +12454,11 @@
         command: "/telegrampouringdone@smartlife_ha_bot"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Spitze!"
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12545,11 +12493,11 @@
       data: "/cancellight"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Licht wird in 20 Minuten NICHT ausgeschaltet."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12572,7 +12520,7 @@
         command: "/remaining_time@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "{{ states.sensor.coal_lighter_finish_duration.attributes.friendly_name }} ist in ungefähr {{ states.sensor.coal_lighter_finish_duration.state }} Minuten fertig."
         disable_notification: true
@@ -12598,7 +12546,7 @@
       target:
         entity_id: input_button.kohleanzunder_timer
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "Kohleanzünder Timer wurde gestartet."
         disable_notification: true
@@ -12623,11 +12571,11 @@
       data:
         entity_id: switch.kuhlschrank
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.chat_id }}"
         message: "Okay, wird ausgeschaltet."
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "Kühlschrank wurde ausgeschaltet."
         disable_notification: true
@@ -12645,11 +12593,11 @@
       target:
         entity_id: update.home_assistant_core_update
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "HA Update gestartet."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12667,11 +12615,11 @@
       target:
         entity_id: update.home_assistant_operating_system_update
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "OS Update gestartet."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12690,7 +12638,7 @@
         command: "/weather@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         disable_notification: true
         message: >
@@ -12725,7 +12673,7 @@
       data:
         entity_id: switch.kuhlschrank
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         # target: "{{ trigger.event.data.chat_id }}"
         message: "Kühlschrank im Keller wurde angeschaltet. Achtung: Wird hierüber NICHT ausgeschaltet!"
@@ -12740,11 +12688,11 @@
         command: "/climateson"
   action:
     - service: telegram_bot.answer_callback_query
-      data_template:
+      data:
         callback_query_id: "{{ trigger.event.data.id }}"
         message: "Okay, werden eingeschaltet."
     - service: telegram_bot.edit_replymarkup
-      data_template:
+      data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
@@ -12811,7 +12759,7 @@
         command: "/urgent@smartlife_ha_bot"
   action:
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         message: "Alle Google Homes werden Fabi/samuel über eine wichtige Nachricht bescheid geben."
     #- service: notify.mobile_app_fabian_iphone
@@ -12832,7 +12780,7 @@
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
         - media_player.fabians_lautsprecher
-      data_template:
+      data:
         message: >
           Wichtige Nachricht von
           {% if (is_state("trigger.event.data.user_id", "649657901")) -%}
@@ -12861,7 +12809,7 @@
           sequence:
             - service: tts.speak
               entity_id: media_player.gastezimmer_mini
-              data_template:
+              data:
                 message: >
                   Wichtige Nachricht von
                   {% if (is_state("trigger.event.data.user_id", "649657901")) -%}
@@ -12914,7 +12862,7 @@
               data:
                 entity_id: switch.schloss
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: "{{ trigger.event.data.chat_id }}"
                 # target: "{{ trigger.event.data.chat_id }}"
                 message: "Gartentor wurde geöffnet."
@@ -12927,7 +12875,7 @@
                   state: "unavailable"
           sequence:
             - service: telegram_bot.send_message
-              data_template:
+              data:
                 target: "{{ trigger.event.data.chat_id }}"
                 message: "Der Gartentoröffner ist aktuell offline. Das Gartentor wurde NICHT geöffnet. Fabian wurde informiert. Bitte nutze /klingel stattdessen."
             - service: notify.telegram_fabian
@@ -12967,7 +12915,7 @@
       entity_id:
         - media_player.wohnzimmer_uhr
         - media_player.kuche_speaker
-      data_template:
+      data:
         message: >
           Ding Dong, es klingelt.
           {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
@@ -12983,7 +12931,7 @@
           {% endif %}
           ist da.
     - service: telegram_bot.send_message
-      data_template:
+      data:
         target: "{{ trigger.event.data.chat_id }}"
         # target: "{{ trigger.event.data.chat_id }}"
         message: "Klingel in Wohnung aktiviert. Gartentor wurde geöffnet."
@@ -13005,7 +12953,7 @@
                 command: "am start -a android.intent.action.VIEW -d /sdcard/doorbell.wav -t audio/wav"
             - service: notify.wohnzimmer_tv
               continue_on_error: true
-              data_template:
+              data:
                 message: >
                   Ding Dong, es klingelt.
                   {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
@@ -13534,3 +13482,156 @@
     - service: switch.turn_off
       data:
         entity_id: switch.staubsauger
+
+- id: whatsapp_status_bot
+  alias: WhatsApp Status Bot
+  description: "Replies to 'Status' with system health."
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: "{{ trigger.event.data.content | lower == 'status' }}"
+  action:
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: "✅ Home Assistant is Online!\nTime: {{ now().strftime('%H:%M') }}"
+
+- id: whatsapp_beer_bot
+  alias: "WhatsApp Bot: Beer Keyword"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: >
+        {{ 'beer' in trigger.event.data.content | lower or
+           'cheers' in trigger.event.data.content | lower or
+           'bier' in trigger.event.data.content | lower or
+           'prost' in trigger.event.data.content | lower }}
+  action:
+    - service: whatsapp.send_reaction
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        reaction: "🍺"
+        message_id: "{{ trigger.event.data.raw.key.id }}"
+
+- id: whatsapp_help_bot
+  alias: "WhatsApp Bot: Help"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: "{{ trigger.event.data.content | lower == 'help' }}"
+  action:
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: "🤖 *HA WhatsApp Bot Help*\n- *Status:* Get system health\n- *Beer/Bier:* Get a 🍺\n- *Müllabholung:* Upcoming waste collection\n- *Witz:* Hear a joke\n- *Help:* View this message"
+
+- id: whatsapp_danke_bot
+  alias: "WhatsApp Bot: Thank you Reaction"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: >
+        {{ 'Danke' in trigger.event.data.content or 'Thanks' in trigger.event.data.content }}
+  action:
+    - service: whatsapp.send_reaction
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        reaction: "🙏"
+        message_id: "{{ trigger.event.data.raw.key.id }}"
+
+- id: whatsapp_waste_bot
+  alias: "WhatsApp Bot: Waste Collection"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: "{{ 'müllabholung' in trigger.event.data.content | lower or 'abfallabholung' in trigger.event.data.content | lower }}"
+  action:
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: >
+          ♻️ *Abfallkalender:*
+
+          - 🚛 *Nächste Abholungen:*
+            {%- set attributes = states.sensor.nachste_abholungen.attributes %}
+            {%- set dates = attributes.keys() | select('match', '^\\d{4}-\\d{2}-\\d{2}$') | sort %}
+            {%- set weekdays = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+            {%- for date in dates[:5] %}
+            {%- set pickup = attributes[date] %}
+            {%- set delta = ((as_timestamp(date) - as_timestamp(now().strftime('%Y-%m-%d'))) / 86400) | int %}
+            {%- set day_name = weekdays[strptime(date, '%Y-%m-%d').strftime('%A')] %}
+            {%- set date_german = as_timestamp(date) | timestamp_custom('%d.%m.%Y') %}
+            {%- set items = pickup | replace('Restmüll', '🗑️ *Restmüll*')
+                                  | replace('Biotonne', '🌿 *Biotonne*')
+                                  | replace('Gelber Sack', '♻️ *Gelber Sack*')
+                                  | replace('Altpapier', '📄 *Altpapier*')
+                                  | replace('Papiersamml', '📄 *Papiersammlung*')
+                                  | replace('Problemmüll', '⚠️ *Problemmüll*')
+                                  | replace('Gartenabfall', '🍂 *Gartenabfall*') %}
+            {%- if delta == 0 %}
+            * 📅 **Heute, {{ day_name }} ({{ date_german }})**: {{ items }}
+            {%- elif delta == 1 %}
+            * 📅 **Morgen, {{ day_name }} ({{ date_german }})**: {{ items }}
+            {%- elif delta < 7 %}
+            * 📅 **{{ day_name }}, in {{ delta }} Tagen ({{ date_german }})**: {{ items }}
+            {%- else %}
+            * 📅 **{{ day_name }}, {{ date_german }}**: {{ items }}
+            {%- endif %}
+            {%- endfor %}
+
+- id: whatsapp_joke_bot
+  alias: "WhatsApp Bot: Joke"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: "{{ 'witz' in trigger.event.data.content | lower }}"
+  action:
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: >
+          😂 *Hier ein Witz:*
+          {{ [
+            "Warum können Geister so schlecht lügen? Weil sie so leicht zu durchschauen sind.",
+            "Was ist grün und klopft an die Tür? Ein Klopfsalat.",
+            "Warum gehen Ameisen nicht in die Kirche? Weil sie In-Sekten sind.",
+            "Was macht ein Clown im Büro? Faxen."
+          ] | random }}
+
+- id: "volleyball_new_training_inquiry_mail"
+  alias: "Volleyball Training: Forward New Email to WhatsApp"
+  description: "Sends a WhatsApp message on new training inquiry."
+  mode: single
+  trigger:
+    - platform: event
+      event_type: imap_content
+  condition:
+    - condition: template
+      value_template: "{{ trigger.event.data['username'] | lower | trim == 'volleyballtraining.zorneding@gmail.com' }}"
+  action:
+    - service: whatsapp.send_message
+      continue_on_error: true
+      data:
+        target: !secret whatsapp_volleyball_orga
+        message: |
+          🏐 *Neue Trainingsanfrage* wurde per E-Mail empfangen.
+
+          📅 *Datum:* {{ as_timestamp(trigger.event.data['date']) | timestamp_custom('%d.%m.%Y %H:%M') }}
+          👤 *Von:* {{ trigger.event.data['sender'] }}
+          📝 *Betreff:* {{ trigger.event.data['subject'] }}
+
+          --------------------------------
+
+          {{ trigger.event.data['text'] | default(trigger.event.data['body']) | default('Kein Textinhalt (evtl. nur HTML)') | truncate(800) }}
