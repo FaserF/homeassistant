@@ -10552,7 +10552,9 @@
       data:
         target: !secret telegram_chat_fabian
         message: >
-          New CTGP-DX Version **{{ states.sensor.ctgp_dx_latest_version.state }}** is now available!
+          New CTGP-DX Version **{{ states.sensor.ctgp_dx_latest_version.state }}** released at {{ state_attr('sensor.ctgp_dx_latest_version', 'release_date') }} is now available!
+
+          Download: {{ state_attr('sensor.ctgp_dx_latest_version', 'data_provided_by') }}
   mode: single
 
 - id: "gsa_new_version_notification_windows"
@@ -10573,7 +10575,9 @@
       data:
         target: !secret telegram_chat_fabian
         message: >
-          New GSA Windows Version **{{ states.sensor.global_secure_access_client_windows.state }}** is now available!
+          New GSA Windows Version **{{ states.sensor.global_secure_access_client_windows.state }}** released at {{ state_attr('sensor.global_secure_access_client_windows', 'release_day') }} is now available!
+
+          Release Notes: {{ state_attr('sensor.global_secure_access_client_windows', 'data_provided_by') }}
   mode: single
 
 - id: "gsa_new_version_notification_macos"
@@ -10594,7 +10598,9 @@
       data:
         target: !secret telegram_chat_fabian
         message: >
-          New GSA MacOS Version **{{ states.sensor.global_secure_access_client_macos.state }}** is now available!
+          New GSA Windows Version **{{ states.sensor.global_secure_access_client_macos.state }}** released at {{ state_attr('sensor.global_secure_access_client_macos', 'release_day') }} is now available!
+
+          Release Notes: {{ state_attr('sensor.global_secure_access_client_macos', 'data_provided_by') }}
   mode: single
 
 - id: notification_on_new_kadermanager_comment
@@ -10610,7 +10616,6 @@
       {{ new_comments != old_comments }}
   action:
     - service: whatsapp.send_message
-      continue_on_error: true
       data:
         target: !secret whatsapp_volleyball_group
         message: >
@@ -10638,7 +10643,6 @@
       {{ new_comments != old_comments }}
   action:
     - service: whatsapp.send_message
-      continue_on_error: true
       data:
         target: !secret whatsapp_volleyball_tischabwischer
         message: >
@@ -10858,7 +10862,7 @@
                       data:
                         target: !secret whatsapp_volleyball_group
                         message: >
-                          *💡 Info:* Wegen des Spiels von Mannschaft 3 findet das Training heute nur mit Mannschaft 2 statt.
+                          *💡 Info:* Wegen des Spiels von Mannschaft 3 findet das kommende Training nur mit Mannschaft 2 statt.
                           {% set zorro_event = state_attr('sensor.kadermanager_zorro', 'events') | selectattr('type', 'eq', 'Spiel') | first %}
                           {% if 'Heim' in zorro_event['title'] %}
                           Freiwillige Schiedsrichter sind herzlich willkommen!
@@ -10899,7 +10903,6 @@
                   {{ event['link'] }}
       default:
         - service: whatsapp.send_message
-          continue_on_error: true
           data:
             target: !secret whatsapp_volleyball_group
             message: >
@@ -10920,7 +10923,7 @@
               {% endif %}
 
               {% set messages = [
-                "👋 *Hey Team, kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen." ~ motivation_text ~ "\n\nHier geht's zum Feedback:\n" ~ event_link,
+                "👋 *Kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen." ~ motivation_text ~ "\n\nHier geht's zum Feedback:\n" ~ event_link,
                 "🏐 *Nicht vergessen: " ~ event_type ~ " am " ~ weekday ~ "!*\n\nAlle Infos im Überblick:\n*Was:* \"" ~ event_title ~ "\"\n*Wann:* " ~ date_formatted ~ " um " ~ event_time ~ " Uhr\n\nBisher sind wir " ~ in_count ~ " Leute." ~ motivation_text ~ "\n\nBitte hier eintragen:\n" ~ event_link,
                 "🗣️ *Aufgepasst, Volleyball-Freunde!* \n\nUnser nächstes Event steht an:\n" ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ "\n⏰ " ~ event_time ~ " Uhr\n\n" ~ in_count ~ " sind schon dabei." ~ motivation_text ~ "\n\nTragt euch hier ein:\n" ~ event_link
               ] %}
@@ -11025,21 +11028,40 @@
             - choose:
                 - conditions:
                     - condition: template
-                      value_template: "{{ strptime(state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['date'], '%Y-%m-%d').weekday() == 1 }}"
+                      value_template: >
+                        {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
+                        {% set ns = namespace(found=false) %}
+
+                        {% if events is not none and events | length > 0 %}
+                          {% set date0 = strptime(events[0].date, '%Y-%m-%d') %}
+
+                          {# Bedingung A: Event 0 ist ein Dienstag #}
+                          {% if date0.weekday() == 1 %}
+                            {% set ns.found = true %}
+                          {% endif %}
+
+                          {# Bedingung B: Event 1 existiert, ist Di und 1 Tag nach Event 0 #}
+                          {% if events | length > 1 %}
+                            {% set date1 = strptime(events[1].date, '%Y-%m-%d') %}
+                            {% if (date1.date() - date0.date()).days == 1 and date1.weekday() == 1 %}
+                              {% set ns.found = true %}
+                            {% endif %}
+                          {% endif %}
+                        {% endif %}
+
+                        {{ ns.found }}
                   sequence:
                     - service: whatsapp.send_message
-                      continue_on_error: true
                       data:
                         target: !secret whatsapp_volleyball_group
                         message: >
-                          *💡 Info:* Wegen des Spiels von Mannschaft 2 findet das Training heute nur mit Mannschaft 3 statt.
+                          *💡 Info:* Wegen des Spiels von Mannschaft 2 findet das kommende Training nur mit Mannschaft 3 statt.
                           {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
                           {% if 'Heim' in event['title'] %}
                           Freiwillige Schiedsrichter sind herzlich willkommen!
                           {% endif %}
       default:
         - service: whatsapp.send_message
-          continue_on_error: true
           data:
             target: !secret whatsapp_volleyball_tischabwischer
             message: >
@@ -11053,7 +11075,7 @@
               {%- set event_time = event['time'] %}
               {%- set event_link = event['link'] %}
               {% set messages = [
-                "👋 *Hey Team, kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen.\n\nHier geht's zur Abstimmung:\n" ~ event_link,
+                "👋 *Kurze Erinnerung!*\n\n*Nächstes Event:*\n🏐 " ~ event_type ~ " \"" ~ event_title ~ "\"\n📅 " ~ weekday ~ ", " ~ date_formatted ~ " um ⏰ " ~ event_time ~ " Uhr\n\n*Aktueller Stand:* " ~ in_count ~ " Zusagen.\n\nHier geht's zur Abstimmung:\n" ~ event_link,
                 "🏐 *Nicht vergessen: " ~ event_type ~ " am " ~ weekday ~ "!*\n\nAlle Infos im Überblick:\n*Was:* \"" ~ event_title ~ "\"\n*Wann:* " ~ date_formatted ~ " um " ~ event_time ~ " Uhr\n\nBisher sind wir " ~ in_count ~ " Leute.\n\nBitte hier abstimmen:\n" ~ event_link
               ] %}
               {{ messages | random }}
@@ -11084,11 +11106,10 @@
           {{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] < 7 }}
   action:
     - service: whatsapp.send_message
-      continue_on_error: true
       data:
         target: !secret whatsapp_volleyball_tischabwischer
         message: >
-          *🚨 Team-Alarm für Mannschaft 2! 🚨*
+          *🚨 Spieler-Alarm für Mannschaft 2! 🚨*
 
           Für das Ligaspiel am
           {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
@@ -11147,7 +11168,6 @@
               value_template: "{{ strptime(state_attr('sensor.kadermanager_zorro', 'events')[0]['date'], '%Y-%m-%d').weekday() == 1 }}"
           sequence:
             - service: whatsapp.send_message
-              continue_on_error: true
               data:
                 target: !secret whatsapp_volleyball_orga
                 message: >
@@ -13485,7 +13505,7 @@
 
 - id: whatsapp_status_bot
   alias: WhatsApp Status Bot
-  description: "Replies to 'Status' with system health."
+  description: "Replies to 'Status' with detailed system health."
   trigger:
     - platform: event
       event_type: whatsapp_message_received
@@ -13496,7 +13516,27 @@
     - service: whatsapp.send_message
       data:
         target: "{{ trigger.event.data.sender }}"
-        message: "✅ Home Assistant is Online!\nTime: {{ now().strftime('%H:%M') }}"
+        message: >
+          ✅ *Home Assistant Online*
+
+          🕒 *Zeit:* {{ now().strftime('%H:%M') }} Uhr
+          📅 *Datum:* {{ now().strftime('%d.%m.%Y') }}
+          ☀️ *Sonne:* {{ states('sun.sun') }}
+
+          💻 *System Health:*
+          - CPU: {{ states('sensor.processor_use') | default('?', true) }}%
+          - RAM: {{ states('sensor.memory_use_percent') | default('?', true) }}%
+          - Disk: {{ states('sensor.disk_use_percent') | default('?', true) }}%
+          - Uptime:
+          {%- if states('sensor.last_boot') not in ['unknown', 'unavailable', 'None'] -%}
+            {{ relative_time(states('sensor.last_boot') | as_datetime) }}
+          {%- elif states('sensor.uptime') not in ['unknown', 'unavailable', 'None'] -%}
+            {{ states('sensor.uptime') }}
+          {%- else -%}
+            ?
+          {%- endif %}
+
+          🔗 *Source:* https://faserf.github.io/ha-whatsapp/
 
 - id: whatsapp_beer_bot
   alias: "WhatsApp Bot: Beer Keyword"
@@ -13507,14 +13547,51 @@
     - condition: template
       value_template: >
         {{ 'beer' in trigger.event.data.content | lower or
-           'cheers' in trigger.event.data.content | lower or
-           'bier' in trigger.event.data.content | lower or
-           'prost' in trigger.event.data.content | lower }}
+          'cheers' in trigger.event.data.content | lower or
+          'bier' in trigger.event.data.content | lower or
+          'prost' in trigger.event.data.content | lower }}
   action:
     - service: whatsapp.send_reaction
       data:
         target: "{{ trigger.event.data.sender }}"
         reaction: "🍺"
+        message_id: "{{ trigger.event.data.raw.key.id }}"
+
+- id: whatsapp_hype_bot
+  alias: "WhatsApp Bot: Hype/Victory Reaction"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: >
+        {{ 'geil' in trigger.event.data.content | lower or
+          'stark' in trigger.event.data.content | lower or
+          'sieg' in trigger.event.data.content | lower or
+          'gewonnen' in trigger.event.data.content | lower or
+          'sauber' in trigger.event.data.content | lower }}
+  action:
+    - service: whatsapp.send_reaction
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        reaction: "🔥"
+        message_id: "{{ trigger.event.data.raw.key.id }}"
+
+- id: whatsapp_volleyball_bot
+  alias: "WhatsApp Bot: Volleyball Reaction"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: >
+        {{ 'volleyball' in trigger.event.data.content | lower or
+          'training' in trigger.event.data.content | lower }}
+  action:
+    - service: whatsapp.send_reaction
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        reaction: "🏐"
         message_id: "{{ trigger.event.data.raw.key.id }}"
 
 - id: whatsapp_help_bot
@@ -13529,7 +13606,14 @@
     - service: whatsapp.send_message
       data:
         target: "{{ trigger.event.data.sender }}"
-        message: "🤖 *HA WhatsApp Bot Help*\n- *Status:* Get system health\n- *Beer/Bier:* Get a 🍺\n- *Müllabholung:* Upcoming waste collection\n- *Witz:* Hear a joke\n- *Help:* View this message"
+        message: >
+          🤖 *HA WhatsApp Bot Befehle*
+
+          📊 *Status:* Systemstatus anzeigen
+          🗑️ *Müllabholung:* Nächste Abholung
+          🍺 *Bier:* Prost!
+          🤡 *Witz:* Erzähl mir was Lustiges
+          ❓ *Help:* Diese Hilfe anzeigen
 
 - id: whatsapp_danke_bot
   alias: "WhatsApp Bot: Thank you Reaction"
@@ -13602,12 +13686,22 @@
       data:
         target: "{{ trigger.event.data.sender }}"
         message: >
-          😂 *Hier ein Witz:*
+          😂 *Witz des Moments:*
+
           {{ [
             "Warum können Geister so schlecht lügen? Weil sie so leicht zu durchschauen sind.",
             "Was ist grün und klopft an die Tür? Ein Klopfsalat.",
             "Warum gehen Ameisen nicht in die Kirche? Weil sie In-Sekten sind.",
-            "Was macht ein Clown im Büro? Faxen."
+            "Was macht ein Clown im Büro? Faxen.",
+            "Ich habe einen Witz über UDP, aber ich bin mir nicht sicher, ob er ankommt.",
+            "Was ist der Unterschied zwischen einem Saxophon und einer Kettensäge? Das Vibrato.",
+            "Egal wie gut du schläfst, Albert schläft wie Einstein.",
+            "Was essen Autos am liebsten? Parkplätzchen.",
+            "Warum trinken Mäuse keinen Alkohol? Weil sie Angst vor dem Kater haben.",
+            "Wie nennt man einen Boomerang, der nicht zurückkommt? Stock.",
+            "Was ist weiß und stört beim Essen? Eine Lawine.",
+            "Was macht ein Pirat am Computer? Er drückt die Enter-Taste.",
+            "Was macht ein Mathematiker im Garten? Wurzeln ziehen."
           ] | random }}
 
 - id: "volleyball_new_training_inquiry_mail"
@@ -13632,6 +13726,6 @@
           👤 *Von:* {{ trigger.event.data['sender'] }}
           📝 *Betreff:* {{ trigger.event.data['subject'] }}
 
-          --------------------------------
+          --------(max 800 Zeichen)------------
 
           {{ trigger.event.data['text'] | default(trigger.event.data['body']) | default('Kein Textinhalt (evtl. nur HTML)') | truncate(800) }}
