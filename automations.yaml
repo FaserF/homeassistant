@@ -12571,6 +12571,34 @@
         message: "Kohleanzünder Timer wurde gestartet."
         disable_notification: true
 
+- id: telegram_phoenixbad_feedback
+  alias: Telegram Phoenix-Bad Feedback
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: telegram_callback
+      event_data:
+        data: "/phoenix"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/phönix"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/phoenix@smartlife_ha_bot"
+  action:
+    - service: telegram_bot.send_message
+      data:
+        target: "{{ trigger.event.data.chat_id }}"
+        message: >
+          *Phönix-Bad Ottobrunn Auslastung:*
+
+          - *Die aktuelle Auslastung im Phönix Bad beträgt:*
+
+            * Schwimmbadbereich: {{ states('sensor.pool_occupancy') | default('?', true) }}%
+            * Sauna: {{ states('sensor.sauna_occupancy') | default('?', true) }}%
+
 - id: telegram_turn_off_fridge
   alias: Telegram Turn off fridge
   initial_state: true
@@ -13611,6 +13639,8 @@
 
           📊 *Status:* Systemstatus anzeigen
           🗑️ *Müllabholung:* Nächste Abholung
+          🌊 *Phoenix:* Aktuelle Auslastung im Phönixbad Ottobrunn
+          🧗‍♂️ *Boulderwelt:* Auslastungsstatistiken für Boulderwelt MUC Süd & Ost
           🍺 *Bier:* Prost!
           🤡 *Witz:* Erzähl mir was Lustiges
           ❓ *Help:* Diese Hilfe anzeigen
@@ -13672,6 +13702,76 @@
             * 📅 **{{ day_name }}, {{ date_german }}**: {{ items }}
             {%- endif %}
             {%- endfor %}
+
+- id: whatsapp_boulderwelt_bot
+  alias: "WhatsApp Bot: Boulderwelt"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: "{{ 'boulderwelt' in trigger.event.data.content | lower }}"
+  action:
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: >
+          Hier ist die Auslastungs-Prognose für die kommende Woche! (Statistik für 17-19 Uhr, dahinter Tagesdurchschnitt):
+
+          🧗‍♂️ **Ost**:
+          {% set days_ost = [
+            {'day': 'Montag', 'value': states('sensor.boulderwelt_ost_monday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_monday_avg') | float(70)},
+            {'day': 'Dienstag', 'value': states('sensor.boulderwelt_ost_tuesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_tuesday_avg') | float(70)},
+            {'day': 'Mittwoch', 'value': states('sensor.boulderwelt_ost_wednesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_wednesday_avg') | float(70)},
+            {'day': 'Donnerstag', 'value': states('sensor.boulderwelt_ost_thursday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_thursday_avg') | float(70)},
+            {'day': 'Freitag', 'value': states('sensor.boulderwelt_ost_friday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_ost_friday_avg') | float(70)}
+          ] | selectattr('value', '>', 0) | sort(attribute='value') | list %}
+          1. {{ days_ost[0].day }} ({{ days_ost[0].value }}% / Tag: {{ days_ost[0].day_avg }}%)
+
+          2. {{ days_ost[1].day }} ({{ days_ost[1].value }}% / Tag: {{ days_ost[1].day_avg }}%)
+
+          3. {{ days_ost[2].day }} ({{ days_ost[2].value }}% / Tag: {{ days_ost[2].day_avg }}%)
+
+          🧗‍♀️ **Süd**:
+          {% set days_sued = [
+            {'day': 'Montag', 'value': states('sensor.boulderwelt_sued_monday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_monday_avg') | float(70)},
+            {'day': 'Dienstag', 'value': states('sensor.boulderwelt_sued_tuesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_tuesday_avg') | float(70)},
+            {'day': 'Mittwoch', 'value': states('sensor.boulderwelt_sued_wednesday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_wednesday_avg') | float(70)},
+            {'day': 'Donnerstag', 'value': states('sensor.boulderwelt_sued_thursday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_thursday_avg') | float(70)},
+            {'day': 'Freitag', 'value': states('sensor.boulderwelt_sued_friday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_friday_avg') | float(70)}
+          ] | selectattr('value', '>', 0) | sort(attribute='value') | list %}
+          1. {{ days_sued[0].day }} ({{ days_sued[0].value }}% / Tag: {{ days_sued[0].day_avg }}%)
+          
+          2. {{ days_sued[1].day }} ({{ days_sued[1].value }}% / Tag: {{ days_sued[1].day_avg }}%)
+
+          3. {{ days_sued[2].day }} ({{ days_sued[2].value }}% / Tag: {{ days_sued[2].day_avg }}%)
+
+          ☀️ **Wochenende Süd**:
+          {% set days_weekend_sued = [
+            {'day': 'Samstag', 'value': states('sensor.boulderwelt_sued_saturday_avg') | float(70)},
+            {'day': 'Sonntag', 'value': states('sensor.boulderwelt_sued_sunday_avg') | float(70)}
+          ] | selectattr('value', '>', 0) | sort(attribute='value') | list %}
+          - {{ days_weekend_sued[0].day }} (Tag: {{ days_weekend_sued[0].value }}%)
+
+- id: whatsapp_phoenixbad_bot
+  alias: "WhatsApp Bot: Phoenix-Bad"
+  trigger:
+    - platform: event
+      event_type: whatsapp_message_received
+  condition:
+    - condition: template
+      value_template: "{{ 'phoenix' in trigger.event.data.content | lower or 'phönix' in trigger.event.data.content | lower }}"
+  action:
+    - service: whatsapp.send_message
+      data:
+        target: "{{ trigger.event.data.sender }}"
+        message: >
+          *Phönix-Bad Ottobrunn Auslastung:*
+
+          - *Die aktuelle Auslastung im Phönix Bad beträgt:*
+
+            * Schwimmbadbereich: {{ states('sensor.pool_occupancy') | default('?', true) }}%
+            * Sauna: {{ states('sensor.sauna_occupancy') | default('?', true) }}%
 
 - id: whatsapp_joke_bot
   alias: "WhatsApp Bot: Joke"
