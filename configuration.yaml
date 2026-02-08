@@ -562,8 +562,6 @@ switch: !include_dir_merge_list switch
 
 light: !include_dir_merge_list light
 
-notify: !include_dir_merge_list notify
-
 device_tracker: !include_dir_merge_list device_tracker
 
 # no_ip:
@@ -597,7 +595,7 @@ rest_command:
 
 google_assistant:
   project_id: !secret google_assistant_id
-  service_account: !include Homeassistant_google_assistant.json
+  service_account: !include SERVICE_ACCOUNT.json
   report_state: true
   exposed_domains:
     - switch
@@ -668,95 +666,61 @@ google_assistant:
       expose: false
       name: Adblocker
     # Enabled Entitys
-    ## Fabians Zimmer
-    light.regal:
-      name: Regal
-      expose: true
-      room: Fabians Zimmer
+    ## Schlafzimmer
     input_boolean.fabian_pc_strom:
       name: Strom Fabian
       expose: true
-      room: Fabians Zimmer
+      room: Schlafzimmer
       aliases:
         - Schreibtisch Fabian
+    switch.staubsauger:
+      expose: true
+      room: Schlafzimmer
+    switch.drucker:
+      expose: true
+      room: Schlafzimmer
     switch.bett_usb_ports:
       name: Bett Steckdose
       expose: true
-      room: Fabians Zimmer
-    light.lichtschalter:
-      name: Licht Schalter
+      room: Schlafzimmer
+    switch.fernseher_schlafzimmer:
       expose: true
-      room: Fabians Zimmer
+      room: Schlafzimmer
+    light.stehlampe_schlafzimmer:
+      expose: true
+      room: Schlafzimmer
     light.bett_gluhbirne:
       name: Bett Glühbirne
       expose: true
-      room: Fabians Zimmer
-    light.leds_tisch:
-      expose: true
-      room: Fabians Zimmer
-    light.yeelink_bslamp2_22e2_light:
-      name: Bettlicht
-      expose: true
-      room: Fabians Zimmer
-      aliases:
-        - Nachtlicht
-    cover.fabians_zimmer_rollo:
+      room: Schlafzimmer
+    #light.yeelink_bslamp2_22e2_light:
+    #  name: Bettlicht
+    #  expose: true
+    #  room: Schlafzimmer
+    #  aliases:
+    #    - Nachtlicht
+    cover.schlafzimmer_gross:
       expose: true
       aliases:
-        - Rollo Fabians Zimmer
-        - Rollo Schlafzimmer
-        - Rolladen Fabians Zimmer
-        - Rolladen Schlafzimmer
-        - Jalousie Fabians Zimmer
-        - Jalousie Schlafzimmer
-      room: Fabians Zimmer
-    ## Samuels Zimmer
-    light.deckenlampe_samuel:
+        - Rollo Schlafzimmer groß
+        - Rollo Schlafzimmer Bett
+        - Rolladen Schlafzimmer groß
+        - Rolladen Schlafzimmer Bett
+        - Jalousie Schlafzimmer groß
+        - Jalousie Schlafzimmer Bett
+      room: Schlafzimmer
+    cover.schlafzimmer_klein:
       expose: true
-      room: Samuels Zimmer
       aliases:
-        - Samuel Licht
-        - Deckenlicht Samuel
-        - Deckenlampe Samuel
-    light.samuels_lichtschalter:
-      expose: true
-      room: Samuels Zimmer
-      aliases:
-        - Lichtschalter Samuel
-        - Schalter Samuel
-    light.lampe_samuel:
-      expose: true
-      room: Samuels Zimmer
-    light.samuel_leds:
-      expose: true
-      room: Samuels Zimmer
-    switch.fernseher_samuel:
-      name: Fernseher Samuel
-      expose: true
-      room: Samuels Zimmer
-    switch.schreibtisch_samuel:
-      expose: false
-      room: Samuels Zimmer
-    switch.samuel_schreibtisch_usb_ports:
-      expose: true
-      room: Samuels Zimmer
-    input_boolean.samuel_pc_strom:
-      name: Samuel PC
-      expose: true
-      room: Samuels Zimmer
-      aliases:
-        - Schreibtisch Samuel
-        - Computer Samuel
-        - PC Samuel
+        - Rollo Schlafzimmer klein
+        - Rollo Schlafzimmer Garage
+        - Rolladen Schlafzimmer klein
+        - Rolladen Schlafzimmer Garage
+        - Jalousie Schlafzimmer klein
+        - Jalousie Schlafzimmer Garage
+      room: Schlafzimmer
     ## Wohnzimmer
-    light.deckenlampe:
-      expose: true
-      room: Wohnzimmer
-    light.leds_wohnzimmer_tv:
-      name: LEDs Wohnzimmer TV
-      expose: true
-      room: Wohnzimmer
-    light.leds_wohnzimmer:
+    light.led_stehlampe:
       expose: true
       room: Wohnzimmer
     light.stehlampe:
@@ -769,68 +733,42 @@ google_assistant:
       aliases:
         - Fernseher
         - TV
-    switch.staubsauger:
+    cover.wohnzimmer_links:
       expose: true
       room: Wohnzimmer
+      aliases:
+        - Rollo Wohnzimmer links
+        - Rolladen Wohnzimmer links
+        - Jalousie Wohnzimmer links
+    cover.wohnzimmer_rechts:
+      expose: true
+      room: Wohnzimmer
+      aliases:
+        - Rollo Wohnzimmer rechts
+        - Rolladen Wohnzimmer rechts
+        - Jalousie Wohnzimmer rechts
+    ## Küche
+    #switch.chunmi_eh1_f9ef_auto_keep_warm:
+    #  expose: true
+    #  room: Küche
+    #button.careli_maf05a_d482_start_cook:
+    #  expose: false
+    #  room: Küche
+    #  aliases:
+    #    - Heißluftfriteuse
+    cover.kuche:
+      expose: true
+      room: Küche
+      aliases:
+        - Rollo Küche
+        - Rolladen Küche
+        - Jalousie Küche
+    ## Bad
     vacuum.valetudo_dreamez10pro:
       expose: true
-      room: Wohnzimmer
+      room: Bad
       aliases:
         - Staubsaugroboter
-    cover.wohnzimmer_rollo_fenster:
-      expose: true
-      room: Wohnzimmer
-      aliases:
-        - Rollo Wohnzimmer Fenster
-        - Rolladen Wohnzimmer Fenster
-        - Jalousie Wohnzimmer Fenster
-    cover.wohnzimmer_rollo_tur:
-      expose: true
-      room: Wohnzimmer
-      aliases:
-        - Rollo Wohnzimmer Fenster
-        - Rolladen Wohnzimmer Fenster
-        - Jalousie Wohnzimmer Fenster
-    ## Keller
-    switch.waschmaschine:
-      expose: true
-      room: Keller
-    switch.kuhlschrank:
-      expose: false
-      room: Keller
-    switch.keller_usb_ports:
-      name: USB Ports Keller
-      expose: true
-      room: Keller
-    switch.fernseher_keller:
-      expose: true
-      room: Keller
-    light.flutlicht_keller:
-      expose: true
-      room: Keller
-    light.deckenlampe_keller:
-      name: Deckenlampe Keller
-      expose: true
-      room: Keller
-    light.keller_leds_flaschen:
-      name: Keller LEDs Flaschen
-      expose: true
-      room: Keller
-    ## Küche
-    switch.chunmi_eh1_f9ef_auto_keep_warm:
-      expose: true
-      room: Küche
-    switch.kuchengerate:
-      expose: true
-      room: Küche
-      aliases:
-        - Toaster
-        - Wasserkocher
-    button.careli_maf05a_d482_start_cook:
-      expose: false
-      room: Küche
-      aliases:
-        - Heißluftfriteuse
 
 alexa:
   smart_home:
@@ -942,7 +880,7 @@ alexa:
       #  - cover
       # Enabled Entitys
       #include_entities:
-      #  ## Fabians Zimmer
+      #  ## Schlafzimmer
       #  light.regal:
       #  input_boolean.fabian_pc_strom:
       #  switch.bett_usb_ports:
@@ -1045,7 +983,7 @@ intent_script:
                   payload: '{"segment_ids": ["4"]}'
           - conditions:
               - condition: template
-                value_template: "{{ ((Room)) == 'Fabians Zimmer' }}"
+                value_template: "{{ ((Room)) == 'Schlafzimmer' }}"
             sequence:
               - action: mqtt.publish
                 data:
@@ -1118,7 +1056,6 @@ frontend:
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
-
 ## Custom Components - has to be the end of the file due to GitHub Actions being unable to handle custom components stuff and will be removed there
 
 # - platform: sonoff_lan_mode_r3
@@ -1137,23 +1074,6 @@ script: !include scripts.yaml
 # api_key: !secret sonoff_lan_mode_r3_steckdose
 # icon: mdi:power-plug
 
-waste_collection_schedule:
-  sources:
-    - name: ics
-      args:
-        url: !secret waste_url
-      customize:
-        - type: Restabfall
-          alias: Restmüll
-          icon: mdi:trash-can
-        - type: BIO
-          alias: Bioabfall
-          icon: mdi:flower-outline
-        - type: Altpapier
-          alias: Papierabfall
-          icon: mdi:trash-can-outline
-        - type: Gelber Sack
-          icon: mdi:recycle
 #xiaomi_miio_cooker:
 #  name: Xiaomi Rice Cooker
 #  host: 192.168.178.61

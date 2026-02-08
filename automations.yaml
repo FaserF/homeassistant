@@ -13548,8 +13548,8 @@
           ✅ *Home Assistant Online*
 
           🕒 *Zeit:* {{ now().strftime('%H:%M') }} Uhr
+
           📅 *Datum:* {{ now().strftime('%d.%m.%Y') }}
-          ☀️ *Sonne:* {{ states('sun.sun') }}
 
           💻 *System Health:*
           - CPU: {{ states('sensor.processor_use') | default('?', true) }}%
@@ -13637,12 +13637,19 @@
         message: >
           🤖 *HA WhatsApp Bot Befehle*
 
+
           📊 *Status:* Systemstatus anzeigen
+
           🗑️ *Müllabholung:* Nächste Abholung
+
           🌊 *Phoenix:* Aktuelle Auslastung im Phönixbad Ottobrunn
+
           🧗‍♂️ *Boulderwelt:* Auslastungsstatistiken für Boulderwelt MUC Süd & Ost
+
           🍺 *Bier:* Prost!
+
           🤡 *Witz:* Erzähl mir was Lustiges
+
           ❓ *Help:* Diese Hilfe anzeigen
 
 - id: whatsapp_danke_bot
@@ -13676,7 +13683,7 @@
         message: >
           ♻️ *Abfallkalender:*
 
-          - 🚛 *Nächste Abholungen:*
+          - 🚛 *Nächste Abholungen in Zorneding:*
             {%- set attributes = states.sensor.nachste_abholungen.attributes %}
             {%- set dates = attributes.keys() | select('match', '^\\d{4}-\\d{2}-\\d{2}$') | sort %}
             {%- set weekdays = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
@@ -13716,7 +13723,7 @@
       data:
         target: "{{ trigger.event.data.sender }}"
         message: >
-          Hier ist die Auslastungs-Prognose für die kommende Woche! (Statistik für 17-19 Uhr, dahinter Tagesdurchschnitt):
+          Hier ist die Auslastungs-Prognose der besten Tage für die kommende Woche! (Statistik für 17-19 Uhr, dahinter Tagesdurchschnitt):
 
           🧗‍♂️ **Ost**:
           {% set days_ost = [
@@ -13732,6 +13739,7 @@
 
           3. {{ days_ost[2].day }} ({{ days_ost[2].value }}% / Tag: {{ days_ost[2].day_avg }}%)
 
+
           🧗‍♀️ **Süd**:
           {% set days_sued = [
             {'day': 'Montag', 'value': states('sensor.boulderwelt_sued_monday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_monday_avg') | float(70)},
@@ -13741,10 +13749,11 @@
             {'day': 'Freitag', 'value': states('sensor.boulderwelt_sued_friday_avg_2h') | float(70), 'day_avg': states('sensor.boulderwelt_sued_friday_avg') | float(70)}
           ] | selectattr('value', '>', 0) | sort(attribute='value') | list %}
           1. {{ days_sued[0].day }} ({{ days_sued[0].value }}% / Tag: {{ days_sued[0].day_avg }}%)
-          
+
           2. {{ days_sued[1].day }} ({{ days_sued[1].value }}% / Tag: {{ days_sued[1].day_avg }}%)
 
           3. {{ days_sued[2].day }} ({{ days_sued[2].value }}% / Tag: {{ days_sued[2].day_avg }}%)
+
 
           ☀️ **Wochenende Süd**:
           {% set days_weekend_sued = [
@@ -13768,10 +13777,10 @@
         message: >
           *Phönix-Bad Ottobrunn Auslastung:*
 
-          - *Die aktuelle Auslastung im Phönix Bad beträgt:*
 
-            * Schwimmbadbereich: {{ states('sensor.pool_occupancy') | default('?', true) }}%
-            * Sauna: {{ states('sensor.sauna_occupancy') | default('?', true) }}%
+          *Schwimmbadbereich:* {{ states('sensor.pool_occupancy') | default('?', true) }}%
+
+          *Sauna:* {{ states('sensor.sauna_occupancy') | default('?', true) }}%
 
 - id: whatsapp_joke_bot
   alias: "WhatsApp Bot: Joke"
