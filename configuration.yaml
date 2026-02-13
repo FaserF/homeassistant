@@ -667,8 +667,13 @@ google_assistant:
       name: Adblocker
     # Enabled Entitys
     ## Schlafzimmer
-    input_boolean.fabian_pc_strom:
-      name: Strom Fabian
+    #input_boolean.fabian_pc_strom:
+    #  name: Strom Fabian
+    #  expose: true
+    #  room: Schlafzimmer
+    #  aliases:
+    #    - Schreibtisch Fabian
+    switch.fabian_schreibtisch:
       expose: true
       room: Schlafzimmer
       aliases:
@@ -723,6 +728,10 @@ google_assistant:
     light.led_stehlampe:
       expose: true
       room: Wohnzimmer
+    light.stehlampe_esstisch:
+      name: Stehlampe Esstisch
+      expose: true
+      room: Wohnzimmer
     light.stehlampe:
       expose: true
       room: Wohnzimmer
@@ -733,6 +742,10 @@ google_assistant:
       aliases:
         - Fernseher
         - TV
+    switch.lautsprecher:
+      name: Lautsprecher Fernseher
+      expose: true
+      room: Wohnzimmer
     cover.wohnzimmer_links:
       expose: true
       room: Wohnzimmer

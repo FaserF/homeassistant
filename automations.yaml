@@ -10839,14 +10839,18 @@
                   *🏐 SPIELTAGS-ALARM! 🏐*
 
                   *Was:* {{ zorro_event['type'] }} {{ zorro_schedule_text }} "{{ zorro_event['title'] }}"
+
                   *Wann:* 📅 {{ weekday }}, {{ date.strftime('%d.%m.') }} um ⏰ {{ zorro_event['time'] }} Uhr
+
                   *Zusagen:* {{ zorro_event['in_count'] }}
                   {% set min_player = 6 if 'Heim' in zorro_event['title'] else 7 %}
                   {% if zorro_event['in_count'] < min_player %}
 
-                  Wir brauchen noch Verstärkung für den Spieltag! Bitte tragt euch zeitnah ein, damit wir planen können:
+
+                  Wir brauchen noch Verstärkung für den Spieltag! Bitte tragt euch zeitnah ein, damit geplant werden kann:
                   {{ zorro_event['link'] }}
                   {% else %}
+
 
                   Nicht vergessen, im Kadermanager abzustimmen:
                   {{ zorro_event['link'] }}
@@ -10867,6 +10871,9 @@
                           {% if 'Heim' in zorro_event['title'] %}
                           Freiwillige Schiedsrichter sind herzlich willkommen!
                           {% endif %}
+
+                          Bitte tragt euch dennoch für das Training ein, zum planen.
+                          {{ zorro_event['link'] }}
         - conditions: # Beachvolleyball
             - condition: or
               conditions:
@@ -11009,17 +11016,21 @@
                     {% endif %}
                   {% endif %}
 
-                  *🏐 SPIELTAGS-ALARM (Mannschaft 2)! 🏐*
+                  *🏐 SPIELTAGS-ALARM! 🏐*
 
                   *Was:* {{ event['type'] }} {{ schedule_text }} "{{ event['title'] }}"
+
                   *Wann:* 📅 {{ weekday }}, {{ date.strftime('%d.%m.') }} um ⏰ {{ event['time'] }} Uhr
+
                   *Zusagen:* {{ event['in_count'] }}
                   {% set min_player = 6 if 'Heim' in event['title'] else 7 %}
                   {% if event['in_count'] < min_player %}
 
+
                   Auf geht's, wir brauchen noch Mitspieler! Bitte tragt euch zeitnah ein:
                   {{ event['link'] }}
                   {% else %}
+
 
                   Stimmt bitte zeitnah im Kadermanager ab:
                   {{ event['link'] }}
@@ -11060,6 +11071,8 @@
                           {% if 'Heim' in event['title'] %}
                           Freiwillige Schiedsrichter sind herzlich willkommen!
                           {% endif %}
+
+                          Bitte tragt euch dennoch für das Training ein, zum planen.
       default:
         - service: whatsapp.send_message
           data:
@@ -13821,8 +13834,12 @@
     - platform: event
       event_type: imap_content
   condition:
+    # Check if the email was sent to the correct mailbox
     - condition: template
       value_template: "{{ trigger.event.data['username'] | lower | trim == 'volleyballtraining.zorneding@gmail.com' }}"
+    # Ignore emails from Google Account notifications
+    - condition: template
+      value_template: "{{ 'no-reply@accounts.google.com' not in trigger.event.data['sender'] }}"
   action:
     - service: whatsapp.send_message
       continue_on_error: true
