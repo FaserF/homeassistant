@@ -6602,321 +6602,119 @@
         - media_player.smart_tv_pro
         - media_player.wohnzimmer_tv
         - media_player.kuche_lautsprecher
-        - media_player.fabians_lautsprecher
-        - media_player.samuels_lautsprecher
-        - media_player.wohnzimmer_tv_cast
-        - media_player.mini_gruppe
-        - media_player.keller_tv_cast
-      attribute: media_title
+        - media_player.schlafzimmer
+        - media_player.wohnzimmer_uhr
+  condition:
+    - condition: template
+      value_template: >
+        {% set attrs = trigger.to_state.attributes %}
+        {% set eid = trigger.entity_id %}
+        {% set app = (attrs.app_name | default('') | string | lower) %}
+        {% set cid = (attrs.media_content_id | default('') | string | lower) %}
+        {% set dur = (attrs.media_duration | default(0) | float(0)) %}
+        {% set title = (attrs.media_title | default('') | string | lower) %}
+        {% set artist = (attrs.media_artist | default('') | string | lower) %}
+        {% set is_muted = attrs.is_volume_muted | default(false) %}
+
+        {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer', 'bluetooth audio'] %}
+
+        {# YouTube Shorts: duration < 40s but no title AND no artist #}
+        {% set is_yt_short = (app == 'youtube' and dur > 0 and dur < 40 and title == '' and artist == '') %}
+
+        {# Rule 1: Spotify Specific (Cast) #}
+        {% set is_spotify_ad = (app == 'spotify' and (
+          cid.startswith('spotify:ad:') or
+          cid.startswith('spotify:advertisment:') or
+          ('spotify' in cid and 'advertisment' in cid)
+        )) %}
+
+        {# Rule 2: Bluetooth Spotify #}
+        {% set is_bt_ad = (app == 'bluetooth audio' and (
+          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren']) or
+          (title == '—' and dur > 0 and dur < 40) or
+          (dur >= 29 and dur <= 31) or
+          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video'])
+        )) %}
+
+        {# Rule 3: General Streaming Apps with duration < 40s (ignoring YT Shorts AND Bluetooth) #}
+        {% set is_short_ad = (app in ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer'] and dur > 0 and dur < 40 and not is_yt_short) %}
+
+        {# Final Result #}
+        {{ (is_spotify_ad or is_bt_ad or is_short_ad) and not is_muted }}
   action:
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.wohnzimmer_uhr
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_uhr
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.wohnzimmer_uhr
-                is_volume_muted: false
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.kuche_lautsprecher
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.kuche_lautsprecher
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.kuche_lautsprecher
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.kuche_lautsprecher
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.kuche_lautsprecher
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.kuche_lautsprecher
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.kuche_lautsprecher
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.kuche_lautsprecher
-                is_volume_muted: false
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.fabians_lautsprecher
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.fabians_lautsprecher
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.fabians_lautsprecher
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.fabians_lautsprecher
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.fabians_lautsprecher
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.fabians_lautsprecher
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.fabians_lautsprecher
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.fabians_lautsprecher
-                is_volume_muted: false
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.samuels_lautsprecher
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.samuels_lautsprecher
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.samuels_lautsprecher
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.samuels_lautsprecher
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.samuels_lautsprecher
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.samuels_lautsprecher
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.samuels_lautsprecher
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.samuels_lautsprecher
-                is_volume_muted: false
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv_cast
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv_cast
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv_cast
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.wohnzimmer_tv_cast
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv_cast
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv_cast
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.wohnzimmer_tv_cast
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.wohnzimmer_tv_cast
-                is_volume_muted: false
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.mini_gruppe
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.mini_gruppe
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.mini_gruppe
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.mini_gruppe
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.mini_gruppe
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.mini_gruppe
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.mini_gruppe
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.mini_gruppe
-                is_volume_muted: false
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.keller_tv_cast
-                  attribute: is_volume_muted
-                  state: "false"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: media_player.keller_tv_cast
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.keller_tv_cast
-                  attribute: media_title
-                  state: "Advertisement"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.keller_tv_cast
-                is_volume_muted: true
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: media_player.keller_tv_cast
-                  attribute: media_title
-                  state: "Advertisement"
-                - condition: state
-                  entity_id: media_player.keller_tv_cast
-                  attribute: media_title
-                  state: "Spotify"
-                - condition: state
-                  entity_id: media_player.keller_tv_cast
-                  attribute: is_volume_muted
-                  state: "true"
-          sequence:
-            - service: media_player.volume_mute
-              data:
-                entity_id: media_player.keller_tv_cast
-                is_volume_muted: false
+    - variables:
+        eid: "{{ trigger.entity_id }}"
+        # Volume Capture Ladder: from_state -> current_state -> fallback 0.2
+        # We avoid capturing 0.0 if already muted by previous parallel run
+        prev_volume: >
+          {% set from_vol = trigger.from_state.attributes.volume_level | default(-1) | float %}
+          {% set to_vol = trigger.to_state.attributes.volume_level | default(-1) | float %}
+          {% if from_vol > 0.0 %}
+            {{ from_vol }}
+          {% elif to_vol > 0.0 %}
+            {{ to_vol }}
+          {% else %}
+            0.2
+          {% endif %}
+        was_muted: "{{ trigger.from_state.attributes.is_volume_muted | default(false) }}"
+    - service: media_player.volume_mute
+      continue_on_error: true
+      data:
+        entity_id: "{{ eid }}"
+        is_volume_muted: true
+    - service: media_player.volume_set
+      continue_on_error: true
+      data:
+        entity_id: "{{ eid }}"
+        volume_level: 0.0
+    - delay: >
+        {% if eid in ['media_player.bedroom_tv', 'media_player.schlafzimmer_tv', 'media_player.smart_tv_pro', 'media_player.wohnzimmer_tv'] %}
+          00:00:01
+        {% else %}
+          00:00:00
+        {% endif %}
+    - wait_template: >
+        {% set st = states(eid) %}
+        {% set app = (state_attr(eid, 'app_name') | default('') | string | lower) %}
+        {% set cid = (state_attr(eid, 'media_content_id') | default('') | string | lower) %}
+        {% set dur = (state_attr(eid, 'media_duration') | default(0) | float(0)) %}
+        {% set title = (state_attr(eid, 'media_title') | default('') | string | lower) %}
+        {% set artist = (state_attr(eid, 'media_artist') | default('') | string | lower) %}
+
+        {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer', 'bluetooth audio'] %}
+
+        {# YouTube Shorts logic (strictly dur > 0) #}
+        {% set is_yt_short = (app == 'youtube' and dur > 0 and dur < 40 and title == '' and artist == '') %}
+
+        {% set is_spotify_ad = (app == 'spotify' and (
+          cid.startswith('spotify:ad:') or
+          cid.startswith('spotify:advertisment:') or
+          ('spotify' in cid and 'advertisment' in cid)
+        )) %}
+
+        {% set is_bt_ad = (app == 'bluetooth audio' and (
+          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren']) or
+          (title == '—' and dur > 0 and dur < 40) or
+          (dur >= 29 and dur <= 31) or
+          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video'])
+        )) %}
+
+        {# Release ONLY if confirmed music (>40s), confirmed Short, or stopped #}
+        {% set is_confirmed_music = (dur >= 40) or (app in ['spotify', 'bluetooth audio'] and not is_spotify_ad and not is_bt_ad and dur > 0) %}
+        {% set is_ad = is_spotify_ad or is_bt_ad or (app != 'bluetooth audio' and app in streaming_apps and dur > 0 and dur < 40 and not is_yt_short) %}
+        {{ st in ['idle', 'off', 'unavailable'] or not is_ad }}
+      timeout: "00:06:00"
+      continue_on_timeout: true
+    - service: media_player.volume_set
+      continue_on_error: true
+      data:
+        entity_id: "{{ eid }}"
+        volume_level: "{{ prev_volume }}"
+    - service: media_player.volume_mute
+      continue_on_error: true
+      data:
+        entity_id: "{{ eid }}"
+        is_volume_muted: "{{ was_muted }}"
 
 - id: turn_off_devices_after_power_loss
   alias: Turn off devices after power loss
