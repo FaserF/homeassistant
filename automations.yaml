@@ -8,20 +8,11 @@
       to: "not_home"
       for:
         minutes: 1
-    - platform: state
-      entity_id: person.samuel
-      from: "home"
-      to: "not_home"
-      for:
-        minutes: 1
   condition:
     condition: not
     conditions:
       - condition: state
         entity_id: person.fabian
-        state: home
-      - condition: state
-        entity_id: person.samuel
         state: home
   action:
     - service: light.turn_off
@@ -30,15 +21,9 @@
     - service: switch.turn_off
       data:
         entity_id:
-          - switch.keller_usb_ports
-          - switch.fernseher_keller
-    - service: switch.turn_off
-      data:
-        entity_id:
           #- switch.bett_usb_ports
-          - switch.kuchengerate
           - switch.fernseher
-          - switch.fernseher_samuel
+          - switch.lautsprecher
     - service: media_player.turn_off
       data:
         entity_id: all
@@ -60,93 +45,12 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: device_tracker.md3f9bmc
-              state: "home"
-            - condition: numeric_state
-              entity_id: sensor.steckerleiste_samuel_energy_power
-              above: 20
-          sequence:
-            - service: notify.telegram_fabian
-              data:
-                message: "Keiner ist mehr zu Hause. Samuels SChreibtisch ist allerdings noch an und wurde nicht ausgeschaltet!"
-                # data:
-                #   inline_keyboard:
-                #     - "Herunterfahren:/shutdownfpc, Ruhezustand:/hibernatefpc"
-            # - service: notify.telegram_fabian
-            #   data:
-            #     message: "Keiner ist mehr zu Hause. samuel-PC ist allerdings noch an und wurde nicht ausgeschaltet!"
-            #     data:
-            #       inline_keyboard:
-            #         - "Herunterfahren:/shutdownnpc, Ruhezustand:/hibernatenpc"
-    - choose:
-        - conditions:
-            - condition: state
               entity_id: device_tracker.fabian_pc
               state: "not_home"
           sequence:
             - service: input_boolean.turn_off
               data:
                 entity_id: input_boolean.fabian_pc_strom
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: device_tracker.md3f9bmc
-              state: "not_home"
-          sequence:
-            - service: input_boolean.turn_off
-              data:
-                entity_id: input_boolean.samuel_pc_strom
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: climate.samuel_s_zimmer
-                  state: "off"
-          sequence:
-            - service: climate.set_hvac_mode
-              data:
-                entity_id: climate.samuel_s_zimmer
-                hvac_mode: auto
-            - service: switch.turn_off
-              data:
-                entity_id: switch.samuel_s_zimmer_usb_ports
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: climate.wohnzimmer
-                  state: "off"
-          sequence:
-            - service: climate.set_hvac_mode
-              data:
-                entity_id: climate.wohnzimmer
-                hvac_mode: auto
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: climate.fabian_s_zimmer
-                  state: "off"
-          sequence:
-            - service: climate.set_hvac_mode
-              data:
-                entity_id: climate.fabian_s_zimmer
-                hvac_mode: auto
-    - choose:
-        - conditions:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: climate.bad
-                  state: "off"
-          sequence:
-            - service: climate.set_hvac_mode
-              data:
-                entity_id: climate.bad
-                hvac_mode: auto
     - delay: "00:30:00"
     - choose:
         - conditions:
@@ -154,9 +58,6 @@
               conditions:
                 - condition: state
                   entity_id: person.fabian
-                  state: home
-                - condition: state
-                  entity_id: person.samuel
                   state: home
             - condition: state
               entity_id: input_boolean.gast_modus
@@ -540,6 +441,24 @@
 #        message: >
 #          Call of Duty Black Ops 6 {{ state_attr('sensor.keyforsteam_166331', 'edition') }} hat den Preis {{ state_attr('sensor.keyforsteam_166331', 'priceCard') }} € bei {{ state_attr('sensor.keyforsteam_166331', 'merchant') }} mit dem Code {{ state_attr('sensor.keyforsteam_166331', 'coupon') }} - Jetzt prüfen: https://www.keyforsteam.de/
 #        target: !secret telegram_chat_fabian
+
+- id: sync_speaker_state_to_tv
+  alias: "Sync: TV to Speaker"
+  description: "Synchronizes the speaker state with the TV state."
+  mode: single
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: switch.fernseher
+      # Triggers only when state changes to 'on' or 'off' (ignores attributes)
+      to:
+        - "on"
+        - "off"
+  action:
+    # Uses the state of the TV (on/off) to determine the service call
+    - service: "switch.turn_{{ trigger.to_state.state }}"
+      target:
+        entity_id: switch.lautsprecher
 
 - id: open_door_for_fabian
   alias: "Open the door for Fabian if coming home"
@@ -13618,23 +13537,6 @@
         reaction: "🔥"
         message_id: "{{ trigger.event.data.raw.key.id }}"
 
-- id: whatsapp_volleyball_bot
-  alias: "WhatsApp Bot: Volleyball Reaction"
-  trigger:
-    - platform: event
-      event_type: whatsapp_message_received
-  condition:
-    - condition: template
-      value_template: >
-        {{ 'volleyball' in trigger.event.data.content | lower or
-          'training' in trigger.event.data.content | lower }}
-  action:
-    - service: whatsapp.send_reaction
-      data:
-        target: "{{ trigger.event.data.sender }}"
-        reaction: "🏐"
-        message_id: "{{ trigger.event.data.raw.key.id }}"
-
 - id: whatsapp_help_bot
   alias: "WhatsApp Bot: Help"
   trigger:
@@ -13839,7 +13741,7 @@
       value_template: "{{ trigger.event.data['username'] | lower | trim == 'volleyballtraining.zorneding@gmail.com' }}"
     # Ignore emails from Google Account notifications
     - condition: template
-      value_template: "{{ 'no-reply@accounts.google.com' not in trigger.event.data['sender'] }}"
+      value_template: "{{ 'no-reply@accounts.google.com' not in trigger.event.data['sender'] and not trigger.event.data['sender'].endswith('@google.com') }}"
   action:
     - service: whatsapp.send_message
       continue_on_error: true
