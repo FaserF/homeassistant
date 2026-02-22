@@ -6599,10 +6599,10 @@
       entity_id:
         - media_player.bedroom_tv
         - media_player.schlafzimmer_tv
-        - media_player.kuche_lautsprecher
-        - media_player.schlafzimmer
         - media_player.smart_tv_pro
         - media_player.wohnzimmer_tv
+        - media_player.kuche_lautsprecher
+        - media_player.schlafzimmer
         - media_player.wohnzimmer_uhr
   condition:
     - condition: template
@@ -6619,7 +6619,7 @@
         {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer'] %}
 
         {# YouTube Shorts: duration < 40s but no title AND no artist #}
-        {% set is_yt_short = (app == 'youtube' and title == '' and artist == '') %}
+        {% set is_yt_short = (app == 'youtube' and dur > 0 and dur < 40 and title == '' and artist == '') %}
 
         {# Rule 1: Spotify Specific #}
         {% set is_spotify_ad = (app == 'spotify' and (
@@ -6635,24 +6635,29 @@
         {{ (is_spotify_ad or is_short_ad) and not is_muted }}
   action:
     - variables:
-        player_id: "{{ trigger.entity_id }}"
+        eid: "{{ trigger.entity_id }}"
         # Default to 20% if current volume is zero or unavailable
         prev_volume: >
-          {% set vol = state_attr(trigger.entity_id, 'volume_level') | float(-1) %}
+          {% set vol = state_attr(eid, 'volume_level') | float(-1) %}
           {{ vol if vol > 0.0 else 0.2 }}
-        was_muted: "{{ state_attr(trigger.entity_id, 'is_volume_muted') | default(false) }}"
+        was_muted: "{{ state_attr(eid, 'is_volume_muted') | default(false) }}"
     - service: media_player.volume_mute
       continue_on_error: true
       data:
-        entity_id: "{{ player_id }}"
+        entity_id: "{{ eid }}"
         is_volume_muted: true
     - service: media_player.volume_set
       continue_on_error: true
       data:
-        entity_id: "{{ player_id }}"
+        entity_id: "{{ eid }}"
         volume_level: 0.0
+    - delay: >
+        {% if eid in ['media_player.bedroom_tv', 'media_player.schlafzimmer_tv', 'media_player.smart_tv_pro', 'media_player.wohnzimmer_tv'] %}
+          00:00:01
+        {% else %}
+          00:00:00
+        {% endif %}
     - wait_template: >
-        {% set eid = player_id %}
         {% set st = states(eid) %}
         {% set app = (state_attr(eid, 'app_name') | default('') | string | lower) %}
         {% set cid = (state_attr(eid, 'media_content_id') | default('') | string | lower) %}
@@ -6661,31 +6666,29 @@
         {% set artist = (state_attr(eid, 'media_artist') | default('') | string | lower) %}
 
         {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer'] %}
+        {% set is_yt_short = (app == 'youtube' and dur > 0 and dur < 40 and title == '' and artist == '') %}
 
-        {% set is_yt_short = (app == 'youtube' and title == '' and artist == '') %}
+        {% set is_spotify_ad = (app == 'spotify' and (
+          cid.startswith('spotify:ad:') or
+          cid.startswith('spotify:advertisment:') or
+          ('spotify' in cid and 'advertisment' in cid)
+        )) %}
 
-        {% set is_ad = (
-          (app == 'spotify' and (
-            cid.startswith('spotify:ad:') or
-            cid.startswith('spotify:advertisment:') or
-            ('spotify' in cid and 'advertisment' in cid)
-          )) or
-          (app in streaming_apps and dur > 0 and dur < 40 and not is_yt_short)
-        ) %}
-
-        {# Release if: not an ad anymore OR player stopped #}
-        {{ st in ['idle', 'off', 'unavailable'] or not is_ad }}
+        {# Stay muted if it's an ad or unknown (dur 0) #}
+        {# Release ONLY if confirmed music (>40s), confirmed Short, or stopped #}
+        {% set is_confirmed_music = (dur >= 40) or (app == 'spotify' and not is_spotify_ad and dur > 0) %}
+        {{ st in ['idle', 'off', 'unavailable'] or is_confirmed_music or is_yt_short }}
       timeout: "00:06:00"
       continue_on_timeout: true
     - service: media_player.volume_set
       continue_on_error: true
       data:
-        entity_id: "{{ player_id }}"
+        entity_id: "{{ eid }}"
         volume_level: "{{ prev_volume }}"
     - service: media_player.volume_mute
       continue_on_error: true
       data:
-        entity_id: "{{ player_id }}"
+        entity_id: "{{ eid }}"
         is_volume_muted: "{{ was_muted }}"
 
 - id: turn_off_devices_after_power_loss
