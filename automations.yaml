@@ -6616,31 +6616,47 @@
         {% set artist = (attrs.media_artist | default('') | string | lower) %}
         {% set is_muted = attrs.is_volume_muted | default(false) %}
 
-        {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer'] %}
+        {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer', 'bluetooth audio'] %}
 
         {# YouTube Shorts: duration < 40s but no title AND no artist #}
         {% set is_yt_short = (app == 'youtube' and dur > 0 and dur < 40 and title == '' and artist == '') %}
 
-        {# Rule 1: Spotify Specific #}
+        {# Rule 1: Spotify Specific (Cast) #}
         {% set is_spotify_ad = (app == 'spotify' and (
           cid.startswith('spotify:ad:') or
           cid.startswith('spotify:advertisment:') or
           ('spotify' in cid and 'advertisment' in cid)
         )) %}
 
-        {# Rule 2: Streaming Apps with duration < 40s (ignoring YT Shorts) #}
-        {% set is_short_ad = (app in streaming_apps and dur > 0 and dur < 40 and not is_yt_short) %}
+        {# Rule 2: Bluetooth Spotify #}
+        {% set is_bt_ad = (app == 'bluetooth audio' and (
+          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren']) or
+          (title == '—' and dur > 0 and dur < 40) or
+          (dur >= 29 and dur <= 31) or
+          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video'])
+        )) %}
+
+        {# Rule 3: General Streaming Apps with duration < 40s (ignoring YT Shorts AND Bluetooth) #}
+        {% set is_short_ad = (app in ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer'] and dur > 0 and dur < 40 and not is_yt_short) %}
 
         {# Final Result #}
-        {{ (is_spotify_ad or is_short_ad) and not is_muted }}
+        {{ (is_spotify_ad or is_bt_ad or is_short_ad) and not is_muted }}
   action:
     - variables:
         eid: "{{ trigger.entity_id }}"
-        # Default to 20% if current volume is zero or unavailable
+        # Volume Capture Ladder: from_state -> current_state -> fallback 0.2
+        # We avoid capturing 0.0 if already muted by previous parallel run
         prev_volume: >
-          {% set vol = state_attr(eid, 'volume_level') | float(-1) %}
-          {{ vol if vol > 0.0 else 0.2 }}
-        was_muted: "{{ state_attr(eid, 'is_volume_muted') | default(false) }}"
+          {% set from_vol = trigger.from_state.attributes.volume_level | default(-1) | float %}
+          {% set to_vol = trigger.to_state.attributes.volume_level | default(-1) | float %}
+          {% if from_vol > 0.0 %}
+            {{ from_vol }}
+          {% elif to_vol > 0.0 %}
+            {{ to_vol }}
+          {% else %}
+            0.2
+          {% endif %}
+        was_muted: "{{ trigger.from_state.attributes.is_volume_muted | default(false) }}"
     - service: media_player.volume_mute
       continue_on_error: true
       data:
@@ -6665,7 +6681,9 @@
         {% set title = (state_attr(eid, 'media_title') | default('') | string | lower) %}
         {% set artist = (state_attr(eid, 'media_artist') | default('') | string | lower) %}
 
-        {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer'] %}
+        {% set streaming_apps = ['spotify', 'youtube', 'youtube music', 'soundcloud', 'deezer', 'bluetooth audio'] %}
+
+        {# YouTube Shorts logic (strictly dur > 0) #}
         {% set is_yt_short = (app == 'youtube' and dur > 0 and dur < 40 and title == '' and artist == '') %}
 
         {% set is_spotify_ad = (app == 'spotify' and (
@@ -6674,10 +6692,17 @@
           ('spotify' in cid and 'advertisment' in cid)
         )) %}
 
-        {# Stay muted if it's an ad or unknown (dur 0) #}
+        {% set is_bt_ad = (app == 'bluetooth audio' and (
+          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren']) or
+          (title == '—' and dur > 0 and dur < 40) or
+          (dur >= 29 and dur <= 31) or
+          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video'])
+        )) %}
+
         {# Release ONLY if confirmed music (>40s), confirmed Short, or stopped #}
-        {% set is_confirmed_music = (dur >= 40) or (app == 'spotify' and not is_spotify_ad and dur > 0) %}
-        {{ st in ['idle', 'off', 'unavailable'] or is_confirmed_music or is_yt_short }}
+        {% set is_confirmed_music = (dur >= 40) or (app in ['spotify', 'bluetooth audio'] and not is_spotify_ad and not is_bt_ad and dur > 0) %}
+        {% set is_ad = is_spotify_ad or is_bt_ad or (app != 'bluetooth audio' and app in streaming_apps and dur > 0 and dur < 40 and not is_yt_short) %}
+        {{ st in ['idle', 'off', 'unavailable'] or not is_ad }}
       timeout: "00:06:00"
       continue_on_timeout: true
     - service: media_player.volume_set
