@@ -6630,10 +6630,10 @@
 
         {# Rule 2: Bluetooth Spotify #}
         {% set is_bt_ad = (app == 'bluetooth audio' and (
-          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren']) or
+          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren', 'arbeitgeber land hesse']) or
           (title == '—' and dur > 0 and dur < 40) or
-          (dur >= 29 and dur <= 31) or
-          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video'])
+          (dur >= 27 and dur <= 31) or
+          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video', 'sparkasse südpfalz', 'Sparda-Bank', 'Leapmotor', 'XXXLutz', 'EMIL FREY', 'Salesperson', 'LEAPMOTOR'])
         )) %}
 
         {# Rule 3: General Streaming Apps with duration < 40s (ignoring YT Shorts AND Bluetooth) #}
@@ -6693,10 +6693,10 @@
         )) %}
 
         {% set is_bt_ad = (app == 'bluetooth audio' and (
-          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren']) or
+          (title in ['advertisement', 'werbung', 'sparkasse', 'mehr erfahren', 'arbeitgeber land hesse', 'Sparda-Bank']) or
           (title == '—' and dur > 0 and dur < 40) or
-          (dur >= 29 and dur <= 31) or
-          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video'])
+          (dur >= 27 and dur <= 31) or
+          (dur > 0 and dur < 40 and artist in ['spotify', 'sparkasse', 'prime video', 'sparkasse südpfalz', 'Leapmotor', 'XXXLutz', 'EMIL FREY', 'Salesperson', 'LEAPMOTOR'])
         )) %}
 
         {# Release ONLY if confirmed music (>40s), confirmed Short, or stopped #}
