@@ -4335,44 +4335,72 @@
           - "Einschalten:/climateson"
 
 - id: remind_for_gruppentreffen
-  alias: "🍻 Gruppentreffen Reminder"
+  alias: "Gruppentreffen Reminder (3 Days Before)"
+  description: "Sends a Telegram poll 3 days before a Gruppentreffen event"
+
   trigger:
-    # Trigger approx. 31 hours before the event
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(state_attr('calendar.votgaming_kalender', 'start_time')) - 111600) | round(-1) }}"
-    # Trigger approx. 15 hours before the event
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-1) == (as_timestamp(state_attr('calendar.votgaming_kalender', 'start_time')) - 54000) | round(-1) }}"
+    # Trigger exactly 72 hours (3 days) before the event start
+    - platform: calendar
+      event: start
+      offset: "-72:00:00"
+      entity_id: calendar.votgaming_kalender
   condition:
-    - condition: and
+    - condition: or
       conditions:
-        - "{{ (as_timestamp(state_attr('calendar.votgaming_kalender', 'start_time')) - as_timestamp(now())) < 112600 }}"
-        - "{{ (as_timestamp(state_attr('calendar.votgaming_kalender', 'start_time')) - as_timestamp(now())) > 0 }}"
-        - condition: state
-          entity_id: calendar.votgaming_kalender
-          attribute: message
-          state: "Gruppentreffen"
-        # Prevents re-triggering within 50 hours
         - condition: template
-          value_template: "{{ as_timestamp(now()) - as_timestamp(this.attributes.last_triggered) | int(0) > 180000 }}"
+          value_template: "{{ trigger is not defined }}" # Allow manual trigger
+        - condition: template
+          value_template: "{{ trigger.calendar_event.summary == 'Gruppentreffen' }}"
   action:
+    - variables:
+        # Robust way to get event data: Try trigger first, then fall back to calendar state
+        event_data: >
+          {% if trigger is defined and trigger.calendar_event is defined %}
+            {{ trigger.calendar_event }}
+          {% else %}
+            {{ {
+              'start': state_attr('calendar.votgaming_kalender', 'start_time'),
+              'summary': state_attr('calendar.votgaming_kalender', 'message')
+            } }}
+          {% endif %}
+        # Calculate weekday from the extracted start time
+        event_weekday: >
+          {% set days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"] %}
+          {% if event_data.start %}
+            {{ days[as_datetime(event_data.start).weekday()] }}
+          {% else %}
+            Event-Tag
+          {% endif %}
+        forecast_data: "{{ state_attr('sensor.weather_ebersberg_daily', 'forecast') }}"
+        # Logic to find the best forecast index based on days remaining
+        target_forecast: >
+          {% if event_data.start %}
+            {% set days_diff = ((as_timestamp(event_data.start) - as_timestamp(now())) / 86400) | int %}
+            {% if forecast_data and days_diff >= 0 and forecast_data | length > days_diff %}
+              {{ forecast_data[days_diff] }}
+            {% else %}
+              {{ none }}
+            {% endif %}
+          {% else %}
+            {{ none }}
+          {% endif %}
     - choose:
-        # Case 1: Good weather
+        # Case 1: Good weather predicted
         - conditions:
-            - condition: or
-              conditions:
-                - "{{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['condition'] == 'sunny' }}"
-                - "{{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['condition'] == 'partlycloudy' }}"
-            - "{{ state_attr('sensor.weather_ebersberg_daily', 'forecast')[1]['temperature'] | int >= 18 }}"
+            - condition: template
+              value_template: >
+                {{ target_forecast is not none and
+                (target_forecast.condition in ['sunny', 'partlycloudy']) and
+                (target_forecast.temperature | int >= 18) }}
           sequence:
             - service: telegram_bot.send_poll
               data:
                 target: !secret telegram_chat_5friends
                 question: >
-                  {% set greetings = ["Obacht!", "Aufgepasst!", "Wohoo!"] %}
-                  {{ greetings | random }} Morgen steht unser {{ state_attr('calendar.votgaming_kalender', 'message') }} an!
-                  Das Wetter wird super: {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].condition }} bei {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[1].temperature }}°C.
-                  {% if now().month <= 4 or now().month >= 10 %} Die Sonne scheint bis ⏰ {{ state_attr('sun.sun', 'next_dusk') | as_timestamp | timestamp_custom('%H:%M', false) }}.{% endif %}
+                  {% set greetings = ["Aufgepasst!", "Wohoo!", "Termin-Check!"] %}
+                  {{ greetings | random }} Am {{ event_weekday }} steht unser {{ event_data.summary }} an!
+                  Das Wetter wird super: {{ target_forecast.condition }} bei {{ target_forecast.temperature }}°C.
+                  {% if now().month <= 4 or now().month >= 10 %}Die Sonne scheint bis ⏰ {{ state_attr('sun.sun', 'next_dusk') | as_timestamp | timestamp_custom('%H:%M', false) }}.{% endif %}
                   Wo treffen wir uns? ☀️
                 options:
                   - "See 🌊"
@@ -4382,23 +4410,24 @@
                   - "Flo"
                   - "Maxi"
                   - "Bar (z.B. Tropic Bar) 🍹"
-                  - "Wo anders (Schreiben wo!)"
+                  - "Wo anders (Schreiben!)"
                 is_anonymous: false
                 allows_multiple_answers: true
                 disable_notification: true
+        # Case 2: Weather sensor unavailable or unknown
         - conditions:
             - condition: or
               conditions:
-                - "{{ states('sensor.weather_ebersberg_hourly') == 'unavailable' }}"
-                - "{{ states('sensor.weather_ebersberg_hourly') == 'unknown' }}"
+                - "{{ states('sensor.weather_ebersberg_daily') in ['unavailable', 'unknown'] }}"
+                - "{{ target_forecast is none }}"
           sequence:
             - service: telegram_bot.send_poll
               data:
                 target: !secret telegram_chat_5friends
                 question: >
-                  {% set greetings = ["Obacht!", "Aufgepasst!", "Wohoo!"] %}
-                  {{ greetings | random }} Morgen ist wieder {{ state_attr('calendar.votgaming_kalender', 'message') }}!
-                  {% if now().month <= 4 or now().month >= 10 %} Die Sonne scheint bis ⏰ {{ state_attr('sun.sun', 'next_dusk') | as_timestamp | timestamp_custom('%H:%M', false) }}.{% endif %}
+                  {% set greetings = ["Obacht!", "Aufgepasst!", "Servus!"] %}
+                  {{ greetings | random }} Am {{ event_weekday }} ist wieder {{ event_data.summary }}!
+                  Wettervorhersage ist gerade nicht verfügbar.
                   Wo schlagen wir unser Lager auf?
                 options:
                   - "Fabi"
@@ -4406,19 +4435,19 @@
                   - "Flo"
                   - "Maxi"
                   - "Bar (z.B. Tropic Bar) 🍹"
-                  - "Wo anders (Schreiben wo!)"
+                  - "Wo anders (Schreiben!)"
                 is_anonymous: false
                 allows_multiple_answers: true
                 disable_notification: true
+      # Default: Bad/Mediocre weather
       default:
         - service: telegram_bot.send_poll
           data:
             target: !secret telegram_chat_5friends
             question: >
-              {% set greetings = ["Obacht!", "Aufgepasst!", "Wohoo!"] %}
-              {{ greetings | random }} Morgen steht unser {{ state_attr('calendar.votgaming_kalender', 'message') }} an!
-              Das Wetter wird eher durchwachsen: {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].condition }} bei {{ states.sensor.weather_ebersberg_hourly.attributes.forecast[24].temperature }}°C.
-              {% if now().month <= 4 or now().month >= 10 %} Die Sonne scheint bis ⏰ {{ state_attr('sun.sun', 'next_dusk') | as_timestamp | timestamp_custom('%H:%M', false) }}.{% endif %}
+              {% set greetings = ["Aufgepasst!", "Gruppentreffen-Erinnerung!"] %}
+              {{ greetings | random }} Am {{ event_weekday }} steht unser Treffen an!
+              Das Wetter wird eher durchwachsen: {{ target_forecast.condition if target_forecast else 'Regnerisch' }} bei {{ target_forecast.temperature if target_forecast else '?' }}°C.
               Wo treffen wir uns? ☔️
             options:
               - "Fabi"
@@ -4427,17 +4456,19 @@
               - "Maxi"
               - "Bar (z.B. Tropic Bar) 🍹"
               - "Trotzdem raus? 🤔"
-              - "Wo anders (Schreiben wo!)"
+              - "Wo anders (Schreiben!)"
             is_anonymous: false
             allows_multiple_answers: true
             disable_notification: true
+    # Food Suggestion Poll
     - service: telegram_bot.send_poll
       data:
         target: !secret telegram_chat_5friends
         question: >
-          {% set cooking_questions = ["Sollen wir was Leckeres zusammen kochen?", "Wer hat Hunger und Lust auf eine gemeinsame Koch-Action?", "Wie wär's mit Kochen?"] %}
-          {{ cooking_questions | random }} 🧑‍🍳 Essensvorschlag des Tages: {{ states('sensor.chefkoch_daily_recipe') }}.
-          Weitere Vorschläge mit /food
+          {% set cooking_questions = ["Sollen wir was Leckeres kochen?", "Hunger? Lust auf gemeinsames Kochen?", "Wie wär's mit Kochen?"] %}
+          {{ cooking_questions | random }} 🧑‍🍳
+          Vorschlag: {{ states('sensor.chefkoch_daily_recipe') }}.
+          Mehr mit /food
         options:
           - "Ja, bin am Start! 😋"
           - "Nein, bin versorgt."
@@ -5825,12 +5856,98 @@
         #  - text: "🗓️ Alle Abholungen"
         #    callback_data: "müllabholung"
 
+- id: foodsharing_basket_notification
+  alias: "Foodsharing: Basket Notification"
+  initial_state: false
+  trigger:
+    - platform: state
+      entity_id:
+        - sensor.foodsharing_location_48_082236_11_854379_korbe # Zornd/Standard
+        - sensor.foodsharing_location_48_117971_11_683341_korbe # MUC East
+  condition:
+    - condition: template
+      # Automatisch: Nur wenn Korb-Anzahl steigt | Manuell: Immer erlaubt
+      value_template: >
+        {% if trigger.to_state is defined and trigger.from_state is defined %}
+          {{ trigger.to_state.state | int(0) > trigger.from_state.state | int(0) }}
+        {% else %}
+          true
+        {% endif %}
+  action:
+    - variables:
+        config:
+          - entity: sensor.foodsharing_location_48_082236_11_854379_korbe
+            target: !secret telegram_foodsharing
+            mobile_push: true
+          - entity: sensor.foodsharing_location_48_117971_11_683341_korbe
+            target: !secret telegram_foodsharing_muc
+            mobile_push: false
+    - repeat:
+        for_each: "{{ config }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: >
+                  {{ (trigger.entity_id is defined and trigger.entity_id == repeat.item.entity) or
+                  (trigger.entity_id is not defined) }}
+              - condition: template
+                value_template: "{{ state_attr(repeat.item.entity, 'baskets') | length > 0 }}"
+            then:
+              - variables:
+                  b: "{{ state_attr(repeat.item.entity, 'baskets')[0] }}"
+                  clean_desc: "{{ b.description | trim | regex_replace('\\n\\s*\\n+', '\\n\\n') | e }}"
+                  time_info: >
+                    {% if b.available_until and b.available_until != 'Unknown' -%}
+                    {% set dt = strptime(b.available_until, "%a %b %d %H:%M:%S %Y", None) -%}
+                    ⏰ <b>Verfügbar bis ca.:</b> {{ dt.strftime('%d.%m. %H:%M') if dt else b.available_until | e }} Uhr
+                    {%- endif %}
+                  msg: |
+                    🧺 <b>NEUER ESSENSKORB {% if b.user_name %}VON {{ b.user_name | upper | e }}{% endif %} VERFÜGBAR!</b>
+
+                    {{ clean_desc }}
+
+                    {{ time_info }}
+                    ------------
+                    🔗 <a href="https://foodsharing.de/essenskoerbe/{{ b.id }}">Korb auf Foodsharing.de</a>
+                    ⚖️ <a href="https://wiki.foodsharing.network/wiki/Verhaltensregeln">Verhaltensregeln</a>
+
+              - choose:
+                  - conditions: "{{ b.picture is defined and b.picture not in [none, '', 'Unknown'] }}"
+                    sequence:
+                      - service: telegram_bot.send_photo
+                        data:
+                          target: "{{ repeat.item.target }}"
+                          url: "{{ b.picture }}"
+                          caption: "{{ msg }}"
+                          parse_mode: html
+                  - default:
+                      - service: telegram_bot.send_message
+                        data:
+                          target: "{{ repeat.item.target }}"
+                          message: "{{ msg }}"
+                          parse_mode: html
+
+              - if:
+                  - condition: template
+                    value_template: >
+                      {{ repeat.item.mobile_push and 'Zorneding' in b.description and is_state('person.fabian', 'home') }}
+                then:
+                  - service: notify.mobile_app_pixel_10_pro
+                    data:
+                      title: "🧺 Neuer Korb in Zorneding"
+                      message: "{% if b.user_name %}Von {{ b.user_name }}: {% endif %}{{ b.description | truncate(150) }}"
+                      data:
+                        image: "{{ b.picture if b.picture else '' }}"
+                        clickAction: "https://foodsharing.de/essenskoerbe/{{ b.id }}"
+                        push:
+                          sound: { name: "default", critical: 1, volume: 0.4 }
+
 - id: foodsharing_basket_available
   alias: "Foodsharing: Basket Available"
   initial_state: true
   trigger:
     - platform: state
-      entity_id: sensor.foodsharing_baskets_48_082236_11_854379
+      entity_id: sensor.foodsharing_location_48_082236_11_854379_korbe
   condition:
     - condition: template
       value_template: |
@@ -5843,7 +5960,7 @@
         target: !secret telegram_foodsharing
         parse_mode: html
         message: |
-          {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_baskets_48_082236_11_854379' %}
+          {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_082236_11_854379_korbe' %}
           {% set baskets = state_attr(entity_id, 'baskets') %}
           {% if baskets and baskets | length > 0 %}
             {% set b = baskets[0] %}
@@ -5872,7 +5989,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: sensor.foodsharing_baskets_48_082236_11_854379
+      entity_id: sensor.foodsharing_location_48_082236_11_854379_korbe
   condition:
     - condition: template
       value_template: |
@@ -5881,7 +5998,7 @@
         {{ to_state > from_state }}
     - condition: template
       value_template: |
-        {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_baskets_48_082236_11_854379' %}
+        {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_082236_11_854379_korbe' %}
         {% set baskets = state_attr(entity_id, 'baskets') %}
         {{ baskets and baskets | length > 0 and 'Zorneding' in (baskets[0].description | default('')) }}
   action:
@@ -5895,7 +6012,7 @@
               data:
                 title: "🧺 Neuer Korb in Zorneding"
                 message: |
-                  {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_baskets_48_082236_11_854379' %}
+                  {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_082236_11_854379_korbe' %}
                   {% set b = state_attr(entity_id, 'baskets')[0] %}
                   {% if b.user_name %}Von {{ b.user_name }}: {% endif %}{{ b.description }}
                   {% if b.available_until and b.available_until != 'Unknown' %}
@@ -5904,7 +6021,7 @@
                   {% endif %}
                 data:
                   image: >
-                    {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_baskets_48_082236_11_854379' %}
+                    {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_082236_11_854379_korbe' %}
                     {% set baskets = state_attr(entity_id, 'baskets') %}
                     {{ baskets[0].picture if baskets and baskets | length > 0 and baskets[0].picture else '' }}
                   push:
@@ -5918,7 +6035,7 @@
   initial_state: true
   trigger:
     - platform: state
-      entity_id: sensor.foodsharing_baskets_48_117971_11_683341
+      entity_id: sensor.foodsharing_location_48_117971_11_683341_korbe
   condition:
     - condition: template
       value_template: |
@@ -5931,7 +6048,7 @@
         target: !secret telegram_foodsharing_muc
         parse_mode: html
         message: |
-          {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_baskets_48_117971_11_683341' %}
+          {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_117971_11_683341_korbe' %}
           {% set baskets = state_attr(entity_id, 'baskets') %}
           {% if baskets and baskets | length > 0 %}
             {% set b = baskets[0] %}
@@ -5963,69 +6080,27 @@
       event_type: "foodsharing_fairteiler_post"
   condition:
     - condition: template
-      value_template: |
-        {{ trigger is defined and trigger.event is defined and 'Herzogplatz' in trigger.event.data.fairteiler_name }}
+      # Filtert auf den speziellen Fairteiler (Zorneding Herzogplatz)
+      value_template: "{{ 'Herzogplatz' in trigger.event.data.fairteiler_name }}"
   action:
     - service: telegram_bot.send_message
       data:
         target: !secret telegram_foodsharing
         parse_mode: html
         message: |
+          {%- set p = trigger.event.data.post -%}
           📢 <b>NEUER EINTRAG IM FAIRTEILER ZORNEDING</b>
-          {% if trigger is defined and trigger.event is defined %}
+
           🏫 <b>Ort:</b> {{ trigger.event.data.fairteiler_name | e }}
-          👤 <b>Von:</b> {{ (trigger.event.data.post.user_name if trigger.event.data.post.user_name else 'Unbekannt') | e }}
-          ⏰ <b>Zeit:</b> {{ (trigger.event.data.post.time | int) | timestamp_custom('%H:%M Uhr', true) }}
+          👤 <b>Von:</b> {{ (p.user_name if p.user_name else 'Unbekannt') | e }}
+          ⏰ <b>Zeit:</b> {{ (p.time | int) | timestamp_custom('%H:%M Uhr', true) }}
 
           <b>Nachricht:</b>
-          {{ trigger.event.data.post.body | e }}
+          {{ p.body | trim | regex_replace('\\n\\s*\\n+', '\\n\\n') | e }}
 
           ------------
-          🔗 <a href="https://foodsharing.de/fairteiler/{{ trigger.event.data.fairteiler_id }}">Fairteiler auf Foodsharing.de öffnen</a>
-          {% else %}
-          (Manueller Test: Trigger-Daten nicht verfügbar)
-          {% endif %}
-          ⚖️ <a href="https://wiki.foodsharing.network/wiki/Verhaltensregeln:Verhaltensregeln_-_Erl%C3%A4uterungen#B)_Verhalten_bei_Abholungen">Verhaltensregeln</a>
-
-- id: foodsharing_basket_available_zorneding
-  alias: "Foodsharing: Basket Available Zorneding"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: sensor.foodsharing_baskets_48_082236_11_854379
-  condition:
-    - condition: template
-      value_template: |
-        {% set to_state = trigger.to_state.state | int(0) %}
-        {% set from_state = trigger.from_state.state | int(0) if trigger.from_state is not none else 0 %}
-        {{ to_state > from_state }}
-    - condition: template
-      value_template: |
-        {% set baskets = state_attr(trigger.entity_id, 'baskets') %}
-        {{ baskets and baskets | length > 0 and 'Zorneding' in (baskets[0].description | default('')) }}
-  action:
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: person.fabian
-              state: "home"
-          sequence:
-            - service: notify.mobile_app_pixel_10_pro
-              data:
-                title: "🧺 Neuer Korb in Zorneding"
-                message: |
-                  {% set b = state_attr(trigger.entity_id, 'baskets')[0] %}
-                  {% if b.user_name %}Von {{ b.user_name }}: {% endif %}{{ b.description }}
-                  {% if b.available_until and b.available_until != 'Unknown' %}
-                  (Bis {{ b.available_until }})
-                  {% endif %}
-                data:
-                  image: "{{ state_attr(trigger.entity_id, 'baskets')[0].picture if state_attr(trigger.entity_id, 'baskets')[0].picture else '' }}"
-                  push:
-                    sound:
-                      name: "default"
-                      critical: 1
-                      volume: 0.4
+          🔗 <a href="https://foodsharing.de/fairteiler/{{ trigger.event.data.fairteiler_id }}">Fairteiler öffnen</a>
+          ⚖️ <a href="https://wiki.foodsharing.network/wiki/Verhaltensregeln">Verhaltensregeln</a>
 
 - id: turn_off_deckenlampe_keller
   alias: "Turn off Deckenlampe Keller"
