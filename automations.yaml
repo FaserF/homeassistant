@@ -4653,31 +4653,6 @@
         allows_multiple_answers: true
         disable_notification: true
 
-- id: remind_for_volleyball
-  alias: "🏐 Volleyball Training"
-  trigger:
-    # Triggers every Tuesday at 18:00
-    - platform: time
-      at: "18:00:00"
-  condition:
-    - condition: time
-      weekday:
-        - tue
-  action:
-    - service: telegram_bot.send_poll
-      data:
-        target: !secret telegram_volleyball # Make sure to define this secret!
-        question: >
-          {% set motivation = ["Zeit, das Netz zum Glühen zu bringen!", "Baggern, pritschen, punkten! Wer ist dabei?", "Lasst uns wieder den Ball fliegen lassen!"] %}
-          {{ motivation | random }} 🏐 Diesen Donnerstag um ⏰ 19:00 Uhr ist wieder Training. Bist du bereit, alles zu geben?
-        options:
-          - "Klar, bin heiß! 🔥"
-          - "Muss leider passen 😥"
-          - "Noch unsicher 🤔"
-        is_anonymous: false
-        allows_multiple_answers: false
-        disable_notification: false
-
 - id: update_boulderwelt_sensor_average
   alias: "Update Boulderwelt Sensor Average"
   trigger:
@@ -9836,56 +9811,6 @@
 
           {% if states.person.samuel.state != "home" %}Samuel ist nicht daheim.{% endif %}
 
-- id: remind_for_volleyball
-  alias: "remind for volleyball"
-  initial_state: false
-  trigger:
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 172800) | round(-2) }}"
-    - platform: template
-      value_template: "{{ as_timestamp(now()) | round(-2) == (as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - 140400) | round(-2) }}"
-  condition:
-    condition: and
-    conditions:
-      - condition: template
-        value_template: "{{ ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) < 173000) and ((as_timestamp(states.calendar.volleyballtraining.attributes.start_time) - as_timestamp(now())) > 0) }}"
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball_on_warm_sundays.attributes.last_triggered) | int > 140200 }}"
-      - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.remind_for_volleyball.attributes.last_triggered) | int > 140200 }}"
-  action:
-    #- service: shell_command.unpin_all_telegram
-    #  data_template:
-    #    telegram_bot_api: !secret telegram_bot_api
-    #    chat_id: !secret telegram_volleyball
-    - service: telegram_bot.send_poll
-      data:
-        target: !secret telegram_volleyball
-        question:
-          "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}
-          {% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %} {% set weekday_number = date | timestamp_custom('%w') | int %}
-          {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ab {{ as_timestamp(states.calendar.volleyballtraining.attributes.start_time) | timestamp_custom('%H:%M', true) }} Uhr findet {{ states.calendar.volleyballtraining.attributes.message }} statt. Ich komme? Kadermanagerabstimmung nicht vergessen."
-        options:
-          - "Ja"
-          - "Nein"
-          - "Vielleicht"
-          - "Nur zeitweise/verspätet"
-        is_anonymous: false
-        allows_multiple_answers: false
-        disable_notification: true
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{not is_state_attr('calendar.volleyballtraining', 'description', '')}}"
-          sequence:
-            - service: telegram_bot.send_message
-              data:
-                target: !secret telegram_volleyball
-                data:
-                  disable_web_page_preview: true
-                message: >
-                  Zusatzinfos: {{ states.calendar.volleyballtraining.attributes.description }}
-
 - id: remind_for_volleyball_on_warm_sundays
   alias: "Remind for Volleyball on warm Sundays"
   initial_state: false
@@ -10605,7 +10530,7 @@
                 message: >
                   {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
                   {%- set date = strptime(event['date'], '%Y-%m-%d') -%}
-                  {%- set days_until_event = (date - now().date()).days -%}
+                  {%- set days_until_event = (date.date() - now().date()).days -%}
                   {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
                   *☀️ Beach-Wetter am {{ weekday }}! ☀️*
 
