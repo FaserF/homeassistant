@@ -13339,16 +13339,31 @@
   alias: "Wurstserver: Erinnerung vor Deadline"
   description: "Sendet eine übersichtliche Erinnerung vor Ablauf der Bestellfrist."
   trigger:
+    # 1. Trigger: Regulär 11 Stunden vor der erfassten Deadline
     - platform: template
       value_template: >
         {% set deadline = states('sensor.wurstserver_deadline') | as_datetime %}
         {{ deadline is not none and now() >= deadline - timedelta(hours=11) }}
+    # 2. Trigger: Donnerstag um 13:00 Uhr, wenn die Deadline ungültig/unbekannt ist
+    - platform: template
+      value_template: >
+        {% set deadline_raw = states('sensor.wurstserver_deadline') %}
+        {% set deadline = deadline_raw | as_datetime %} 
+        {% set is_invalid = deadline_raw in ['unavailable', 'unknown'] or deadline is none %}
+        {{ is_invalid and now().weekday() == 3 and now().hour == 13 and now().minute == 0 }}
+  condition:
+    # Verhindert Mehrfach-Triggerung innerhalb von 24 Stunden (86300 Sekunden)
+    - condition: template
+      value_template: >
+        {% set last_triggered = state_attr('automation.whatsapp_wurstserver_reminder', 'last_triggered') %}
+        {{ last_triggered is none or as_timestamp(now()) - as_timestamp(last_triggered) > 86300 }}
   action:
     - service: whatsapp.send_message
       data:
         target: !secret whatsapp_wurstlrunde
         message: >
-          🌭 Bitte denkt noch an's Feedback für die nächste Würschtlrunde vor {{ as_timestamp(states('sensor.wurstserver_deadline')) | timestamp_custom('%d.%m. %H:%M') }}
+          {% set deadline = states('sensor.wurstserver_deadline') | as_datetime %}
+          🌭 Bitte denkt noch an's Feedback für die nächste Würschtlrunde vor {{ deadline.strftime('%d.%m. %H:%M') if deadline is not none else 'Donnerstag 24:00 Uhr' }}
 
 
           *✅ ZUSAGEN: ({{ states('sensor.wurstserver_zusagen') }} Personen)*
@@ -13359,9 +13374,12 @@
 
           {% endfor %}
 
-          *❌ ABSAGEN:*
+          *❌ ABSAGEN: ({{ states('sensor.wurstserver_absagen') }} Personen)*
 
-          {{ states('sensor.wurstserver_absagen') }} Personen haben bereits abgesagt.
+          {% for entry in entries if entry.status == 'absage' -%}
+          • {{ entry.name }}{% if entry.remark %} (_{{ entry.remark }}_){% endif %}
+
+          {% endfor %}
 
           ---
 
