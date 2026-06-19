@@ -13348,7 +13348,7 @@
     - platform: template
       value_template: >
         {% set deadline_raw = states('sensor.wurstserver_deadline') %}
-        {% set deadline = deadline_raw | as_datetime %} 
+        {% set deadline = deadline_raw | as_datetime %}
         {% set is_invalid = deadline_raw in ['unavailable', 'unknown'] or deadline is none %}
         {{ is_invalid and now().weekday() == 3 and now().hour == 13 and now().minute == 0 }}
   condition:
@@ -13370,7 +13370,7 @@
 
           {% set entries = state_attr('sensor.wurstserver_ubersicht', 'entries') %}
           {% for entry in entries if entry.status == 'zusage' -%}
-          • {{ entry.name }}: *{{ entry.order_count }} Stück* {% if entry.remark %}(_{{ entry.remark }}_){% endif %}
+          • {{ entry.name }}: *{{ entry.detailed_order | default(entry.order_count ~ ' Stück') }}*{% if entry.remark %} (_{{ entry.remark }}_){% endif %}
 
           {% endfor %}
 
