@@ -4581,6 +4581,7 @@
 
 - id: remind_for_bouldern
   alias: "🧗 Bouldering Planning"
+  initial_state: false
   trigger:
     - platform: time
       at: "19:00:00"
