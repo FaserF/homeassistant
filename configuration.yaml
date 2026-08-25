@@ -22,47 +22,6 @@ system_health:
 api:
 mobile_app:
 
-http:
-  #ssl_certificate: !secret ssl_certificate
-  #ssl_key: !secret ssl_key
-  use_x_forwarded_for: true
-  ip_ban_enabled: true
-  login_attempts_threshold: 4
-  # server_port: !secret port
-  trusted_proxies:
-    - 127.0.0.1
-    - 172.30.0.0/18 # NGINX Proxy Manager
-    - 172.30.33.0/24 # NGINX Proxy Manager
-    - 172.30.33.7
-    - 103.21.244.0/22 # Here and below -> Cloudflare
-    - 103.22.200.0/22
-    - 103.31.4.0/22
-    - 104.16.0.0/12
-    - 108.162.192.0/18
-    - 131.0.72.0/22
-    - 141.101.64.0/18
-    - 162.158.0.0/15
-    - 172.64.0.0/13
-    - 173.245.48.0/20
-    - 188.114.96.0/20
-    - 190.93.240.0/20
-    - 197.234.240.0/22
-    - 198.41.128.0/17
-    - 103.21.244.0/22
-    - 103.22.200.0/22
-    - 103.31.4.0/22
-    - 104.16.0.0/12
-    - 108.162.192.0/18
-    - 131.0.72.0/22
-    - 141.101.64.0/18
-    - 162.158.0.0/15
-    - 172.64.0.0/13
-    - 173.245.48.0/20
-    - 188.114.96.0/20
-    - 190.93.240.0/20
-    - 197.234.240.0/22
-    - 198.41.128.0/17
-
 recorder:
   purge_keep_days: 7
   exclude:
@@ -78,6 +37,9 @@ recorder:
       - sun.sun # Don't record sun data
       - sensor.last_boot # Comes from 'systemmonitor' sensor platform
       - sensor.date
+      - sensor.weather_ebersberg_hourly
+      - binary_sensor.mydealz_germany_high_temperature_alert
+      - binary_sensor.mydealz_germany_smart_filter_match
       - input_number.lautstarke_ansagen
       - sensor.fs_smspin
       - sensor.fs_caller

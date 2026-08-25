@@ -1,265 +1,57 @@
----
-#################################################################
-## Groups
-#################################################################
-
 Wohnzimmer:
   name: Wohnzimmer
   icon: mdi:television-classic
   entities:
-    - media_player.wohnzimmer_tv
-    - media_player.wohnzimmer_tv_cast
-    - media_player.wohnzimmer_uhr
-    - light.yeelight_color_0x00000000036dc050 # Stehlampe
-    - light.leds_wohnzimmer
-    - light.leds_wohnzimmer_tv
-    # - climate.wohnzimmer
-    - switch.fernseher
-    - switch.staubsauger
-    - light.deckenlampe
-    - vacuum.valetudo_dreamez10pro
-
+  - media_player.wohnzimmer_tv
+  - media_player.wohnzimmer_uhr
+  - light.fernseher_leds
+  - light.stehlampe
+  - light.stehlampe_esstisch
+  - light.stehlampe_oben
+  - light.stehlampe_unten
+  - switch.fernseher
+  - switch.staubsauger
+  - switch.tv_usb_ports
+  - switch.leds_wohnzimmer
+  - vacuum.valetudo_dreamez10pro
 FabiansZimmer:
   name: fabian_s_zimmer
   icon: mdi:bed
   entities:
-    - media_player.fabian_s_zimmer_speaker
-    - light.leds_tisch
-    - light.bett_gluhbirne
-    - light.yeelight_bslamp2_0x0000000013fea10f
-    - light.prismatik
-    - light.regal
-    # - climate.fabian_s_zimmer
-    - switch.steckdose_1
-    - switch.steckdose_2
-    - switch.steckdose_3
-    - switch.steckdose_4
-    - switch.bett_usb_ports
-    - switch.fabian_strom
-    - light.lichtschalter
-
+  - media_player.schlafzimmer_tv
+  - light.bett_gluhbirne
+  - light.prismatik
+  - light.stehlampe_schlafzimmer
+  - light.yeelink_bslamp2_22e2_light
+  - switch.schlafzimmer_steckerleiste_bett_bett_gluhbirne
+  - switch.schlafzimmer_steckerleiste_bett_bett_steckdose
+  - switch.schlafzimmer_steckerleiste_bett_bett_usb_ports
+  - switch.schlafzimmer_steckerleiste_bett_bettlicht
+  - switch.schlafzimmer_steckerleiste_bett_rollladen
+  - switch.schreibtisch_usb_ports
+  - switch.fabian_schreibtisch
 SamuelsZimmer:
   name: samuel_s_zimmer
   icon: mdi:laptop
-  entities:
-    - media_player.gastezimmer_mini
-    - light.lampe_gastezimmer
-    - light.leds_gastezimmer
-    # - climate.gastezimmer
-    - switch.nessie_pc
-
+  entities: []
 Keller:
   name: Keller
   icon: mdi:washing-machine
-  entities:
-    - media_player.keller_tv
-    - media_player.keller_tv_cast
-    - light.keller_gluhbirne
-    - switch.waschmaschine
-    - switch.kohleanzunder
-    - switch.kuhlschrank
-    - switch.fernseher_keller
-    - switch.keller_usb_ports
-    - switch.strom_keller
-
+  entities: []
 ignored_entities:
   name: Entitäten welche von der unavailable Automation ignoriert werden sollen
   entities:
-    - device_tracker.nessie_phone
-    - device_tracker.fabian_phone
-    - media_player.keller_tv_group
-    - media_player.keller_tv
-    - media_player.keller_tv_2
-    - media_player.keller_tv_cast
-    - media_player.wohnzimmer_tv_group
-    - media_player.wohnzimmer_tv
-    - media_player.wohnzimmer_tv_cast
-    - light.keller_gluhbirne
-    - light.keller_bulb
-    - light.prismatik
-    - sensor.nessie_phone_charger_type
-    - sensor.fabian_phone_charger_type
-    - sensor.strip_keller
-    - sensor.deckenlampe
-    - sensor.lichtschalter
-    - sensor.hacs
-    - sensor.dwd_weather_warnings_advance_warning_level
-    - sensor.dwd_weather_warnings_current_warning_level
-    - sensor.lk_ebersberg_weekincidence
-    - sensor.lk_munchen_weekincidence
-    - weather.dwd_weather_ebersberg_halbing
-    - sensor.kuche_mini_alarms
-    - sensor.kuche_mini_timers
-    - sensor.fabian_s_zimmer_speaker_alarms
-    - sensor.fabian_s_zimmer_speaker_timers
-    - sensor.washing_machine_mode
-    - sensor.gastezimmer_mini_alarms
-    - sensor.gastezimmer_mini_timers
-    - sensor.kuche_speaker_alarms
-    - sensor.kuche_speaker_timers
-    - sensor.mydealz
-    - sensor.fabian_ipadpro_battery_state_2
-    - sensor.fabian_ipadpro_battery_state
-    - sensor.playlists_sensor
-    - sensor.wohnzimmer_uhr_alarms
-    - sensor.wohnzimmer_uhr_timers
-    - sensor.miwifi_9c_9d_7e_30_89_fb_devices
-    - sensor.miwifi_9c_9d_7e_30_89_fb_memory_usage
-    - sensor.miwifi_9c_9d_7e_30_89_fb_uptime
-    - switch.miwifi_9c_9d_7e_30_89_fb_wifi_2_4g
-    - light.miwifi_9c_9d_7e_30_89_fb_led
-    - update.miwifi_9c_9d_7e_30_89_fb_firmware_update
-    - sensor.xiaomi_miio_cooker_cooking_delayed
-    - sensor.xiaomi_miio_cooker_duration
-    - sensor.xiaomi_miio_cooker_favorite
-    - sensor.xiaomi_miio_cooker_menu
-    - sensor.xiaomi_miio_cooker_mode
-    - sensor.xiaomi_miio_cooker_remaining
-    - sensor.xiaomi_miio_cooker_rice_id
-    - sensor.xiaomi_miio_cooker_stage_description
-    - sensor.xiaomi_miio_cooker_stage_name
-    - sensor.xiaomi_miio_cooker_state
-    - sensor.xiaomi_miio_cooker_taste
-    - sensor.xiaomi_miio_cooker_taste_phase
-    - sensor.xiaomi_miio_cooker_temperature
-    - switch.xiaomi_89fb_7604_reboot
-    - device_tracker.galaxy_s9
-    - device_tracker.galaxy_s10_lite
-    - device_tracker.florian_s_s20
-    - device_tracker.9a_27_b0_8d_70_93
-    - device_tracker.iphone_2
-    - device_tracker.iphone
-    - device_tracker.huawei_p30_lite_aec7d0205
-    - device_tracker.ea_39_66_3f_03_75
-    - binary_sensor.xiaomi_89fb_7604_state
-    - binary_sensor.xiaomi_89fb_7604_wifi_state
-    - light.xiaomi_89fb_7604_led
-    - number.gastezimmer_mini_alarm_volume
-    - number.kuche_speaker_alarm_volume
-    - number.fabian_s_zimmer_speaker_alarm_volume
-    - number.wohnzimmer_uhr_alarm_volume
-    - sensor.fabian_s_zimmer_speaker_device
-    - sensor.wohnzimmer_uhr_device
-    - switch.fabian_s_zimmer_speaker_do_not_disturb
-    - switch.wohnzimmer_uhr_do_not_disturb
-    - sensor.gastezimmer_mini_device
-    - sensor.kuche_speaker_device
-    - switch.gastezimmer_mini_do_not_disturb
-    - switch.kuche_speaker_do_not_disturb
-    - sensor.ks_battery_state
-    - sensor.samuel_iphone_battery_state
-    - sensor.adri_iphone_battery_state
-    - sensor.iphone_se_battery_state
-    - sensor.fabian_iphone7_battery_state
-    - sensor.info_juzzo_de
-    - sensor.valetudo_dreamez10pro_error_description
-    - sensor.fabian_watch3_battery_state
-    - sensor.mikas_iphone_battery_state
-    - person.flo
-    - person.isi
-    - person.maxi
-    - input_button.find_fabian_s_ipad_by_sound
-    - input_button.find_fabian_s_phone_by_sound
-    - input_button.find_nessie_s_phone_by_sound
-    - input_button.james_room_cleaning
-    - sensor.cpuload
-    - sensor.cpuloadsensor
-    - sensor.gpuload
-    - switch.hibernate
-    - switch.restart
-    - switch.shutdown
-    - media_player.android_tv_192_168_178_12
-    - binary_sensor.miwifi_9c_9d_7e_30_89_fb_state
-    - sensor.fabian_ipadpro_geocoded_location
-    - media_player.wohnzimmer_tv_old
-    - sensor.fabian_ipadair2_battery_state
-    - device_tracker.fabian_ipadair2_2
-    - sensor.ks_battery_state_2
-    - sensor.iphone_battery_state
-    - update.valetudo_map_card_update
-    - device_tracker.thes_macbook_pro
-    - sensor.thes_macbook_pro_battery_state
-    - sensor.fabian_iphone6s_battery_state
-    - sensor.fabian_iphone12_battery_state
-    - update.miwifi_28_d1_27_fc_ab_d8_firmware_update
-    - sensor.miwifi_28_d1_27_fc_ab_d8_mode
-    - button.fabian_pc_shutdown
-    - button.rgb_pc_shutdown
-    - sensor.fabian_pc_gpu_temperature
-    - sensor.fabian_pc_gpu_load
-    - sensor.fabian_pc_cpu_load
-    - sensor.rgb_pc_gpu_temperature
-    - sensor.rgb_pc_gpu_load
-    - sensor.rgb_pc_cpu_load
-    - switch.fernseher_old
-    - switch.nessie_pc_old
-    - sensor.nessie_pc_energy_power_old
-    - sensor.nessie_pc_energy_today_old
-    - sensor.nessie_pc_energy_yesterday_old
-    - light.lampe_gastezimmer
-    - media_player.beyondtv
-    - media_player.beyondtv_2
-    - binary_sensor.miwifi_28_d1_27_fc_ab_d8_state
-    - binary_sensor.miwifi_28_d1_27_fc_ab_d8_wan_state
-    - light.miwifi_28_d1_27_fc_ab_d8_led
-    - select.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g_signal_strength
-    - select.miwifi_28_d1_27_fc_ab_d8_wifi_5g_signal_strength
-    - sensor.miwifi_28_d1_27_fc_ab_d8_memory_usage
-    - sensor.miwifi_28_d1_27_fc_ab_d8_uptime
-    - switch.miwifi_28_d1_27_fc_ab_d8_wifi_2_4g
-    - sensor.iphone_11p_battery_state
-    - switch.024munml4k8md6t_internet_access
-    - sensor.keller_tv_device
-    - sensor.adrians_ipad_battery_state
-    - sensor.lutuli_int_consol_de_battery_state
-    - sensor.fabian_ipadpro_battery_state_3
-    - sensor.fabian_iphone_battery_state
-    - sensor.fabian_macbookpro_battery_state
-    - sensor.iphone11p_battery_state
-    - sensor.lutuli_int_consol_de_battery_state_2
-    - sensor.thes_macbook_pro_battery_state_2
-    - media_player.fabian_s_zimmer_tv
-    - media_player.fabian_s_zimmer_tv_cast
-    - sensor.fabians_lautsprecher_alarms
-    - sensor.samuels_mini_alarms
-    - sensor.samuels_mini_timers
-    - sensor.fabians_lautsprecher_timers
-    - sensor.fabians_lautsprecher_alarms
-    - sensor.fabians_lautsprecher_timers
-    - sensor.samuels_lautsprecher_alarms
-    - sensor.samuels_lautsprecher_timers
-    - media_player.schlafzimmer_tv_2
-    - media_player.schlafzimmer_tv
-    - media_player.schlafzimmer_tv_cast
-    - sensor.fabians_lautsprecher_device
-    - sensor.samuels_mini_device
-    - switch.fabians_lautsprecher_do_not_disturb
-    - switch.samuels_mini_do_not_disturb
-    - number.fabians_lautsprecher_alarm_volume
-    - number.samuels_mini_alarm_volume
-    - sensor.wohnzimmer_tv_device
-    - sensor.schlafzimmer_tv_device
-    - sensor.kuche_lautsprecher_alarms
-    - sensor.kuche_lautsprecher_timers
-    - sensor.fabian_iphone_activity
-    - sensor.fabian_iphone_floors_ascended
-    - sensor.fabian_iphone_distance
-    - sensor.fabian_iphone_floors_descended
-    - sensor.fabian_iphone_connection_type
-    - sensor.fabian_iphone_average_active_pace
-    - sensor.fabian_iphone_battery_level
-    - sensor.fabian_iphone_steps
-    - binary_sensor.fabian_iphone_focus
-    - sensor.fabian_iphone_storage
-    - sensor.fabian_iphone_bssid
-    - sensor.fabian_iphone_sim_2
-    - sensor.fabian_iphone_ssid
-    - sensor.fabian_iphone_last_update_trigger
-    - sensor.fabian_iphone_sim_1
-    - remote.samuel_s_fernseher
-    - sensor.valetudo_dreamez10pro_status_flag
-    - person.janina
-    - media_player.samuels_lautsprecher
-    - light.deckenlampe_samuel
-    - media_player.chromecast8917
-    - light.keller_leds_flaschen
+  - media_player.wohnzimmer_tv
+  - light.prismatik
+  - sensor.washing_machine_mode
+  - sensor.fabian_ipadpro_battery_state
+  - sensor.valetudo_dreamez10pro_error_description
+  - person.flo
+  - person.maxi
+  - input_button.find_fabian_s_ipad_by_sound
+  - input_button.find_fabian_s_phone_by_sound
+  - input_button.james_room_cleaning
+  - sensor.fabian_ipadpro_geocoded_location
+  - update.valetudo_map_card_update
+  - media_player.schlafzimmer_tv
+  - sensor.valetudo_dreamez10pro_status_flag
