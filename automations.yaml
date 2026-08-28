@@ -93,8 +93,6 @@
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.abwesend_modus
-    - service: automation.trigger
-      entity_id: automation.set_climate_at_night
     - choose:
         - conditions:
             - condition: sun
@@ -2013,18 +2011,6 @@
                 target: !secret telegram_chat_fabian
                 message: "Homeassistant wurde soeben gestartet."
 
-- id: run_bash_script_with_addon_bash_script_executer_every_hour
-  alias: "Run Bash Script with Addon Bash Script Executer every hour"
-  initial_state: false
-  trigger:
-    - platform: time_pattern
-      minutes: "/59"
-      seconds: 0
-  action:
-    - service: hassio.addon_start
-      data:
-        addon: 605cee21_bashscriptexecuter
-
 - id: run_epicgames_free_addon_once_a_week
   alias: "Run Epic Games free addon once a week"
   initial_state: true
@@ -2960,7 +2946,7 @@
       for:
         minutes: 3
   action:
-    action: cast.show_lovelace_view
+    action: cast.show_view
     data:
       entity_id: media_player.wohnzimmer_tv
       view_path: cast
@@ -3064,9 +3050,9 @@
           - media_player.wohnzimmer_uhr
           - media_player.kuche_lautsprecher
         message: "Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet."
-    - service: fritz.reboot
-      data:
-        host: 192.168.178.1
+    - service: button.press
+      target:
+        entity_id: button.fritz_box_7490_neu_starten
     - service: automation.turn_on
       data:
         entity_id: automation.fritzbox_internet_access_returned
@@ -3236,11 +3222,6 @@
                   entity_id: light.fernseher_leds
                   state: "unavailable"
           sequence:
-            #  - service: light.turn_off
-            #    data:
-            #      area_id: 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
-            #      transition: 2
-            #      brightness: 255
             - service: light.turn_on
               data:
                 entity_id: light.stehlampe
@@ -3274,8 +3255,11 @@
                     seconds: 2
           sequence:
             - service: light.turn_off
-              data:
-                area_id: 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
+              target:
+                entity_id:
+                  - light.fernseher_leds
+                  - switch.leds_wohnzimmer
+                  - light.stehlampe
 
 - id: deckenlampe_button_double_press
   alias: Deckenlampe Button double press
@@ -5106,60 +5090,6 @@
                       data:
                         position: 23
 
-- id: telegram_pill_1h
-  alias: "Telegram pill 1h"
-  initial_state: false
-  trigger:
-    - platform: event
-      event_type: telegram_callback
-      event_data:
-        data: "/pill1h"
-    - platform: event
-      event_type: mobile_app_notification_action
-      event_data:
-        action: pill1h
-  action:
-    - service: telegram_bot.answer_callback_query
-      data:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "Okay, eine Stunde"
-    - service: telegram_bot.edit_replymarkup
-      data:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
-    - delay: "00:60:00"
-    - service: telegram_bot.send_message
-      data:
-        target: !secret telegram_chat_fabian
-        message: "Pille nehmen nicht vergessen!"
-        data:
-          inline_keyboard:
-            - "Erledigt:/pilldone, Erinnern1h:/pill1h"
-
-- id: telegram_pill_marked_done
-  alias: "Telegram pill marked done"
-  initial_state: false
-  trigger:
-    - platform: event
-      event_type: telegram_callback
-      event_data:
-        data: "/pilldone"
-    - platform: event
-      event_type: mobile_app_notification_action
-      event_data:
-        action: pilldone
-  action:
-    - service: telegram_bot.answer_callback_query
-      data:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "Okay."
-    - service: telegram_bot.edit_replymarkup
-      data:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
-
 - id: telegram_washing_mashine_set_program_30_degrees_pflegeleicht
   alias: "Telegram Washing mashine set program 30 degrees pflegeleicht"
   initial_state: true
@@ -5995,7 +5925,7 @@
       event_data:
         command: "/lostfabian@smartlife_ha_bot"
   action:
-    - service: notify.mobile_app_fabian_iphone
+    - service: notify.mobile_app_pixel_10_pro
       data:
         message: "This phone is marked as lost! +49176 66334870"
         data:
@@ -6004,26 +5934,6 @@
               name: "default"
               critical: 1
               volume: 1.0
-    - service: icloud.play_sound
-      data:
-        account: !secret vapid_email
-        device_name: Fabian-iPhone
-
-- id: find_ipad_fabian
-  alias: "Find Fabians ipad by sound"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: input_button.find_fabian_s_ipad_by_sound
-    - platform: event
-      event_type: telegram_command
-      event_data:
-        command: "/lostfabian"
-  action:
-    - service: icloud.play_sound
-      data:
-        account: !secret vapid_email
-        device_name: Fabian-iPad
 
 - id: telegram_urgent_message
   alias: "Telegram urgent message"
