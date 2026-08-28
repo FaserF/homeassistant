@@ -585,7 +585,7 @@
             - service: switch.turn_off
               entity_id:
                 - switch.fernseher
-                #- switch.kuhlschrank
+                #
             - service: light.turn_off
               entity_id: all
             - choose:
@@ -6127,6 +6127,113 @@
         volume_level: 0.3
         entity_id: media_player.wohnzimmer_uhr
 
+- id: telegram_virtual_bell
+  alias: "Telegram virtual bell"
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/klingel"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/klingel@smartlife_ha_bot"
+  action:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.drucker
+    - service: notify.notify
+      data:
+        message: "Es klingelt! Jemand ist da."
+        data:
+          push:
+            sound:
+              name: "default"
+              critical: 1
+              volume: 0.7
+    - service: media_player.volume_set
+      data:
+        volume_level: 0.7
+        entity_id: media_player.wohnzimmer_uhr
+    - service: tts.speak
+      entity_id:
+        - media_player.wohnzimmer_uhr
+        - media_player.kuche_lautsprecher
+      data:
+        message: >
+          Ding Dong, es klingelt.
+          {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+            Fabian
+          {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+            samuel
+          {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+            Kai
+          {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+            Adri
+          {% else %}
+            Jemand
+          {% endif %}
+          ist da.
+    - service: telegram_bot.send_message
+      data:
+        chat_id: "{{ trigger.event.data.chat_id }}"
+        message: "Klingel in Wohnung aktiviert. Gartentor wurde geöffnet."
+    - service: media_player.volume_set
+      data:
+        volume_level: 0.3
+        entity_id: media_player.wohnzimmer_uhr
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.wohnzimmer_tv
+                  state: "unavailable"
+          sequence:
+            - service: notify.notify
+              continue_on_error: true
+              data:
+                message: >
+                  Ding Dong, es klingelt.
+                  {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+                    Fabian
+                  {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+                    samuel
+                  {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+                    Kai
+                  {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+                    Adri
+                  {% else %}
+                    Jemand
+                  {% endif %}
+                  ist da.
+    - choose:
+        - conditions:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: media_player.schlafzimmer_tv
+                  state: "unavailable"
+          sequence:
+            - service: notify.notify
+              continue_on_error: true
+              data:
+                message: >
+                  Ding Dong, es klingelt.
+                  {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+                    Fabian
+                  {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+                    samuel
+                  {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+                    Kai
+                  {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+                    Adri
+                  {% else %}
+                    Jemand
+                  {% endif %}
+                  ist da.
+
 - id: "squash_detailed_informations"
   alias: "Squash - Detailed Slot Notification"
   description: "Sends a notification with the count and list of all free slots."
@@ -6323,7 +6430,7 @@
     - choose:
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Wohnzimmer"
           sequence:
             - service: mqtt.publish
@@ -6332,7 +6439,7 @@
                 payload: '{"segment_ids": ["6"]}'
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Küche"
           sequence:
             - service: mqtt.publish
@@ -6341,7 +6448,7 @@
                 payload: '{"segment_ids": ["4"]}'
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Fabians-Zimmer"
           sequence:
             - service: mqtt.publish
@@ -6350,7 +6457,7 @@
                 payload: '{"segment_ids": ["2"]}'
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Samuels-Zimmer"
           sequence:
             - service: mqtt.publish
@@ -6359,7 +6466,7 @@
                 payload: '{"segment_ids": ["5"]}'
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Bad"
           sequence:
             - service: mqtt.publish
@@ -6368,7 +6475,7 @@
                 payload: '{"segment_ids": ["1"]}'
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Flur"
           sequence:
             - service: mqtt.publish
@@ -6377,7 +6484,7 @@
                 payload: '{"segment_ids": ["3"]}'
         - conditions:
             - condition: state
-              entity_id: vacuum.valetudo_dreamez10pro
+              entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
               state: "Gesamt"
           sequence:
             - service: vacuum.start
@@ -6386,7 +6493,7 @@
     - delay: "00:30:00"
     - service: input_select.select_option
       data:
-        entity_id: vacuum.valetudo_dreamez10pro
+        entity_id: select.bad_dreame_vacuum_p2028_lan_room_selection
         option: "Gesamt"
 
 - id: vacuum_reset_water_level
