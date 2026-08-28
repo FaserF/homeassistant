@@ -62,10 +62,12 @@
             - condition: state
               entity_id: input_boolean.gast_modus
               state: "off"
-            - condition: template
-              value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['temperature'] | int <= 10 }}"
-            - condition: template
-              value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['temperature'] | int >= 28 }}"
+            - condition: or
+              conditions:
+                - condition: template
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['temperature'] | int <= 10 }}"
+                - condition: template
+                  value_template: "{{state_attr('sensor.weather_ebersberg_daily', 'forecast')[0]['temperature'] | int >= 28 }}"
           sequence:
             - service: cover.close_cover
               target:
@@ -570,9 +572,6 @@
                 #- condition: state
                 #  entity_id: switch.kuhlschrank
                 #  state: "on"
-                - condition: state
-                  entity_id: switch.fernseher_keller
-                  state: "on"
                 - condition: template
                   value_template: >
                     {% set domain = 'light' %}
@@ -586,11 +585,9 @@
             - service: switch.turn_off
               entity_id:
                 - switch.fernseher
-                #
+                #- switch.kuhlschrank
             - service: light.turn_off
               entity_id: all
-            - service: media_player.turn_off
-              entity_id: media_player.keller_tv
             - choose:
                 - conditions:
                     - condition: or
@@ -4791,13 +4788,6 @@
                       entity_id: cover.wohnzimmer_links
                       state: "closed"
               sequence:
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: binary_sensor.wohnzimmer_open_window
-                          state: "on"
-                      sequence:
-                        - delay: "00:15:00"
                 - service: cover.set_cover_position
                   target:
                     entity_id:
@@ -4813,13 +4803,6 @@
                       entity_id: cover.schlafzimmer_gross
                       state: "closed"
               sequence:
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: binary_sensor.fabian_s_open_window
-                          state: "on"
-                      sequence:
-                        - delay: "00:15:00"
                 - choose:
                     - conditions:
                         - condition: numeric_state
@@ -5047,13 +5030,6 @@
                               - switch.leds_wohnzimmer
                               - light.stehlampe
                             transition: 2
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: binary_sensor.wohnzimmer_open_window
-                          state: "on"
-                      sequence:
-                        - delay: "00:15:00"
                 - service: cover.close_cover
                   target:
                     entity_id:
@@ -5083,13 +5059,6 @@
                           data:
                             entity_id:
                               - light.stehlampe_schlafzimmer
-                - choose:
-                    - conditions:
-                        - condition: state
-                          entity_id: binary_sensor.fabian_s_open_window
-                          state: "on"
-                      sequence:
-                        - delay: "00:15:00"
                 - choose:
                     - conditions:
                         - condition: numeric_state
