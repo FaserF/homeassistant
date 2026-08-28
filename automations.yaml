@@ -36,8 +36,9 @@
               entity_id: switch.fabian_schreibtisch
               state: 'on'
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "Keiner ist mehr zu Hause! Fabian-PC ist allerdings noch an!"
                 data:
                   inline_keyboard:
@@ -192,8 +193,9 @@
             - condition: template
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_send_daily_weather_forecast_fabian.attributes.last_triggered) | int > 3600 }}"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "Welcome back. Samuel ist nicht daheim."
     - choose:
         - conditions:
@@ -209,8 +211,9 @@
                     - condition: template
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
                   sequence:
-                    - service: notify.telegram_fabian
+                    - service: telegram_bot.send_message
                       data:
+                        target: !secret telegram_chat_fabian
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
             - choose:
                 - conditions:
@@ -220,8 +223,9 @@
                     - condition: template
                       value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
                   sequence:
-                    - service: notify.telegram_fabian
+                    - service: telegram_bot.send_message
                       data:
+                        target: !secret telegram_chat_fabian
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
     - choose:
         - conditions:
@@ -657,7 +661,7 @@
     - condition: template
       value_template: >
         {% set relevant_domains = ['switch', 'light', 'input_button', 'climate'] %}
-        {% set excluded = ['light.keller_leds_flaschen', 'light.deckenlampe_samuel', 'switch.fernseher_old', 'light.prismatik'] %}
+        {% set excluded = ['light.prismatik'] %}
         {% set unavailable_devices = states | selectattr('domain', 'in', relevant_domains)
           | selectattr('state', 'eq', 'unavailable')
           | rejectattr('entity_id', 'in', excluded)
@@ -671,9 +675,6 @@
     - variables:
         excluded:
           [
-            "light.keller_leds_flaschen",
-            "light.deckenlampe_samuel",
-            "switch.fernseher_old",
             "light.prismatik",
           ]
         unavailable_devices: >
@@ -1240,8 +1241,10 @@
     - delay: "00:04:00"
     - service: light.turn_off
       data:
-        area_id:
-          - 7c05afe47efd44f5a0a064769ad6e105 # Wohnzimmer
+        entity_id:
+        - light.bett_gluhbirne
+        - light.yeelink_bslamp2_22e2_light
+        - light.stehlampe_schlafzimmer # Wohnzimmer
 
 - id: turn_off_prismatik_during_the_day
   alias: "Turn off Prismatik during the day"
@@ -2088,7 +2091,6 @@
         media_player_entity_id:
           - media_player.wohnzimmer_uhr
           - media_player.kuche_lautsprecher
-          - media_player.samuels_lautsprecher
           - media_player.kuche_lautsprecher
           - media_player.schlafzimmer_audio
         message: Einbrecher sind nicht erwünscht. Du wirst beobachtet und wurdest gefilmt. Verlasse die Wohnung sofort. Die Polizei wird gerufen.
@@ -2989,8 +2991,9 @@
           entity_id: sensor.fritz_box_7490_externe_ip
           state: "unknown"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Öffentliche IP hat sich geändert zu {{ states.sensor.fritz_box_7490_externe_ip.state }}"
 
 #   - id: turn_on_fritzbox_wifi_if_miwifi_is_off
@@ -3011,7 +3014,9 @@
 #             entity_id: 'binary_sensor.fritz_box_7490_verbindung'
 #             state: 'not_connected'
 #     action:
-#       - service: notify.telegram_fabian
+#       - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_fabian
 #         data:
 #           message: 'Miwifi hat kein Internet'
 
@@ -3058,7 +3063,6 @@
           - media_player.schlafzimmer_audio
           - media_player.wohnzimmer_uhr
           - media_player.kuche_lautsprecher
-          - media_player.samuels_lautsprecher
         message: "Die Fritzbox hat keine Internet Verbindung und wird nun neugestartet."
     - service: fritz.reboot
       data:
@@ -3112,7 +3116,6 @@
                   - media_player.schlafzimmer_audio
                   - media_player.wohnzimmer_uhr
                   - media_player.kuche_lautsprecher
-                  - media_player.samuels_lautsprecher
                 message: "Die Internetverbindung ist wiederhergestellt."
     - choose:
         - conditions:
@@ -3147,7 +3150,9 @@
 #      - condition: template
 #        value_template: "{{ states.device_tracker.google_maps_112174659110860535869.state == 'home' }}"
 #    action:
-#      - service: notify.telegram_fabian
+#      - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_fabian
 #        data:
 #          message: 'Die Internetgeschwindigkeit ist aktuell langsam ( {{ states.sensor.speedtest_download }} Mbit/s ). Eventuell die Fritzbox neustarten?'
 
@@ -3165,7 +3170,9 @@
 #        entity_id: device_tracker.md3f9bmc
 #        state: home
 #    action:
-#      - service: notify.telegram_fabian
+#      - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_fabian
 #        data:
 #          message: 'Die Internetgeschwindigkeit ist aktuell langsam. Eventuell die Fritzbox neustarten?'
 
@@ -3177,7 +3184,9 @@
 #        entity_id: sensor.latest_tasmota
 #        above: 0
 #    action:
-#      - service: notify.telegram_fabian
+#      - service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_fabian
 #        data:
 #          message: 'Alle Tasmota Geräte werden aktualisiert auf Version {{ states.sensor.latest_tasmota.state }}.'
 #      - service: mqtt.publish
@@ -3489,11 +3498,13 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "Der Airfryer ist in {{ states.sensor.careli_maf05a_d482_left_time.state }} Minuten fertig."
     - choose:
         - conditions:
@@ -3554,8 +3565,9 @@
               entity_id: device_tracker.pixel_10_pro
               state: home
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 title: "Sbahn um {{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[0]['scheduledDeparture'] }} hat +{{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[0]['delayDeparture'] }} min Verspätung."
                 message: "Nächste Sbahn: {{ state_attr('sensor.zorneding_departures_via_starnberg_nord', 'next_departures')[1]['scheduledDeparture'] }} Uhr"
 
@@ -3591,8 +3603,9 @@
             entity_id: person.fabian
             state: home
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         title: "Sbahn um {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['scheduledDeparture'] }} hat +{{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[0]['delayDeparture'] }} min Verspätung."
         message: "Nächste Sbahn: {{ state_attr('sensor.starnberg_nord_departures_via_zorneding', 'next_departures')[1]['scheduledDeparture'] }} Uhr"
 
@@ -3629,8 +3642,9 @@
           entity_id: person.fabian
           state: "Arbeit Fabi"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
 - id: notify_samuel_fabian_on_way_home_longer_distance
@@ -3666,8 +3680,9 @@
           entity_id: person.fabian
           state: "Arbeit Fabi"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
 - id: notify_samuel_fabian_on_way_home_long_distance
@@ -3700,8 +3715,9 @@
           entity_id: person.fabian
           state: "Arbeit Fabi"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Fabian ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_fabian_distance.state }} km entfernt von zu Hause."
 
 - id: notify_fabian_samuel_on_way_home
@@ -3741,8 +3757,9 @@
           entity_id: person.samuel
           state: "Berufsschule"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_samuel_distance.state }} km entfernt von zu Hause."
 
 - id: notify_fabian_samuel_on_way_home_longer_distance
@@ -3779,8 +3796,9 @@
           entity_id: person.samuel
           state: "Berufsschule"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_samuel_distance.state }} km entfernt von zu Hause."
 
 - id: notify_fabian_samuel_on_way_home_long_distance
@@ -3814,8 +3832,9 @@
           entity_id: person.samuel
           state: "Berufsschule"
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "samuel ist auf dem Weg nach Hause und ist noch {{ states.sensor.smart_life_samuel_distance.state }} km entfernt von zu Hause."
 
 - id: notify_samuel_fabian_on_way_home_from_gil
@@ -3838,8 +3857,9 @@
       entity_id: sensor.smart_life_samuel_distance
       below: 35000
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Fabian ist auf dem Weg nach Hause von Gilching und kommt voraussichtlich in 1,25 Stunden nach Hause."
 
 - id: notify_samuel_fabian_on_way_home_from_muc
@@ -3860,8 +3880,9 @@
       entity_id: sensor.smart_life_samuel_distance
       below: 35000
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Fabian ist auf dem Weg nach Hause von Gräfelfing und kommt voraussichtlich in einer Stunde in Zorneding an."
 
 - id: notify_samuel_fabian_on_way_home_from_whm
@@ -3882,8 +3903,9 @@
       entity_id: sensor.smart_life_samuel_distance
       below: 35000
   action:
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Fabian ist auf dem Weg nach Hause von Weilheim. Da er mit dem Auto fährt ist keine Zeitangabe möglich. Voraussichtlich daheim in ca. 1,5 Stunden."
 
 - id: telegram_send_daily_weather_forecast_fabian
@@ -3946,10 +3968,6 @@
       - condition: template
         value_template: "{{ now().month <= 10 and now().month >= 4 }}"
   action:
-    - service: shell_command.unpin_all_telegram
-      data:
-        telegram_bot_api: !secret telegram_bot_api
-        chat_id: !secret telegram_volleyball
     - service: telegram_bot.send_poll
       data:
         target: !secret telegram_volleyball
@@ -5111,8 +5129,9 @@
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
     - delay: "00:60:00"
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Pille nehmen nicht vergessen!"
         data:
           inline_keyboard:
@@ -5172,8 +5191,9 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
         - conditions:
@@ -5186,8 +5206,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "30 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_20_degrees_feinwasche
@@ -5221,8 +5242,9 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
         - conditions:
@@ -5235,8 +5257,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "20 Grad Feinwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_60_degrees_koch_bunt
@@ -5270,8 +5293,9 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
         - conditions:
@@ -5284,8 +5308,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "60 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_40_degrees_pflegeleicht
@@ -5319,8 +5344,9 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
         - conditions:
@@ -5333,8 +5359,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "40 Grad Pflegeleicht wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_washing_mashine_set_program_40_degrees_koch_bunt
@@ -5368,8 +5395,9 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
     - choose:
         - conditions:
@@ -5382,8 +5410,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "40 Grad Koch-/Buntwäsche wurde als Waschmaschinen Programm ausgewählt. Voraussichtlich fertig um {{ states.sensor.washing_machine_finish_time.state }} Uhr."
 
 - id: telegram_shutdown_fpc
@@ -5407,54 +5436,6 @@
     - service: input_boolean.turn_off
       data:
         entity_id: input_boolean.fabian_pc_strom
-
-- id: telegram_hibernate_fpc
-  alias: "Telegram hibernate fpc"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: telegram_callback
-    event_data:
-      data: "/hibernatefpc"
-  action:
-    - service: system_bridge.send_command
-      data:
-        bridge: adad8b8056b4dfcde2399824f9be1dd5
-        command: shutdown
-        arguments: "/h /t 0"
-    - service: telegram_bot.answer_callback_query
-      data:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "OK, PC wird in Ruhezustand gestellt."
-    - service: telegram_bot.edit_replymarkup
-      data:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
-
-- id: telegram_hibernate_npc
-  alias: "Telegram hibernate npc"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: telegram_callback
-    event_data:
-      data: "/hibernatenpc"
-  action:
-    - service: system_bridge.send_command
-      data:
-        bridge: adad8b8056b4dfcde239???
-        command: shutdown
-        arguments: "/h /t 0"
-    - service: telegram_bot.answer_callback_query
-      data:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "OK, PC wird in Ruhezustand gestellt."
-    - service: telegram_bot.edit_replymarkup
-      data:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
 
 - id: telegram_reboot_ha
   alias: Telegram Reboot HA
@@ -5485,7 +5466,7 @@
         target: "{{ trigger.event.data.chat_id }}"
         message: "Rebooting Server..."
     - delay: 00:00:05
-    - service: shell_command.restartha
+    - service: homeassistant.restart
 
 - id: telegram_help
   alias: Telegram Help
@@ -5829,11 +5810,13 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Die Waschmaschine wurde ausgeräumt."
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Die Waschmaschine wurde ausgeräumt."
 
 - id: telegram_pouring_done
@@ -5858,7 +5841,9 @@
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: "{{ trigger.event.data.chat_id }}"
         inline_keyboard: []
-    #- service: notify.telegram_fabian
+    #- service: telegram_bot.send_message
+      data:
+        target: !secret telegram_chat_fabian
     #  data:
     #    message: "Die Pflanzen wurden gegossen."
     - choose:
@@ -5875,8 +5860,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
+            - service: telegram_bot.send_message
               data:
+                target: !secret telegram_chat_fabian
                 message: "Die Pflanzen wurden gegossen."
 
 - id: telegram_answer_cancel_light_turn_off
@@ -6261,8 +6247,9 @@
         data:
           inline_keyboard:
             - "Website|https://www.eversports.de/widget/w/hwhk63"
-    - service: notify.telegram_fabian
+    - service: telegram_bot.send_message
       data:
+        target: !secret telegram_chat_fabian
         message: "Pille nehmen nicht vergessen!"
         data:
           inline_keyboard:
@@ -6300,8 +6287,9 @@
               entity_id: person.samuel
               state: "home"
           sequence:
-            - service: notify.telegram_fabian
-              data_template:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
                 message: "Die geplante Staubsauger Reinigung startet in 30 Minuten. Bitte alle Türen öffnen."
     - choose:
         - conditions:
@@ -6309,8 +6297,9 @@
               entity_id: person.fabian
               state: "home"
           sequence:
-            - service: notify.telegram_fabian
-              data_template:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
                 message: "Die geplante Staubsauger Reinigung startet in 30 Minuten. Bitte alle Türen öffnen."
 
 - id: turn_on_vacuum_weekly
@@ -6539,8 +6528,9 @@
               entity_id: sensor.smart_life_fabian_distance
               below: 70
           sequence:
-            - service: notify.telegram_fabian
-              data_template:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
                 message: "Anscheinend waren Türen bei der geplanten Reinigung geschlossen. Daher wurden nicht alle Räume gesaugt."
 
 - id: trigger_a_full_dust_bin_reminder
@@ -6627,8 +6617,9 @@
                       entity_id: person.samuel
                       state: home
                   sequence:
-                    - service: notify.telegram_fabian
-                      data_template:
+                    - service: telegram_bot.send_message
+                      data:
+                        target: !secret telegram_chat_fabian
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
             - choose:
                 - conditions:
@@ -6636,8 +6627,9 @@
                       entity_id: person.fabian
                       state: home
                   sequence:
-                    - service: notify.telegram_fabian
-                      data_template:
+                    - service: telegram_bot.send_message
+                      data:
+                        target: !secret telegram_chat_fabian
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
     - choose:
         - conditions:
@@ -6684,8 +6676,9 @@
                   entity_id: person.samuel
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
-              data_template:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
                 message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
     - choose:
         - conditions:
@@ -6695,8 +6688,9 @@
                   entity_id: person.fabian
                   state: "home"
           sequence:
-            - service: notify.telegram_fabian
-              data_template:
+            - service: telegram_bot.send_message
+              data:
+                target: !secret telegram_chat_fabian
                 message: "Der Wassertank des Staubsaugroboters wurde soeben aufgefüllt."
 
 - id: turn_off_staubsauger_after_x_hours
