@@ -140,23 +140,47 @@ logger:
 sun:
 
 media_source:
+  # media_player:
+  # - platform: mpd
+  # host: 127.0.0.1
 
-# media_player:
-# - platform: mpd
-# host: 127.0.0.1
+  # speedtestdotnet:
+  # server_id: 21514
 
-# speedtestdotnet:
-# server_id: 21514
+  # coinbase:
+  #   api_key: !secret coinbase_key
+  #   api_secret: !secret coinbase_secret
+  #   account_balance_currencies:
+  #     - BTC
+  #   exchange_rate_currencies:
+  #     - BTC
 
-# coinbase:
-#   api_key: !secret coinbase_key
-#   api_secret: !secret coinbase_secret
-#   account_balance_currencies:
-#     - BTC
-#   exchange_rate_currencies:
-#     - BTC
-
-template:
+  # template:
+  #   - light:
+  #       - name: "Wohnzimmer Uhr Nachtlicht"
+  #         unique_id: lenovo_smart_clock_nachtlicht_wohnzimmer
+  #         icon: >-
+  #           {% if is_state('light.lenovo_nachtlicht', 'on') %}
+  #             mdi:lightbulb-night
+  #           {% else %}
+  #             mdi:lightbulb-night-outline
+  #           {% endif %}
+  #         turn_on:
+  #           action: google_assistant_sdk.send_text_command
+  #           data:
+  #             command: "Schalte das Nachtlicht ein"
+  #             media_player: media_player.wohnzimmer_uhr
+  #         turn_off:
+  #           action: google_assistant_sdk.send_text_command
+  #           data:
+  #             command: "Schalte das Nachtlicht aus"
+  #             media_player: media_player.wohnzimmer_uhr
+  #         set_level:
+  #           action: google_assistant_sdk.send_text_command
+  #           data:
+  #             command: >-
+  #               Setze das Nachtlicht auf {{ (brightness / 255 * 100) | round }} Prozent
+  #             media_player: media_player.wohnzimmer_uhr
   - sensor:
       - name: "Unavailable Entities"
         unique_id: unavailable_entities
@@ -523,9 +547,8 @@ sensor: !include_dir_merge_list sensor
 
 switch: !include_dir_merge_list switch
 
-light: !include_dir_merge_list light
-
-device_tracker: !include_dir_merge_list device_tracker
+#light: !include_dir_merge_list light
+#device_tracker: !include_dir_merge_list device_tracker
 
 # no_ip:
 # domain: !secret domain_noip
