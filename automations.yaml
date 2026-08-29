@@ -3334,8 +3334,6 @@
                 brightness: 255
                 color_temp: 225
                 transition: 2
-            - service: light.turn_on
-              entity_id: light.stehlampe_schlafzimmer
     - choose:
         - conditions:
             - condition: or
