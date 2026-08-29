@@ -241,7 +241,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
-                        target: !secret telegram_chat_fabian
+                        chat_id: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegramdustbindone"
     - choose:
@@ -276,7 +276,7 @@
                                                 | replace('Problemmüll', '⚠️ *Problemmüll*')
                                                 | replace('Gartenabfall', '🍂 *Gartenabfall*') %}
                           📣 {{ day_name }}, {{ date_german }} (morgen) {{ verb }} {{ items }} abgeholt. Bitte rechtzeitig rausstellen! 🚛
-                        target: !secret telegram_chat_fabian
+                        chat_id: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
     - choose:
@@ -295,7 +295,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: Die Waschmaschine muss noch ausgeräumt werden.
-                        target: !secret telegram_chat_fabian
+                        chat_id: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegramwasherdone"
             - choose:
@@ -309,7 +309,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: Die Waschmaschine muss noch ausgeräumt werden.
-                        target: !secret telegram_chat_samuel_dummy
+                        chat_id: !secret telegram_chat_samuel_dummy
                         inline_keyboard:
                           - "Erledigt:/telegramwasherdone"
     #- choose:
@@ -343,7 +343,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: Bitte die Pflanzen gießen.
-                        target: !secret telegram_chat_fabian
+                        chat_id: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegrampouringdone"
             - choose:
@@ -357,7 +357,7 @@
                     - service: telegram_bot.send_message
                       data:
                         message: Bitte die Pflanzen gießen.
-                        target: !secret telegram_chat_samuel_dummy
+                        chat_id: !secret telegram_chat_samuel_dummy
                         inline_keyboard:
                           - "Erledigt:/telegrampouringdone"
     - choose:
@@ -380,7 +380,7 @@
                           James hatte ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
                           Die Reinigung wurde daher unterbrochen.
-                        target: !secret telegram_chat_fabian
+                        chat_id: !secret telegram_chat_fabian
             - choose:
                 - conditions:
                     - condition: state
@@ -395,7 +395,7 @@
                           James hatte ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
                           Die Reinigung wurde daher unterbrochen.
-                        target: !secret telegram_chat_samuel_dummy
+                        chat_id: !secret telegram_chat_samuel_dummy
 
     # - choose:
     #     - conditions:
@@ -494,7 +494,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_chat_kai
+        chat_id: !secret telegram_chat_kai
         message: >
           Denk an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
 
@@ -511,7 +511,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_chat_adrian
+        chat_id: !secret telegram_chat_adrian
         message: >
           Denk an den [Check-In zum parken](https://www.boulderwelt-muenchen-sued.de/neue-parkplatz-dauer-regelungen/)
 
@@ -618,7 +618,7 @@
                   sequence:
                     - service: telegram_bot.send_message
                       data:
-                        target: !secret telegram_chat_samuel_dummy
+                        chat_id: !secret telegram_chat_samuel_dummy
                         message: "Fernseher & Lichter wurden automatisch ausgeschaltet, da diese vermutlich vergessen wurden."
     - choose:
         - conditions:
@@ -724,7 +724,7 @@
         message: "Gast Modus wuremand vermutlich übernachtet. Automationen in Samuels Zimmer sind dadurch eingeschränkt."
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_chat_samuel_dummy
+        chat_id: !secret telegram_chat_samuel_dummy
         message: "Gast Modus wurde aktiviert, da jemand vermutlich übernachtet. Automationen in Samuels Zimmer sind dadurch eingeschränkt."
 
 - id: deactivate_guest_mode_if_no_guest_is_here
@@ -1449,7 +1449,7 @@
           sequence:
             - service: telegram_bot.send_poll
               data:
-                target: !secret telegram_chat_5friends
+                chat_id: !secret telegram_chat_5friends
                 question: >
                   {% set greetings = ["Aufgepasst!", "Wohoo!", "Termin-Check!"] %}
                   {{ greetings | random }} Am {{ event_weekday }} steht unser {{ event_data.summary }} an!
@@ -1477,7 +1477,7 @@
           sequence:
             - service: telegram_bot.send_poll
               data:
-                target: !secret telegram_chat_5friends
+                chat_id: !secret telegram_chat_5friends
                 question: >
                   {% set greetings = ["Obacht!", "Aufgepasst!", "Servus!"] %}
                   {{ greetings | random }} Am {{ event_weekday }} ist wieder {{ event_data.summary }}!
@@ -1497,7 +1497,7 @@
       default:
         - service: telegram_bot.send_poll
           data:
-            target: !secret telegram_chat_5friends
+            chat_id: !secret telegram_chat_5friends
             question: >
               {% set greetings = ["Aufgepasst!", "Gruppentreffen-Erinnerung!"] %}
               {{ greetings | random }} Am {{ event_weekday }} steht unser Treffen an!
@@ -1517,7 +1517,7 @@
     # Food Suggestion Poll
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_chat_5friends
+        chat_id: !secret telegram_chat_5friends
         question: >
           {% set cooking_questions = ["Sollen wir was Leckeres kochen?", "Hunger? Lust auf gemeinsames Kochen?", "Wie wär's mit Kochen?"] %}
           {{ cooking_questions | random }} 🧑‍🍳
@@ -1551,7 +1551,7 @@
   action:
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_spieletreff
+        chat_id: !secret telegram_spieletreff
         question: >
           {% set date = state_attr('calendar.votgaming_kalender', 'start_time') | as_timestamp %}
           Zeit für eine Runde {{ state_attr('calendar.votgaming_kalender', 'message') }}! Wer ist am 📅 {{ date | timestamp_custom('%a, %d.%m') }} ab ⏰ {{ date | timestamp_custom('%H:%M') }} Uhr dabei?
@@ -1564,7 +1564,7 @@
         disable_notification: false
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_spieletreff
+        chat_id: !secret telegram_spieletreff
         question: >
           {% set game_questions = ["Worauf habt ihr Lust? 🃏", "Was wird gespielt? 🎲"] %}
           {{ game_questions | random }}
@@ -1584,7 +1584,7 @@
         disable_notification: true
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_spieletreff
+        chat_id: !secret telegram_spieletreff
         question: >
           {% set location_questions = ["Und wo treffen wir uns? 🏠", "Wo wird gespielt? 🏠"] %}
           {{ location_questions | random }}
@@ -1613,12 +1613,12 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_squash
+        chat_id: !secret telegram_squash
         message: "🏸 Neue Woche, neues Glück. Wann habt ihr Zeit für ein Match?"
         disable_notification: true
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_squash
+        chat_id: !secret telegram_squash
         question: "🏸 Neue Woche, neues Glück. Wann habt ihr Zeit für ein Match?"
         options:
           - "Montag"
@@ -1646,7 +1646,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_chat_bouldern
+        chat_id: !secret telegram_chat_bouldern
         message: >
           Hier ist die Auslastungs-Prognose für die kommende Woche! (Statistik für 17-19 Uhr, dahinter Tagesdurchschnitt):
 
@@ -1682,7 +1682,7 @@
           - {{ days_weekend_sued[0].day }} (Tag: {{ days_weekend_sued[0].value }}%)
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_chat_bouldern
+        chat_id: !secret telegram_chat_bouldern
         question: "Wann wird gebouldert? 🧗"
         options:
           - "Montag"
@@ -1698,7 +1698,7 @@
         disable_notification: true
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_chat_bouldern
+        chat_id: !secret telegram_chat_bouldern
         question: "In welche Halle gehen wir?"
         options:
           - "Ost"
@@ -1921,7 +1921,7 @@
                 message: Die Zeitumstellung ist morgen! Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel_dummy
+                chat_id: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: Die Zeitumstellung ist morgen! Sommerzeit hat begonnen und die Uhrzeit wird um eine Stunde vorgestellt (eine Stunde weniger Schlaf).
         - conditions:
@@ -1935,7 +1935,7 @@
                 message: Die Zeitumstellung ist morgen! Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel_dummy
+                chat_id: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: Die Zeitumstellung ist morgen! Winterzeit hat begonnen und die Uhrzeit wird um eine Stunde zurückgestellt (eine Stunde mehr Schlaf).
 
@@ -1959,7 +1959,7 @@
           {%- endif -%}
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_chat_samuel_dummy
+        chat_id: !secret telegram_chat_samuel_dummy
         disable_notification: true
         message: >
           Die Zeitumstellung hat stattgefunden!
@@ -2101,7 +2101,7 @@
             - service: telegram_bot.send_message
               data:
                 message: Bitte die Pflanzen gießen.
-                target: !secret telegram_chat_fabian
+                chat_id: !secret telegram_chat_fabian
                 inline_keyboard:
                   - "Erledigt:/telegrampouringdone"
     - choose:
@@ -2113,7 +2113,7 @@
             - service: telegram_bot.send_message
               data:
                 message: Bitte die Pflanzen gießen.
-                target: !secret telegram_chat_samuel_dummy
+                chat_id: !secret telegram_chat_samuel_dummy
                 inline_keyboard:
                   - "Erledigt:/telegrampouringdone"
 
@@ -2221,14 +2221,14 @@
                     sequence:
                       - service: telegram_bot.send_photo
                         data:
-                          target: "{{ repeat.item.target }}"
+                          chat_id: "{{ repeat.item.target }}"
                           url: "{{ b.picture }}"
                           caption: "{{ msg }}"
                           parse_mode: html
                   - default:
                       - service: telegram_bot.send_message
                         data:
-                          target: "{{ repeat.item.target }}"
+                          chat_id: "{{ repeat.item.target }}"
                           message: "{{ msg }}"
                           parse_mode: html
 
@@ -2262,7 +2262,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_foodsharing
+        chat_id: !secret telegram_foodsharing
         parse_mode: html
         message: |
           {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_082236_11_854379_korbe' %}
@@ -2350,7 +2350,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_foodsharing_muc
+        chat_id: !secret telegram_foodsharing_muc
         parse_mode: html
         message: |
           {% set entity_id = trigger.entity_id if trigger is defined and trigger.entity_id is defined else 'sensor.foodsharing_location_48_117971_11_683341_korbe' %}
@@ -2390,7 +2390,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: !secret telegram_foodsharing
+        chat_id: !secret telegram_foodsharing
         parse_mode: html
         message: |
           {%- set p = trigger.event.data.post -%}
@@ -2560,7 +2560,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel_dummy
+                chat_id: !secret telegram_chat_samuel_dummy
                 disable_notification: true
                 message: >
                   Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -2581,7 +2581,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_5friends
+                chat_id: !secret telegram_chat_5friends
                 disable_notification: true
                 message: >
                   Aktuell Wetterwarnung vor markantem Wetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
@@ -2639,7 +2639,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel_dummy
+                chat_id: !secret telegram_chat_samuel_dummy
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
@@ -2659,7 +2659,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_5friends
+                chat_id: !secret telegram_chat_5friends
                 message: >
                   Aktuell Wetterwarnung vor Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
@@ -2716,7 +2716,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_samuel_dummy
+                chat_id: !secret telegram_chat_samuel_dummy
                 message: >
                   *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
@@ -2736,7 +2736,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_chat_5friends
+                chat_id: !secret telegram_chat_5friends
                 message: >
                   *ACHTUNG!!!!* Aktuell Wetterwarnung vor extremen Unwetter in {{ states.sensor.gemeinde_zorneding_current_warning_level.attributes.region_name }}.
 
@@ -2784,7 +2784,7 @@
     - service: telegram_bot.send_message
       data:
         title: "Fabi Akku unter 5%"
-        target: !secret telegram_chat_samuel_dummy
+        chat_id: !secret telegram_chat_samuel_dummy
         message: ""
 
 - id: mute_cast_music_ads
@@ -3932,7 +3932,7 @@
   action:
     - service: telegram_bot.send_poll
       data:
-        target: !secret telegram_volleyball
+        chat_id: !secret telegram_volleyball
         question:
           "{%- set date = as_timestamp(states.calendar.volleyballtraining.attributes.start_time) -%}{% set weekday = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] %}
           {% set weekday_number = date | timestamp_custom('%w') | int %} {% set weekday_found = weekday[weekday_number] %} {{weekday_found}} ist das Wetter gut: {{ states.sensor.weather_ebersberg_daily.attributes.forecast[2].condition }}
@@ -3953,7 +3953,7 @@
           sequence:
             - service: telegram_bot.send_message
               data:
-                target: !secret telegram_volleyball
+                chat_id: !secret telegram_volleyball
                 data:
                   disable_web_page_preview: true
                 message: >
@@ -5356,7 +5356,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: "Restarting Homeassistant Container..."
     - service: homeassistant.restart
 
@@ -5371,7 +5371,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: "Rebooting Server..."
     - delay: 00:00:05
     - service: homeassistant.restart
@@ -5391,7 +5391,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           Hier sind ein paar Befehle:
 
@@ -5421,7 +5421,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           👤 User ID: {{ trigger.event.data.user_id }}
 
@@ -5442,7 +5442,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           Hier sind ein paar Befehle:
 
@@ -5466,7 +5466,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: "System is online! Current time: {{ now().strftime('%Y-%m-%d %H:%M:%S') }}."
 
 - id: telegram_essen
@@ -5508,7 +5508,7 @@
     - service: telegram_bot.send_message
       data:
         title: "Zufallsessensvorschlag: "
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           **Rezept:** {{ states.sensor.chefkoch_random_recipe.state }}
 
@@ -5554,7 +5554,7 @@
     - service: telegram_bot.send_message
       data:
         title: "Veganer Zufallsessensvorschlag: "
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           **Rezept:** {{ states.sensor.chefkoch_vegan_recipe.state }}
 
@@ -5811,7 +5811,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           *Phönix-Bad Ottobrunn Auslastung:*
 
@@ -5834,7 +5834,7 @@
         entity_id: update.home_assistant_core_update
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: "HA Update gestartet."
     - service: telegram_bot.edit_replymarkup
       data:
@@ -5856,7 +5856,7 @@
         entity_id: update.home_assistant_operating_system_update
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: "OS Update gestartet."
     - service: telegram_bot.edit_replymarkup
       data:
@@ -5879,7 +5879,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         disable_notification: true
         message: >
           Wettervorhersage für heute {{ states.weather.ebersberg_ebersberg.state }} bei {{ states.weather.ebersberg_ebersberg.attributes.temperature }} °C
@@ -5928,7 +5928,7 @@
   action:
     - service: telegram_bot.send_message
       data:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: "Alle Google Homes werden Fabi/samuel über eine wichtige Nachricht bescheid geben."
     #- service: notify.mobile_app_fabian_iphone
     #  data:
@@ -6126,7 +6126,7 @@
   action:
     - service: telegram_bot.send_message
       data_template:
-        target: "{{ trigger.event.data.chat_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
           Der nächste Freie Platz ist um {{ states('sensor.eversports_squash_next_available') }} Uhr verfügbar.
           Insgesamt sind heute {{ state_attr('sensor.eversports_squash_next_available', 'available_slots_count') }} buchbare Platzzeiten verfügbar.
@@ -6283,7 +6283,7 @@
                   James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
                   Die Reinigung wurde daher unterbrochen.
-                target: !secret telegram_chat_fabian
+                chat_id: !secret telegram_chat_fabian
         - conditions:
             - condition: state
               entity_id: person.samuel
@@ -6295,7 +6295,7 @@
                   James hat ein Problem: {{ states.sensor.valetudo_dreamez10pro_error_description.state }}
 
                   Die Reinigung wurde daher unterbrochen.
-                target: !secret telegram_chat_samuel
+                chat_id: !secret telegram_chat_samuel
 
 - id: james_room_cleaning
   alias: "James Raum Reinigiung"
@@ -6442,7 +6442,7 @@
             - service: telegram_bot.send_message
               data:
                 message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
-                target: !secret telegram_chat_samuel
+                chat_id: !secret telegram_chat_samuel
                 inline_keyboard:
                   - "Erledigt:/telegramdustbindone"
     - choose:
@@ -6459,7 +6459,7 @@
             - service: telegram_bot.send_message
               data:
                 message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
-                target: !secret telegram_chat_fabian
+                chat_id: !secret telegram_chat_fabian
                 inline_keyboard:
                   - "Erledigt:/telegramdustbindone"
 
