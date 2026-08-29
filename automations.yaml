@@ -3349,22 +3349,17 @@
                   for:
                     seconds: 2
                 - condition: state
-                  entity_id: light.stehlampe_schlafzimmer
-                  state: "on"
-                  for:
-                    seconds: 2
-                - condition: state
                   entity_id: light.yeelink_bslamp2_22e2_light
                   state: "on"
                   for:
                     seconds: 2
-              sequence:
-                - service: light.turn_off
-                  target:
-                    entity_id:
-                      - light.bett_gluhbirne
-                      - light.yeelink_bslamp2_22e2_light
-                      - light.stehlampe_schlafzimmer
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id:
+                  - light.bett_gluhbirne
+                  - light.yeelink_bslamp2_22e2_light
+                  - light.stehlampe_schlafzimmer
 
 - id: lichtschalter_button_double_press
   alias: Lichtschalter Button double press
