@@ -3993,7 +3993,7 @@
   alias: "Benachrichtigung bei neuem Kadermanager Kommentar 2. Mannschaft"
   trigger:
     - platform: state
-      entity_id: sensor.kadermanager_zorro
+      entity_id: sensor.kadermanager_tischabwischer
   condition:
     condition: template
     value_template: >
@@ -4005,7 +4005,7 @@
       data:
         target: !secret whatsapp_volleyball_tischabwischer
         message: >
-          {% set latest_comment = states.sensor.kadermanager_zorro.attributes.events[0].comments[0] %}
+          {% set latest_comment = states.sensor.kadermanager_tischabwischer.attributes.events[0].comments[0] %}
           {% set author = latest_comment.author %}
           {% set text = latest_comment.text %}
           {% set messages = [
@@ -4090,12 +4090,12 @@
                   false
                 {% endif %}
             - condition: template
-              value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] == 'Spiel' }}"
+              value_template: "{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}"
             - condition: template
               value_template: >
                 {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
                 {% set date = strptime(event['date'], '%Y-%m-%d') %}
-                {% set tischabwischer_event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                {% set tischabwischer_event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
                 {% set tischabwischer_date = strptime(tischabwischer_event['date'], '%Y-%m-%d') %}
                 {{ date.strftime('%Y-%m-%d') == tischabwischer_date.strftime('%Y-%m-%d') }}
           sequence:
@@ -4111,7 +4111,7 @@
                   {% else %}
                     {% set zorro_event = event_0 %}
                   {% endif %}
-                  {%- set tischabwischer_event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                  {%- set tischabwischer_event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
                   {%- set zorro_date = strptime(zorro_event['date'], '%Y-%m-%d') %}
                   {%- set weekday = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][zorro_date.weekday()] %}
                   {% set tischabwischer_schedule_text = "" %}
@@ -4311,7 +4311,7 @@
   trigger:
     - platform: template
       value_template: >
-        {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+        {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
         {% if events and events | length > 0 %}
           {% set event = events[0] %}
           {% set event_date = event['date'] %}
@@ -4329,7 +4329,7 @@
         {% endif %}
     - platform: template
       value_template: >
-        {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+        {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
         {% if events and events | length > 0 %}
           {% set event = events[0] %}
           {% set event_date = event['date'] %}
@@ -4370,14 +4370,14 @@
                   true
                 {% endif %}
             - condition: template
-              value_template: "{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['type'] == 'Spiel' }}"
+              value_template: "{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['type'] == 'Spiel' }}"
           sequence:
             - service: whatsapp.send_message
               continue_on_error: true
               data:
                 target: !secret whatsapp_volleyball_tischabwischer
                 message: >
-                  {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                  {%- set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
                   {%- set date = strptime(event['date'], '%Y-%m-%d') %}
                   {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
                   {% set schedule_text = "" %}
@@ -4419,7 +4419,7 @@
                 - conditions:
                     - condition: template
                       value_template: >
-                        {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+                        {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
                         {% set ns = namespace(found=false) %}
 
                         {% if events is not none and events | length > 0 %}
@@ -4446,7 +4446,7 @@
                         target: !secret whatsapp_volleyball_group
                         message: >
                           *💡 Info:* Wegen des Spiels von Mannschaft 2 findet das kommende Training nur mit Mannschaft 3 statt.
-                          {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+                          {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
                           {% if 'Heim' in event['title'] %}
                           Freiwillige Schiedsrichter sind herzlich willkommen!
                           {% endif %}
@@ -4457,7 +4457,7 @@
           data:
             target: !secret whatsapp_volleyball_tischabwischer
             message: >
-              {%- set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+              {%- set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
               {%- set date = strptime(event['date'], '%Y-%m-%d') %}
               {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
               {%- set date_formatted = date.strftime('%d.%m.') %}
@@ -4478,7 +4478,7 @@
   trigger:
     - platform: template
       value_template: >
-        {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+        {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
         {% if events and events | length > 0 %}
           {% set event = events[0] %}
           {% set event_date = event['date'] %}
@@ -4497,11 +4497,11 @@
     conditions:
       - condition: template
         value_template: >
-          {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+          {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
           {{ events is not none and events | length > 0 and events[0]['type'] == 'Spiel' }}
       - condition: template
         value_template: >
-          {% set events = state_attr('sensor.kadermanager_zorro', 'events') %}
+          {% set events = state_attr('sensor.kadermanager_tischabwischer', 'events') %}
           {{ events is not none and events | length > 0 and events[0]['in_count'] < 7 }}
   action:
     - service: whatsapp.send_message
@@ -4511,18 +4511,18 @@
           *🚨 Spieler-Alarm für Mannschaft 2! 🚨*
 
           Für das Ligaspiel am
-          {% set event = state_attr('sensor.kadermanager_zorro', 'events')[0] %}
+          {% set event = state_attr('sensor.kadermanager_tischabwischer', 'events')[0] %}
           {%- set date = strptime(event['date'], '%Y-%m-%d') %}
           {%- set weekday = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][date.weekday()] %}
-          {{ weekday }} um ⏰ {{ event['time'] }} Uhr haben wir erst *{{ state_attr('sensor.kadermanager_zorro', 'events')[0]['in_count'] }}* Zusagen.
+          {{ weekday }} um ⏰ {{ event['time'] }} Uhr haben wir erst *{{ state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['in_count'] }}* Zusagen.
 
-          {% set accepted_players = state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['accepted_players'] %}
+          {% set accepted_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['accepted_players'] %}
           {% if accepted_players %}
           *✅ Zugesagt haben:*
           {{ accepted_players | join(', ') }}
           {% endif %}
 
-          {% set declined_players = state_attr('sensor.kadermanager_zorro', 'events')[0]['players']['declined_players'] %}
+          {% set declined_players = state_attr('sensor.kadermanager_tischabwischer', 'events')[0]['players']['declined_players'] %}
           {% if declined_players %}
           *❌ Abgesagt haben:*
           {{ declined_players | join(', ') }}
