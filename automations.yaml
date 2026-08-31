@@ -225,25 +225,7 @@
                       data:
                         chat_id: !secret telegram_chat_fabian
                         message: "Der Wassertank des Staubsaugroboters sollte zeitnah aufgefüllt werden."
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ as_timestamp(states.automation.trigger_a_full_dust_bin_reminder.attributes.last_triggered) > as_timestamp(states.automation.telegram_dust_bin_emptied.attributes.last_triggered) }}"
-          sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: "Der Staubbehälter des Staubsaugroboters könnte langsam voll sein und sollte geleert werden."
-                        chat_id: !secret telegram_chat_fabian
-                        inline_keyboard:
-                          - "Erledigt:/telegramdustbindone"
+
     - choose:
         - conditions:
             - condition: template
@@ -279,87 +261,7 @@
                         chat_id: !secret telegram_chat_fabian
                         inline_keyboard:
                           - "Erledigt:/telegramwastedone"
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ as_timestamp(states.automation.telegram_washer_emptied.attributes.last_triggered) < as_timestamp(states.automation.set_washing_machine_clean_when_power_drops.attributes.last_triggered) }}"
-          sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: Die Waschmaschine muss noch ausgeräumt werden.
-                        chat_id: !secret telegram_chat_fabian
-                        inline_keyboard:
-                          - "Erledigt:/telegramwasherdone"
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.samuel
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: Die Waschmaschine muss noch ausgeräumt werden.
-                        chat_id: !secret telegram_chat_samuel_dummy
-                        inline_keyboard:
-                          - "Erledigt:/telegramwasherdone"
-    #- choose:
-    #    - conditions:
-    #        - condition: template
-    #          value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
-    #        - condition: template
-    #          value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_coming_home.attributes.last_triggered) | int > 10800 }}"
-    #      sequence:
-    #        - choose:
-    #            - conditions:
-    #                - condition: state
-    #                  entity_id: person.fabian
-    #                  state: home
-    #                - condition: template
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ as_timestamp(states.automation.telegram_pouring_done.attributes.last_triggered) < as_timestamp(states.automation.remind_for_pouring.attributes.last_triggered) }}"
-            - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_coming_home.attributes.last_triggered) | int > 10800 }}"
-          sequence:
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.fabian
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.fabian.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: Bitte die Pflanzen gießen.
-                        chat_id: !secret telegram_chat_fabian
-                        inline_keyboard:
-                          - "Erledigt:/telegrampouringdone"
-            - choose:
-                - conditions:
-                    - condition: state
-                      entity_id: person.samuel
-                      state: home
-                    - condition: template
-                      value_template: "{{ (as_timestamp(now()) - as_timestamp(states.person.samuel.last_changed) | int < 240) }}"
-                  sequence:
-                    - service: telegram_bot.send_message
-                      data:
-                        message: Bitte die Pflanzen gießen.
-                        chat_id: !secret telegram_chat_samuel_dummy
-                        inline_keyboard:
-                          - "Erledigt:/telegrampouringdone"
+
     - choose:
         - conditions:
             - condition: state
@@ -581,8 +483,6 @@
                     {{ states[domain] | selectattr('state','eq', state) | list | count > 0 }}
             - condition: template
               value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.telegram_answer_cancel_light_turn_off.attributes.last_triggered) | int > 1500 }}"
-            - condition: template
-              value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.turn_off_devices_at_night_notify.attributes.last_triggered) | int < 1800 }}"
           sequence:
             - service: switch.turn_off
               entity_id:
@@ -3542,8 +3442,6 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 3600 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 3600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 3700 }}"
     - condition: not
       conditions:
         - condition: state
@@ -3580,8 +3478,6 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 4600 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 4600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 4700 }}"
     - condition: not
       conditions:
         - condition: state
@@ -3615,8 +3511,6 @@
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_longer_distance.attributes.last_triggered) | int > 4600 }}"
     - condition: template
       value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_long_distance.attributes.last_triggered) | int > 4600 }}"
-    - condition: template
-      value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.notify_samuel_fabian_on_way_home_from_sta.attributes.last_triggered) | int > 4600 }}"
     - condition: not
       conditions:
         - condition: state
