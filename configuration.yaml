@@ -140,47 +140,8 @@ logger:
 sun:
 
 media_source:
-  # media_player:
-  # - platform: mpd
-  # host: 127.0.0.1
 
-  # speedtestdotnet:
-  # server_id: 21514
-
-  # coinbase:
-  #   api_key: !secret coinbase_key
-  #   api_secret: !secret coinbase_secret
-  #   account_balance_currencies:
-  #     - BTC
-  #   exchange_rate_currencies:
-  #     - BTC
-
-  # template:
-  #   - light:
-  #       - name: "Wohnzimmer Uhr Nachtlicht"
-  #         unique_id: lenovo_smart_clock_nachtlicht_wohnzimmer
-  #         icon: >-
-  #           {% if is_state('light.lenovo_nachtlicht', 'on') %}
-  #             mdi:lightbulb-night
-  #           {% else %}
-  #             mdi:lightbulb-night-outline
-  #           {% endif %}
-  #         turn_on:
-  #           action: google_assistant_sdk.send_text_command
-  #           data:
-  #             command: "Schalte das Nachtlicht ein"
-  #             media_player: media_player.wohnzimmer_uhr
-  #         turn_off:
-  #           action: google_assistant_sdk.send_text_command
-  #           data:
-  #             command: "Schalte das Nachtlicht aus"
-  #             media_player: media_player.wohnzimmer_uhr
-  #         set_level:
-  #           action: google_assistant_sdk.send_text_command
-  #           data:
-  #             command: >-
-  #               Setze das Nachtlicht auf {{ (brightness / 255 * 100) | round }} Prozent
-  #             media_player: media_player.wohnzimmer_uhr
+template:
   - sensor:
       - name: "Unavailable Entities"
         unique_id: unavailable_entities
@@ -214,6 +175,8 @@ media_source:
   - trigger:
       - platform: time_pattern
         hours: /1
+      - platform: homeassistant
+        event: start
     action:
       - action: weather.get_forecasts
         data:
@@ -233,6 +196,8 @@ media_source:
   - trigger:
       - platform: time_pattern
         hours: /23
+      - platform: homeassistant
+        event: start
     action:
       - action: weather.get_forecasts
         data:
@@ -533,6 +498,24 @@ media_source:
         unique_id: boulderwelt_sued_sunday_avg
         unit_of_measurement: "%"
         state: "{{ states('input_number.boulderwelt_sued_sunday_avg') }}"
+
+      - name: "Wurstserver Deadline"
+        unique_id: wurstserver_deadline
+        state: "unknown"
+
+      - name: "Wurstserver Zusagen"
+        unique_id: wurstserver_zusagen
+        state: "0"
+
+      - name: "Wurstserver Absagen"
+        unique_id: wurstserver_absagen
+        state: "0"
+
+      - name: "Wurstserver Uebersicht"
+        unique_id: wurstserver_ubersicht
+        state: "OK"
+        attributes:
+          entries: []
 
 #command_line:
 #  - sensor:

@@ -20,7 +20,6 @@ FabiansZimmer:
   entities:
   - media_player.schlafzimmer_tv
   - light.bett_gluhbirne
-  - light.prismatik
   - light.stehlampe_schlafzimmer
   - light.yeelink_bslamp2_22e2_light
   - switch.schlafzimmer_steckerleiste_bett_bett_gluhbirne
@@ -42,8 +41,6 @@ ignored_entities:
   name: Entitäten welche von der unavailable Automation ignoriert werden sollen
   entities:
   - media_player.wohnzimmer_tv
-  - light.prismatik
-  - sensor.washing_machine_mode
   - sensor.fabian_ipadpro_battery_state
   - sensor.valetudo_dreamez10pro_error_description
   - person.flo
@@ -52,6 +49,5 @@ ignored_entities:
   - input_button.find_fabian_s_phone_by_sound
   - input_button.james_room_cleaning
   - sensor.fabian_ipadpro_geocoded_location
-  - update.valetudo_map_card_update
   - media_player.schlafzimmer_tv
   - sensor.valetudo_dreamez10pro_status_flag
