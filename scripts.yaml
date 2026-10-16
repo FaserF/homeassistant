@@ -1,1 +1,39 @@
----
+hermes_voice_dispatch:
+  sequence:
+  - data:
+      text: '{{ prompt }}'
+      agent_id: conversation.omniroute_conversation
+    action: conversation.process
+    response_variable: hermes_agent_response
+  - action: tts.speak
+    data:
+      media_player_entity_id: '{{ speaker | default(''media_player.kuche_lautsprecher_3'')
+        }}'
+      message: '{{ hermes_agent_response.response.speech.plain.speech | default(''Auftrag
+        verarbeitet.'') }}'
+    target:
+      entity_id: tts.google_de_de
+  - data:
+      message: "\U0001F3A4 *Google Home Auftrag:* {{ prompt }}\n\n\U0001F916 *Hermes:*
+        {{ hermes_agent_response.response.speech.plain.speech | default('Keine Antwort.')
+        }}"
+    action: notify.send_message
+    target:
+      entity_id: notify.telegram_bot_706806981_649657901
+  alias: Hermes Voice Dispatch (Google Home)
+  fields:
+    prompt:
+      description: Der Sprachbefehl oder die Frage an Hermes
+      required: true
+      selector:
+        text: {}
+      name: Prompt
+    speaker:
+      selector:
+        entity:
+          domain: media_player
+      default: media_player.kuche_lautsprecher_3
+      description: Der Google Home Lautsprecher für die Sprachausgabe
+      name: Lautsprecher
+  description: Verarbeitet Sprachbefehle von Google Home Lautsprechern über Hermes/OmniRoute,
+    antwortet kurz per TTS auf dem Lautsprecher und sendet den Bericht an Telegram.

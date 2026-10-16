@@ -573,7 +573,7 @@
     - variables:
         excluded:
           [
-            
+
           ]
         unavailable_devices: >
           {{ states | selectattr('domain', 'in', relevant_domains)
@@ -6494,3 +6494,74 @@
           --------(max 800 Zeichen)------------
 
           {{ trigger.event.data['text'] | default(trigger.event.data['body']) | default('Kein Textinhalt (evtl. nur HTML)') | truncate(800) }}
+
+- id: voip_incoming_call_jarvis_omniroute
+  alias: "VoIP: Incoming Call to Jarvis OmniRoute"
+  description: "Bridges incoming phone calls to the Jarvis OmniRoute voice assistant pipeline."
+  mode: single
+  trigger:
+    - platform: webhook
+      webhook_id: jarvis_sip_call
+      allowed_methods:
+        - POST
+        - PUT
+      local_only: true
+  condition:
+    - condition: template
+      value_template: "{{ trigger.json.event == 'incoming_call' }}"
+  action:
+    - service: hassio.addon_stdin
+      data:
+        addon: c7744bff_ha-sip
+        input:
+          command: answer
+          number: "{{ trigger.json.internal_id }}"
+          webhook_to_call:
+            call_disconnected: hangup_voip_assistant
+          menu:
+            post_action: noop
+    - service: hassio.addon_stdin
+      data:
+        addon: c7744bff_ha-sip
+        input:
+          command: dial
+          number: "sip:voip-assistant@192.168.1.2:5070"
+          ring_timeout: 30
+          webhook_to_call:
+            call_established: incoming_voip_call_established
+    - wait_for_trigger:
+        - platform: webhook
+          webhook_id: incoming_voip_call_established
+          allowed_methods:
+            - POST
+            - PUT
+          local_only: true
+      timeout:
+        seconds: 10
+    - service: hassio.addon_stdin
+      data:
+        addon: c7744bff_ha-sip
+        input:
+          command: bridge_audio
+          number: "{{ trigger.json.internal_id }}"
+          bridge_to: "sip:voip-assistant@192.168.1.2:5070"
+
+- id: voip_incoming_call_jarvis_omniroute_hangup
+  alias: "VoIP: Hangup Jarvis OmniRoute"
+  description: "Terminates the VoIP session when the caller hangs up."
+  mode: single
+  trigger:
+    - platform: webhook
+      webhook_id: hangup_voip_assistant
+      allowed_methods:
+        - POST
+        - PUT
+      local_only: true
+  condition: []
+  action:
+    - service: hassio.addon_stdin
+      data:
+        addon: c7744bff_ha-sip
+        input:
+          command: hangup
+          number: "sip:voip-assistant@192.168.1.2:5070"
