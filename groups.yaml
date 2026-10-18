@@ -22,11 +22,6 @@ FabiansZimmer:
   - light.bett_gluhbirne
   - light.stehlampe_schlafzimmer
   - light.yeelink_bslamp2_22e2_light
-  - switch.schlafzimmer_steckerleiste_bett_bett_gluhbirne
-  - switch.schlafzimmer_steckerleiste_bett_bett_steckdose
-  - switch.schlafzimmer_steckerleiste_bett_bett_usb_ports
-  - switch.schlafzimmer_steckerleiste_bett_bettlicht
-  - switch.schlafzimmer_steckerleiste_bett_rollladen
   - switch.schreibtisch_usb_ports
   - switch.fabian_schreibtisch
 SamuelsZimmer:

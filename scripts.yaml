@@ -2,7 +2,7 @@ hermes_voice_dispatch:
   sequence:
   - data:
       text: '{{ prompt }}'
-      agent_id: conversation.omniroute_conversation
+      agent_id: conversation.omniroute_gateway_assist
     action: conversation.process
     response_variable: hermes_agent_response
   - action: tts.speak

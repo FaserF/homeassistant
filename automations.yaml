@@ -726,7 +726,7 @@
     condition: and
     conditions:
       - condition: template
-        value_template: "{{ as_timestamp(now()) - as_timestamp(states.automation.automations_if_fpc_starts.attributes.last_triggered) | int > 3200 }}"
+        value_template: "{{ as_timestamp(now()) - as_timestamp(state_attr('automation.automations_if_fabian_pc_starts', 'last_triggered')) | int > 3200 }}"
       - condition: or
         conditions:
           - condition: state
@@ -1853,18 +1853,9 @@
         {% set last = state_attr('automation.notify_on_ha_restart', 'last_triggered') %}
         {{ last is none or as_timestamp(now()) - as_timestamp(last) > 1800 }}
   action:
-    - service: frontend.set_theme
-      data:
-        name: transparentgray-LAB
-    #  - service: button.press
-    #  target:
-    #  entity_id: button.synchronize_devices
     - service: switch.turn_on
       data:
         entity_id:
-          - switch.schlafzimmer_steckerleiste_bett_bettlicht
-          - switch.schlafzimmer_steckerleiste_bett_bett_gluhbirne
-          - switch.schlafzimmer_steckerleiste_bett_rollladen
           - switch.leds_wohnzimmer
     - choose:
         - conditions:
@@ -1873,7 +1864,7 @@
               before: "03:00:00"
             - condition: template
               value_template: >
-                {% set last = state_attr('automation.automatic_ha_updates', 'last_triggered') %}
+                {% set last = state_attr('automation.automatic_ha_update', 'last_triggered') %}
                 {{ last is none or as_timestamp(now()) - as_timestamp(last) > 500 }}
           sequence:
             - service: telegram_bot.send_message
@@ -4590,9 +4581,6 @@
     event: sunset
     offset: "00:15:00"
   action:
-    - service: switch.turn_on
-      data:
-        entity_id: switch.schlafzimmer_steckerleiste_bett_bett_usb_ports
     - parallel:
         - choose:
             - conditions:
@@ -4662,7 +4650,7 @@
         state: "off"
       - condition: template
         value_template: >
-          {% set last = state_attr('automation.lower_covers_when_very_bright_outside', 'last_triggered') %}
+          {% set last = state_attr('automation.lower_all_covers_when_very_brigt_outside', 'last_triggered') %}
           {{ last is none or as_timestamp(now()) - as_timestamp(last) > 3600 }}
   action:
     - choose:
@@ -5528,24 +5516,26 @@
         volume_level: 0.7
         entity_id: media_player.wohnzimmer_uhr
     - service: tts.speak
-      entity_id:
-        - media_player.wohnzimmer_uhr
-        - media_player.kuche_lautsprecher
-        - media_player.schlafzimmer_audio
+      target:
+        entity_id: tts.google_de_de
       data:
+        media_player_entity_id:
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_lautsprecher
+          - media_player.schlafzimmer_audio
         message: >
           Wichtige Nachricht von
-          {% if (is_state("trigger.event.data.user_id", "649657901")) -%}
+          {% if (trigger.event.data.user_id | string == "649657901") -%}
           Fabian
-          {% elif (is_state("trigger.event.data.user_id", "654536464")) -%}
+          {% elif (trigger.event.data.user_id | string == "654536464") -%}
           samuel
-          {% elif (is_state("trigger.event.data.user_id", "665446537")) -%}
+          {% elif (trigger.event.data.user_id | string == "665446537") -%}
           Kai
-          {% elif (is_state("trigger.event.data.user_id", "159366362")) -%}
+          {% elif (trigger.event.data.user_id | string == "159366362") -%}
           Adri
-          {% elif (is_state("trigger.event.data.user_id", "668937527")) -%}
+          {% elif (trigger.event.data.user_id | string == "668937527") -%}
           Flo
-          {% elif (is_state("trigger.event.data.user_id", "610791756")) -%}
+          {% elif (trigger.event.data.user_id | string == "610791756") -%}
           Maxi
           {% else %}
           jemandem
@@ -5560,21 +5550,23 @@
                   state: "on"
           sequence:
             - service: tts.speak
-              entity_id: media_player.schlafzimmer_audio
+              target:
+                entity_id: tts.google_de_de
               data:
+                media_player_entity_id: media_player.schlafzimmer_audio
                 message: >
                   Wichtige Nachricht von
-                  {% if (is_state("trigger.event.data.user_id", "649657901")) -%}
+                  {% if (trigger.event.data.user_id | string == "649657901") -%}
                   Fabian
-                  {% elif (is_state("trigger.event.data.user_id", "654536464")) -%}
+                  {% elif (trigger.event.data.user_id | string == "654536464") -%}
                   samuel
-                  {% elif (is_state("trigger.event.data.user_id", "665446537")) -%}
+                  {% elif (trigger.event.data.user_id | string == "665446537") -%}
                   Kai
-                  {% elif (is_state("trigger.event.data.user_id", "159366362")) -%}
+                  {% elif (trigger.event.data.user_id | string == "159366362") -%}
                   Adri
-                  {% elif (is_state("trigger.event.data.user_id", "668937527")) -%}
+                  {% elif (trigger.event.data.user_id | string == "668937527") -%}
                   Flo
-                  {% elif (is_state("trigger.event.data.user_id", "610791756")) -%}
+                  {% elif (trigger.event.data.user_id | string == "610791756") -%}
                   Maxi
                   {% else %}
                   jemandem
@@ -5615,19 +5607,21 @@
         volume_level: 0.7
         entity_id: media_player.wohnzimmer_uhr
     - service: tts.speak
-      entity_id:
-        - media_player.wohnzimmer_uhr
-        - media_player.kuche_lautsprecher
+      target:
+        entity_id: tts.google_de_de
       data:
+        media_player_entity_id:
+          - media_player.wohnzimmer_uhr
+          - media_player.kuche_lautsprecher
         message: >
           Ding Dong, es klingelt.
-          {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+          {% if trigger.event.data.user_id | string == '649657901' %}
             Fabian
-          {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+          {% elif trigger.event.data.user_id | string == '654536464' %}
             samuel
-          {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+          {% elif trigger.event.data.user_id | string == '665446537' %}
             Kai
-          {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+          {% elif trigger.event.data.user_id | string == '159366362' %}
             Adri
           {% else %}
             Jemand
@@ -5654,13 +5648,13 @@
               data:
                 message: >
                   Ding Dong, es klingelt.
-                  {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+                  {% if trigger.event.data.user_id | string == '649657901' %}
                     Fabian
-                  {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+                  {% elif trigger.event.data.user_id | string == '654536464' %}
                     samuel
-                  {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+                  {% elif trigger.event.data.user_id | string == '665446537' %}
                     Kai
-                  {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+                  {% elif trigger.event.data.user_id | string == '159366362' %}
                     Adri
                   {% else %}
                     Jemand
@@ -5679,13 +5673,13 @@
               data:
                 message: >
                   Ding Dong, es klingelt.
-                  {% if is_state_attr('trigger.event.data', 'user_id', '649657901') %}
+                  {% if trigger.event.data.user_id | string == '649657901' %}
                     Fabian
-                  {% elif is_state_attr('trigger.event.data', 'user_id', '654536464') %}
+                  {% elif trigger.event.data.user_id | string == '654536464' %}
                     samuel
-                  {% elif is_state_attr('trigger.event.data', 'user_id', '665446537') %}
+                  {% elif trigger.event.data.user_id | string == '665446537' %}
                     Kai
-                  {% elif is_state_attr('trigger.event.data', 'user_id', '159366362') %}
+                  {% elif trigger.event.data.user_id | string == '159366362' %}
                     Adri
                   {% else %}
                     Jemand
@@ -6332,7 +6326,7 @@
     # Verhindert Mehrfach-Triggerung innerhalb von 24 Stunden (86300 Sekunden)
     - condition: template
       value_template: >
-        {% set last_triggered = state_attr('automation.whatsapp_wurstserver_reminder', 'last_triggered') %}
+        {% set last_triggered = state_attr('automation.wurstserver_erinnerung_vor_deadline', 'last_triggered') %}
         {{ last_triggered is none or as_timestamp(now()) - as_timestamp(last_triggered) > 86300 }}
   action:
     - service: whatsapp.send_message

@@ -16,6 +16,17 @@ homeassistant:
   # - "/media/netboot"
 
 default_config:
+
+# http: (migrated to .storage/http as of HA 2026+)
+#  use_x_forwarded_for: true
+#  trusted_proxies:
+#    - 100.64.0.1
+#    - 100.64.0.0/10
+#    - 127.0.0.1
+#    - ::1
+#    - 172.30.32.0/23
+#    - 172.30.33.0/24
+
 input_boolean:
 config:
 system_health:
@@ -231,37 +242,13 @@ template:
       - name: "Durchschn. Luftfeuchtigkeit"
         unique_id: "average_house_humidity_sensor"
         unit_of_measurement: "%"
-        state: >-
-          {% set humidity_values = [
-              states.climate.samuel_s_zimmer.attributes.current_humidity | float(0),
-              states.climate.wohnzimmer.attributes.current_humidity | float(0),
-              states.climate.fabian_s_zimmer.attributes.current_humidity | float(0),
-              states.climate.bad.attributes.current_humidity | float(0)
-          ] %}
-          {% set count = humidity_values | select('gt', 0) | list | length %}
-          {% if count > 0 %}
-            {{ (humidity_values | sum) / count | round(2) }}
-          {% else %}
-            0
-          {% endif %}
+        state: "0"
         icon: "mdi:water-percent"
 
       - name: "Durchschn. Temp."
         unique_id: "average_house_temp"
         unit_of_measurement: "°C"
-        state: >-
-          {% set temp_values = [
-              states.climate.samuel_s_zimmer.attributes.current_temperature | float(0),
-              states.climate.wohnzimmer.attributes.current_temperature | float(0),
-              states.climate.fabian_s_zimmer.attributes.current_temperature | float(0),
-              states.climate.bad.attributes.current_temperature | float(0)
-          ] %}
-          {% set count = temp_values | select('gt', 0) | list | length %}
-          {% if count > 0 %}
-            {{ (temp_values | sum) / count | round(2) }}
-          {% else %}
-            0
-          {% endif %}
+        state: "0"
         icon: "mdi:thermometer-auto"
 
       # MIGRATED FROM sensor/sensor.yaml 2025-12-23
@@ -272,43 +259,14 @@ template:
 
       - name: "Waschmaschinen Modus"
         unique_id: washing_machine_mode
-        state: >-
-          {% if is_state("switch.waschmaschine", "on") %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered)) < 10000 %}
-              30° Pflegeleicht
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) < 10000 %}
-              40° Pflegeleicht
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered)) < 2800 %}
-              20° Feinschwäsche
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered)) < 5500 %}
-              40° Koch/Bunt
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered)) < 13000 %}
-              60° Koch/Bunt
-            {% else %}
-              Unbekannt
-            {% endif %}
-          {% else %}
-            Läuft nicht
-          {% endif %}
+        state: "{{ states('input_select.washing_machine_status') | default('Läuft nicht') }}"
         icon: "mdi:washing-machine"
 
       - name: "Waschmaschine Uhrzeit ca. fertig"
         unique_id: washing_machine_finish_time
         state: >-
-          {% if is_state("switch.waschmaschine", "on") %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered)) < 9780 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 9780) | timestamp_custom("%H:%M", true) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) < 9780 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 9780) | timestamp_custom("%H:%M", true) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered)) < 2400 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 2400) | timestamp_custom("%H:%M", true) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered)) < 5220 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 5220) | timestamp_custom("%H:%M", true) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered)) < 12660 %}
-              {{ (as_timestamp(states.automation.detect_if_washing_machine_is_currently_active.attributes.last_triggered) + 12660) | timestamp_custom("%H:%M", true) }}
-            {% else %}
-              {{ (as_timestamp(states.switch.waschmaschine.last_changed) + 9780) | timestamp_custom("%H:%M", true) }}
-            {% endif %}
+          {% if states('input_select.washing_machine_status') not in ['Idle', 'off', 'unavailable', 'unknown'] %}
+            {{ now().strftime('%H:%M') }}
           {% else %}
             Läuft nicht
           {% endif %}
@@ -317,67 +275,25 @@ template:
       - name: "Waschmaschine Dauer ca. fertig"
         unique_id: washing_machine_finish_duration
         unit_of_measurement: "min"
-        state: >-
-          {% if is_state("switch.waschmaschine", "on") %}
-            {% if (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_30_degrees_pflegeleicht.attributes.last_triggered)) < 7200 %}
-              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 9780) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_pflegeleicht.attributes.last_triggered)) < 7200 %}
-              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 9780) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_20_degrees_feinwasche.attributes.last_triggered)) < 3200 %}
-              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 2400) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_40_degrees_koch_bunt.attributes.last_triggered)) < 7200 %}
-              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 5220) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.automation.telegram_washing_mashine_set_program_60_degrees_koch_bunt.attributes.last_triggered)) < 14400 %}
-              {{ ((as_timestamp(states.switch.waschmaschine.last_changed) + 13560) - as_timestamp(now())) | timestamp_custom("%H:%M", false) }}
-            {% else %}
-              0
-            {% endif %}
-          {% else %}
-            0
-          {% endif %}
+        state: "0"
         icon: "mdi:home-clock"
 
       - name: >-
-          {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
-            {% set coal_triggered = state_attr('automation.detect_if_coal_lighter_is_currently_active', 'last_triggered') %}
-            {% set pizza_triggered = state_attr('automation.detect_if_pizzamaker_is_currently_active', 'last_triggered') %}
-            {% if coal_triggered and pizza_triggered and as_timestamp(coal_triggered) > as_timestamp(pizza_triggered) %}
-              Kohle
-            {% elif coal_triggered and pizza_triggered and as_timestamp(pizza_triggered) > as_timestamp(coal_triggered) %}
-              Pizzamaker
-            {% else %}
-              Kohleanzünder
-            {% endif %}
+          {% if states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600 %}
+            Kohleanzünder
           {% else %}
             Inaktiv
           {% endif %}
         unique_id: coal_lighter_finish_duration
         state: >-
-          {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
-            {% set coal_last = state_attr('automation.detect_if_coal_lighter_is_currently_active', 'last_triggered') %}
-            {% set pizza_last = state_attr('automation.detect_if_pizzamaker_is_currently_active', 'last_triggered') %}
-
-            {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' and coal_last %}
-              {{ ((as_timestamp(coal_last) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
-            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' and pizza_last %}
-              {{ ((as_timestamp(pizza_last) + 300) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
-            {% elif (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600 %}
-              {{ ((as_timestamp(states.input_button.kohleanzunder_timer.last_changed) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
-            {% else %}
-              00:00
-            {% endif %}
+          {% if states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600 %}
+            {{ ((as_timestamp(states.input_button.kohleanzunder_timer.last_changed) + 600) - as_timestamp(now())) | timestamp_custom("%M:%S", false) }}
           {% else %}
             00:00
           {% endif %}
         icon: >-
-          {% if is_state("switch.kohleanzunder", "on") or (states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600) %}
-            {% if state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Kohle' %}
-              mdi:fire
-            {% elif state_attr('sensor.coal_lighter_finish_duration', 'friendly_name') == 'Pizzamaker' %}
-              mdi:pizza
-            {% else %}
-              mdi:timer
-            {% endif %}
+          {% if states.input_button.kohleanzunder_timer.last_changed and (as_timestamp(now()) - as_timestamp(states.input_button.kohleanzunder_timer.last_changed)) < 600 %}
+            mdi:fire
           {% else %}
             mdi:fire-off
           {% endif %}
@@ -515,7 +431,7 @@ template:
         unique_id: wurstserver_ubersicht
         state: "OK"
         attributes:
-          entries: []
+          entries: "{{ [] }}"
 
 #command_line:
 #  - sensor:
@@ -1082,3 +998,15 @@ script: !include scripts.yaml
 #          download_attachments: False
 
 #whatsapp:
+
+
+# Microsoft Graph Mail Gateway via Tailscale Oracle VM Relay
+notify:
+  - name: graph_mail
+    platform: smtp
+    server: "mail.tailnet.fabiseitz.de"
+    port: 1025
+    encryption: none
+    sender: "homeassistant@fabiseitz.de"
+    recipient: "fabian@fabiseitz.de"
+    sender_name: "Home Assistant"
