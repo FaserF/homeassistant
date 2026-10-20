@@ -125,9 +125,6 @@ logger:
       - "Setup of light platform prismatik is taking over 10 seconds."
     homeassistant.helpers.service:
       - "Unable to find referenced entities$"
-    homeassistant.config_entries:
-      - "Config entry 'Keller TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
-      - "Config entry 'Wohnzimmer TV' for nfandroidtv integration not ready yet: Failed to connect; Retrying in background"
   default: warning
   logs:
     custom_components.tasmota_fwupdate: debug
@@ -1010,3 +1007,7 @@ notify:
     sender: "homeassistant@fabiseitz.de"
     recipient: "fabian@fabiseitz.de"
     sender_name: "Home Assistant"
+
+# Jellyfin AI Recommender powered by OmniRoute
+shell_command:
+  update_jellyfin_ai_recommendations: "python3 /config/jellyfin_ai_recommender.py"

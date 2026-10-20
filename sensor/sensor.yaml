@@ -416,3 +416,16 @@
   max_age:
     hours: 2
   sampling_size: 2
+
+- platform: fints
+  bank_identification_number: 50010517
+  username: !secret ing_username
+  pin: !secret ing_pin
+  url: https://fints.ing.de/fints/
+  accounts:
+    - account: "DE51500105175448220781"
+      name: "ING Girokonto"
+    - account: "DE62500105175806408409"
+      name: "ING Extra-Konto ETFs"
+    - account: "DE89500105175806422376"
+      name: "ING Extra-Konto Aktien"

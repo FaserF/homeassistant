@@ -1843,7 +1843,7 @@
 
 - id: notify_on_HA_restart
   alias: "Notify on HA restart"
-  initial_state: true
+  initial_state: false
   trigger:
     platform: homeassistant
     event: start
@@ -2276,6 +2276,7 @@
           ⚖️ <a href="https://wiki.foodsharing.network/wiki/Verhaltensregeln">Verhaltensregeln</a>
 
 - id: automatic_ha_updates
+  initial_state: false
   alias: "Install All Updates on Sunday Night"
   description: Sends a Telegram message with available updates for integrations and installs them every Sunday night at 2 AM.
   trigger:
