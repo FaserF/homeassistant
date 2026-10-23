@@ -37,3 +37,16 @@ hermes_voice_dispatch:
       name: Lautsprecher
   description: Verarbeitet Sprachbefehle von Google Home Lautsprechern über Hermes/OmniRoute,
     antwortet kurz per TTS auf dem Lautsprecher und sendet den Bericht an Telegram.
+close_bedroom_covers:
+  alias: Schlafzimmer Rollläden schließen
+  mode: single
+  sequence:
+  - action: cover.close_cover
+    target:
+      entity_id:
+      - cover.schlafzimmer_gross
+      - cover.schlafzimmer_klein
+  - action: notify.persistent_notification
+    data:
+      message: Schlafzimmer Rollläden vollständig geschlossen ✓
+      title: Hermes Smart Home
