@@ -1323,11 +1323,11 @@
               data:
                 chat_id: !secret telegram_chat_5friends
                 question: >
-                  {% set greetings = ["Aufgepasst!", "Wohoo!", "Termin-Check!"] %}
+                  {% set greetings = ["Servus Bande! ☀️", "Moin Crew! 😎", "Termin-Check für die Bande! 🚀", "Obacht Freunde! 🎉"] %}
                   {{ greetings | random }} Am {{ event_weekday }} steht unser {{ event_data.summary }} an!
-                  Das Wetter wird super: {{ target_forecast.condition }} bei {{ target_forecast.temperature }}°C.
-                  {% if now().month <= 4 or now().month >= 10 %}Die Sonne scheint bis ⏰ {{ state_attr('sun.sun', 'next_dusk') | as_timestamp | timestamp_custom('%H:%M', false) }}.{% endif %}
-                  Wo treffen wir uns? ☀️
+                  Wetter spielt mega mit: {{ target_forecast.condition }} bei sonnigen {{ target_forecast.temperature }}°C.
+                  {% if now().month <= 4 or now().month >= 10 %}Sonne scheint bis ⏰ {{ state_attr('sun.sun', 'next_dusk') | as_timestamp | timestamp_custom('%H:%M', false) }}.{% endif %}
+                  Wo wollen wir starten / chillen? 🍻
                 options:
                   - "See 🌊"
                   - "Weiher"
@@ -1336,7 +1336,7 @@
                   - "Flo"
                   - "Maxi"
                   - "Bar (z.B. Tropic Bar) 🍹"
-                  - "Wo anders (Schreiben!)"
+                  - "Wo anders (einfach schreiben!)"
                 is_anonymous: false
                 allows_multiple_answers: true
                 disable_notification: true
@@ -1351,17 +1351,17 @@
               data:
                 chat_id: !secret telegram_chat_5friends
                 question: >
-                  {% set greetings = ["Obacht!", "Aufgepasst!", "Servus!"] %}
+                  {% set greetings = ["Servus Bande! 🤙", "Obacht Freunde!", "Gude Crew! 🚀"] %}
                   {{ greetings | random }} Am {{ event_weekday }} ist wieder {{ event_data.summary }}!
-                  Wettervorhersage ist gerade nicht verfügbar.
-                  Wo schlagen wir unser Lager auf?
+                  Wetterbericht streikt gerade, aber Treffen steht fest!
+                  Wo schlagen wir unser Lager auf? 🏠
                 options:
                   - "Fabi"
                   - "Kai & Adri"
                   - "Flo"
                   - "Maxi"
                   - "Bar (z.B. Tropic Bar) 🍹"
-                  - "Wo anders (Schreiben!)"
+                  - "Wo anders (einfach schreiben!)"
                 is_anonymous: false
                 allows_multiple_answers: true
                 disable_notification: true
@@ -1371,36 +1371,68 @@
           data:
             chat_id: !secret telegram_chat_5friends
             question: >
-              {% set greetings = ["Aufgepasst!", "Gruppentreffen-Erinnerung!"] %}
+              {% set greetings = ["Servus Bande! ☔", "Treffen-Check!", "Moin moin! 🌧️"] %}
               {{ greetings | random }} Am {{ event_weekday }} steht unser Treffen an!
-              Das Wetter wird eher durchwachsen: {{ target_forecast.condition if target_forecast else 'Regnerisch' }} bei {{ target_forecast.temperature if target_forecast else '?' }}°C.
-              Wo treffen wir uns? ☔️
+              Das Wetter wird eher Sofa-tauglich ({{ target_forecast.condition if target_forecast else 'Regnerisch' }} bei {{ target_forecast.temperature if target_forecast else '?' }}°C).
+              Bei wem machen wir's uns gemütlich? 🛋️
             options:
               - "Fabi"
               - "Kai & Adri"
               - "Flo"
               - "Maxi"
               - "Bar (z.B. Tropic Bar) 🍹"
-              - "Trotzdem raus? 🤔"
-              - "Wo anders (Schreiben!)"
+              - "Trotzdem raus? (Harte Socken) 🤔"
+              - "Wo anders (einfach schreiben!)"
             is_anonymous: false
             allows_multiple_answers: true
             disable_notification: true
-    # Food Suggestion Poll
-    - service: telegram_bot.send_poll
+    # Food Recipe Recommendations - 3 curated options (Weather #1, Veggie/Vegan #2, Weather Alt #3)
+    - service: chefkoch_ha.get_recommendations
+      response_variable: food_recs
+    - service: telegram_bot.send_message
       data:
         chat_id: !secret telegram_chat_5friends
-        question: >
-          {% set cooking_questions = ["Sollen wir was Leckeres kochen?", "Hunger? Lust auf gemeinsames Kochen?", "Wie wär's mit Kochen?"] %}
-          {{ cooking_questions | random }} 🧑‍🍳
-          Vorschlag: {{ states('sensor.chefkoch_daily_recipe') }}.
-          Mehr mit /food
-        options:
-          - "Ja, bin am Start! 😋"
-          - "Nein, bin versorgt."
-        is_anonymous: false
-        allows_multiple_answers: false
         disable_notification: true
+        message: >
+          {% set r1 = food_recs.recipe_1 if food_recs is defined and food_recs.recipe_1 is defined else {} %}
+          {% set r2 = food_recs.recipe_2 if food_recs is defined and food_recs.recipe_2 is defined else {} %}
+          {% set r3 = food_recs.recipe_3 if food_recs is defined and food_recs.recipe_3 is defined else {} %}
+
+          {% set is_warm = target_forecast is not none and target_forecast.temperature | int >= 18 %}
+          {% set is_cold = target_forecast is not none and target_forecast.temperature | int <= 12 %}
+
+          {% if is_warm %}
+            {% set intros = [
+              "Wetter soll mega werden! ☀️ Lust, dass wir zusammen was Frisches zaubern? Hier 3 Ideen für die Runde:",
+              "Sommerfeeling pur! 🌿 Drei leichte Rezeptideen für unser Treffen:",
+              "Sonne satt! 🥗 Lust auf gemeinsame Sommerküche? Hier drei Vorschläge:"
+            ] %}
+          {% elif is_cold %}
+            {% set intros = [
+              "Draußen Schmuddelwetter, drinnen gemütlich! 🍲 Lust auf Soulfood? Drei Ideen für die Runde:",
+              "Bei dem Wetter wärmt nix besser als was Deftiges aus'm Topf oder Ofen! 🥘 Zur Auswahl:",
+              "Perfektes Wetter für Soulfood & Ofengerichte! 🧑‍🍳 Drei frische Vorschläge für euch:"
+            ] %}
+          {% else %}
+            {% set intros = [
+              "Hunger mitbringen nicht vergessen! 🧑‍🍳 Hier drei frische Rezeptideen für die Runde:",
+              "Sollen wir vor dem Abend zusammen was Feines zaubern? 🍳 Drei Vorschläge:",
+              "Bock auf 'ne entspannte Koch-Session? 😋 Hier drei Rezeptideen für unser Treffen:"
+            ] %}
+          {% endif %}
+
+          {{ intros | random }}
+
+          1️⃣ **{{ r1.title | default('Wetter-Empfehlung', true) }}** ({{ r1.weather_category | default(r1.category, true) | default('Wetter-Tipp', true) }})
+          🔗 {{ r1.url }}
+
+          2️⃣ **{{ r2.title | default('Veggie-Empfehlung', true) }}** ({{ r2.category | default(r2.diet, true) | default('Veggie / Vegan', true) }})
+          🔗 {{ r2.url }}
+
+          3️⃣ **{{ r3.title | default('Saisonale Alternative', true) }}** ({{ r3.weather_category | default(r3.category, true) | default('Alternative', true) }})
+          🔗 {{ r3.url }}
+
+          (Shuffle & mehr Ideen jederzeit mit /food oder /foodv 🎲)
 
 - id: remind_for_board_game_events
   alias: "🎲 Board Game Reminder"
@@ -5063,49 +5095,66 @@
       event_data:
         command: "foodno@smartlife_ha_bot"
   action:
-    - service: telegram_bot.answer_callback_query
-      continue_on_error: true
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.event.data.data == '/foodno' or trigger.event.data.command in ['/foodno', 'foodno@smartlife_ha_bot'] }}"
+          sequence:
+            - service: telegram_bot.answer_callback_query
+              continue_on_error: true
+              data:
+                callback_query_id: "{{ trigger.event.data.id }}"
+                message: >
+                  {% set reject_msgs = ["Alles klar, wird verworfen! Suche was Besseres... 🎲", "Nächster Versuch! 🍳", "Kommt sofort was Neues! 🔄"] %}
+                  {{ reject_msgs | random }}
+            - service: telegram_bot.edit_replymarkup
+              continue_on_error: true
+              data:
+                message_id: "{{ trigger.event.data.message.message_id }}"
+                chat_id: "{{ trigger.event.data.chat_id }}"
+                inline_keyboard: []
+    - service: chefkoch_ha.get_recipe
       data:
-        callback_query_id: "{{ trigger.event.data.id }}"
-        message: "Okay, neues Essen."
-    - service: telegram_bot.edit_replymarkup
-      continue_on_error: true
-      data:
-        message_id: "{{ trigger.event.data.message.message_id }}"
-        chat_id: "{{ trigger.event.data.chat_id }}"
-        inline_keyboard: []
-    - service: homeassistant.reload_config_entry
-      target:
-        entity_id: sensor.chefkoch_random_recipe
-    - delay: "00:00:01"
+        recipe_type: random
+      response_variable: result
+    - variables:
+        rec: "{{ result.recipe if result is defined and result.recipe is defined else {} }}"
     - service: telegram_bot.send_message
       data:
-        title: "Zufallsessensvorschlag: "
         chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
-          **Rezept:** {{ states.sensor.chefkoch_random_recipe.state }}
+          {% set intros = [
+            "Wie wär's hiermit? 😋",
+            "Frisch aus der Chefkoch-Küche: 🧑‍🍳",
+            "Schau mal, das klingt doch mega: ✨",
+            "Vorschlag für die Runde: 🍽️",
+            "Bock auf das hier? 🤤",
+            "Zufallstreffer aus der Rezeptkiste: 🎲"
+          ] %}
+          {{ intros | random }}
 
+          🍴 **{{ rec.title | default('Chefkoch Rezept', true) }}** ({{ rec.category | default('Klassiker', true) }})
 
-          {{ state_attr('sensor.chefkoch_random_recipe', 'url') }}
+          🔗 {{ rec.url }}
 
-          {% if state_attr('sensor.chefkoch_random_recipe', 'totalTime') %}
-          **Zubereitungszeit:** {{ state_attr('sensor.chefkoch_random_recipe', 'totalTime') }}
+          {% if rec.totalTime or rec.total_time %}
+          ⏱️ **Zubereitungszeit:** {{ rec.totalTime | default(rec.total_time, true) }}
           {% endif %}
-
-          {% if state_attr('sensor.chefkoch_random_recipe', 'ingredients') %}
-          **Zutaten:** {{ state_attr('sensor.chefkoch_random_recipe', 'ingredients') | join(', ') }}
+          {% if rec.difficulty %}
+          📊 **Schwierigkeit:** {{ rec.difficulty }}
           {% endif %}
-
-          {% if state_attr('sensor.chefkoch_random_recipe', 'calories') %}
-          **Kalorien:** {{ state_attr('sensor.chefkoch_random_recipe', 'calories') }}
+          {% if rec.rating %}
+          ⭐ **Bewertung:** {{ rec.rating }} / 5
           {% endif %}
-
-          {% if state_attr('sensor.chefkoch_random_recipe', 'category') %}
-          **Kategorie:** {{ state_attr('sensor.chefkoch_random_recipe', 'category') }}
+          {% if rec.calories %}
+          🔥 **Kalorien:** {{ rec.calories }}
+          {% endif %}
+          {% if rec.ingredients %}
+          🛒 **Zutaten:** {{ rec.ingredients[:6] | join(', ') }}
           {% endif %}
         disable_notification: true
         inline_keyboard:
-          - "Ja:/foodyes, Nein:/foodno"
+          - "Klingt mega! 😋:/foodyes, Weiter suchen 🔄:/foodno"
 
 - id: telegram_essen_vegan
   alias: Telegram Essen Vegan
@@ -5120,38 +5169,101 @@
       event_data:
         command: "/foodv@smartlife_ha_bot"
   action:
-    - service: homeassistant.reload_config_entry
-      target:
-        entity_id: sensor.chefkoch_vegan_recipe
-    - delay: "00:00:01"
+    - service: chefkoch_ha.get_recipe
+      data:
+        recipe_type: vegan
+      response_variable: result
+    - variables:
+        rec: "{{ result.recipe if result is defined and result.recipe is defined else {} }}"
     - service: telegram_bot.send_message
       data:
-        title: "Veganer Zufallsessensvorschlag: "
         chat_id: "{{ trigger.event.data.chat_id }}"
         message: >
-          **Rezept:** {{ states.sensor.chefkoch_vegan_recipe.state }}
+          {% set intros = [
+            "Pflanzliche Inspiration gefällig? 🌱",
+            "Vegan & lecker: 🧑‍🍳",
+            "Grüner Genuss für die Runde: ✨",
+            "Hier was Feines ohne Tierprodukte: 🥗",
+            "Frisch, vegan, genial: 🥑"
+          ] %}
+          {{ intros | random }}
 
+          🌱 **{{ rec.title | default('Veganes Chefkoch Rezept', true) }}** ({{ rec.category | default('Vegan', true) }})
 
-          {{ state_attr('sensor.chefkoch_vegan_recipe', 'url') }}
+          🔗 {{ rec.url }}
 
-          {% if state_attr('sensor.chefkoch_vegan_recipe', 'totalTime') %}
-          **Zubereitungszeit:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'totalTime') }}
+          {% if rec.totalTime or rec.total_time %}
+          ⏱️ **Zubereitungszeit:** {{ rec.totalTime | default(rec.total_time, true) }}
           {% endif %}
-
-          {% if state_attr('sensor.chefkoch_vegan_recipe', 'ingredients') %}
-          **Zutaten:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'ingredients') | join(', ') }}
+          {% if rec.difficulty %}
+          📊 **Schwierigkeit:** {{ rec.difficulty }}
           {% endif %}
-
-          {% if state_attr('sensor.chefkoch_vegan_recipe', 'calories') %}
-          **Kalorien:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'calories') }}
+          {% if rec.rating %}
+          ⭐ **Bewertung:** {{ rec.rating }} / 5
           {% endif %}
-
-          {% if state_attr('sensor.chefkoch_vegan_recipe', 'category') %}
-          **Kategorie:** {{ state_attr('sensor.chefkoch_vegan_recipe', 'category') }}
+          {% if rec.calories %}
+          🔥 **Kalorien:** {{ rec.calories }}
+          {% endif %}
+          {% if rec.ingredients %}
+          🛒 **Zutaten:** {{ rec.ingredients[:6] | join(', ') }}
           {% endif %}
         disable_notification: true
         inline_keyboard:
-          - "Ja:/foodyes, Nein:/foodno"
+          - "Klingt mega! 😋:/foodyes, Weiter suchen 🔄:/foodno"
+
+- id: telegram_essen_wetter
+  alias: Telegram Essen Wetter
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/foodw"
+    - platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/foodw@smartlife_ha_bot"
+  action:
+    - service: chefkoch_ha.get_recipe
+      data:
+        recipe_type: weather
+      response_variable: result
+    - variables:
+        rec: "{{ result.recipe if result is defined and result.recipe is defined else {} }}"
+    - service: telegram_bot.send_message
+      data:
+        chat_id: "{{ trigger.event.data.chat_id }}"
+        message: >
+          {% set intros = [
+            "Passend zum aktuellen Wetter serviert: 🌦️",
+            "Saisonal abgestimmter Vorschlag: 🍂",
+            "Hier was Perfektes für das Wetter heute: 🧑‍🍳",
+            "Frische Wetter-Inspiration für die Küche: 🍲"
+          ] %}
+          {{ intros | random }}
+
+          🌤️ **{{ rec.title | default('Wetter-Rezept', true) }}** ({{ rec.weather_category | default(rec.category, true) | default('Saisonal', true) }})
+
+          🔗 {{ rec.url }}
+
+          {% if rec.totalTime or rec.total_time %}
+          ⏱️ **Zubereitungszeit:** {{ rec.totalTime | default(rec.total_time, true) }}
+          {% endif %}
+          {% if rec.difficulty %}
+          📊 **Schwierigkeit:** {{ rec.difficulty }}
+          {% endif %}
+          {% if rec.rating %}
+          ⭐ **Bewertung:** {{ rec.rating }} / 5
+          {% endif %}
+          {% if rec.calories %}
+          🔥 **Kalorien:** {{ rec.calories }}
+          {% endif %}
+          {% if rec.ingredients %}
+          🛒 **Zutaten:** {{ rec.ingredients[:6] | join(', ') }}
+          {% endif %}
+        disable_notification: true
+        inline_keyboard:
+          - "Klingt mega! 😋:/foodyes, Weiter suchen 🔄:/foodno"
 
 - id: telegram_food_yes
   alias: "Telegram food yes"
@@ -5165,13 +5277,23 @@
     - service: telegram_bot.answer_callback_query
       data:
         callback_query_id: "{{ trigger.event.data.id }}"
-        message: "Okay."
+        message: >
+          {% set yes_msgs = ["Gute Wahl! Lass es dir schmecken! 😋", "Top! Guten Appetit! 👨‍🍳", "Perfekt, Rezept ist eingeloggt! 🍴"] %}
+          {{ yes_msgs | random }}
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
+      data:
+        message_id: "{{ trigger.event.data.message.message_id }}"
+        chat_id: "{{ trigger.event.data.chat_id }}"
+        inline_keyboard: []
+    - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: !secret telegram_chat_samuel
         inline_keyboard: []
     - service: telegram_bot.edit_replymarkup
+      continue_on_error: true
       data:
         message_id: "{{ trigger.event.data.message.message_id }}"
         chat_id: !secret telegram_chat_fabian
@@ -6560,3 +6682,157 @@
         input:
           command: hangup
           number: "sip:voip-assistant@192.168.1.2:5070"
+
+- id: track_ha_cover_command
+  alias: "Rolladen SSOT: Track Authorized HA Commands"
+  description: "Records when Home Assistant, user, Google Home, or Hermes initiates a cover action"
+  initial_state: true
+  mode: queued
+  trigger:
+    - platform: event
+      event_type: call_service
+      event_data:
+        domain: cover
+  condition:
+    - condition: template
+      value_template: >
+        {{ trigger.event.data.service in ['open_cover', 'close_cover', 'set_cover_position', 'stop_cover', 'toggle'] }}
+    - condition: template
+      value_template: >
+        {{ state_attr('automation.rolladen_ssot_abort_external_movement', 'current') | default(0, true) == 0 and state_attr('automation.rolladen_ssot_block_07_00_provider_morning_schedule', 'current') | default(0, true) == 0 }}
+  action:
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.last_ha_cover_command
+      data:
+        timestamp: "{{ as_timestamp(now()) }}"
+
+- id: rolladen_ssot_guard
+  alias: "Rolladen SSOT: Abort External Movement"
+  description: "Home Assistant is Single Source of Truth: automatically cancels and reverts external provider/hardware movements 24/7"
+  initial_state: true
+  mode: parallel
+  trigger:
+    - platform: state
+      entity_id:
+        - cover.schlafzimmer_gross
+        - cover.schlafzimmer_klein
+        - cover.wohnzimmer_links
+        - cover.wohnzimmer_rechts
+        - cover.kuche
+      to:
+        - "opening"
+        - "open"
+        - "closing"
+  condition:
+    # 1. Protection must be active (either helper)
+    - condition: template
+      value_template: >
+        {{ is_state('input_boolean.rolladen_ssot_active', 'on') or is_state('input_boolean.externe_rolladen_automationen_blockieren', 'on') }}
+    # 2. Exclude reboot / unavailable transitions
+    - condition: template
+      value_template: >
+        {{ trigger.from_state is not none and trigger.from_state.state not in ['unavailable', 'unknown'] and trigger.to_state.state not in ['unavailable', 'unknown'] }}
+    # 3. Check if movement was authorized by Home Assistant or authorized user
+    - condition: template
+      value_template: >
+        {% set last_cmd = as_timestamp(states('input_datetime.last_ha_cover_command')) | default(0, true) %}
+        {% set is_ha_recent = (as_timestamp(now()) - last_cmd) <= 30 %}
+        {% set has_user = trigger.to_state.context.user_id is not none %}
+        {% set has_parent = trigger.to_state.context.parent_id is not none %}
+        {% set is_authorized = is_ha_recent or has_user or has_parent %}
+        {{ not is_authorized }}
+  action:
+    # 1. Immediately halt the motor
+    - service: cover.stop_cover
+      target:
+        entity_id: "{{ trigger.entity_id }}"
+    # 2. Revert back to original position
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state in ['opening', 'open'] or trigger.from_state.state == 'closed' }}"
+          sequence:
+            - delay: "00:00:01"
+            - service: cover.close_cover
+              target:
+                entity_id: "{{ trigger.entity_id }}"
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state in ['closing'] or trigger.from_state.state == 'open' }}"
+          sequence:
+            - delay: "00:00:01"
+            - service: cover.open_cover
+              target:
+                entity_id: "{{ trigger.entity_id }}"
+    - service: logbook.log
+      data:
+        name: "Rolladen SSOT Schutz"
+        message: "Externer Fahrbefehl für {{ trigger.to_state.name }} sofort gestoppt & zurückgesetzt (Single Source of Truth: HA)."
+        entity_id: "{{ trigger.entity_id }}"
+    - service: telegram_bot.send_message
+      continue_on_error: true
+      data:
+        chat_id: !secret telegram_chat_fabian
+        message: >
+          🛡️ *Rolladen-Schutz aktiv (24/7):* Externer Fahrbefehl (TaHoma) für *{{ trigger.to_state.name }}* wurde umgehend gestoppt und zurückgesetzt.
+
+- id: rolladen_block_0700_provider_open
+  alias: "Rolladen SSOT: Block 07:00 Provider Morning Schedule"
+  description: "Blocks the 07:00 Somfy/provider auto-open schedule completely until HA sunrise/workday schedule allows"
+  initial_state: true
+  mode: single
+  trigger:
+    - platform: time
+      at: "07:00:00"
+    - platform: time
+      at: "07:00:05"
+  condition:
+    - condition: template
+      value_template: >
+        {{ is_state('input_boolean.rolladen_ssot_active', 'on') or is_state('input_boolean.externe_rolladen_automationen_blockieren', 'on') }}
+    # Block if before allowed HA schedule (07:30 on workdays, 10:00 on weekends)
+    - condition: or
+      conditions:
+        - condition: and
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.workday_sensor
+              state: "on"
+            - condition: time
+              before: "07:30:00"
+        - condition: and
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.workday_sensor
+              state: "off"
+            - condition: time
+              before: "10:00:00"
+  action:
+    - delay: "00:00:02"
+    - repeat:
+        count: 3
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {% set covers = [
+                        'cover.schlafzimmer_gross',
+                        'cover.schlafzimmer_klein',
+                        'cover.wohnzimmer_links',
+                        'cover.wohnzimmer_rechts',
+                        'cover.kuche'
+                      ] %}
+                      {% set open_covers = covers | select('is_state', 'opening') | list + covers | select('is_state', 'open') | list %}
+                      {{ open_covers | length > 0 }}
+                sequence:
+                  - service: cover.close_cover
+                    target:
+                      entity_id:
+                        - cover.schlafzimmer_gross
+                        - cover.schlafzimmer_klein
+                        - cover.wohnzimmer_links
+                        - cover.wohnzimmer_rechts
+                        - cover.kuche
+          - delay: "00:00:04"

@@ -28,6 +28,10 @@ default_config:
 #    - 172.30.33.0/24
 
 input_boolean:
+  rolladen_ssot_active:
+    name: "Rolladen Single Source of Truth"
+    icon: mdi:shield-home
+    initial: on
 config:
 system_health:
 api:
@@ -943,6 +947,10 @@ input_select:
 input_datetime:
   cooker_start_time:
     name: Reiskocher Startzeit
+    has_date: true
+    has_time: true
+  last_ha_cover_command:
+    name: "Letzter HA Rolladen Befehl"
     has_date: true
     has_time: true
 
