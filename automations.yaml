@@ -1386,21 +1386,11 @@
             is_anonymous: false
             allows_multiple_answers: true
             disable_notification: true
-    # Food Recipe Recommendations - 3 curated options (Weather #1, Veggie/Vegan #2, Weather Alt #3)
-    - service: chefkoch_ha.get_recommendations
-      response_variable: food_recs
-    - service: telegram_bot.send_message
-      data:
-        chat_id: !secret telegram_chat_5friends
-        disable_notification: true
-        message: >
-          {% set r1 = food_recs.recipe_1 if food_recs is defined and food_recs.recipe_1 is defined else {} %}
-          {% set r2 = food_recs.recipe_2 if food_recs is defined and food_recs.recipe_2 is defined else {} %}
-          {% set r3 = food_recs.recipe_3 if food_recs is defined and food_recs.recipe_3 is defined else {} %}
-
+    # Dinner recommendations (no desserts): title is the link, one recipe per line
+    - variables:
+        food_intro: >-
           {% set is_warm = target_forecast is not none and target_forecast.temperature | int >= 18 %}
           {% set is_cold = target_forecast is not none and target_forecast.temperature | int <= 12 %}
-
           {% if is_warm %}
             {% set intros = [
               "Wetter soll mega werden! ☀️ Lust, dass wir zusammen was Frisches zaubern? Hier 3 Ideen für die Runde:",
@@ -1420,20 +1410,22 @@
               "Bock auf 'ne entspannte Koch-Session? 😋 Hier drei Rezeptideen für unser Treffen:"
             ] %}
           {% endif %}
-
-          {{ intros | random }}
-
-          1️⃣ **{{ r1.title | default('Wetter-Empfehlung', true) }}** ({{ r1.weather_category | default(r1.category, true) | default('Wetter-Tipp', true) }})
-          🔗 {{ r1.url }}
-
-          2️⃣ **{{ r2.title | default('Veggie-Empfehlung', true) }}** ({{ r2.category | default(r2.diet, true) | default('Veggie / Vegan', true) }})
-          🔗 {{ r2.url }}
-
-          3️⃣ **{{ r3.title | default('Saisonale Alternative', true) }}** ({{ r3.weather_category | default(r3.category, true) | default('Alternative', true) }})
-          🔗 {{ r3.url }}
-
-          (Shuffle & mehr Ideen jederzeit mit /food oder /foodv 🎲)
-
+          {{ intros | random | e }}
+    - service: chefkoch_ha.get_recommendations
+      data:
+        meal_type: main
+        header: "{{ food_intro }}"
+        footer: "(Shuffle &amp; mehr Ideen jederzeit mit /food oder /foodv 🎲)"
+        details:
+          - category
+          - time
+      response_variable: food_recs
+    - service: telegram_bot.send_message
+      data:
+        chat_id: !secret telegram_chat_5friends
+        disable_notification: true
+        parse_mode: html
+        message: "{{ food_recs.message_html }}"
 - id: remind_for_board_game_events
   alias: "🎲 Board Game Reminder"
   trigger:
@@ -5116,41 +5108,43 @@
     - service: chefkoch_ha.get_recipe
       data:
         recipe_type: random
+        numbering: none
+        details:
+          - category
       response_variable: result
     - variables:
         rec: "{{ result.recipe if result is defined and result.recipe is defined else {} }}"
     - service: telegram_bot.send_message
       data:
         chat_id: "{{ trigger.event.data.chat_id }}"
+        parse_mode: html
         message: >
           {% set intros = [
-            "Wie wär's hiermit? 😋",
-            "Frisch aus der Chefkoch-Küche: 🧑‍🍳",
-            "Schau mal, das klingt doch mega: ✨",
-            "Vorschlag für die Runde: 🍽️",
-            "Bock auf das hier? 🤤",
-            "Zufallstreffer aus der Rezeptkiste: 🎲"
-          ] %}
-          {{ intros | random }}
+                      "Wie wär's hiermit? 😋",
+                      "Frisch aus der Chefkoch-Küche: 🧑‍🍳",
+                      "Schau mal, das klingt doch mega: ✨",
+                      "Vorschlag für die Runde: 🍽️",
+                      "Bock auf das hier? 🤤",
+                      "Zufallstreffer aus der Rezeptkiste: 🎲"
+                    ] %}
+          {{ intros | random | e }}
 
-          🍴 **{{ rec.title | default('Chefkoch Rezept', true) }}** ({{ rec.category | default('Klassiker', true) }})
-
-          🔗 {{ rec.url }}
+          🍴 {{ result.message_html if result is defined and result.message_html else 'Gerade nichts Passendes gefunden, versuch es nochmal 🙈' }}
 
           {% if rec.totalTime or rec.total_time %}
-          ⏱️ **Zubereitungszeit:** {{ rec.totalTime | default(rec.total_time, true) }}
+          ⏱️ <b>Zubereitungszeit:</b> {{ rec.totalTime | default(rec.total_time, true) }}
           {% endif %}
           {% if rec.difficulty %}
-          📊 **Schwierigkeit:** {{ rec.difficulty }}
+          📊 <b>Schwierigkeit:</b> {{ rec.difficulty | e }}
           {% endif %}
           {% if rec.rating %}
-          ⭐ **Bewertung:** {{ rec.rating }} / 5
+          ⭐ <b>Bewertung:</b> {{ rec.rating }} / 5
           {% endif %}
           {% if rec.calories %}
-          🔥 **Kalorien:** {{ rec.calories }}
+          🔥 <b>Kalorien:</b> {{ rec.calories | e }}
           {% endif %}
           {% if rec.ingredients %}
-          🛒 **Zutaten:** {{ rec.ingredients[:6] | join(', ') }}
+          🛒 <b>Zutaten:</b> {{ rec.ingredients[:6] | join(', ') | e }}
           {% endif %}
         disable_notification: true
         inline_keyboard:
@@ -5172,40 +5166,42 @@
     - service: chefkoch_ha.get_recipe
       data:
         recipe_type: vegan
+        numbering: none
+        details:
+          - category
       response_variable: result
     - variables:
         rec: "{{ result.recipe if result is defined and result.recipe is defined else {} }}"
     - service: telegram_bot.send_message
       data:
         chat_id: "{{ trigger.event.data.chat_id }}"
+        parse_mode: html
         message: >
           {% set intros = [
-            "Pflanzliche Inspiration gefällig? 🌱",
-            "Vegan & lecker: 🧑‍🍳",
-            "Grüner Genuss für die Runde: ✨",
-            "Hier was Feines ohne Tierprodukte: 🥗",
-            "Frisch, vegan, genial: 🥑"
-          ] %}
-          {{ intros | random }}
+                      "Pflanzliche Inspiration gefällig? 🌱",
+                      "Vegan & lecker: 🧑‍🍳",
+                      "Grüner Genuss für die Runde: ✨",
+                      "Hier was Feines ohne Tierprodukte: 🥗",
+                      "Frisch, vegan, genial: 🥑"
+                    ] %}
+          {{ intros | random | e }}
 
-          🌱 **{{ rec.title | default('Veganes Chefkoch Rezept', true) }}** ({{ rec.category | default('Vegan', true) }})
-
-          🔗 {{ rec.url }}
+          🌱 {{ result.message_html if result is defined and result.message_html else 'Gerade nichts Passendes gefunden, versuch es nochmal 🙈' }}
 
           {% if rec.totalTime or rec.total_time %}
-          ⏱️ **Zubereitungszeit:** {{ rec.totalTime | default(rec.total_time, true) }}
+          ⏱️ <b>Zubereitungszeit:</b> {{ rec.totalTime | default(rec.total_time, true) }}
           {% endif %}
           {% if rec.difficulty %}
-          📊 **Schwierigkeit:** {{ rec.difficulty }}
+          📊 <b>Schwierigkeit:</b> {{ rec.difficulty | e }}
           {% endif %}
           {% if rec.rating %}
-          ⭐ **Bewertung:** {{ rec.rating }} / 5
+          ⭐ <b>Bewertung:</b> {{ rec.rating }} / 5
           {% endif %}
           {% if rec.calories %}
-          🔥 **Kalorien:** {{ rec.calories }}
+          🔥 <b>Kalorien:</b> {{ rec.calories | e }}
           {% endif %}
           {% if rec.ingredients %}
-          🛒 **Zutaten:** {{ rec.ingredients[:6] | join(', ') }}
+          🛒 <b>Zutaten:</b> {{ rec.ingredients[:6] | join(', ') | e }}
           {% endif %}
         disable_notification: true
         inline_keyboard:
@@ -5227,39 +5223,41 @@
     - service: chefkoch_ha.get_recipe
       data:
         recipe_type: weather
+        numbering: none
+        details:
+          - category
       response_variable: result
     - variables:
         rec: "{{ result.recipe if result is defined and result.recipe is defined else {} }}"
     - service: telegram_bot.send_message
       data:
         chat_id: "{{ trigger.event.data.chat_id }}"
+        parse_mode: html
         message: >
           {% set intros = [
-            "Passend zum aktuellen Wetter serviert: 🌦️",
-            "Saisonal abgestimmter Vorschlag: 🍂",
-            "Hier was Perfektes für das Wetter heute: 🧑‍🍳",
-            "Frische Wetter-Inspiration für die Küche: 🍲"
-          ] %}
-          {{ intros | random }}
+                      "Passend zum aktuellen Wetter serviert: 🌦️",
+                      "Saisonal abgestimmter Vorschlag: 🍂",
+                      "Hier was Perfektes für das Wetter heute: 🧑‍🍳",
+                      "Frische Wetter-Inspiration für die Küche: 🍲"
+                    ] %}
+          {{ intros | random | e }}
 
-          🌤️ **{{ rec.title | default('Wetter-Rezept', true) }}** ({{ rec.weather_category | default(rec.category, true) | default('Saisonal', true) }})
-
-          🔗 {{ rec.url }}
+          🌤️ {{ result.message_html if result is defined and result.message_html else 'Gerade nichts Passendes gefunden, versuch es nochmal 🙈' }}
 
           {% if rec.totalTime or rec.total_time %}
-          ⏱️ **Zubereitungszeit:** {{ rec.totalTime | default(rec.total_time, true) }}
+          ⏱️ <b>Zubereitungszeit:</b> {{ rec.totalTime | default(rec.total_time, true) }}
           {% endif %}
           {% if rec.difficulty %}
-          📊 **Schwierigkeit:** {{ rec.difficulty }}
+          📊 <b>Schwierigkeit:</b> {{ rec.difficulty | e }}
           {% endif %}
           {% if rec.rating %}
-          ⭐ **Bewertung:** {{ rec.rating }} / 5
+          ⭐ <b>Bewertung:</b> {{ rec.rating }} / 5
           {% endif %}
           {% if rec.calories %}
-          🔥 **Kalorien:** {{ rec.calories }}
+          🔥 <b>Kalorien:</b> {{ rec.calories | e }}
           {% endif %}
           {% if rec.ingredients %}
-          🛒 **Zutaten:** {{ rec.ingredients[:6] | join(', ') }}
+          🛒 <b>Zutaten:</b> {{ rec.ingredients[:6] | join(', ') | e }}
           {% endif %}
         disable_notification: true
         inline_keyboard:
@@ -6685,9 +6683,10 @@
 
 - id: track_ha_cover_command
   alias: "Rolladen SSOT: Track Authorized HA Commands"
-  description: "Records when Home Assistant, user, Google Home, or Hermes initiates a cover action"
+  description: "Tracks authorized HA, HomeKit, Voice, and Hermes cover commands & target positions per shutter"
   initial_state: true
   mode: queued
+  max: 20
   trigger:
     - platform: event
       event_type: call_service
@@ -6696,22 +6695,48 @@
   condition:
     - condition: template
       value_template: >
-        {{ trigger.event.data.service in ['open_cover', 'close_cover', 'set_cover_position', 'stop_cover', 'toggle'] }}
-    - condition: template
-      value_template: >
-        {{ state_attr('automation.rolladen_ssot_abort_external_movement', 'current') | default(0, true) == 0 and state_attr('automation.rolladen_ssot_block_07_00_provider_morning_schedule', 'current') | default(0, true) == 0 }}
+        {% set svc = trigger.event.data.service | default('') %}
+        {% set is_guard = (trigger.event.data.service_data | default({})).get('__ssot_guard', false) %}
+        {{ svc in ['open_cover', 'close_cover', 'set_cover_position', 'stop_cover', 'toggle'] and not is_guard }}
   action:
     - service: input_datetime.set_datetime
       target:
         entity_id: input_datetime.last_ha_cover_command
       data:
         timestamp: "{{ as_timestamp(now()) }}"
+    - condition: template
+      value_template: "{{ states('input_text.rolladen_ssot_targets') not in ['unknown', 'unavailable'] }}"
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.rolladen_ssot_targets
+      data:
+        value: >-
+          {% set raw = states('input_text.rolladen_ssot_targets') %}
+          {% set cur = (raw | from_json) if (raw and raw.startswith('{')) else {} %}
+          {% set svc = trigger.event.data.service | default('') %}
+          {% set sdata = trigger.event.data.service_data | default({}) %}
+          {% set raw_eids = sdata.get('entity_id', trigger.event.data.get('entity_id', [])) %}
+          {% set eids = [raw_eids] if raw_eids is string else (raw_eids if raw_eids is iterable else []) %}
+          {% set all_keys = ['schlafzimmer_gross','schlafzimmer_klein','wohnzimmer_links','wohnzimmer_rechts','kuche'] %}
+          {% set targets = all_keys if ('all' in eids or eids | length == 0) else (eids | map('replace', 'cover.', '') | list) %}
+          {% set pos = 100 if svc == 'open_cover' else (0 if svc == 'close_cover' else (sdata.get('position') if svc == 'set_cover_position' else none)) %}
+          {% set ns = namespace(d=dict(cur)) %}
+          {% if pos is not none %}
+            {% for k in all_keys %}
+              {% if k in targets %}
+                {% set ns.d = dict(ns.d, **{k: (pos | int)}) %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          {% set ns.d = dict(ns.d, **{'ha_ts': (as_timestamp(now()) | int)}) %}
+          {{ ns.d | to_json | replace(' ', '') }}
 
 - id: rolladen_ssot_guard
   alias: "Rolladen SSOT: Abort External Movement"
-  description: "Home Assistant is Single Source of Truth: automatically cancels and reverts external provider/hardware movements 24/7"
+  description: "Home Assistant is Single Source of Truth: intercepts unauthorized native TaHoma/cloud movements, restores HA target position, and sends deduplicated alerts"
   initial_state: true
   mode: parallel
+  max: 5
   trigger:
     - platform: state
       entity_id:
@@ -6722,117 +6747,115 @@
         - cover.kuche
       to:
         - "opening"
-        - "open"
         - "closing"
+    - platform: state
+      entity_id:
+        - cover.schlafzimmer_gross
+        - cover.schlafzimmer_klein
+        - cover.wohnzimmer_links
+        - cover.wohnzimmer_rechts
+        - cover.kuche
+      from: "closed"
+      to: "open"
+    - platform: state
+      entity_id:
+        - cover.schlafzimmer_gross
+        - cover.schlafzimmer_klein
+        - cover.wohnzimmer_links
+        - cover.wohnzimmer_rechts
+        - cover.kuche
+      from: "open"
+      to: "closed"
   condition:
-    # 1. Protection must be active (either helper)
+    # 1. Protection must be active
     - condition: template
       value_template: >
         {{ is_state('input_boolean.rolladen_ssot_active', 'on') or is_state('input_boolean.externe_rolladen_automationen_blockieren', 'on') }}
     # 2. Exclude reboot / unavailable transitions
     - condition: template
       value_template: >
-        {{ trigger.from_state is not none and trigger.from_state.state not in ['unavailable', 'unknown'] and trigger.to_state.state not in ['unavailable', 'unknown'] }}
-    # 3. Check if movement was authorized by Home Assistant or authorized user
+        {{ trigger.from_state is not none
+           and trigger.from_state.state not in ['unavailable', 'unknown']
+           and trigger.to_state.state not in ['unavailable', 'unknown'] }}
+    # 3. Only trigger on true external (TaHoma native app/cloud) commands:
+    #    - Not within 300s of an authorized HA command (accounts for Overkiz cloud polling lag up to 3m)
+    #    - Not within 180s of the guard's own corrective action (anti-loop)
+    #    - No HA user_id / parent_id on the state context
+    #    - Current position deviates by >10% from HA's last stored target position (when known)
     - condition: template
       value_template: >
+        {% set now_ts = as_timestamp(now()) %}
         {% set last_cmd = as_timestamp(states('input_datetime.last_ha_cover_command')) | default(0, true) %}
-        {% set is_ha_recent = (as_timestamp(now()) - last_cmd) <= 30 %}
+        {% set raw = states('input_text.rolladen_ssot_targets') %}
+        {% set meta = (raw | from_json) if (raw and raw.startswith('{')) else {} %}
+        {% set ha_ts = [last_cmd, (meta.get('ha_ts', 0) | float)] | max %}
+        {% set guard_ts = meta.get('guard_ts', 0) | float %}
+        {% set is_ha_recent = (now_ts - ha_ts) <= 300 %}
+        {% set is_guard_recent = (now_ts - guard_ts) <= 180 %}
         {% set has_user = trigger.to_state.context.user_id is not none %}
         {% set has_parent = trigger.to_state.context.parent_id is not none %}
-        {% set is_authorized = is_ha_recent or has_user or has_parent %}
-        {{ not is_authorized }}
+        {% set key = trigger.entity_id | replace('cover.', '') %}
+        {% set target_pos = meta.get(key, none) %}
+        {% set cur_pos = state_attr(trigger.entity_id, 'current_position') %}
+        {% set matches_target = (target_pos is not none and cur_pos is not none and ((cur_pos | int) - (target_pos | int)) | abs <= 10 and trigger.to_state.state not in ['opening', 'closing']) %}
+        {{ not (is_ha_recent or is_guard_recent or has_user or has_parent or matches_target) }}
   action:
-    # 1. Immediately halt the motor
+    # 1. Stamp guard_ts & alert cooldown atomically before issuing corrective cover calls
+    - variables:
+        shutter_key: "{{ trigger.entity_id | replace('cover.', '') }}"
+        raw_meta: "{{ states('input_text.rolladen_ssot_targets') }}"
+        parsed_meta: "{{ (raw_meta | from_json) if (raw_meta and raw_meta.startswith('{')) else {} }}"
+        desired_pos: >-
+          {% if shutter_key in parsed_meta %}
+            {{ parsed_meta[shutter_key] | int }}
+          {% elif trigger.from_state is not none and trigger.from_state.attributes.get('current_position') is not none %}
+            {{ trigger.from_state.attributes.get('current_position') | int }}
+          {% else %}
+            0
+          {% endif %}
+        should_alert: "{{ (as_timestamp(now()) - (parsed_meta.get('alert_ts', 0) | float)) > 120 }}"
+    - if:
+        - condition: template
+          value_template: "{{ states('input_text.rolladen_ssot_targets') not in ['unknown', 'unavailable'] }}"
+      then:
+        - service: input_text.set_value
+          target:
+            entity_id: input_text.rolladen_ssot_targets
+          data:
+            value: >-
+              {% set now_i = as_timestamp(now()) | int %}
+              {% set alert_i = now_i if should_alert else (parsed_meta.get('alert_ts', 0) | int) %}
+              {% set d = dict(parsed_meta, **{'guard_ts': now_i, 'alert_ts': alert_i}) %}
+              {{ d | to_json | replace(' ', '') }}
+    # 2. Stamp last_ha_cover_command so parallel Overkiz echoes don't re-trigger
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.last_ha_cover_command
+      data:
+        timestamp: "{{ as_timestamp(now()) }}"
+    # 3. Halt external movement & restore HA's desired target position
     - service: cover.stop_cover
       target:
         entity_id: "{{ trigger.entity_id }}"
-    # 2. Revert back to original position
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ trigger.to_state.state in ['opening', 'open'] or trigger.from_state.state == 'closed' }}"
-          sequence:
-            - delay: "00:00:01"
-            - service: cover.close_cover
-              target:
-                entity_id: "{{ trigger.entity_id }}"
-        - conditions:
-            - condition: template
-              value_template: "{{ trigger.to_state.state in ['closing'] or trigger.from_state.state == 'open' }}"
-          sequence:
-            - delay: "00:00:01"
-            - service: cover.open_cover
-              target:
-                entity_id: "{{ trigger.entity_id }}"
+    - delay: "00:00:02"
+    - service: cover.set_cover_position
+      target:
+        entity_id: "{{ trigger.entity_id }}"
+      data:
+        position: "{{ desired_pos | int }}"
+    # 4. Log & send deduplicated Telegram notification (max 1 alert per 2m burst)
     - service: logbook.log
       data:
         name: "Rolladen SSOT Schutz"
-        message: "Externer Fahrbefehl für {{ trigger.to_state.name }} sofort gestoppt & zurückgesetzt (Single Source of Truth: HA)."
+        message: "Externer TaHoma-Fahrbefehl für {{ trigger.to_state.name }} gestoppt -> Rückfahrt auf HA-Soll ({{ desired_pos }}%)."
         entity_id: "{{ trigger.entity_id }}"
-    - service: telegram_bot.send_message
-      continue_on_error: true
-      data:
-        chat_id: !secret telegram_chat_fabian
-        message: >
-          🛡️ *Rolladen-Schutz aktiv (24/7):* Externer Fahrbefehl (TaHoma) für *{{ trigger.to_state.name }}* wurde umgehend gestoppt und zurückgesetzt.
-
-- id: rolladen_block_0700_provider_open
-  alias: "Rolladen SSOT: Block 07:00 Provider Morning Schedule"
-  description: "Blocks the 07:00 Somfy/provider auto-open schedule completely until HA sunrise/workday schedule allows"
-  initial_state: true
-  mode: single
-  trigger:
-    - platform: time
-      at: "07:00:00"
-    - platform: time
-      at: "07:00:05"
-  condition:
-    - condition: template
-      value_template: >
-        {{ is_state('input_boolean.rolladen_ssot_active', 'on') or is_state('input_boolean.externe_rolladen_automationen_blockieren', 'on') }}
-    # Block if before allowed HA schedule (07:30 on workdays, 10:00 on weekends)
-    - condition: or
-      conditions:
-        - condition: and
-          conditions:
-            - condition: state
-              entity_id: binary_sensor.workday_sensor
-              state: "on"
-            - condition: time
-              before: "07:30:00"
-        - condition: and
-          conditions:
-            - condition: state
-              entity_id: binary_sensor.workday_sensor
-              state: "off"
-            - condition: time
-              before: "10:00:00"
-  action:
-    - delay: "00:00:02"
-    - repeat:
-        count: 3
-        sequence:
-          - choose:
-              - conditions:
-                  - condition: template
-                    value_template: >
-                      {% set covers = [
-                        'cover.schlafzimmer_gross',
-                        'cover.schlafzimmer_klein',
-                        'cover.wohnzimmer_links',
-                        'cover.wohnzimmer_rechts',
-                        'cover.kuche'
-                      ] %}
-                      {% set open_covers = covers | select('is_state', 'opening') | list + covers | select('is_state', 'open') | list %}
-                      {{ open_covers | length > 0 }}
-                sequence:
-                  - service: cover.close_cover
-                    target:
-                      entity_id:
-                        - cover.schlafzimmer_gross
-                        - cover.schlafzimmer_klein
-                        - cover.wohnzimmer_links
-                        - cover.wohnzimmer_rechts
-                        - cover.kuche
-          - delay: "00:00:04"
+    - if:
+        - condition: template
+          value_template: "{{ should_alert }}"
+      then:
+        - service: telegram_bot.send_message
+          continue_on_error: true
+          data:
+            chat_id: !secret telegram_chat_fabian
+            message: >
+              🛡️ *Rolladen-Schutz (HA SSOT):* Externer TaHoma-Befehl auf *{{ trigger.to_state.name }}* erkannt – gestoppt und auf HA-Sollposition (*{{ desired_pos }}%*) zurückgesetzt.
